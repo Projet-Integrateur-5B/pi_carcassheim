@@ -3,7 +3,7 @@
 ----
 
 ## Rejoignez-nous : &emsp; &darr; <img src="https://media.giphy.com/media/7ft4h1fBVyTYMXAN6Y/giphy.gif" width="60"> &darr; <img src="https://media.giphy.com/media/3V52SV0C5mnDKGVZmU/giphy.gif" width="60"> &darr; <br>
-<div style="text-align: center"><a href="https://twitter.com/Carcassheim"><img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white"></a><a href="https://www.instagram.com/carcassheim/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"></a><a href="https://www.twitch.tv/"><img src="https://img.shields.io/badge/Twitch-9146FF?style=for-the-badge&logo=twitch&logoColor=white"></a></div>
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; <a href="https://twitter.com/Carcassheim"><img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white"></a><a href="https://www.instagram.com/carcassheim/"><img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"></a><a href="https://www.twitch.tv/"><img src="https://img.shields.io/badge/Twitch-9146FF?style=for-the-badge&logo=twitch&logoColor=white"></a>
 
 ----
 
