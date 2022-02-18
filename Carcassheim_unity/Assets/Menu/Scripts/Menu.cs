@@ -17,8 +17,22 @@ public class Menu: MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
   public AudioSource soundSource;
   public Text soundText;
 
+  public GameObject ConnectState;
+  public Button StateButtonPlay;
+  public Button StateButtonStat;
+  public bool State;
+
   // Start is called before the first frame update
   void Start() {
+    State = false;
+    // Null Reference Exceptions WARNING (A résoudre !)
+    if (!State) { 
+      StateButtonPlay.interactable = !StateButtonPlay.interactable;
+      StateButtonStat.interactable = !StateButtonStat.interactable;
+      Debug.Log(StateButtonPlay.name);
+      Debug.Log(StateButtonStat.name);
+    }
+
     /* optionsMenu.SetActive(false); */
   }
 
@@ -28,23 +42,39 @@ public class Menu: MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
   }
 
   public void OnPointerEnter(PointerEventData eventData) {
-    Color newCol;
-
-    if (ColorUtility.TryParseHtmlString("#6F00FF", out newCol)) {
-      HighlightHere.GetComponent < Text > ().color = newCol;
-    } else {
-      HighlightHere.GetComponent < Text > ().color = Color.blue;
-    }
+    tryColor(HighlightHere, Color.blue, "#6F00FF");
   }
 
   public void OnPointerExit(PointerEventData eventData) {
+    tryColor(HighlightHere, Color.black, "#07062e");
+  }
+
+  /* ---------------------------------------------------------------------------------------------- */
+  /* ------------------------------------ MISCELLANEOUS methods ----------------------------------- */
+  /* ---------------------------------------------------------------------------------------------- */
+
+  public void tryColor(GameObject change, Color defaultColor, string coloration) {
     Color newCol;
 
-    if (ColorUtility.TryParseHtmlString("#07062e", out newCol)) {
-      HighlightHere.GetComponent < Text > ().color = newCol;
+    if (ColorUtility.TryParseHtmlString(coloration, out newCol)) {
+      change.GetComponent < Text > ().color = newCol;
     } else {
-      HighlightHere.GetComponent < Text > ().color = Color.black;
+      change.GetComponent < Text > ().color = defaultColor;
     }
+  }
+
+  /* ---------------------------------------------------------------------------------------------- */
+  /* ------------------------------------------- ACCUEIL ------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------- */
+
+  public void Connect() {
+    tryColor(ConnectState, Color.green, "#90EE90");
+    ConnectState.GetComponent < Text > ().text = "Connecte";
+    ConnectState.GetComponent < Text > ().transform.position = new Vector3(1275, 575, 0);
+    HighlightHere.SetActive(false);
+    StateButtonPlay.interactable = !StateButtonPlay.interactable;
+    StateButtonStat.interactable = !StateButtonStat.interactable;
+    Debug.Log("Connecté");
   }
 
   public void Jouer() {
@@ -66,6 +96,15 @@ public class Menu: MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     mainMenu.SetActive(true);
     HighlightHere.GetComponent < Text > ().color = Color.black;
   }
+
+  public void Quitter() {
+    Application.Quit();
+    Debug.Log("Quit!");
+  }
+
+  /* ---------------------------------------------------------------------------------------------- */
+  /* ------------------------------------------- OPTIONS ------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------- */
 
   public void SwitchMusic() {
     if (musicSource.volume > 0) {
@@ -100,8 +139,4 @@ public class Menu: MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
     Application.OpenURL("https://tinyurl.com/SlapDance");
   }
 
-  public void Quitter() {
-    Application.Quit();
-    Debug.Log("Quit!");
-  }
 }
