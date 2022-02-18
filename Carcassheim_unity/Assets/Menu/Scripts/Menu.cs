@@ -261,7 +261,7 @@ public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
                 tryColor (ConnectState, Color.green, "#90EE90");
                 ConnectState.GetComponent<Text> ().text = "Connecte";
                 ConnectState.GetComponent<Text> ().transform.position
-                    = new Vector3 (1275, 575, 0);
+                    = new Vector3 (1100, 575, 0);
                 StateButtonConnect.SetActive (false);
                 StateButtonPlay.GetComponent<Button> ().interactable = true;
                 StateButtonStat.GetComponent<Button> ().interactable = true;
