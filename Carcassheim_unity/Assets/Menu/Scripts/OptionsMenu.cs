@@ -54,6 +54,23 @@ public class OptionsMenu : MonoBehaviour
 		}
 	}
 
+	public void FlagsToggle() //affiche la langue du toggle enclenche
+	{
+		if (GameObject.Find("Toggle French").GetComponent<Toggle>().isOn == true)
+		{
+			Debug.Log("French");
+		}
+		else if (GameObject.Find("Toggle English").GetComponent<Toggle>().isOn == true)
+		{
+			Debug.Log("English");
+		}
+		else if (GameObject.Find("Toggle German").GetComponent<Toggle>().isOn == true)
+		{
+			Debug.Log("German");
+		}
+
+	}
+
 	public void FullScreen()
 	{
 		Screen.fullScreen = !Screen.fullScreen;

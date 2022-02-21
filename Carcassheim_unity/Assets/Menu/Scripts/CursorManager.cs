@@ -38,8 +38,11 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
-		btnText.color = previousColor;
+		if (GameObject.Find(name).GetComponent<Button>() != null) //comme les toggle n'ont pas de texte, on verifie que le gameobject soit bien un bouton pour effectuer le changement de la couleur du texte
+		{
+			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
+			btnText.color = previousColor;
+		}
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		switch (name)
 		{
@@ -65,6 +68,11 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 				break;
 			case "Btn Son":
 				option.SwitchSound();
+				break;
+			case "Toggle French":
+			case "Toggle English":
+			case "Toggle German":
+				option.FlagsToggle();
 				break;
 			case "Btn Musique":
 				option.SwitchMusic();
@@ -102,26 +110,33 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
-		tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-		if (!co.getState() && tmpBool)
+		if (GameObject.Find(name).GetComponent<Button>() != null)
 		{
-			ms.tryColorText(btnText, Color.grey, "#808080");
-		}
-		else
-		{
-			previousColor = btnText.color;
-			ms.tryColorText(btnText, Color.blue, "#1e90ff");
+			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
+
+			tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
+			if (!co.getState() && tmpBool)
+			{
+				ms.tryColorText(btnText, Color.grey, "#808080");
+			}
+			else
+			{
+				previousColor = btnText.color;
+				ms.tryColorText(btnText, Color.blue, "#1e90ff");
+			}
 		}
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		/* bool tmpBool = ms.StrCompare(name, "Btn Jouer")
-            || ms.StrCompare(name, "Btn Statistiques"); */
-		if (co.getState() || !tmpBool)
+		if (GameObject.Find(name).GetComponent<Button>() != null)
 		{
-			btnText.color = previousColor;
+			bool tmpBool = ms.StrCompare(name, "Btn Jouer")
+			   || ms.StrCompare(name, "Btn Statistiques");
+			if (co.getState() || !tmpBool)
+			{
+				btnText.color = previousColor;
+			}
 		}
 	}
 }
