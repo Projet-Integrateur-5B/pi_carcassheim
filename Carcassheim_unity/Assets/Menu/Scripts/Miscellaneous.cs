@@ -21,6 +21,11 @@ public class Miscellaneous : MonoBehaviour
 		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
 	}
 
+	public GameObject FindGoTool(string menu, string tool)
+	{
+		return FindMenu(menu).transform.Find(tool).gameObject;
+	}
+
 	public void tryColorText(Text change, Color defaultColor, string coloration)
 	{
 		Color newCol;
