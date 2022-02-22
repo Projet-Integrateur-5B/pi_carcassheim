@@ -6,6 +6,9 @@ public class Tuile
     int _nombreSlot;
     int[][] _lienSlotPosition;
 
+    public Slot[] Slot => _slots;
+    public int[][] LienSlotPosition => _lienSlotPosition;
+
     public int X { get; set; }
     public int Y { get; set; }
     public Rotation Rotation { get; set; }
@@ -13,7 +16,16 @@ public class Tuile
     public Tuile()
     {
         _slots = new Slot[_nombreSlot];
-        _lienSlotPosition = new int[_nombreSlot][];
+        _lienSlotPosition = new int[_nombreSlot][12];
 
+    }
+
+    public TypeTerrain[] TerrainSurFace(Rotation rot)
+    {
+        TypeTerrain[] resultat = new TypeTerrain[3];
+
+
+
+        return resultat;
     }
 }
