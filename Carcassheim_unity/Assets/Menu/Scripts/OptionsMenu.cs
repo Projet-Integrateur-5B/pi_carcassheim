@@ -8,12 +8,41 @@ public class OptionsMenu : MonoBehaviour
 {
 	private ConnectionMenu co;
 	private Miscellaneous ms;
+	private Button btnSon;
+	private Button btnMusique;
+	private AudioSource soundCtrl;
+	private AudioSource musicCtrl;
+	private Scrollbar soundScroll;
+	private Scrollbar musicScroll;
+	private Text pourcentSon;
+	private Text pourcentMusique;
+	private float previousSoundVol = 0.0f;
+	private float previousMusicVol = 0.0f;
+	private static bool tmpOnce = true;
+	float lastSoundValue = 0;
+	float lastMusicValue = 0;
 	// Start is called before the first frame update
 	void Start()
 	{
 		// SCRIPT :
 		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
 		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
+		/* if(ms.FindMenu("OptionsMenu").activeSelf) { */
+		btnSon = ms.FindGoTool("OptionsMenu", "Btn Son").GetComponent<Button>();
+		btnMusique = ms.FindGoTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
+		/* } */
+		soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
+		musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
+		soundScroll = ms.FindGoTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
+		musicScroll = ms.FindGoTool("OptionsMenu", "Scrollbar Musique").GetComponent<Scrollbar>();
+		pourcentSon = ms.FindGoTool("OptionsMenu", "Pourcent Son").GetComponent<Text>();
+		pourcentMusique = ms.FindGoTool("OptionsMenu", "Pourcent Musique").GetComponent<Text>();
+		defaultMusicSound();
+		//Subscribe to the Scrollbar event
+		soundScroll.onValueChanged.AddListener(soundScrollbarCallBack);
+		lastSoundValue = soundScroll.value;
+		musicScroll.onValueChanged.AddListener(musicScrollbarCallBack);
+		lastMusicValue = musicScroll.value;
 	}
 
 	// Update is called once per frame
@@ -26,51 +55,131 @@ public class OptionsMenu : MonoBehaviour
 		ms.changeMenu(ms.FindMenu("OptionsMenu"), ms.FindMenu("HomeMenu"));
 	}
 
-	public void SwitchMusic()
-	{
-		if (GameObject.Find("MusicController").GetComponent<AudioSource>().volume > 0)
-		{
-			GameObject.Find("MusicController").GetComponent<AudioSource>().volume = 0;
-			GameObject.Find("Btn Musique").GetComponent<Button>().GetComponentInChildren<Text>().text = "Musique 'OFF'";
-		}
-		else
-		{
-			GameObject.Find("MusicController").GetComponent<AudioSource>().volume = 100;
-			GameObject.Find("Btn Musique").GetComponent<Button>().GetComponentInChildren<Text>().text = "Musique 'ON'";
-		}
-	}
-
-	public void SwitchSound()
-	{
-		if (GameObject.Find("SoundController").GetComponent<AudioSource>().volume > 0)
-		{
-			GameObject.Find("SoundController").GetComponent<AudioSource>().volume = 0;
-			GameObject.Find("Btn Son").GetComponent<Button>().GetComponentInChildren<Text>().text = "Son 'OFF'";
-		}
-		else
-		{
-			GameObject.Find("SoundController").GetComponent<AudioSource>().volume = 100;
-			GameObject.Find("Btn Son").GetComponent<Button>().GetComponentInChildren<Text>().text = "Son 'ON'";
-		}
-	}
-
 	public void FlagsToggle() //affiche la langue du toggle enclenche
 	{
-		if (GameObject.Find("Toggle French").GetComponent<Toggle>().isOn == true)
+		// foreach
+		if (GameObject.Find("Toggle French").GetComponent<Toggle>().isOn)
 		{
 			Debug.Log("French");
 		}
-		else if (GameObject.Find("Toggle English").GetComponent<Toggle>().isOn == true)
+		else if (GameObject.Find("Toggle English").GetComponent<Toggle>().isOn)
 		{
 			Debug.Log("English");
 		}
-		else if (GameObject.Find("Toggle German").GetComponent<Toggle>().isOn == true)
+		else if (GameObject.Find("Toggle German").GetComponent<Toggle>().isOn)
 		{
 			Debug.Log("German");
 		}
-
 	}
 
+	//---------------------------- Music/Sound Begin ----------------------------//
+	public void volumeSound(float value)
+	{
+		soundCtrl.volume = value;
+		pourcentSon.text = Mathf.RoundToInt(value * 100) + "%";
+	}
+
+	public void volumeMusic(float value)
+	{
+		musicCtrl.volume = value;
+		pourcentMusique.text = Mathf.RoundToInt(value * 100) + "%";
+	}
+
+	public void displayVolumeSound(float value)
+	{
+		if (value > 0 /* && soundCtrl.isPlaying */)
+		{
+			btnSon.GetComponentInChildren<Text>().text = "Son 'ON'";
+		}
+		else
+		{
+			btnSon.GetComponentInChildren<Text>().text = "Son 'OFF'";
+		}
+
+		volumeSound(value);
+	}
+
+	public void displayVolumeMusic(float value)
+	{
+		if (value > 0)
+		{
+			btnMusique.GetComponentInChildren<Text>().text = "Musique 'ON'";
+		}
+		else
+		{
+			btnMusique.GetComponentInChildren<Text>().text = "Musique 'OFF'";
+		}
+
+		volumeMusic(value);
+	}
+
+	public void defaultMusicSound()
+	{
+		if (tmpOnce)
+		{
+			soundScroll.numberOfSteps = musicScroll.numberOfSteps = 11; // 0->10 = 11
+			soundCtrl.volume = musicCtrl.volume = soundScroll.value = musicScroll.value = 0.2f;
+			volumeSound(soundScroll.value);
+			volumeMusic(musicScroll.value);
+			tmpOnce = !tmpOnce;
+		}
+	}
+
+	//Will be called when Scrollbar changes
+	public void soundScrollbarCallBack(float value)
+	{
+		/*  if (lastSoundValue > value)
+        Debug.Log("Scrolling UP: " + value);
+    else
+        Debug.Log("Scrolling DOWN: " + value);
+*/
+		displayVolumeSound(value);
+	/* lastSoundValue = value; */
+	}
+
+	//Will be called when Scrollbar changes
+	public void musicScrollbarCallBack(float value)
+	{
+		displayVolumeMusic(value);
+	}
+
+	/* public void OnDisable()
+{
+    //Un-Subscribe To Scrollbar Event
+    soundScroll.onValueChanged.RemoveListener(soundScrollbarCallBack);
+	musicScroll.onValueChanged.RemoveListener(musicScrollbarCallBack);
+} */
+	public void SwitchSound()
+	{
+		if (soundScroll.value != 0)
+		{
+			previousSoundVol = soundCtrl.volume;
+			soundScroll.value = 0.0f;
+			soundScrollbarCallBack(soundScroll.value);
+		}
+		else
+		{
+			soundScroll.value = previousSoundVol;
+			soundScrollbarCallBack(previousSoundVol);
+		}
+	}
+
+	public void SwitchMusic()
+	{
+		if (musicScroll.value != 0)
+		{
+			previousMusicVol = musicCtrl.volume;
+			musicScroll.value = 0.0f;
+			musicScrollbarCallBack(musicScroll.value);
+		}
+		else
+		{
+			musicScroll.value = previousMusicVol;
+			musicScrollbarCallBack(previousMusicVol);
+		}
+	}
+
+	// -------------- Music/Sound End -----------------------//
 	public void FullScreen()
 	{
 		Screen.fullScreen = !Screen.fullScreen;

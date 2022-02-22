@@ -34,11 +34,12 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	// Update is called once per frame
 	void Update()
 	{
+
 	}
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>() != null) //comme les toggle n'ont pas de texte, on verifie que le gameobject soit bien un bouton pour effectuer le changement de la couleur du texte
+		if (GameObject.Find(name).GetComponent<Button>()) //pour bouttons (texte), et non toggle (pas de texte)
 		{
 			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
 			btnText.color = previousColor;
@@ -110,7 +111,7 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>() != null)
+		if (GameObject.Find(name).GetComponent<Button>())
 		{
 			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
 
@@ -129,7 +130,7 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>() != null)
+		if (GameObject.Find(name).GetComponent<Button>())
 		{
 			bool tmpBool = ms.StrCompare(name, "Btn Jouer")
 			   || ms.StrCompare(name, "Btn Statistiques");
