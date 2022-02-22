@@ -8,24 +8,19 @@ public class HomeMenu : MonoBehaviour
 {
 	private static ConnectionMenu co;
 	private static Miscellaneous ms;
-	private static bool initScripts = true;
 	// Start is called before the first frame update
 	void Start()
 	{
 		// SCRIPT :
-		if (initScripts)
-		{
-			ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
-			co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-			initScripts = false;
+		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
+		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
 		/* Debug.Log ("antiLoop"); */
-		}
-
+		/* GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponent<Button>().interactable = co.getState(); */
 		Color newCol;
 		if (!co.getState() && ms.FindMenu("HomeMenu").activeSelf)
 		{
-			GameObject.Find("Btn Jouer").GetComponent<Button>().interactable = co.getState();
-			GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponent<Button>().interactable = co.getState();
+			ms.FindGoTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = co.getState();
+			ms.FindGoTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = co.getState();
 			ColorUtility.TryParseHtmlString("#808080", out newCol);
 			GameObject.Find("Btn Jouer").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 			GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
