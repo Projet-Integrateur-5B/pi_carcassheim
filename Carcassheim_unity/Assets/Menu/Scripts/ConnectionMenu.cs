@@ -6,7 +6,6 @@ using UnityEngine.EventSystems;
 
 public class ConnectionMenu : MonoBehaviour
 {
-	private HomeMenu home;
 	private Miscellaneous ms;
 	private static bool State = false;
 	// Start is called before the first frame update
@@ -14,7 +13,6 @@ public class ConnectionMenu : MonoBehaviour
 	{
 		// SCRIPT :
 		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
-		home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
 	}
 
 	// Update is called once per frame
