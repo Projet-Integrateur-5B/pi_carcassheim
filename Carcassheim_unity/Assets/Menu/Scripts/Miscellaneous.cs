@@ -68,10 +68,10 @@ public class Miscellaneous : MonoBehaviour
 
 	public void changeMenu(GameObject close, GameObject goTo)
 	{
+		menuHasChanged = false;
 		close.SetActive(false);
 		goTo.SetActive(true);
 		menuHasChanged = true;
-		Debug.Log(" HHOOOEE" + menuHasChanged);
 	}
 
 	public bool StrCompare(string str1, string str2)

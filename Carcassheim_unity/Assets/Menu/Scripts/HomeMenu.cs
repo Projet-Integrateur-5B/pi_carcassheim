@@ -10,6 +10,11 @@ public class HomeMenu : ConnectionMenu // Reference a class in another script pr
 	// Start is called before the first frame update
 	void Start()
 	{
+	}
+
+	// Awake is called when the script object is initialised
+	void Awake()
+	{
 		Color newCol;
 		if (getState() == false && FindMenu("HomeMenu").activeSelf == true)
 		{
@@ -29,7 +34,7 @@ public class HomeMenu : ConnectionMenu // Reference a class in another script pr
 	public void Jouer()
 	{
 		randomIntColor(GameObject.Find("Etat de connexion"));
-		/* SceneManager.LoadScene("InGame"); */
+	/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void Statistiques()
