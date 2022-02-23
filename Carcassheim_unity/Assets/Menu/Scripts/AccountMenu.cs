@@ -5,18 +5,13 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 /* using System.Text.RegularExpressions; // needed for Regex */
-public class AccountMenu : MonoBehaviour
+public class AccountMenu : ConnectionMenu
 {
-	private static ConnectionMenu co;
-	private static Miscellaneous ms;
 	private static bool modif_y_text = false;
 	// Start is called before the first frame update
 	void Start()
 	{
-		// SCRIPT :
-		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
-		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-		if (ms.FindMenu("CreateAccountMenu").activeSelf == true)
+		if (FindMenu("CreateAccountMenu").activeSelf == true)
 		{
 			GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn = false;
 			InputField tmpDay = GameObject.Find("InputField Day CA").GetComponent<InputField>();
@@ -39,34 +34,34 @@ public class AccountMenu : MonoBehaviour
 	{
 		GameObject tmpGO = GameObject.Find("Create Account");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		ms.tryColor(tmpGO, Color.white, "f4fefe");
+		tryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Creez votre compte";
 	}
 
 	public void HideAccount()
 	{
 		resetWarningTextAM();
-		ms.changeMenu(ms.FindMenu("CreateAccountMenu"), ms.FindMenu("ConnectionMenu"));
+		changeMenu(FindMenu("CreateAccountMenu"), FindMenu("ConnectionMenu"));
 	}
 
 	public void HideAccountConnected()
 	{
 		resetWarningTextAM();
-		ms.changeMenu(ms.FindMenu("CreateAccountMenu"), ms.FindMenu("HomeMenu"));
-		co.Connected();
+		changeMenu(FindMenu("CreateAccountMenu"), FindMenu("HomeMenu"));
+		Connected();
 	}
 
 	public bool getInputFields()
 	{
-		bool a = ms.StrCompare(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text, "a");
-		bool b = ms.StrCompare(GameObject.Find("InputField Email CA").GetComponent<InputField>().text, "b");
-		bool c = ms.StrCompare(GameObject.Find("InputField Day CA").GetComponent<InputField>().text, "01");
-		bool d = ms.StrCompare(GameObject.Find("InputField Month CA").GetComponent<InputField>().text, "02");
-		bool e = ms.StrCompare(GameObject.Find("InputField Year CA").GetComponent<InputField>().text, "0304");
+		bool a = StrCompare(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text, "a");
+		bool b = StrCompare(GameObject.Find("InputField Email CA").GetComponent<InputField>().text, "b");
+		bool c = StrCompare(GameObject.Find("InputField Day CA").GetComponent<InputField>().text, "01");
+		bool d = StrCompare(GameObject.Find("InputField Month CA").GetComponent<InputField>().text, "02");
+		bool e = StrCompare(GameObject.Find("InputField Year CA").GetComponent<InputField>().text, "0304");
 		string tmpPwd = GameObject.Find("InputField Password CA").GetComponent<InputField>().text;
 		string tmpPwd2 = GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().text;
-		bool f = ms.StrCompare(tmpPwd, "c");
-		bool g = ms.StrCompare(tmpPwd2, tmpPwd);
+		bool f = StrCompare(tmpPwd, "c");
+		bool g = StrCompare(tmpPwd2, tmpPwd);
 		return a && b && c && d && e && f && g;
 	}
 
@@ -85,14 +80,14 @@ public class AccountMenu : MonoBehaviour
 			modif_y_text = true;
 		}
 		Text tmpText = tmpGO.GetComponent<Text>();
-		co.setState(tmpBool && getInputFields());
-		if (co.getState() == true)
+		setState(tmpBool && getInputFields());
+		if (getState() == true)
 		{
 			HideAccountConnected();
 		}
 		else
 		{
-			ms.randomIntColor(tmpGO);
+			randomIntColor(tmpGO);
 			tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
 		}
 	}

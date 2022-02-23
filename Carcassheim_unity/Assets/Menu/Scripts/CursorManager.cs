@@ -4,12 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+// include fonctions du script via la classe HomeMenu incluant elle meme (ConnectionMenu + Miscellaneous + Monobehaviour)
+public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-	private HomeMenu home;
 	private OptionsMenu option;
-	private ConnectionMenu co;
-	private Miscellaneous ms;
 	private AccountMenu acc;
 	private Texture2D cursorTexture;
 	private CursorMode cursorMode = CursorMode.Auto;
@@ -24,10 +22,7 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 		cursorTexture = Resources.Load("basic_01 BLUE") as Texture2D;
 		Cursor.SetCursor(cursorTexture, cursorHotspot, cursorMode);
 		// SCRIPT :
-		home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
 		option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
-		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
 		acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
 	}
 
@@ -40,8 +35,8 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	{
 		bool isToggle = GameObject.Find(name).GetComponent<Button>(); //pour bouttons (texte), et non toggle (pas de texte)
 		Debug.Log(isToggle);
-		tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-		bool tmp = (!co.getState() && !tmpBool) || co.getState();
+		tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
+		bool tmp = (!getState() && !tmpBool) || getState();
 		if (tmp)
 		{
 			if (isToggle)
@@ -52,21 +47,21 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 				{
 					// HomeMenu :
 					case "Btn Connexion":
-						home.ShowConnection();
+						ShowConnection();
 						break;
 					case "Btn Jouer":
-						if (co.getState())
-							home.Jouer();
+						if (getState())
+							Jouer();
 						break;
 					case "Btn Statistiques":
-						if (co.getState())
-							home.Statistiques();
+						if (getState())
+							Statistiques();
 						break;
 					case "Btn Options":
-						home.ShowOptions();
+						ShowOptions();
 						break;
 					case "Btn Quitter le jeu":
-						home.Quitter();
+						Quitter();
 						break;
 					// OptionsMenu :
 					case "Btn Retour Opt":
@@ -91,16 +86,16 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 						break;
 					// ConnectionMenu :
 					case "Btn Retour Co":
-						co.HideConnection();
+						HideConnection();
 						break;
 					case "Btn ForgottenPwdUser":
-						co.ForgottenPwdUser();
+						ForgottenPwdUser();
 						break;
 					case "Btn Se Connecter":
-						co.Connect();
+						Connect();
 						break;
 					case "Btn Creer un compte":
-						co.CreateAccount();
+						CreateAccount();
 						break;
 					// AccountMenu
 					case "Btn Retour Crea CA":
@@ -113,14 +108,14 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 						return;
 				}
 
-				if (ms.hasMenuChanged())
+				if (hasMenuChanged())
 				{
 					btnText.fontSize -= 3;
 					btnText.color = previousColor;
-					ms.setMenuChanged(false);
+					setMenuChanged(false);
 				}
 				else
-					ms.tryColorText(btnText, Color.blue, "#1e90ff");
+					tryColorText(btnText, Color.blue, "#1e90ff");
 			}
 
 			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
@@ -132,15 +127,15 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 		if (GameObject.Find(name).GetComponent<Button>())
 		{
 			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
-			tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-			if (!co.getState() && tmpBool)
+			tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
+			if (!getState() && tmpBool)
 			{
-				ms.tryColorText(btnText, Color.grey, "#808080");
+				tryColorText(btnText, Color.grey, "#808080");
 			}
 			else
 			{
 				previousColor = btnText.color;
-				ms.tryColorText(btnText, Color.blue, "#1e90ff");
+				tryColorText(btnText, Color.blue, "#1e90ff");
 				btnText.fontSize += 3;
 			}
 		}
@@ -150,8 +145,8 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	{
 		if (GameObject.Find(name).GetComponent<Button>())
 		{
-			bool tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-			if (co.getState() || !tmpBool)
+			bool tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
+			if (getState() || !tmpBool)
 			{
 				btnText.color = previousColor;
 				btnText.fontSize -= 3;

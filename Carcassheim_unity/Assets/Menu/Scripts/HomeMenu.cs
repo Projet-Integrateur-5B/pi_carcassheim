@@ -4,23 +4,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class HomeMenu : MonoBehaviour
+// include fonctions du script via la classe ConnectionMenu + (incluant elle même Miscellaneous + Monobehaviour)
+public class HomeMenu : ConnectionMenu // Reference a class in another script properly
 {
-	private static ConnectionMenu co;
-	private static Miscellaneous ms;
 	// Start is called before the first frame update
 	void Start()
 	{
-		// SCRIPT :
-		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
-		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-		/* Debug.Log ("antiLoop"); */
-		/* GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponent<Button>().interactable = co.getState(); */
 		Color newCol;
-		if (co.getState() == false && ms.FindMenu("HomeMenu").activeSelf == true)
+		if (getState() == false && FindMenu("HomeMenu").activeSelf == true)
 		{
-			ms.FindGoTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = co.getState();
-			ms.FindGoTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = co.getState();
+			FindGoTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = getState();
+			FindGoTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = getState();
 			ColorUtility.TryParseHtmlString("#808080", out newCol);
 			GameObject.Find("Btn Jouer").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 			GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
@@ -34,23 +28,23 @@ public class HomeMenu : MonoBehaviour
 
 	public void Jouer()
 	{
-		ms.randomIntColor(GameObject.Find("Etat de connexion"));
+		randomIntColor(GameObject.Find("Etat de connexion"));
 		/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void Statistiques()
 	{
-		ms.randomIntColor(GameObject.Find("Etat de connexion"));
+		randomIntColor(GameObject.Find("Etat de connexion"));
 	}
 
 	public void ShowOptions()
 	{
-		ms.changeMenu(ms.FindMenu("HomeMenu"), ms.FindMenu("OptionsMenu"));
+		changeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
 	}
 
 	public void ShowConnection()
 	{
-		ms.changeMenu(ms.FindMenu("HomeMenu"), ms.FindMenu("ConnectionMenu"));
+		changeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
 	}
 
 	public void Quitter()
