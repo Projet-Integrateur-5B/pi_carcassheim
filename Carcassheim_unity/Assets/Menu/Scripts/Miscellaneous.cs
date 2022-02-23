@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -28,7 +28,7 @@ public class Miscellaneous : MonoBehaviour
 	public void tryColorText(Text change, Color defaultColor, string coloration)
 	{
 		Color newCol;
-		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
+		if (ColorUtility.TryParseHtmlString(coloration, out newCol) == true)
 		{
 			change.color = newCol;
 		}
@@ -41,7 +41,7 @@ public class Miscellaneous : MonoBehaviour
 	public void tryColor(GameObject change, Color defaultColor, string coloration)
 	{
 		Color newCol;
-		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
+		if (ColorUtility.TryParseHtmlString(coloration, out newCol) == true)
 		{
 			change.GetComponent<Text>().color = newCol;
 		}
@@ -71,6 +71,6 @@ public class Miscellaneous : MonoBehaviour
 		);
 		int r = Random.Range(40, 70);
 		GO.GetComponent<Text>().color = randomColor;
-	/* GO.GetComponent<Text>().fontSize = r; */
+		/* GO.GetComponent<Text>().fontSize = r; */
 	}
 }

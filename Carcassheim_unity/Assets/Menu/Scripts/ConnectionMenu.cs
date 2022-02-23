@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -8,6 +8,7 @@ public class ConnectionMenu : MonoBehaviour
 {
 	private Miscellaneous ms;
 	private static bool State = false;
+	private static bool modif_y_text = false;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -56,7 +57,8 @@ public class ConnectionMenu : MonoBehaviour
 		Button tmpJouer = GameObject.Find("Btn Jouer").GetComponent<Button>();
 		ms.tryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
-		GameObject.Find("Etat de connexion").transform.position = new Vector3(1250, 475, 0);
+		//on place le texte Connecte la ou il y avait le bouton Se connecter
+		GameObject.Find("Etat de connexion").transform.position = GameObject.Find("Btn Connexion").transform.position;
 		GameObject.Find("Btn Connexion").SetActive(false);
 		tmpJouer.interactable = true;
 		tmpStat.interactable = true;
@@ -72,8 +74,16 @@ public class ConnectionMenu : MonoBehaviour
 		bool b = ms.StrCompare(GameObject.Find("InputField Password").GetComponent<InputField>().text, "World");
 		State = a && b;
 		GameObject tmpGO = GameObject.Find("Instructions");
+		//idem que dans AccountMenu 
+		if (modif_y_text == false)
+		{
+			Vector3 up_y = new Vector3(0, tmpGO.GetComponent<RectTransform>().rect.height / 4, 0) + tmpGO.transform.position;
+			tmpGO.transform.position = up_y;
+			modif_y_text = true;
+		}
+
 		Text tmpText = tmpGO.GetComponent<Text>();
-		if (State)
+		if (State == true)
 		{
 			HideConnection();
 			Connected();

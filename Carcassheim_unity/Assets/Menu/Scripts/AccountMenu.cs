@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -9,13 +9,14 @@ public class AccountMenu : MonoBehaviour
 {
 	private static ConnectionMenu co;
 	private static Miscellaneous ms;
+	private static bool modif_y_text = false;
 	// Start is called before the first frame update
 	void Start()
 	{
 		// SCRIPT :
 		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
 		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-		if (ms.FindMenu("CreateAccountMenu").activeSelf)
+		if (ms.FindMenu("CreateAccountMenu").activeSelf == true)
 		{
 			GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn = false;
 			InputField tmpDay = GameObject.Find("InputField Day CA").GetComponent<InputField>();
@@ -24,8 +25,8 @@ public class AccountMenu : MonoBehaviour
 			tmpDay2.characterLimit = 2;
 			InputField tmpDay3 = GameObject.Find("InputField Year CA").GetComponent<InputField>();
 			tmpDay3.characterLimit = 4;
-		/*  InputField.CharacterValidation =  tmpDay.CharacterValidation.None; */
-		/* Regex.Replace(tmpDay.text, @"[^a-zA-Z0-9 ]", ""); */
+			/*  InputField.CharacterValidation =  tmpDay.CharacterValidation.None; */
+			/* Regex.Replace(tmpDay.text, @"[^a-zA-Z0-9 ]", ""); */
 		}
 	}
 
@@ -73,9 +74,19 @@ public class AccountMenu : MonoBehaviour
 	{
 		bool tmpBool = GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn;
 		GameObject tmpGO = GameObject.Find("Create Account");
+		//le texte etait coup car trop long (debordait sur le formulaire)
+		//donc pour rendre le code portable et utilisable peu importe la taille du texte
+		//on modifie la position du texte en ajoutant a sa coordonne y la moitie de sa hauteur pour que le texte ne deborde plus
+		//le bool modif_y_text est la pour que l'ajout en y ne se fasse qu'une seule fois
+		if (modif_y_text == false)
+		{
+			Vector3 up_y = new Vector3(0, tmpGO.GetComponent<RectTransform>().rect.height / 2, 0) + tmpGO.transform.position;
+			tmpGO.transform.position = up_y;
+			modif_y_text = true;
+		}
 		Text tmpText = tmpGO.GetComponent<Text>();
 		co.setState(tmpBool && getInputFields());
-		if (co.getState())
+		if (co.getState() == true)
 		{
 			HideAccountConnected();
 		}

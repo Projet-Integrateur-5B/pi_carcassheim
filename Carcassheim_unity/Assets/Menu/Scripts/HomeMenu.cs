@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -17,7 +17,7 @@ public class HomeMenu : MonoBehaviour
 		/* Debug.Log ("antiLoop"); */
 		/* GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponent<Button>().interactable = co.getState(); */
 		Color newCol;
-		if (!co.getState() && ms.FindMenu("HomeMenu").activeSelf)
+		if (co.getState() == false && ms.FindMenu("HomeMenu").activeSelf == true)
 		{
 			ms.FindGoTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = co.getState();
 			ms.FindGoTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = co.getState();
@@ -35,7 +35,7 @@ public class HomeMenu : MonoBehaviour
 	public void Jouer()
 	{
 		ms.randomIntColor(GameObject.Find("Etat de connexion"));
-	/* SceneManager.LoadScene("InGame"); */
+		/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void Statistiques()

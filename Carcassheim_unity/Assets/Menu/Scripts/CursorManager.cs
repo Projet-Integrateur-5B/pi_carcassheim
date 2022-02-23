@@ -1,5 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -17,7 +17,7 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	private Color previousColor;
 	private Text btnText;
 	private bool tmpBool;
-	private bool tmpHasExit;
+	//private bool tmpHasExit;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -42,24 +42,24 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 		tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
 		bool tmp = (!co.getState() && !tmpBool) || co.getState();
 		/* Debug.Log(tmp); */
-		if (tmp)
+		if (tmp == true)
 		{
-			if (GameObject.Find(name).GetComponent<Button>()) //pour bouttons (texte), et non toggle (pas de texte)
+			if (GameObject.Find(name).GetComponent<Button>() != null) //pour bouttons (texte), et non toggle (pas de texte)
 			{
 				btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
 				bool tmpa = GameObject.Find(name).transform.parent.gameObject.activeSelf;
-				if (/* !tmpa */true)
+				if ( /* !tmpa */true)
 				{
 					btnText.color = previousColor;
 					Debug.Log("PAS ACTIF");
 				}
-				else
-				{
-					if (!tmpHasExit)
+				/*else
 					{
-						ms.tryColorText(btnText, Color.blue, "#1e90ff");
-					}
-				}
+						if (!tmpHasExit)
+						{
+							ms.tryColorText(btnText, Color.blue, "#1e90ff");
+						}
+					}*/
 			}
 
 			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
@@ -133,11 +133,11 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>())
+		if (GameObject.Find(name).GetComponent<Button>() != null)
 		{
 			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
 			tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-			if (!co.getState() && tmpBool)
+			if (co.getState() == false && tmpBool == true)
 			{
 				ms.tryColorText(btnText, Color.grey, "#808080");
 			}
@@ -146,22 +146,20 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 				previousColor = btnText.color;
 				ms.tryColorText(btnText, Color.blue, "#1e90ff");
 			}
-
-			tmpHasExit = false;
+			//tmpHasExit = false;
 		}
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>())
+		if (GameObject.Find(name).GetComponent<Button>() != null)
 		{
 			bool tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-			if (co.getState() || !tmpBool)
+			if (co.getState() == true || tmpBool == false)
 			{
 				btnText.color = previousColor;
 			}
-
-			tmpHasExit = true;
+			//tmpHasExit = true;
 		}
 	}
 }
