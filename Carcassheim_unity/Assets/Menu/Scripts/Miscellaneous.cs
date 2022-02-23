@@ -1,11 +1,13 @@
-/*using System.Collections;
-using System.Collections.Generic;*/
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Miscellaneous : MonoBehaviour
 {
+	/* public static GameObject currentActivMenu = FindMenu("HomeMenu"); */
+	private static bool menuHasChanged = false;
 	void Start()
 	{
 	}
@@ -15,6 +17,19 @@ public class Miscellaneous : MonoBehaviour
 	{
 	}
 
+	public void setMenuChanged(bool b)
+	{
+		menuHasChanged = b;
+	}
+
+	public bool hasMenuChanged()
+	{
+		return menuHasChanged;
+	}
+
+	/* public GameObject getCurrentMenu() {
+		return currentActivMenu;
+	} */
 	public GameObject FindMenu(string menu)
 	{
 		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
@@ -28,7 +43,7 @@ public class Miscellaneous : MonoBehaviour
 	public void tryColorText(Text change, Color defaultColor, string coloration)
 	{
 		Color newCol;
-		if (ColorUtility.TryParseHtmlString(coloration, out newCol) == true)
+		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
 		{
 			change.color = newCol;
 		}
@@ -41,7 +56,7 @@ public class Miscellaneous : MonoBehaviour
 	public void tryColor(GameObject change, Color defaultColor, string coloration)
 	{
 		Color newCol;
-		if (ColorUtility.TryParseHtmlString(coloration, out newCol) == true)
+		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
 		{
 			change.GetComponent<Text>().color = newCol;
 		}
@@ -55,6 +70,8 @@ public class Miscellaneous : MonoBehaviour
 	{
 		close.SetActive(false);
 		goTo.SetActive(true);
+		menuHasChanged = true;
+		Debug.Log(" HHOOOEE" + menuHasChanged);
 	}
 
 	public bool StrCompare(string str1, string str2)
@@ -71,6 +88,6 @@ public class Miscellaneous : MonoBehaviour
 		);
 		int r = Random.Range(40, 70);
 		GO.GetComponent<Text>().color = randomColor;
-		/* GO.GetComponent<Text>().fontSize = r; */
+	/* GO.GetComponent<Text>().fontSize = r; */
 	}
 }

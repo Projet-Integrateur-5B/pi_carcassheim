@@ -1,5 +1,5 @@
-/*using System.Collections;
-using System.Collections.Generic;*/
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -17,7 +17,6 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 	private Color previousColor;
 	private Text btnText;
 	private bool tmpBool;
-	//private bool tmpHasExit;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -39,105 +38,102 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
+		bool isToggle = GameObject.Find(name).GetComponent<Button>(); //pour bouttons (texte), et non toggle (pas de texte)
+		Debug.Log(isToggle);
 		tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
 		bool tmp = (!co.getState() && !tmpBool) || co.getState();
-		/* Debug.Log(tmp); */
-		if (tmp == true)
+		if (tmp)
 		{
-			if (GameObject.Find(name).GetComponent<Button>() != null) //pour bouttons (texte), et non toggle (pas de texte)
+			if (isToggle)
 			{
 				btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
-				bool tmpa = GameObject.Find(name).transform.parent.gameObject.activeSelf;
-				if ( /* !tmpa */true)
+
+				switch (name)
 				{
-					btnText.color = previousColor;
-					Debug.Log("PAS ACTIF");
+					// HomeMenu :
+					case "Btn Connexion":
+						home.ShowConnection();
+						break;
+					case "Btn Jouer":
+						if (co.getState())
+							home.Jouer();
+						break;
+					case "Btn Statistiques":
+						if (co.getState())
+							home.Statistiques();
+						break;
+					case "Btn Options":
+						home.ShowOptions();
+						break;
+					case "Btn Quitter le jeu":
+						home.Quitter();
+						break;
+					// OptionsMenu :
+					case "Btn Retour Opt":
+						option.HideOptions();
+						break;
+					case "Btn Son":
+						option.SwitchSound();
+						break;
+					case "Toggle French":
+					case "Toggle English":
+					case "Toggle German":
+						option.FlagsToggle();
+						break;
+					case "Btn Musique":
+						option.SwitchMusic();
+						break;
+					case "Btn Fenêtré":
+						option.FullScreen();
+						break;
+					case "Btn Aide":
+						option.Help();
+						break;
+					// ConnectionMenu :
+					case "Btn Retour Co":
+						co.HideConnection();
+						break;
+					case "Btn ForgottenPwdUser":
+						co.ForgottenPwdUser();
+						break;
+					case "Btn Se Connecter":
+						co.Connect();
+						break;
+					case "Btn Creer un compte":
+						co.CreateAccount();
+						break;
+					// AccountMenu
+					case "Btn Retour Crea CA":
+						acc.HideAccount();
+						break;
+					case "Btn Creer votre compte":
+						acc.CreateAccountConnected();
+						break;
+					default:
+						return;
 				}
-				/*else
-					{
-						if (!tmpHasExit)
-						{
-							ms.tryColorText(btnText, Color.blue, "#1e90ff");
-						}
-					}*/
+
+				if (ms.hasMenuChanged())
+				{
+					btnText.fontSize -= 3;
+					btnText.color = previousColor;
+					ms.setMenuChanged(false);
+				}
+				else
+					ms.tryColorText(btnText, Color.blue, "#1e90ff");
 			}
 
 			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
-		}
-
-		switch (name)
-		{
-			// HomeMenu :
-			case "Btn Connexion":
-				home.ShowConnection();
-				break;
-			case "Btn Jouer":
-				if (co.getState())
-					home.Jouer();
-				break;
-			case "Btn Statistiques":
-				if (co.getState())
-					home.Statistiques();
-				break;
-			case "Btn Options":
-				home.ShowOptions();
-				break;
-			case "Btn Quitter le jeu":
-				home.Quitter();
-				break;
-			// OptionsMenu :
-			case "Btn Retour Opt":
-				option.HideOptions();
-				break;
-			case "Btn Son":
-				option.SwitchSound();
-				break;
-			case "Toggle French":
-			case "Toggle English":
-			case "Toggle German":
-				option.FlagsToggle();
-				break;
-			case "Btn Musique":
-				option.SwitchMusic();
-				break;
-			case "Btn Fenêtré":
-				option.FullScreen();
-				break;
-			case "Btn Aide":
-				option.Help();
-				break;
-			// ConnectionMenu :
-			case "Btn Retour Co":
-				co.HideConnection();
-				break;
-			case "Btn ForgottenPwdUser":
-				co.ForgottenPwdUser();
-				break;
-			case "Btn Se Connecter":
-				co.Connect();
-				break;
-			case "Btn Creer un compte":
-				co.CreateAccount();
-				break;
-			// AccountMenu
-			case "Btn Retour Crea CA":
-				acc.HideAccount();
-				break;
-			case "Btn Creer votre compte":
-				acc.CreateAccountConnected();
-				break;
-			default:
-				return;
 		}
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>() != null)
+		if (GameObject.Find(name).GetComponent<Button>())
 		{
 			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
 			tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-			if (co.getState() == false && tmpBool == true)
+			if (!co.getState() && tmpBool)
 			{
 				ms.tryColorText(btnText, Color.grey, "#808080");
 			}
@@ -145,21 +141,21 @@ public class CursorManager : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 			{
 				previousColor = btnText.color;
 				ms.tryColorText(btnText, Color.blue, "#1e90ff");
+				btnText.fontSize += 3;
 			}
-			//tmpHasExit = false;
 		}
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		if (GameObject.Find(name).GetComponent<Button>() != null)
+		if (GameObject.Find(name).GetComponent<Button>())
 		{
 			bool tmpBool = ms.StrCompare(name, "Btn Jouer") || ms.StrCompare(name, "Btn Statistiques");
-			if (co.getState() == true || tmpBool == false)
+			if (co.getState() || !tmpBool)
 			{
 				btnText.color = previousColor;
+				btnText.fontSize -= 3;
 			}
-			//tmpHasExit = true;
 		}
 	}
 }
