@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class Miscellaneous : MonoBehaviour
 {
-	/* public static GameObject currentActivMenu = FindMenu("HomeMenu"); */
+	private GameObject GOtoFind;
 	private static bool menuHasChanged = false;
 	void Start()
 	{
@@ -27,9 +27,19 @@ public class Miscellaneous : MonoBehaviour
 		return menuHasChanged;
 	}
 
-	/* public GameObject getCurrentMenu() {
-		return currentActivMenu;
-	} */
+	public GameObject getCurrentMenu()
+	{
+		GOtoFind = GameObject.Find("SubMenus");
+		for (int i = 0; i < GOtoFind.transform.childCount; i++)
+			if (GOtoFind.transform.GetChild(i).gameObject.activeSelf)
+			{
+				GOtoFind = GOtoFind.transform.GetChild(i).gameObject;
+				break;
+			}
+
+		return GOtoFind;
+	}
+
 	public GameObject FindMenu(string menu)
 	{
 		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
