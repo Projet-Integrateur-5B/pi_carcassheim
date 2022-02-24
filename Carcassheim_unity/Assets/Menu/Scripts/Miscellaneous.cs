@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 
 public class Miscellaneous : MonoBehaviour
 {
+	/* public static GameObject currentActivMenu = FindMenu("HomeMenu"); */
+	private static bool menuHasChanged = false;
 	void Start()
 	{
 	}
@@ -15,6 +17,19 @@ public class Miscellaneous : MonoBehaviour
 	{
 	}
 
+	public void setMenuChanged(bool b)
+	{
+		menuHasChanged = b;
+	}
+
+	public bool hasMenuChanged()
+	{
+		return menuHasChanged;
+	}
+
+	/* public GameObject getCurrentMenu() {
+		return currentActivMenu;
+	} */
 	public GameObject FindMenu(string menu)
 	{
 		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
@@ -53,8 +68,10 @@ public class Miscellaneous : MonoBehaviour
 
 	public void changeMenu(GameObject close, GameObject goTo)
 	{
+		menuHasChanged = false;
 		close.SetActive(false);
 		goTo.SetActive(true);
+		menuHasChanged = true;
 	}
 
 	public bool StrCompare(string str1, string str2)

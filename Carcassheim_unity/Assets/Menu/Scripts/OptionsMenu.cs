@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class OptionsMenu : MonoBehaviour
+public class OptionsMenu : Miscellaneous
 {
-	private ConnectionMenu co;
-	private Miscellaneous ms;
 	private Button btnSon;
 	private Button btnMusique;
 	private AudioSource soundCtrl;
@@ -24,19 +22,15 @@ public class OptionsMenu : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		// SCRIPT :
-		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
-		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-		/* if(ms.FindMenu("OptionsMenu").activeSelf) { */
-		btnSon = ms.FindGoTool("OptionsMenu", "Btn Son").GetComponent<Button>();
-		btnMusique = ms.FindGoTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
-		/* } */
+		btnSon = FindGoTool("OptionsMenu", "Btn Son").GetComponent<Button>();
+		btnMusique = FindGoTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
+		
 		soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
 		musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
-		soundScroll = ms.FindGoTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
-		musicScroll = ms.FindGoTool("OptionsMenu", "Scrollbar Musique").GetComponent<Scrollbar>();
-		pourcentSon = ms.FindGoTool("OptionsMenu", "Pourcent Son").GetComponent<Text>();
-		pourcentMusique = ms.FindGoTool("OptionsMenu", "Pourcent Musique").GetComponent<Text>();
+		soundScroll = FindGoTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
+		musicScroll = FindGoTool("OptionsMenu", "Scrollbar Musique").GetComponent<Scrollbar>();
+		pourcentSon = FindGoTool("OptionsMenu", "Pourcent Son").GetComponent<Text>();
+		pourcentMusique = FindGoTool("OptionsMenu", "Pourcent Musique").GetComponent<Text>();
 		defaultMusicSound();
 		//Subscribe to the Scrollbar event
 		soundScroll.onValueChanged.AddListener(soundScrollbarCallBack);
@@ -52,21 +46,21 @@ public class OptionsMenu : MonoBehaviour
 
 	public void HideOptions()
 	{
-		ms.changeMenu(ms.FindMenu("OptionsMenu"), ms.FindMenu("HomeMenu"));
+		changeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
 	}
 
 	public void FlagsToggle() //affiche la langue du toggle enclenche
 	{
 		// foreach
-		if (GameObject.Find("Toggle French").GetComponent<Toggle>().isOn)
+		if (GameObject.Find("Toggle French").GetComponent<Toggle>().isOn == true)
 		{
 			Debug.Log("French");
 		}
-		else if (GameObject.Find("Toggle English").GetComponent<Toggle>().isOn)
+		else if (GameObject.Find("Toggle English").GetComponent<Toggle>().isOn == true)
 		{
 			Debug.Log("English");
 		}
-		else if (GameObject.Find("Toggle German").GetComponent<Toggle>().isOn)
+		else if (GameObject.Find("Toggle German").GetComponent<Toggle>().isOn == true)
 		{
 			Debug.Log("German");
 		}
@@ -115,7 +109,7 @@ public class OptionsMenu : MonoBehaviour
 
 	public void defaultMusicSound()
 	{
-		if (tmpOnce)
+		if (tmpOnce == true)
 		{
 			soundScroll.numberOfSteps = musicScroll.numberOfSteps = 11; // 0->10 = 11
 			soundCtrl.volume = musicCtrl.volume = soundScroll.value = musicScroll.value = 0.2f;
@@ -134,7 +128,7 @@ public class OptionsMenu : MonoBehaviour
         Debug.Log("Scrolling DOWN: " + value);
 */
 		displayVolumeSound(value);
-	/* lastSoundValue = value; */
+		/* lastSoundValue = value; */
 	}
 
 	//Will be called when Scrollbar changes

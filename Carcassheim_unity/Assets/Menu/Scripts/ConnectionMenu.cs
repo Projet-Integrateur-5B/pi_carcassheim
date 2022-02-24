@@ -1,18 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
+/*using System.Collections;
+using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class ConnectionMenu : MonoBehaviour
+public class ConnectionMenu : Miscellaneous 
 {
-	private Miscellaneous ms;
 	private static bool State = false;
+	private static bool modif_y_text = false;
 	// Start is called before the first frame update
 	void Start()
 	{
-		// SCRIPT :
-		ms = gameObject.AddComponent(typeof(Miscellaneous)) as Miscellaneous;
 	}
 
 	// Update is called once per frame
@@ -34,14 +32,14 @@ public class ConnectionMenu : MonoBehaviour
 	{
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		ms.tryColor(tmpGO, Color.white, "f4fefe");
+		tryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Connectez vous";
 	}
 
 	public void HideConnection()
 	{
 		resetWarningTextCM();
-		ms.changeMenu(ms.FindMenu("ConnectionMenu"), ms.FindMenu("HomeMenu"));
+		changeMenu(FindMenu("ConnectionMenu"), FindMenu("HomeMenu"));
 	}
 
 	public void ForgottenPwdUser()
@@ -54,9 +52,10 @@ public class ConnectionMenu : MonoBehaviour
 		Color newCol;
 		Button tmpStat = GameObject.Find("Btn Statistiques").GetComponent<Button>();
 		Button tmpJouer = GameObject.Find("Btn Jouer").GetComponent<Button>();
-		ms.tryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
+		tryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
-		GameObject.Find("Etat de connexion").transform.position = new Vector3(1250, 475, 0);
+		//on place le texte Connecte la ou il y avait le bouton Se connecter
+		GameObject.Find("Etat de connexion").transform.position = GameObject.Find("Btn Connexion").transform.position;
 		GameObject.Find("Btn Connexion").SetActive(false);
 		tmpJouer.interactable = true;
 		tmpStat.interactable = true;
@@ -68,19 +67,27 @@ public class ConnectionMenu : MonoBehaviour
 
 	public void Connect()
 	{
-		bool a = ms.StrCompare(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text, "Hello");
-		bool b = ms.StrCompare(GameObject.Find("InputField Password").GetComponent<InputField>().text, "World");
+		bool a = StrCompare(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text, "Hello");
+		bool b = StrCompare(GameObject.Find("InputField Password").GetComponent<InputField>().text, "World");
 		State = a && b;
 		GameObject tmpGO = GameObject.Find("Instructions");
+		//idem que dans AccountMenu 
+		if (modif_y_text == false)
+		{
+			Vector3 up_y = new Vector3(0, tmpGO.GetComponent<RectTransform>().rect.height / 4, 0) + tmpGO.transform.position;
+			tmpGO.transform.position = up_y;
+			modif_y_text = true;
+		}
+
 		Text tmpText = tmpGO.GetComponent<Text>();
-		if (State)
+		if (State == true)
 		{
 			HideConnection();
 			Connected();
 		}
 		else
 		{
-			ms.randomIntColor(tmpGO);
+			randomIntColor(tmpGO);
 			tmpText.text = "Ressaissiez votre login et votre mot de passe !";
 		}
 	}
@@ -89,8 +96,8 @@ public class ConnectionMenu : MonoBehaviour
 	{
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		ms.tryColor(tmpGO, Color.white, "f4fefe");
+		tryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Connectez vous";
-		ms.changeMenu(ms.FindMenu("ConnectionMenu"), ms.FindMenu("CreateAccountMenu"));
+		changeMenu(FindMenu("ConnectionMenu"), FindMenu("CreateAccountMenu"));
 	}
 }
