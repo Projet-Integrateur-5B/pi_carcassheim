@@ -97,11 +97,12 @@ public class Miscellaneous : MonoBehaviour
 		//comme les string sont immutable, on doit passer par une autre string
 		string modif = "";
 		//on verifie que la string ne soit pas vide
-		if(mot.Length > 1)
-        {
+		if (mot.Length > 1)
+		{
 			//on enleve tous les caracteres ' ' a la fin du mot
 			modif = mot.TrimEnd();
-        }
-		return modif;
+			return modif;
+		}
+		else return mot;
 	}
 }
