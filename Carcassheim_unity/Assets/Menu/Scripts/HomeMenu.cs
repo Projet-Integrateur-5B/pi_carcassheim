@@ -37,9 +37,9 @@ public class HomeMenu : ConnectionMenu // Reference a class in another script pr
 	/* SceneManager.LoadScene("InGame"); */
 	}
 
-	public void Statistiques()
+	public void ShowStatistiques()
 	{
-		randomIntColor(GameObject.Find("Etat de connexion"));
+		changeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
 	}
 
 	public void ShowOptions()

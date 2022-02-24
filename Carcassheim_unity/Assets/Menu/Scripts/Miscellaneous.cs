@@ -82,12 +82,26 @@ public class Miscellaneous : MonoBehaviour
 	public void randomIntColor(GameObject GO)
 	{
 		Color randomColor = new Color(Random.Range(0f, 1f), // Red
- Random.Range(0f, 1f), // Green
- Random.Range(0f, 1f), // Blue
- 1 // Alpha (transparency)
+		Random.Range(0f, 1f), // Green
+		Random.Range(0f, 1f), // Blue
+		1 // Alpha (transparency)
 		);
 		int r = Random.Range(40, 70);
 		GO.GetComponent<Text>().color = randomColor;
-	/* GO.GetComponent<Text>().fontSize = r; */
+	 /* GO.GetComponent<Text>().fontSize = r; */
+	}
+
+	//methode a ne pas utiliser pour les mots de passe car dans ceux-ci le caractere ' ' est compte comme un vrai caractere
+	public string removeLastSpace(string mot)
+    {
+		//comme les string sont immutable, on doit passer par une autre string
+		string modif = "";
+		//on verifie que la string ne soit pas vide
+		if(mot.Length > 1)
+        {
+			//on enleve tous les caracteres ' ' a la fin du mot
+			modif = mot.TrimEnd();
+        }
+		return modif;
 	}
 }

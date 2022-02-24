@@ -49,6 +49,11 @@ public class OptionsMenu : Miscellaneous
 		changeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
 	}
 
+	public void ShowCredits()
+	{
+		changeMenu(FindMenu("OptionsMenu"), FindMenu("CreditsMenu"));
+	}
+
 	public void FlagsToggle() //affiche la langue du toggle enclenche
 	{
 		// foreach

@@ -51,10 +51,27 @@ public class AccountMenu : ConnectionMenu
 		Connected();
 	}
 
+	public void HideShowPwdConf()
+	{
+		if (GameObject.Find("Toggle AfficherMdp CA").GetComponent<Toggle>().isOn == true)
+		{
+			GameObject.Find("InputField Password CA").GetComponent<InputField>().inputType = InputField.InputType.Standard;
+			GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().inputType = InputField.InputType.Standard;
+		}
+		else
+		{
+			GameObject.Find("InputField Password CA").GetComponent<InputField>().inputType = InputField.InputType.Password;
+			GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().inputType = InputField.InputType.Password;
+		}
+		//permet le changement immediat, sans cette ligne, on doit cliquer sur l'inputfield pour que le changement se fasse
+		GameObject.Find("InputField Password CA").GetComponent<InputField>().ForceLabelUpdate();
+		GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().ForceLabelUpdate();
+	}
+
 	public bool getInputFields()
 	{
-		bool a = StrCompare(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text, "a");
-		bool b = StrCompare(GameObject.Find("InputField Email CA").GetComponent<InputField>().text, "b");
+		bool a = StrCompare(removeLastSpace(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text), "a");
+		bool b = StrCompare(removeLastSpace(GameObject.Find("InputField Email CA").GetComponent<InputField>().text), "b");
 		bool c = StrCompare(GameObject.Find("InputField Day CA").GetComponent<InputField>().text, "01");
 		bool d = StrCompare(GameObject.Find("InputField Month CA").GetComponent<InputField>().text, "02");
 		bool e = StrCompare(GameObject.Find("InputField Year CA").GetComponent<InputField>().text, "0304");

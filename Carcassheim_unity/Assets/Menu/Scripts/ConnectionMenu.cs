@@ -47,6 +47,20 @@ public class ConnectionMenu : Miscellaneous
 		Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
 	}
 
+	public void HideShowPwd()
+	{
+		if (GameObject.Find("Toggle AfficherMdp").GetComponent<Toggle>().isOn == true)
+		{
+			GameObject.Find("InputField Password").GetComponent<InputField>().inputType = InputField.InputType.Standard;
+		}
+		else
+		{
+			GameObject.Find("InputField Password").GetComponent<InputField>().inputType = InputField.InputType.Password;
+		}
+		//permet le changement immediat, sans cette ligne, on doit cliquer sur l'inputfield pour que le changement se fasse
+		GameObject.Find("InputField Password").GetComponent<InputField>().ForceLabelUpdate();
+	}
+
 	public void Connected()
 	{
 		Color newCol;
@@ -54,8 +68,6 @@ public class ConnectionMenu : Miscellaneous
 		Button tmpJouer = GameObject.Find("Btn Jouer").GetComponent<Button>();
 		tryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
-		//on place le texte Connecte la ou il y avait le bouton Se connecter
-		GameObject.Find("Etat de connexion").transform.position = GameObject.Find("Btn Connexion").transform.position;
 		GameObject.Find("Btn Connexion").SetActive(false);
 		tmpJouer.interactable = true;
 		tmpStat.interactable = true;
@@ -67,7 +79,7 @@ public class ConnectionMenu : Miscellaneous
 
 	public void Connect()
 	{
-		bool a = StrCompare(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text, "Hello");
+		bool a = StrCompare(removeLastSpace(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text), "Hello");
 		bool b = StrCompare(GameObject.Find("InputField Password").GetComponent<InputField>().text, "World");
 		State = a && b;
 		GameObject tmpGO = GameObject.Find("Instructions");
