@@ -24,7 +24,6 @@ public class OptionsMenu : Miscellaneous
 	{
 		btnSon = FindGoTool("OptionsMenu", "Btn Son").GetComponent<Button>();
 		btnMusique = FindGoTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
-		
 		soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
 		musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
 		soundScroll = FindGoTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
@@ -37,6 +36,10 @@ public class OptionsMenu : Miscellaneous
 		lastSoundValue = soundScroll.value;
 		musicScroll.onValueChanged.AddListener(musicScrollbarCallBack);
 		lastMusicValue = musicScroll.value;
+	}
+
+	void Awake()
+	{
 	}
 
 	// Update is called once per frame
@@ -133,7 +136,7 @@ public class OptionsMenu : Miscellaneous
         Debug.Log("Scrolling DOWN: " + value);
 */
 		displayVolumeSound(value);
-		/* lastSoundValue = value; */
+	/* lastSoundValue = value; */
 	}
 
 	//Will be called when Scrollbar changes

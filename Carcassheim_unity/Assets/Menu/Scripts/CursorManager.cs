@@ -5,10 +5,12 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 // include fonctions du script via la classe HomeMenu incluant elle meme (ConnectionMenu + Miscellaneous + Monobehaviour)
-public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class CursorManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
 	private OptionsMenu option;
 	private AccountMenu acc;
+	private HomeMenu home;
+	private ConnectionMenu co;
 	private CreditsMenu cred;
 	private StatistiquesMenu stat;
 	private Texture2D cursorTexture;
@@ -26,6 +28,8 @@ public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler
 		// SCRIPT :
 		option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
 		acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
+		home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
+		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
 		cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
 		stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
 	}
@@ -52,21 +56,21 @@ public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler
 			{
 				// HomeMenu :
 				case "Btn Connexion":
-					ShowConnection();
+					home.ShowConnection();
 					break;
 				case "Btn Jouer":
 					if (getState())
-						Jouer();
+						home.Jouer();
 					break;
 				case "Btn Statistiques":
 					if (getState())
-						ShowStatistiques();
+						home.ShowStatistiques();
 					break;
 				case "Btn Options":
-					ShowOptions();
+					home.ShowOptions();
 					break;
 				case "Btn Quitter le jeu":
-					Quitter();
+					home.Quitter();
 					break;
 				// StatistiquesMenu : 
 				case "Btn Retour Stat":
@@ -102,19 +106,19 @@ public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler
 					break;
 				// ConnectionMenu :
 				case "Btn Retour Co":
-					HideConnection();
+					co.HideConnection();
 					break;
 				case "Btn ForgottenPwdUser":
-					ForgottenPwdUser();
+					co.ForgottenPwdUser();
 					break;
 				case "Btn Se Connecter":
-					Connect();
+					co.Connect();
 					break;
 				case "Btn Creer un compte":
-					CreateAccount();
+					co.CreateAccount();
 					break;
 				case "Toggle AfficherMdp":
-					HideShowPwd();
+					co.HideShowPwd();
 					break;
 				// AccountMenu
 				case "Btn Retour Crea CA":
@@ -141,10 +145,10 @@ public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler
 				else
 					tryColorText(btnText, Color.blue, "#1e90ff");
 			}
+
 			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		}
 	}
-	
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
@@ -153,9 +157,7 @@ public class CursorManager : HomeMenu, IPointerEnterHandler, IPointerExitHandler
 			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
 			tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
 			if (!getState() && tmpBool)
-			{
 				tryColorText(btnText, Color.grey, "#808080");
-			}
 			else
 			{
 				previousColor = btnText.color;
