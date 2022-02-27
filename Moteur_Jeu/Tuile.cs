@@ -24,7 +24,19 @@ public class Tuile
     {
         TypeTerrain[] resultat = new TypeTerrain[3];
 
-
+        int positionInterneRecherchee = rot * 3, compteur = 0;
+        
+        for (int i = 0; i < _nombreSlot; i++)
+        {
+            foreach (int position in _lienSlotPosition[i])
+            {
+                if (position == positionInterneRecherchee)
+                {
+                    resultat[compteur++] = _slots[i].Terrain;
+                    positionInterneRecherchee++;
+                }
+            }
+        }
 
         return resultat;
     }
