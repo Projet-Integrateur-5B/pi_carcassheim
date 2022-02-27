@@ -33,7 +33,8 @@ public class HomeMenu : Miscellaneous // Reference a class in another script pro
 
 	public void Jouer()
 	{
-		randomIntColor(GameObject.Find("Etat de connexion"));
+		changeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
+		//randomIntColor(GameObject.Find("Etat de connexion"));
 	/* SceneManager.LoadScene("InGame"); */
 	}
 

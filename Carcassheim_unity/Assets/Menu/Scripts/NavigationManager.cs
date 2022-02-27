@@ -13,6 +13,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	private ConnectionMenu co;
 	private CreditsMenu cred;
 	private StatistiquesMenu stat;
+	private RoomSelectionMenu sroom;
 	private Texture2D cursorTexture;
 	private CursorMode cursorMode = CursorMode.Auto;
 	private Vector2 cursorHotspot = Vector2.zero;
@@ -38,6 +39,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
 		cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
 		stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
+		sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
 	}
 
 	// Update is called once per frame
@@ -313,6 +315,13 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				break;
 			case "Toggle AfficherMdp CA":
 				acc.HideShowPwdConf();
+				break;
+			// RoomSelectionMenu
+			case "Btn Retour RoomSelection":
+				sroom.HideRoomSelection();
+				break;
+			case "Btn Options Pop-Up":
+				sroom.ShowPopUpOptions();
 				break;
 			default:
 				return;
