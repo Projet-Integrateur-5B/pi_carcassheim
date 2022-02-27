@@ -47,7 +47,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void OnPointerClick(PointerEventData eventData)
 	{
-		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour bouttons (texte), et non toggle (pas de texte)
+		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
 		Debug.Log(hasText);
 		tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
 		bool tmp = (!getState() && !tmpBool) || getState();
@@ -77,9 +77,9 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void highlightEnter(string name)
 	{
-		if (GameObject.Find(name).GetComponent<Button>())
+		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
-			btnText = GameObject.Find(name).GetComponent<Button>().GetComponentInChildren<Text>();
+			btnText = GameObject.Find(name).GetComponentInChildren<Text>();
 			tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
 			if (!getState() && tmpBool)
 				tryColorText(btnText, Color.grey, "#808080");
@@ -94,7 +94,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void highlightExit(string name)
 	{
-		if (GameObject.Find(name).GetComponent<Button>())
+		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
 			bool tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
 			if (getState() || !tmpBool)
