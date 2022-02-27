@@ -6,8 +6,9 @@ public class Tuile
     int _nombreSlot;
     int[][] _lienSlotPosition;
 
-    public Slot[] Slot => _slots;
+    public Slot[] Slots => _slots;
     public int[][] LienSlotPosition => _lienSlotPosition;
+    public int NombreSlot => _nombreSlot;
 
     public int X { get; set; }
     public int Y { get; set; }
@@ -18,6 +19,18 @@ public class Tuile
         _slots = new Slot[_nombreSlot];
         _lienSlotPosition = new int[_nombreSlot][12];
 
+    }
+
+    public int IdSlotFromPositionInterne(int pos)
+    {
+        for (int i = 0; i < _nombreSlot; i++)
+        {
+            foreach (int p in _lienSlotPosition[i])
+            {
+                if (p == pos)
+                    return i;
+            }
+        }
     }
 
     public TypeTerrain[] TerrainSurFace(Rotation rot)

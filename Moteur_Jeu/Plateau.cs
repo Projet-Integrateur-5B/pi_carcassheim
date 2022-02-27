@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class Plateau
 {
-    public static const int[,] PositionAdjacentes = new int[,]
+    public static readonly int[,] PositionAdjacentes = new int[,]
         { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
     
     private List<Tuile> _tuiles;
@@ -56,8 +56,8 @@ public class Plateau
         {
             for (int i = 0; i < 4; i++)
             {
-                x = t.X + PositionAdjacentes[0, i];
-                y = t.Y + PositionAdjacentes[1, i];
+                x = t.X + PositionAdjacentes[i, 0];
+                y = t.Y + PositionAdjacentes[i, 1];
 
                 if (checkedX.Contains(x) && checkedY.Contains(y))
                     break;
@@ -130,7 +130,72 @@ public class Plateau
 
     public bool ZoneFermee(Tuile tuile, int idSlot)
     {
+        if (!_tuiles.Contains(tuile)) // ERROR
+            return false;
+
+        List<Tuile> tuilesFormantZone = new();
+        tuilesFormantZone.Add(tuile);
+
+        return ZoneFermeeAux(tuile, idSlot, tuilesFormantZone);
+    }
+
+    private bool ZoneFermeeAux(Tuile tuile, int idSlot, List<Tuile> tuilesFormantZone)
+    {
+        bool ferme = true, emplacementVide;
+        int[] positionsInternes = new int[4];
+        Tuile[] tuilesAdjSlot = TuilesAdjacentesAuSlot(tuile, idSlot, out emplacementVide, out positionsInternes);
+
+        if (emplacementVide)
+            return false;
         
+        int c = 0;
+        foreach (var item in tuilesAdjSlot)
+        {
+            if (!tuilesFormantZone.Contains(item))
+            {
+                tuilesFormantZone.Add(item);
+
+                int idSlotProchaineTuile = item.IdSlotFromPositionInterne(positionsInternes[c++]);
+                ferme = ferme && ZoneFermeeAux(item, idSlotProchaineTuile, tuilesFormantZone);
+            }
+        }
+
+        return ferme;
+    }
+
+    private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, int idSlot,
+        out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
+    {
+        emplacementVide = false;
+
+        int[] positionsInternes = tuile.LienSlotPosition[idSlot];
+        List<Tuile> resultat = new();
+        int x = tuile.X, y = tuile.Y;
+
+        int direction, c = 0;
+        foreach (int position in positionsInternes)
+        {
+            //direction = (position + (3 * tuile.Rotation)) / 3;
+            direction = (position / 3 + tuile.Rotation) % 3;
+
+            Tuile elem = GetTuile(x + PositionAdjacentes[direction, 0],
+                                  y + PositionAdjacentes[direction, 1]);
+
+            if (elem == null)
+            {
+                emplacementVide = true;
+                return null;
+            }
+            
+            if (!resultat.Contains(elem))
+            {
+                resultat.Add(elem);
+                positionsInternesProchainesTuiles[c++] = 
+                    (position + 6 + (elem.Rotation - tuile.Rotation)) % 3;
+            }
+        }
+
+        return resultat.ToArray();
     }
 }
 
