@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 // include fonctions du script via la classe ConnectionMenu + (incluant elle même Miscellaneous + Monobehaviour)
-public class HomeMenu : ConnectionMenu // Reference a class in another script properly
+public class HomeMenu : Miscellaneous // Reference a class in another script properly
 {
 	// Start is called before the first frame update
 	void Start()
