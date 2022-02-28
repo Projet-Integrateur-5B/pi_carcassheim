@@ -185,7 +185,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void EnterKeyboard()
 	{
-		Debug.Log("MethodeCall : " + hname);
+		Debug.Log("methodeCall : " + hname);
 		MethodeCall(hname);
 	}
 

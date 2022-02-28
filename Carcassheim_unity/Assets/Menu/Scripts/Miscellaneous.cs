@@ -9,7 +9,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	private GameObject GOtoFind;
 	private static bool State = false;
 	private static bool menuHasChanged = false;
-	private static bool DisplayFlexOnce = false;
+	private static bool displayFlexOnce = false;
 	void Start()
 	{
 	}
@@ -57,11 +57,11 @@ public abstract class Miscellaneous : MonoBehaviour
 		else
 			tmpDF = GameObject.Find("Create Account");
 		Text tmpDFText = tmpDF.GetComponent<Text>();
-		if (DisplayFlexOnce == false)
+		if (displayFlexOnce == false)
 		{
 			Vector3 up_y = new Vector3(0, tmpDF.GetComponent<RectTransform>().rect.height / 4, 0) + tmpDF.transform.position;
 			tmpDF.transform.position = up_y;
-			DisplayFlexOnce = true;
+			displayFlexOnce = true;
 		}
 	}
 
