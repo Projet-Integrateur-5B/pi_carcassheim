@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class RoomSelectionMenu : Miscellaneous
 {
 	public GameObject Pop_up_Options;
-	public static bool IsOpenPanel = false;
+	public static bool s_isOpenPanel = false;
 
 	// Start is called before the first frame update
 	void Start()
@@ -15,14 +15,14 @@ public class RoomSelectionMenu : Miscellaneous
 
 	public void HideRoomSelection()
 	{
-		IsOpenPanel = false;
-		Pop_up_Options.SetActive(IsOpenPanel);
+		s_isOpenPanel = false;
+		Pop_up_Options.SetActive(s_isOpenPanel);
 		ChangeMenu(FindMenu("RoomSelectionMenu"), FindMenu("HomeMenu"));
 	}
 
 	public void ShowPopUpOptions()
 	{
-		IsOpenPanel = !IsOpenPanel;
-		Pop_up_Options.SetActive(IsOpenPanel);
+		s_isOpenPanel = !s_isOpenPanel;
+		Pop_up_Options.SetActive(s_isOpenPanel);
 	}
 }

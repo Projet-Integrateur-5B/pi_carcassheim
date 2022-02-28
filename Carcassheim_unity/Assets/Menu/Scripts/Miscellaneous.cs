@@ -6,10 +6,10 @@ using UnityEngine.EventSystems;
 
 public abstract class Miscellaneous : MonoBehaviour
 {
-	private GameObject GOtoFind;
-	private static bool State = false;
-	private static bool menuHasChanged = false;
-	private static bool displayFlexOnce = false;
+	private GameObject _goToFind;
+	private static bool s_state = false;
+	private static bool s_menuHasChanged = false;
+	private static bool s_displayFlexOnce = false;
 	void Start()
 	{
 	}
@@ -22,12 +22,12 @@ public abstract class Miscellaneous : MonoBehaviour
 	// ---- Etat de connection Account et Connection Menu ----
 	public bool GetState()
 	{
-		return State;
+		return s_state;
 	}
 
 	public void SetState(bool b)
 	{
-		State = b;
+		s_state = b;
 	}
 
 	public void Connected()
@@ -50,42 +50,42 @@ public abstract class Miscellaneous : MonoBehaviour
 	// -------------------------------------------------------
 	public void DisplayFlex()
 	{
-		//bool DisplayFlexOnce : l'ajout en y ne se fasse qu'une seule fois
+		//bool s_displayFlexOnce : l'ajout en y ne se fasse qu'une seule fois
 		GameObject tmpDF = null;
 		if (GetCurrentMenu().name == "ConnectionMenu")
 			tmpDF = FindGOTool("ConnectionMenu", "Instructions");
 		else
 			tmpDF = GameObject.Find("Create Account");
 		Text tmpDFText = tmpDF.GetComponent<Text>();
-		if (displayFlexOnce == false)
+		if (s_displayFlexOnce == false)
 		{
 			Vector3 up_y = new Vector3(0, tmpDF.GetComponent<RectTransform>().rect.height / 4, 0) + tmpDF.transform.position;
 			tmpDF.transform.position = up_y;
-			displayFlexOnce = true;
+			s_displayFlexOnce = true;
 		}
 	}
 
 	public void SetMenuChanged(bool b)
 	{
-		menuHasChanged = b;
+		s_menuHasChanged = b;
 	}
 
 	public bool HasMenuChanged()
 	{
-		return menuHasChanged;
+		return s_menuHasChanged;
 	}
 
 	public GameObject GetCurrentMenu()
 	{
-		GOtoFind = GameObject.Find("SubMenus");
-		for (int i = 0; i < GOtoFind.transform.childCount; i++)
-			if (GOtoFind.transform.GetChild(i).gameObject.activeSelf)
+		_goToFind = GameObject.Find("SubMenus");
+		for (int i = 0; i < _goToFind.transform.childCount; i++)
+			if (_goToFind.transform.GetChild(i).gameObject.activeSelf)
 			{
-				GOtoFind = GOtoFind.transform.GetChild(i).gameObject;
+				_goToFind = _goToFind.transform.GetChild(i).gameObject;
 				break;
 			}
 
-		return GOtoFind;
+		return _goToFind;
 	}
 
 	public GameObject FindMenu(string menu)
@@ -126,10 +126,10 @@ public abstract class Miscellaneous : MonoBehaviour
 
 	public void ChangeMenu(GameObject close, GameObject goTo)
 	{
-		menuHasChanged = false;
+		s_menuHasChanged = false;
 		close.SetActive(false);
 		goTo.SetActive(true);
-		menuHasChanged = true;
+		s_menuHasChanged = true;
 	}
 
 	public bool StrCompare(string str1, string str2)
