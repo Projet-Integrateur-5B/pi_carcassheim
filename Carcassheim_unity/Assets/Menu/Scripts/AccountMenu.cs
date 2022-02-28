@@ -79,8 +79,6 @@ public class AccountMenu : Miscellaneous
 		string tmpPwd2 = GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().text;
 		bool f = StrCompare(tmpPwd, "c");
 		bool g = StrCompare(tmpPwd2, tmpPwd);
-		Debug.Log("ICI");
-		Debug.Log(a && b && c && d && e && f && g);
 		return a && b && c && d && e && f && g;
 	}
 

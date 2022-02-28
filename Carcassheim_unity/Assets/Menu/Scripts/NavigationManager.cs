@@ -50,7 +50,6 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
-		Debug.Log(hasText);
 		tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
 		bool tmp = (!GetState() && !tmpBool) || GetState();
 		if (tmp)
