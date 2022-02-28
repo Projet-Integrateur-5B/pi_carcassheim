@@ -20,18 +20,18 @@ public class ConnectionMenu : Miscellaneous
 	{
 	}
 
-	public void resetWarningTextCM()
+	public void ResetWarningTextCM()
 	{
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		tryColor(tmpGO, Color.white, "f4fefe");
+		TryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Connectez vous";
 	}
 
 	public void HideConnection()
 	{
-		resetWarningTextCM();
-		changeMenu(FindMenu("ConnectionMenu"), FindMenu("HomeMenu"));
+		ResetWarningTextCM();
+		ChangeMenu(FindMenu("ConnectionMenu"), FindMenu("HomeMenu"));
 	}
 
 	public void ForgottenPwdUser()
@@ -56,20 +56,20 @@ public class ConnectionMenu : Miscellaneous
 
 	public void Connect()
 	{
-		bool a = StrCompare(removeLastSpace(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text), "");
+		bool a = StrCompare(RemoveLastSpace(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text), "");
 		bool b = StrCompare(GameObject.Find("InputField Password").GetComponent<InputField>().text, "");
-		setState(a && b);
+		SetState(a && b);
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		if (getState() == true)
+		if (GetState() == true)
 		{
 			HideConnection();
 			Connected();
 		}
 		else
 		{
-			displayFlex();
-			randomIntColor(tmpGO);
+			DisplayFlex();
+			RandomIntColor(tmpGO);
 			tmpText.text = "Ressaissiez votre login et votre mot de passe !";
 		}
 	}
@@ -78,8 +78,8 @@ public class ConnectionMenu : Miscellaneous
 	{
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		tryColor(tmpGO, Color.white, "f4fefe");
+		TryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Connectez vous";
-		changeMenu(FindMenu("ConnectionMenu"), FindMenu("CreateAccountMenu"));
+		ChangeMenu(FindMenu("ConnectionMenu"), FindMenu("CreateAccountMenu"));
 	}
 }

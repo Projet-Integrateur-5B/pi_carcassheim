@@ -16,6 +16,6 @@ public class CreditsMenu : Miscellaneous
 
 	public void HideCredits()
 	{
-		changeMenu(FindMenu("CreditsMenu"), FindMenu("OptionsMenu"));
+		ChangeMenu(FindMenu("CreditsMenu"), FindMenu("OptionsMenu"));
 	}
 }

@@ -16,6 +16,6 @@ public class StatistiquesMenu : Miscellaneous
 
 	public void HideStatistiques()
 	{
-		changeMenu(FindMenu("StatistiquesMenu"), FindMenu("HomeMenu"));
+		ChangeMenu(FindMenu("StatistiquesMenu"), FindMenu("HomeMenu"));
 	}
 }

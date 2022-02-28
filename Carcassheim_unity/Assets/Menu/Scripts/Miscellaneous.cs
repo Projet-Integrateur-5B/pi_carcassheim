@@ -9,7 +9,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	private GameObject GOtoFind;
 	private static bool State = false;
 	private static bool menuHasChanged = false;
-	private static bool displayFlexOnce = false;
+	private static bool DisplayFlexOnce = false;
 	void Start()
 	{
 	}
@@ -20,12 +20,12 @@ public abstract class Miscellaneous : MonoBehaviour
 	}
 
 	// ---- Etat de connection Account et Connection Menu ----
-	public bool getState()
+	public bool GetState()
 	{
 		return State;
 	}
 
-	public void setState(bool b)
+	public void SetState(bool b)
 	{
 		State = b;
 	}
@@ -35,7 +35,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		Color newCol;
 		Button tmpStat = GameObject.Find("Btn Statistiques").GetComponent<Button>();
 		Button tmpJouer = GameObject.Find("Btn Jouer").GetComponent<Button>();
-		tryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
+		TryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
 		GameObject.Find("Btn Connexion").SetActive(false);
 		tmpJouer.interactable = true;
@@ -48,34 +48,34 @@ public abstract class Miscellaneous : MonoBehaviour
 	}
 
 	// -------------------------------------------------------
-	public void displayFlex()
+	public void DisplayFlex()
 	{
-		//bool displayFlexOnce : l'ajout en y ne se fasse qu'une seule fois
+		//bool DisplayFlexOnce : l'ajout en y ne se fasse qu'une seule fois
 		GameObject tmpDF = null;
-		if (getCurrentMenu().name == "ConnectionMenu")
-			tmpDF = FindGoTool("ConnectionMenu", "Instructions");
+		if (GetCurrentMenu().name == "ConnectionMenu")
+			tmpDF = FindGOTool("ConnectionMenu", "Instructions");
 		else
 			tmpDF = GameObject.Find("Create Account");
 		Text tmpDFText = tmpDF.GetComponent<Text>();
-		if (displayFlexOnce == false)
+		if (DisplayFlexOnce == false)
 		{
 			Vector3 up_y = new Vector3(0, tmpDF.GetComponent<RectTransform>().rect.height / 4, 0) + tmpDF.transform.position;
 			tmpDF.transform.position = up_y;
-			displayFlexOnce = true;
+			DisplayFlexOnce = true;
 		}
 	}
 
-	public void setMenuChanged(bool b)
+	public void SetMenuChanged(bool b)
 	{
 		menuHasChanged = b;
 	}
 
-	public bool hasMenuChanged()
+	public bool HasMenuChanged()
 	{
 		return menuHasChanged;
 	}
 
-	public GameObject getCurrentMenu()
+	public GameObject GetCurrentMenu()
 	{
 		GOtoFind = GameObject.Find("SubMenus");
 		for (int i = 0; i < GOtoFind.transform.childCount; i++)
@@ -93,12 +93,12 @@ public abstract class Miscellaneous : MonoBehaviour
 		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
 	}
 
-	public GameObject FindGoTool(string menu, string tool)
+	public GameObject FindGOTool(string menu, string tool)
 	{
 		return FindMenu(menu).transform.Find(tool).gameObject;
 	}
 
-	public void tryColorText(Text change, Color defaultColor, string coloration)
+	public void TryColorText(Text change, Color defaultColor, string coloration)
 	{
 		Color newCol;
 		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
@@ -111,7 +111,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		}
 	}
 
-	public void tryColor(GameObject change, Color defaultColor, string coloration)
+	public void TryColor(GameObject change, Color defaultColor, string coloration)
 	{
 		Color newCol;
 		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
@@ -124,7 +124,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		}
 	}
 
-	public void changeMenu(GameObject close, GameObject goTo)
+	public void ChangeMenu(GameObject close, GameObject goTo)
 	{
 		menuHasChanged = false;
 		close.SetActive(false);
@@ -137,7 +137,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		return (str2.Equals(str1));
 	}
 
-	public void randomIntColor(GameObject GO)
+	public void RandomIntColor(GameObject GO)
 	{
 		Color randomColor = new Color(Random.Range(0f, 1f), // Red
  Random.Range(0f, 1f), // Green
@@ -150,7 +150,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	}
 
 	//methode a ne pas utiliser pour les mots de passe car dans ceux-ci le caractere ' ' est compte comme un vrai caractere
-	public string removeLastSpace(string mot)
+	public string RemoveLastSpace(string mot)
 	{
 		//comme les string sont immutable, on doit passer par une autre string
 		string modif = "";

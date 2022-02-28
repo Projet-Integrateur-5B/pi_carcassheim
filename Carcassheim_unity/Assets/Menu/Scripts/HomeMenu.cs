@@ -16,10 +16,10 @@ public class HomeMenu : Miscellaneous // Reference a class in another script pro
 	void Awake()
 	{
 		Color newCol;
-		if (getState() == false && FindMenu("HomeMenu").activeSelf == true)
+		if (GetState() == false && FindMenu("HomeMenu").activeSelf == true)
 		{
-			FindGoTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = getState();
-			FindGoTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = getState();
+			FindGOTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = GetState();
+			FindGOTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = GetState();
 			ColorUtility.TryParseHtmlString("#808080", out newCol);
 			GameObject.Find("Btn Jouer").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 			GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
@@ -33,24 +33,24 @@ public class HomeMenu : Miscellaneous // Reference a class in another script pro
 
 	public void Jouer()
 	{
-		changeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
-		//randomIntColor(GameObject.Find("Etat de connexion"));
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
+		//RandomIntColor(GameObject.Find("Etat de connexion"));
 	/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void ShowStatistiques()
 	{
-		changeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
 	}
 
 	public void ShowOptions()
 	{
-		changeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
 	}
 
 	public void ShowConnection()
 	{
-		changeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
 	}
 
 	public void Quitter()

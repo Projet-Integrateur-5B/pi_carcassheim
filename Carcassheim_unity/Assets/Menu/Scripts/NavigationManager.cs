@@ -52,7 +52,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
 		Debug.Log(hasText);
 		tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-		bool tmp = (!getState() && !tmpBool) || getState();
+		bool tmp = (!GetState() && !tmpBool) || GetState();
 		if (tmp)
 		{
 			if (hasText)
@@ -60,46 +60,46 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				btnText = GameObject.Find(name).GetComponentInChildren<Text>();
 			}
 
-			methodeCall(name);
+			MethodeCall(name);
 			if (hasText)
 			{
-				if (hasMenuChanged())
+				if (HasMenuChanged())
 				{
 					btnText.fontSize -= 3;
 					btnText.color = previousColor;
-					setMenuChanged(false);
+					SetMenuChanged(false);
 				}
 				else
-					tryColorText(btnText, Color.blue, "#1e90ff");
+					TryColorText(btnText, Color.blue, "#1e90ff");
 			}
 
 			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		}
 	}
 
-	public void highlightEnter(string name)
+	public void HighlightEnter(string name)
 	{
 		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
 			btnText = GameObject.Find(name).GetComponentInChildren<Text>();
 			tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-			if (!getState() && tmpBool)
-				tryColorText(btnText, Color.grey, "#808080");
+			if (!GetState() && tmpBool)
+				TryColorText(btnText, Color.grey, "#808080");
 			else
 			{
 				previousColor = btnText.color;
-				tryColorText(btnText, Color.blue, "#1e90ff");
+				TryColorText(btnText, Color.blue, "#1e90ff");
 				btnText.fontSize += 3;
 			}
 		}
 	}
 
-	public void highlightExit(string name)
+	public void HighlightExit(string name)
 	{
 		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
 			bool tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-			if (getState() || !tmpBool)
+			if (GetState() || !tmpBool)
 			{
 				btnText.color = previousColor;
 				btnText.fontSize -= 3;
@@ -116,7 +116,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		Cursor.visible = b;
 	}
 
-	public void forwardKey()
+	public void ForwardKey()
 	{
 		if (ibool)
 		{
@@ -124,13 +124,13 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 			Debug.Log(foundObjects[i].name + " : " + i);
 			if (pbool)
 			{ // A optimiser
-				highlightExit(pname);
+				HighlightExit(pname);
 				SetCursorVisible(false);
 			}
 
 			if (hbool)
 			{
-				highlightExit(foundObjects[i].name);
+				HighlightExit(foundObjects[i].name);
 			}
 
 			if (i == foundObjects.Length - 1)
@@ -142,7 +142,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				i++;
 			}
 
-			highlightEnter(foundObjects[i].name);
+			HighlightEnter(foundObjects[i].name);
 			hbool = true;
 			Debug.Log(foundObjects[i].name + " : " + i);
 			ibool = false;
@@ -150,7 +150,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		}
 	}
 
-	public void backwardKey()
+	public void BackwardKey()
 	{
 		if (ibool)
 		{
@@ -158,13 +158,13 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 			Debug.Log(foundObjects[i].name + " : " + i);
 			if (pbool)
 			{ // A optimiser
-				highlightExit(pname);
+				HighlightExit(pname);
 				SetCursorVisible(false);
 			}
 
 			if (hbool)
 			{
-				highlightExit(foundObjects[i].name);
+				HighlightExit(foundObjects[i].name);
 			}
 
 			if (i == 0)
@@ -176,39 +176,39 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				i--;
 			}
 
-			highlightEnter(foundObjects[i].name);
+			HighlightEnter(foundObjects[i].name);
 			Debug.Log(foundObjects[i].name + " : " + i);
 			ibool = false;
 			hname = name;
 		}
 	}
 
-	public void enterKeyboard()
+	public void EnterKeyboard()
 	{
-		Debug.Log("methodeCall : " + hname);
-		methodeCall(hname);
+		Debug.Log("MethodeCall : " + hname);
+		MethodeCall(hname);
 	}
 
 	void OnGUI()
 	{
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow))
 		{ // haut/droit
-			forwardKey();
+			ForwardKey();
 		}
 
 		if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
 		{ // bas/gauche
-			backwardKey();
+			BackwardKey();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 		{ // Entree
-			enterKeyboard();
+			EnterKeyboard();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{ // Echape
-			highlightExit(hname); // A optimiser
+			HighlightExit(hname); // A optimiser
 			SetCursorVisible(true);
 		// + engrenage
 		}
@@ -225,18 +225,18 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		highlightEnter(name);
+		HighlightEnter(name);
 		pbool = true;
 		pname = name;
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		highlightExit(name);
+		HighlightExit(name);
 		pbool = false;
 	}
 
-	public void methodeCall(string name)
+	public void MethodeCall(string name)
 	{
 		switch (name)
 		{
@@ -245,11 +245,11 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				home.ShowConnection();
 				break;
 			case "Btn Jouer":
-				if (getState())
+				if (GetState())
 					home.Jouer();
 				break;
 			case "Btn Statistiques":
-				if (getState())
+				if (GetState())
 					home.ShowStatistiques();
 				break;
 			case "Btn Options":
