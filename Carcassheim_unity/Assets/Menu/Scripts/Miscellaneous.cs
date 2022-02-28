@@ -4,6 +4,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
+/* Convention de nommage : 
+ * 
+ * Méthodes : Méthode(int a...)
+ * Attributs : public int Variable, private int _variable, static s_variable
+ * Variables locales : int variable;
+ * Classes : Classe1
+ * 
+ */
+
 public abstract class Miscellaneous : MonoBehaviour
 {
 	private GameObject _goToFind;
