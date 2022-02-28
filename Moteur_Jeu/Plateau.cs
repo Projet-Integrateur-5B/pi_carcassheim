@@ -1,5 +1,6 @@
 using Tuile;
 using System.Collections.Generic;
+using System;
 
 public class Plateau
 {
@@ -182,12 +183,9 @@ public class Plateau
                                   y + PositionAdjacentes[direction, 1]);
 
             if (elem == null)
-            {
                 emplacementVide = true;
-                return null;
-            }
             
-            if (!resultat.Contains(elem))
+            else if (!resultat.Contains(elem))
             {
                 resultat.Add(elem);
                 positionsInternesProchainesTuiles[c++] = 
@@ -196,6 +194,52 @@ public class Plateau
         }
 
         return resultat.ToArray();
+    }
+
+    public void PoserPion(int idJoueur, Tuile tuile, int idSlot)
+    {
+        tuile.Slots[idSlot].IdJoueur = idJoueur;
+    }
+
+    public int[] EmplacementPionPossible(Tuile tuile, int idJoueur)
+    {
+        List<int> resultat = new();
+        List<Tuile> parcourues = new();
+
+        for (int i = 0; i < tuile.NombreSlot; i++)
+        {
+            if (ZoneAppartientAutreJoueur(tuile, i, idJoueur, parcourues))
+                resultat.Add(i);
+        }
+
+        return result.ToArray();
+    }
+
+    public bool ZoneAppartientAutreJoueur(Tuile tuile, int idSlot, int idJoueur, List<Tuile> parcourues)
+    {
+        bool vide, resultat = true;
+        int[] positionsInternesProchainesTuiles;
+        Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, positionsInternesProchainesTuiles);
+
+        if (adj.length == 0)
+            return false;
+
+        int c = 0;
+        foreach (var t in adj)
+        {
+            if (parcourues.Contains(t))
+                break;
+            parcourues.Add(t);
+
+            int pos = positionsInternesProchainesTuiles[c++];
+            int nextSlot = t.IdSlotFromPositionInterne(pos);
+            int idJ = t.Slots[nextSlot].idJoueur;
+            if (idJ != 0 && idJ != idJoueur)
+                return false;
+            resultat = resultat && ZoneAppartientAutreJoueur(t, nextSlot, idJoueur, parcourues);
+        }
+
+        return resultat;
     }
 }
 
