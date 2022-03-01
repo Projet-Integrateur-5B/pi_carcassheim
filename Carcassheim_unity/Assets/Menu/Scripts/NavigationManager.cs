@@ -1,11 +1,14 @@
+using System;
+using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
 
 // include fonctions du script via la classe HomeMenu incluant elle meme (ConnectionMenu + Miscellaneous + Monobehaviour)
-public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, /* IPointerClickHandler, */ ISelectHandler/* , IPointerDownHandler */
 {
 	private OptionsMenu _option;
 	private AccountMenu _acc;
@@ -24,8 +27,12 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	public static bool s_ibool = true;
 	public static bool s_hbool = false;
 	public static bool s_pbool = false;
+	public static bool s_keyboardOn = false;
 	private string _pname;
 	private string _hname;
+
+	private static bool clickEnter = false;
+	private string namein;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -40,15 +47,79 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		_cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
 		_stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
 		_sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
+		// Button btn = GameObject.Find("Btn Se Connecter").GetComponent<Button>();
+			/* Debug.Log("BBBBBBBB" + btn); */
+		// btn.onClick.AddListener(TaskOnClick);
+
+		/* SetCursorVisible(false); */
+	}
+
+	void TaskOnClick(){
+		Debug.Log ("You have clicked the button!");
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
+		/* if(Keyboard.current.anyKey.wasPressedThisFrame) */
+			/* Debug.Log("ahhhhhhhhhhhhhhhhhhhhh"); */
+			// A AMELIORER
+				if(clickEnter){
+			Button btn = GameObject.Find(EventSystem.current.currentSelectedGameObject.name).GetComponent<Button>();
+			Debug.Log(EventSystem.current.currentSelectedGameObject.name);
+			btn.onClick.AddListener(TaskOnClick);
+		}
 	}
 
-	public void OnPointerClick(PointerEventData eventData)
+/* 
+    void OnSelectionChange()
+    {
+        selectionIDs = Selection.instanceIDs;
+    }
+ */
+	//Do this when the selectable UI object is selected.
+	public void OnPointerEnter(PointerEventData eventData) 
 	{
+		if(!EventSystem.current.alreadySelecting){
+			EventSystem.current.SetSelectedGameObject(this.gameObject);
+			/* Debug.Log (this.gameObject.GetComponent<Button>().name + "selected"); */
+		namein = name;
+		clickEnter = true;
+
+/* 		HighlightEnter(name);
+		s_pbool = true;
+		_pname = name; */
+		}
+
+	}
+
+	//Do this when the selectable UI object is selected.
+	public void OnDeselect (BaseEventData eventData) 
+	{
+		this.GetComponent<Selectable>().OnPointerExit(null);
+		Debug.Log (/* this.gameObject.name +  */ "DESELECTED");
+	}
+
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		Debug.Log ("EXIT");
+
+/* 		HighlightExit(name);
+		s_pbool = false; */
+	}
+
+
+	//Do this when the selectable UI object is selected.
+	public void OnSelect (BaseEventData eventData) 
+	{
+		Debug.Log ("SELECTED");
+	}
+
+
+	 public void OnMouseDown()
+	{
+		Debug.Log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
 		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
 		_tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
 		bool tmp = (!GetState() && !_tmpBool) || GetState();
@@ -115,7 +186,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		Cursor.visible = b;
 	}
 
-	public void ForwardKey()
+	public void DirectionKey(char direction)
 	{
 		if (s_ibool)
 		{
@@ -132,13 +203,25 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				HighlightExit(foundObjects[s_i].name);
 			}
 
-			if (s_i == foundObjects.Length - 1)
-			{
-				s_i = 0;
-			}
-			else if (s_i < foundObjects.Length - 1 && s_i >= 0)
-			{
-				s_i++;
+			if(direction == '+'){
+				if (s_i == foundObjects.Length - 1)
+				{
+					s_i = 0;
+				}
+				else if (s_i < foundObjects.Length - 1 && s_i >= 0)
+				{
+					s_i++;
+				}
+			} 
+			else if(direction == '-'){
+				if (s_i == 0)
+				{
+					s_i = foundObjects.Length - 1;
+				}
+				else if (s_i <= foundObjects.Length - 1 && s_i > 0)
+				{
+					s_i--;
+				}
 			}
 
 			HighlightEnter(foundObjects[s_i].name);
@@ -146,75 +229,40 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 			Debug.Log(foundObjects[s_i].name + " : " + s_i);
 			s_ibool = false;
 			_hname = name;
+			s_keyboardOn = true;
 		}
-	}
-
-	public void BackwardKey()
-	{
-		if (s_ibool)
-		{
-			var foundObjects = FindObjectsOfType<Button>();
-			Debug.Log(foundObjects[s_i].name + " : " + s_i);
-			if (s_pbool)
-			{ // A optimiser
-				HighlightExit(_pname);
-				SetCursorVisible(false);
-			}
-
-			if (s_hbool)
-			{
-				HighlightExit(foundObjects[s_i].name);
-			}
-
-			if (s_i == 0)
-			{
-				s_i = foundObjects.Length - 1;
-			}
-			else if (s_i <= foundObjects.Length - 1 && s_i > 0)
-			{
-				s_i--;
-			}
-
-			HighlightEnter(foundObjects[s_i].name);
-			Debug.Log(foundObjects[s_i].name + " : " + s_i);
-			s_ibool = false;
-			_hname = name;
-		}
-	}
-
-	public void EnterKeyboard()
-	{
-		Debug.Log("methodeCall : " + _hname);
-		MethodeCall(_hname);
 	}
 
 	void OnGUI()
 	{
-		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+		
+/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow))
 		{ // haut/droit
-			ForwardKey();
+			DirectionKey('+');
 		}
 
 		if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
 		{ // bas/gauche
-			BackwardKey();
+			DirectionKey('-');
 		}
 
 		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 		{ // Entree
-			EnterKeyboard();
+			Debug.Log("methodeCall : " + _hname);
+			MethodeCall(_hname);
 		}
 
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{ // Echape
+		if ((Input.GetAxis("Mouse X") != 0) && s_keyboardOn) // if mouse moves
+		{ 
 			HighlightExit(_hname); // A optimiser
 			SetCursorVisible(true);
+			s_keyboardOn = false;
 		// + engrenage
 		}
 
 		bool boolKeyUp = Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Escape);
 		if (boolKeyUp)
-			s_ibool = true;
+			s_ibool = true; */
 	// A preserver : 	
 	/* 		direction = new Vector3(0, 1, 0); // up
 		btnMain = (Button)FindObjectOfType(typeof(Button));
@@ -222,7 +270,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
         Debug.Log(newSelectable.name);  */
 	}
 
-	public void OnPointerEnter(PointerEventData eventData)
+/* 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		HighlightEnter(name);
 		s_pbool = true;
@@ -233,7 +281,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	{
 		HighlightExit(name);
 		s_pbool = false;
-	}
+	} */
 
 	public void MethodeCall(string name)
 	{
