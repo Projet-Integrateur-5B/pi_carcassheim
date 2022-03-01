@@ -6,36 +6,36 @@ using UnityEngine.EventSystems;
 
 public class OptionsMenu : Miscellaneous
 {
-	private Button btnSon;
-	private Button btnMusique;
-	private AudioSource soundCtrl;
-	private AudioSource musicCtrl;
-	private Scrollbar soundScroll;
-	private Scrollbar musicScroll;
-	private Text pourcentSon;
-	private Text pourcentMusique;
-	private float previousSoundVol = 0.0f;
-	private float previousMusicVol = 0.0f;
-	private static bool tmpOnce = true;
+	private Button _btnSon;
+	private Button _btnMusique;
+	private AudioSource _soundCtrl;
+	private AudioSource _musicCtrl;
+	private Scrollbar _soundScroll;
+	private Scrollbar _musicScroll;
+	private Text _pourcentSon;
+	private Text _pourcentMusique;
+	private float _previousSoundVol = 0.0f;
+	private float _previousMusicVol = 0.0f;
+	private static bool s_tmpOnce = true;
 	float lastSoundValue = 0;
 	float lastMusicValue = 0;
 	// Start is called before the first frame update
 	void Start()
 	{
-		btnSon = FindGoTool("OptionsMenu", "Btn Son").GetComponent<Button>();
-		btnMusique = FindGoTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
-		soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
-		musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
-		soundScroll = FindGoTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
-		musicScroll = FindGoTool("OptionsMenu", "Scrollbar Musique").GetComponent<Scrollbar>();
-		pourcentSon = FindGoTool("OptionsMenu", "Pourcent Son").GetComponent<Text>();
-		pourcentMusique = FindGoTool("OptionsMenu", "Pourcent Musique").GetComponent<Text>();
-		defaultMusicSound();
+		_btnSon = FindGOTool("OptionsMenu", "Btn Son").GetComponent<Button>();
+		_btnMusique = FindGOTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
+		_soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
+		_musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
+		_soundScroll = FindGOTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
+		_musicScroll = FindGOTool("OptionsMenu", "Scrollbar Musique").GetComponent<Scrollbar>();
+		_pourcentSon = FindGOTool("OptionsMenu", "Pourcent Son").GetComponent<Text>();
+		_pourcentMusique = FindGOTool("OptionsMenu", "Pourcent Musique").GetComponent<Text>();
+		DefaultMusicSound();
 		//Subscribe to the Scrollbar event
-		soundScroll.onValueChanged.AddListener(soundScrollbarCallBack);
-		lastSoundValue = soundScroll.value;
-		musicScroll.onValueChanged.AddListener(musicScrollbarCallBack);
-		lastMusicValue = musicScroll.value;
+		_soundScroll.onValueChanged.AddListener(SoundScrollbarCallBack);
+		lastSoundValue = _soundScroll.value;
+		_musicScroll.onValueChanged.AddListener(MusicScrollbarCallBack);
+		lastMusicValue = _musicScroll.value;
 	}
 
 	void Awake()
@@ -49,12 +49,12 @@ public class OptionsMenu : Miscellaneous
 
 	public void HideOptions()
 	{
-		changeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
+		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
 	}
 
 	public void ShowCredits()
 	{
-		changeMenu(FindMenu("OptionsMenu"), FindMenu("CreditsMenu"));
+		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("CreditsMenu"));
 	}
 
 	public void FlagsToggle() //affiche la langue du toggle enclenche
@@ -75,109 +75,109 @@ public class OptionsMenu : Miscellaneous
 	}
 
 	//---------------------------- Music/Sound Begin ----------------------------//
-	public void volumeSound(float value)
+	public void VolumeSound(float value)
 	{
-		soundCtrl.volume = value;
-		pourcentSon.text = Mathf.RoundToInt(value * 100) + "%";
+		_soundCtrl.volume = value;
+		_pourcentSon.text = Mathf.RoundToInt(value * 100) + "%";
 	}
 
-	public void volumeMusic(float value)
+	public void VolumeMusic(float value)
 	{
-		musicCtrl.volume = value;
-		pourcentMusique.text = Mathf.RoundToInt(value * 100) + "%";
+		_musicCtrl.volume = value;
+		_pourcentMusique.text = Mathf.RoundToInt(value * 100) + "%";
 	}
 
-	public void displayVolumeSound(float value)
+	public void DisplayVolumeSound(float value)
 	{
 		if (value > 0 /* && soundCtrl.isPlaying */)
 		{
-			btnSon.GetComponentInChildren<Text>().text = "Son 'ON'";
+			_btnSon.GetComponentInChildren<Text>().text = "Son 'ON'";
 		}
 		else
 		{
-			btnSon.GetComponentInChildren<Text>().text = "Son 'OFF'";
+			_btnSon.GetComponentInChildren<Text>().text = "Son 'OFF'";
 		}
 
-		volumeSound(value);
+		VolumeSound(value);
 	}
 
-	public void displayVolumeMusic(float value)
+	public void DisplayVolumeMusic(float value)
 	{
 		if (value > 0)
 		{
-			btnMusique.GetComponentInChildren<Text>().text = "Musique 'ON'";
+			_btnMusique.GetComponentInChildren<Text>().text = "Musique 'ON'";
 		}
 		else
 		{
-			btnMusique.GetComponentInChildren<Text>().text = "Musique 'OFF'";
+			_btnMusique.GetComponentInChildren<Text>().text = "Musique 'OFF'";
 		}
 
-		volumeMusic(value);
+		VolumeMusic(value);
 	}
 
-	public void defaultMusicSound()
+	public void DefaultMusicSound()
 	{
-		if (tmpOnce == true)
+		if (s_tmpOnce == true)
 		{
-			soundScroll.numberOfSteps = musicScroll.numberOfSteps = 11; // 0->10 = 11
-			soundCtrl.volume = musicCtrl.volume = soundScroll.value = musicScroll.value = 0.2f;
-			volumeSound(soundScroll.value);
-			volumeMusic(musicScroll.value);
-			tmpOnce = !tmpOnce;
+			_soundScroll.numberOfSteps = _musicScroll.numberOfSteps = 11; // 0->10 = 11
+			_soundCtrl.volume = _musicCtrl.volume = _soundScroll.value = _musicScroll.value = 0.2f;
+			VolumeSound(_soundScroll.value);
+			VolumeMusic(_musicScroll.value);
+			s_tmpOnce = !s_tmpOnce;
 		}
 	}
 
 	//Will be called when Scrollbar changes
-	public void soundScrollbarCallBack(float value)
+	public void SoundScrollbarCallBack(float value)
 	{
 		/*  if (lastSoundValue > value)
         Debug.Log("Scrolling UP: " + value);
     else
         Debug.Log("Scrolling DOWN: " + value);
 */
-		displayVolumeSound(value);
+		DisplayVolumeSound(value);
 	/* lastSoundValue = value; */
 	}
 
 	//Will be called when Scrollbar changes
-	public void musicScrollbarCallBack(float value)
+	public void MusicScrollbarCallBack(float value)
 	{
-		displayVolumeMusic(value);
+		DisplayVolumeMusic(value);
 	}
 
 	/* public void OnDisable()
 {
     //Un-Subscribe To Scrollbar Event
-    soundScroll.onValueChanged.RemoveListener(soundScrollbarCallBack);
-	musicScroll.onValueChanged.RemoveListener(musicScrollbarCallBack);
+    soundScroll.onValueChanged.RemoveListener(SoundScrollbarCallBack);
+	musicScroll.onValueChanged.RemoveListener(MusicScrollbarCallBack);
 } */
 	public void SwitchSound()
 	{
-		if (soundScroll.value != 0)
+		if (_soundScroll.value != 0)
 		{
-			previousSoundVol = soundCtrl.volume;
-			soundScroll.value = 0.0f;
-			soundScrollbarCallBack(soundScroll.value);
+			_previousSoundVol = _soundCtrl.volume;
+			_soundScroll.value = 0.0f;
+			SoundScrollbarCallBack(_soundScroll.value);
 		}
 		else
 		{
-			soundScroll.value = previousSoundVol;
-			soundScrollbarCallBack(previousSoundVol);
+			_soundScroll.value = _previousSoundVol;
+			SoundScrollbarCallBack(_previousSoundVol);
 		}
 	}
 
 	public void SwitchMusic()
 	{
-		if (musicScroll.value != 0)
+		if (_musicScroll.value != 0)
 		{
-			previousMusicVol = musicCtrl.volume;
-			musicScroll.value = 0.0f;
-			musicScrollbarCallBack(musicScroll.value);
+			_previousMusicVol = _musicCtrl.volume;
+			_musicScroll.value = 0.0f;
+			MusicScrollbarCallBack(_musicScroll.value);
 		}
 		else
 		{
-			musicScroll.value = previousMusicVol;
-			musicScrollbarCallBack(previousMusicVol);
+			_musicScroll.value = _previousMusicVol;
+			MusicScrollbarCallBack(_previousMusicVol);
 		}
 	}
 

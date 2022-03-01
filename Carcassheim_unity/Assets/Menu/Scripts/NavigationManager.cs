@@ -7,39 +7,39 @@ using UnityEngine.EventSystems;
 // include fonctions du script via la classe HomeMenu incluant elle meme (ConnectionMenu + Miscellaneous + Monobehaviour)
 public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-	private OptionsMenu option;
-	private AccountMenu acc;
-	private HomeMenu home;
-	private ConnectionMenu co;
-	private CreditsMenu cred;
-	private StatistiquesMenu stat;
-	private RoomSelectionMenu sroom;
-	private Texture2D cursorTexture;
-	private CursorMode cursorMode = CursorMode.Auto;
-	private Vector2 cursorHotspot = Vector2.zero;
-	private Color previousColor;
-	private Text btnText;
-	private bool tmpBool;
-	private static int i = 0;
-	public static bool ibool = true;
-	public static bool hbool = false;
-	public static bool pbool = false;
-	private string pname;
-	private string hname;
+	private OptionsMenu _option;
+	private AccountMenu _acc;
+	private HomeMenu _home;
+	private ConnectionMenu _co;
+	private CreditsMenu _cred;
+	private StatistiquesMenu _stat;
+	private RoomSelectionMenu _sroom;
+	private Texture2D _cursorTexture;
+	private CursorMode _cursorMode = CursorMode.Auto;
+	private Vector2 _cursorHotspot = Vector2.zero;
+	private Color _previousColor;
+	private Text _btnText;
+	private bool _tmpBool;
+	private static int s_i = 0;
+	public static bool s_ibool = true;
+	public static bool s_hbool = false;
+	public static bool s_pbool = false;
+	private string _pname;
+	private string _hname;
 	// Start is called before the first frame update
 	void Start()
 	{
 		// Cursor Texture :
-		cursorTexture = Resources.Load("basic_01 BLUE") as Texture2D;
-		Cursor.SetCursor(cursorTexture, cursorHotspot, cursorMode);
+		_cursorTexture = Resources.Load("basic_01 BLUE") as Texture2D;
+		Cursor.SetCursor(_cursorTexture, _cursorHotspot, _cursorMode);
 		// SCRIPT :
-		option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
-		acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
-		home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
-		co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-		cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
-		stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
-		sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
+		_option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
+		_acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
+		_home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
+		_co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
+		_cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
+		_stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
+		_sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
 	}
 
 	// Update is called once per frame
@@ -50,59 +50,58 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	public void OnPointerClick(PointerEventData eventData)
 	{
 		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
-		Debug.Log(hasText);
-		tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-		bool tmp = (!getState() && !tmpBool) || getState();
+		_tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
+		bool tmp = (!GetState() && !_tmpBool) || GetState();
 		if (tmp)
 		{
 			if (hasText)
 			{
-				btnText = GameObject.Find(name).GetComponentInChildren<Text>();
+				_btnText = GameObject.Find(name).GetComponentInChildren<Text>();
 			}
 
-			methodeCall(name);
+			MethodeCall(name);
 			if (hasText)
 			{
-				if (hasMenuChanged())
+				if (HasMenuChanged())
 				{
-					btnText.fontSize -= 3;
-					btnText.color = previousColor;
-					setMenuChanged(false);
+					_btnText.fontSize -= 3;
+					_btnText.color = _previousColor;
+					SetMenuChanged(false);
 				}
 				else
-					tryColorText(btnText, Color.blue, "#1e90ff");
+					TryColorText(_btnText, Color.blue, "#1e90ff");
 			}
 
 			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		}
 	}
 
-	public void highlightEnter(string name)
+	public void HighlightEnter(string name)
 	{
 		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
-			btnText = GameObject.Find(name).GetComponentInChildren<Text>();
-			tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-			if (!getState() && tmpBool)
-				tryColorText(btnText, Color.grey, "#808080");
+			_btnText = GameObject.Find(name).GetComponentInChildren<Text>();
+			_tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
+			if (!GetState() && _tmpBool)
+				TryColorText(_btnText, Color.grey, "#808080");
 			else
 			{
-				previousColor = btnText.color;
-				tryColorText(btnText, Color.blue, "#1e90ff");
-				btnText.fontSize += 3;
+				_previousColor = _btnText.color;
+				TryColorText(_btnText, Color.blue, "#1e90ff");
+				_btnText.fontSize += 3;
 			}
 		}
 	}
 
-	public void highlightExit(string name)
+	public void HighlightExit(string name)
 	{
 		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
 			bool tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-			if (getState() || !tmpBool)
+			if (GetState() || !tmpBool)
 			{
-				btnText.color = previousColor;
-				btnText.fontSize -= 3;
+				_btnText.color = _previousColor;
+				_btnText.fontSize -= 3;
 			}
 		}
 	}
@@ -116,106 +115,106 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		Cursor.visible = b;
 	}
 
-	public void forwardKey()
+	public void ForwardKey()
 	{
-		if (ibool)
+		if (s_ibool)
 		{
 			var foundObjects = FindObjectsOfType<Button>();
-			Debug.Log(foundObjects[i].name + " : " + i);
-			if (pbool)
+			Debug.Log(foundObjects[s_i].name + " : " + s_i);
+			if (s_pbool)
 			{ // A optimiser
-				highlightExit(pname);
+				HighlightExit(_pname);
 				SetCursorVisible(false);
 			}
 
-			if (hbool)
+			if (s_hbool)
 			{
-				highlightExit(foundObjects[i].name);
+				HighlightExit(foundObjects[s_i].name);
 			}
 
-			if (i == foundObjects.Length - 1)
+			if (s_i == foundObjects.Length - 1)
 			{
-				i = 0;
+				s_i = 0;
 			}
-			else if (i < foundObjects.Length - 1 && i >= 0)
+			else if (s_i < foundObjects.Length - 1 && s_i >= 0)
 			{
-				i++;
+				s_i++;
 			}
 
-			highlightEnter(foundObjects[i].name);
-			hbool = true;
-			Debug.Log(foundObjects[i].name + " : " + i);
-			ibool = false;
-			hname = name;
+			HighlightEnter(foundObjects[s_i].name);
+			s_hbool = true;
+			Debug.Log(foundObjects[s_i].name + " : " + s_i);
+			s_ibool = false;
+			_hname = name;
 		}
 	}
 
-	public void backwardKey()
+	public void BackwardKey()
 	{
-		if (ibool)
+		if (s_ibool)
 		{
 			var foundObjects = FindObjectsOfType<Button>();
-			Debug.Log(foundObjects[i].name + " : " + i);
-			if (pbool)
+			Debug.Log(foundObjects[s_i].name + " : " + s_i);
+			if (s_pbool)
 			{ // A optimiser
-				highlightExit(pname);
+				HighlightExit(_pname);
 				SetCursorVisible(false);
 			}
 
-			if (hbool)
+			if (s_hbool)
 			{
-				highlightExit(foundObjects[i].name);
+				HighlightExit(foundObjects[s_i].name);
 			}
 
-			if (i == 0)
+			if (s_i == 0)
 			{
-				i = foundObjects.Length - 1;
+				s_i = foundObjects.Length - 1;
 			}
-			else if (i <= foundObjects.Length - 1 && i > 0)
+			else if (s_i <= foundObjects.Length - 1 && s_i > 0)
 			{
-				i--;
+				s_i--;
 			}
 
-			highlightEnter(foundObjects[i].name);
-			Debug.Log(foundObjects[i].name + " : " + i);
-			ibool = false;
-			hname = name;
+			HighlightEnter(foundObjects[s_i].name);
+			Debug.Log(foundObjects[s_i].name + " : " + s_i);
+			s_ibool = false;
+			_hname = name;
 		}
 	}
 
-	public void enterKeyboard()
+	public void EnterKeyboard()
 	{
-		Debug.Log("methodeCall : " + hname);
-		methodeCall(hname);
+		Debug.Log("methodeCall : " + _hname);
+		MethodeCall(_hname);
 	}
 
 	void OnGUI()
 	{
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow))
 		{ // haut/droit
-			forwardKey();
+			ForwardKey();
 		}
 
 		if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
 		{ // bas/gauche
-			backwardKey();
+			BackwardKey();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 		{ // Entree
-			enterKeyboard();
+			EnterKeyboard();
 		}
 
 		if (Input.GetKeyDown(KeyCode.Escape))
 		{ // Echape
-			highlightExit(hname); // A optimiser
+			HighlightExit(_hname); // A optimiser
 			SetCursorVisible(true);
 		// + engrenage
 		}
 
 		bool boolKeyUp = Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Escape);
 		if (boolKeyUp)
-			ibool = true;
+			s_ibool = true;
 	// A preserver : 	
 	/* 		direction = new Vector3(0, 1, 0); // up
 		btnMain = (Button)FindObjectOfType(typeof(Button));
@@ -225,103 +224,103 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		highlightEnter(name);
-		pbool = true;
-		pname = name;
+		HighlightEnter(name);
+		s_pbool = true;
+		_pname = name;
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		highlightExit(name);
-		pbool = false;
+		HighlightExit(name);
+		s_pbool = false;
 	}
 
-	public void methodeCall(string name)
+	public void MethodeCall(string name)
 	{
 		switch (name)
 		{
 			// HomeMenu :
 			case "Btn Connexion":
-				home.ShowConnection();
+				_home.ShowConnection();
 				break;
 			case "Btn Jouer":
-				if (getState())
-					home.Jouer();
+				if (GetState())
+					_home.Jouer();
 				break;
 			case "Btn Statistiques":
-				if (getState())
-					home.ShowStatistiques();
+				if (GetState())
+					_home.ShowStatistiques();
 				break;
 			case "Btn Options":
-				home.ShowOptions();
+				_home.ShowOptions();
 				break;
 			case "Btn Quitter le jeu":
-				home.Quitter();
+				_home.Quitter();
 				break;
 			// StatistiquesMenu : 
 			case "Btn Retour Stat":
-				stat.HideStatistiques();
+				_stat.HideStatistiques();
 				break;
 			// OptionsMenu :
 			case "Btn Retour Opt":
-				option.HideOptions();
+				_option.HideOptions();
 				break;
 			case "Btn Son":
-				option.SwitchSound();
+				_option.SwitchSound();
 				break;
 			case "Toggle French":
 			case "Toggle English":
 			case "Toggle German":
-				option.FlagsToggle();
+				_option.FlagsToggle();
 				break;
 			case "Btn Musique":
-				option.SwitchMusic();
+				_option.SwitchMusic();
 				break;
 			case "Btn Fenêtré":
-				option.FullScreen();
+				_option.FullScreen();
 				break;
 			case "Btn Aide":
-				option.Help();
+				_option.Help();
 				break;
 			case "Btn Credits":
-				option.ShowCredits();
+				_option.ShowCredits();
 				break;
 			// CreditsMenu :
 			case "Btn Retour Credits":
-				cred.HideCredits();
+				_cred.HideCredits();
 				break;
 			// ConnectionMenu :
 			case "Btn Retour Co":
-				co.HideConnection();
+				_co.HideConnection();
 				break;
 			case "Btn ForgottenPwdUser":
-				co.ForgottenPwdUser();
+				_co.ForgottenPwdUser();
 				break;
 			case "Btn Se Connecter":
-				co.Connect();
+				_co.Connect();
 				break;
 			case "Btn Creer un compte":
-				co.CreateAccount();
+				_co.CreateAccount();
 				break;
 			case "Toggle AfficherMdp":
-				co.HideShowPwd();
+				_co.HideShowPwd();
 				break;
 			// AccountMenu
 			case "Btn Retour Crea CA":
-				acc.HideAccount();
+				_acc.HideAccount();
 				break;
 			case "Btn Creer votre compte":
-				acc.CreateAccountConnected();
+				_acc.CreateAccountConnected();
 				break;
 			case "Toggle AfficherMdp CA":
-				acc.HideShowPwdConf();
+				_acc.HideShowPwdConf();
 				break;
 			// RoomSelectionMenu
 			case "Btn Retour RoomSelection":
-				sroom.HideRoomSelection();
+				_sroom.HideRoomSelection();
 				break;
 			case "Btn Options Pop-Up":
-				sroom.ShowPopUpOptions();
+				_sroom.ShowPopUpOptions();
 				break;
 			default:
 				return;

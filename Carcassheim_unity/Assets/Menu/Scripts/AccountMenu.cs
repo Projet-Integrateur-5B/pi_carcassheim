@@ -29,24 +29,24 @@ public class AccountMenu : Miscellaneous
 	{
 	}
 
-	public void resetWarningTextAM()
+	public void ResetWarningTextAM()
 	{
 		GameObject tmpGO = GameObject.Find("Create Account");
 		Text tmpText = tmpGO.GetComponent<Text>();
-		tryColor(tmpGO, Color.white, "f4fefe");
+		TryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Creez votre compte";
 	}
 
 	public void HideAccount()
 	{
-		resetWarningTextAM();
-		changeMenu(FindMenu("CreateAccountMenu"), FindMenu("ConnectionMenu"));
+		ResetWarningTextAM();
+		ChangeMenu(FindMenu("CreateAccountMenu"), FindMenu("ConnectionMenu"));
 	}
 
 	public void HideAccountConnected()
 	{
-		resetWarningTextAM();
-		changeMenu(FindMenu("CreateAccountMenu"), FindMenu("HomeMenu"));
+		ResetWarningTextAM();
+		ChangeMenu(FindMenu("CreateAccountMenu"), FindMenu("HomeMenu"));
 		Connected();
 	}
 
@@ -68,10 +68,10 @@ public class AccountMenu : Miscellaneous
 		GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().ForceLabelUpdate();
 	}
 
-	public bool getInputFields()
+	public bool GetInputFields()
 	{
-		bool a = StrCompare(removeLastSpace(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text), "a");
-		bool b = StrCompare(removeLastSpace(GameObject.Find("InputField Email CA").GetComponent<InputField>().text), "b");
+		bool a = StrCompare(RemoveLastSpace(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text), "a");
+		bool b = StrCompare(RemoveLastSpace(GameObject.Find("InputField Email CA").GetComponent<InputField>().text), "b");
 		bool c = StrCompare(GameObject.Find("InputField Day CA").GetComponent<InputField>().text, "01");
 		bool d = StrCompare(GameObject.Find("InputField Month CA").GetComponent<InputField>().text, "02");
 		bool e = StrCompare(GameObject.Find("InputField Year CA").GetComponent<InputField>().text, "0304");
@@ -79,8 +79,6 @@ public class AccountMenu : Miscellaneous
 		string tmpPwd2 = GameObject.Find("InputField ConfirmPwd CA").GetComponent<InputField>().text;
 		bool f = StrCompare(tmpPwd, "c");
 		bool g = StrCompare(tmpPwd2, tmpPwd);
-		Debug.Log("ICI");
-		Debug.Log(a && b && c && d && e && f && g);
 		return a && b && c && d && e && f && g;
 	}
 
@@ -91,13 +89,13 @@ public class AccountMenu : Miscellaneous
 		//Texte deborde sur formulaire. Rendre code portable et utilisable :
 		// Modification position texte en ajoutant a sa coordonne la moitie de sa hauteur.
 		Text tmpText = tmpGO.GetComponent<Text>();
-		setState(tmpBool && getInputFields());
-		if (getState() == true)
+		SetState(tmpBool && GetInputFields());
+		if (GetState() == true)
 			HideAccountConnected();
 		else
 		{
-			displayFlex();
-			randomIntColor(tmpGO);
+			DisplayFlex();
+			RandomIntColor(tmpGO);
 			tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
 		}
 	}
