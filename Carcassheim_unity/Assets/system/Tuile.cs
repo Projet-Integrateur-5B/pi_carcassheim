@@ -48,7 +48,7 @@ public partial class Tuile
     {
         Id = id;
         _slots = slots;
-        _lien = lien;
+        _lienSlotPosition = lien;
         _nombreSlot = slots.Length;
     }
 
