@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 public partial class Tuile
 {
@@ -48,7 +49,7 @@ public partial class Tuile
     {
         Id = id;
         _slots = slots;
-        _lien = lien;
+        _lienSlotPosition = lien;
         _nombreSlot = slots.Length;
     }
 
@@ -64,18 +65,18 @@ public partial class Tuile
         }
         return 0;
     }
-
+/*
     public TypeTerrain[] TerrainSurFace(int rot)
     {
         TypeTerrain[] resultat = new TypeTerrain[3];
 
         int[] positionInterneRecherchee = new int[3];
-        int compteur = 0;
         for (int i = 0; i < 3; i++)
         {
             positionInterneRecherchee[i] = rot * 3 + i;
         }
         
+        int compteur = 0;
         for (int i = 0; i < _nombreSlot; i++)
         {
             foreach (int position in _lienSlotPosition[i])
@@ -85,8 +86,27 @@ public partial class Tuile
                     position == positionInterneRecherchee[2])
                 {
                     resultat[compteur++] = _slots[i].Terrain;
+
+                    if (X == Y)
+                        Debug.Log(position);
                 }
             }
+        }
+
+        return resultat;
+    }*/
+
+    public TypeTerrain[] TerrainSurFace(int rot)
+    {
+        TypeTerrain[] resultat = new TypeTerrain[3];
+
+        int positionInterneRecherchee;
+        for (int i = 0; i < 3; i++)
+        {
+            positionInterneRecherchee = rot * 3 + i;
+
+            int idSlot = IdSlotFromPositionInterne(positionInterneRecherchee);
+            resultat[i] = _slots[idSlot].Terrain;
         }
 
         return resultat;
