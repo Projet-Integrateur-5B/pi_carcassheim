@@ -26,8 +26,6 @@ public class Partie
         lien[0] = t2;
         TypeTerrain[] terrains = new TypeTerrain[] { TypeTerrain.Ville };*/
         
-        _plateau.PoserTuile(new Tuile(0, 1, lien, terrains), 0, 0, 2);
-
-        Console.WriteLine("TOUT EST OK");
+        _plateau.PoserTuile(new Tuile(0, 2, lien, terrains), 0, 0, 2);
     }
 }
