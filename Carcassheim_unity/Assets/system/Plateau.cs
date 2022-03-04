@@ -29,6 +29,16 @@ public class Plateau
         return null;
     }
 
+    public Tuile GetTuile(int id)
+    {
+        foreach (var item in _tuiles)
+        {
+            if (item.Id == id)
+                return item;
+        }
+        return null;
+    }
+
     public Tuile[] GetTuiles => _tuiles.ToArray();/*
     {
         return _tuiles.ToArray();
@@ -257,6 +267,22 @@ public class Plateau
         }
 
         return resultat;
+    }
+
+    public bool PionPosable(int idTuile, int idSlot, int idJoueur)
+    {
+        Tuile tuile = GetTuile(idTuile);
+
+        if (tuile == null || tuile.NombreSlot < idSlot)
+            return false;
+
+        int[] tab = EmplacementPionPossible(tuile, idJoueur);
+        for (int i = 0; i < tab.Length; i++)
+        {
+            if (tab[i] == idSlot)
+                return true;
+        }
+        return false;
     }
 }
 
