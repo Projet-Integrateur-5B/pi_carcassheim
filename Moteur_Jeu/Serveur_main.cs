@@ -5,7 +5,7 @@ using Thread_communication;
 
 public static class Serveur_main 
 {
-    private List<Thread> _lst_threads_com;
+    private List<Thread_communication> _lst_threads_com;
 
     static void Main(string[] args){
 
@@ -19,23 +19,57 @@ public static class Serveur_main
                 //(BDD - Vérifie si le login et mdp sont bons)
 
             // Réception d'une connexion à une partie
-            // Réception d'une création de partie
+            
             int port_partie;
 
             
-                // SI il n'existe aucun thread de communication
-                if(_lst_threads_com.Count() == 0){
+            // Réception d'une création de partie (un if dans le while de reception global)
+            
+                if(_lst_threads_com.Count() == 0){ // Aucun thread de comm n'existe
                     
-                    Thread_communication manipulateur_threads = new Thread_communication(port_partie);
-                    Thread nouv_thread = new Thread(new ThreadStart(manipulateur_threads.lancement_thread_com));
-                    _lst_threads_com.Add(nouv_thread);
+                    Thread_communication thread_com = new Thread_communication(port_partie);
+                    Thread nouv_thread = new Thread(new ThreadStart(thread_com.lancement_thread_com));
+                    _lst_threads_com.Add(thread_com);
                     nouv_thread.Start();
-                }
 
-                // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
-                foreach(Thread threa_com in _lst_threads_com){
-                    //if()
+                    // A FAIRE - Fonction de redirection vers thread de com
                 }
+                else{
+                    bool thread_com_trouve = false;
+
+                    // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
+                    foreach(Thread_communication thread_com in _lst_threads_com){
+                        lock(thread_com){
+                            if(thread_com.get_parties_gerees() < 5){
+
+                                thread_com_trouve = true;
+                                thread_com.add_partie_geree();
+
+                                // A FAIRE - Fonction (dans le thread de com) de création d'accueil
+
+                                // A FAIRE - Fonction de redirection vers thread de com
+                            }
+                        }
+                    }
+
+                    // Si aucun des threads n'est libre pour héberger une partie de plus
+                    if(thread_com_trouve == false){
+
+                        Thread_communication thread_com = new Thread_communication(port_partie);
+                        Thread nouv_thread = new Thread(new ThreadStart(thread_com.lancement_thread_com));
+                        _lst_threads_com.Add(thread_com);
+                        nouv_thread.Start();
+
+                        // A FAIRE - Fonction (dans le thread de com) de création d'accueil
+
+                        // A FAIRE - Fonction de redirection vers thread de com
+
+                    }
+
+                }
+                
+
+                
 
                 // Passage de la requête vers le thread de communication lié
                 
