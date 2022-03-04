@@ -33,6 +33,8 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	private static bool clickEnter = false;
 	private string namein;
+
+	public Button[] buttons;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -53,7 +55,6 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 		/* SetCursorVisible(false); */
 	}
-
 	void TaskOnClick(){
 		Debug.Log ("You have clicked the button!");
 	}
@@ -64,11 +65,12 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		/* if(Keyboard.current.anyKey.wasPressedThisFrame) */
 			/* Debug.Log("ahhhhhhhhhhhhhhhhhhhhh"); */
 			// A AMELIORER
-				if(clickEnter){
+/* 				if(clickEnter){
 			Button btn = GameObject.Find(EventSystem.current.currentSelectedGameObject.name).GetComponent<Button>();
 			Debug.Log(EventSystem.current.currentSelectedGameObject.name);
-			btn.onClick.AddListener(TaskOnClick);
-		}
+			btn.onClick.AddListener(TaskOnClick); */
+
+		
 	}
 
 /* 
@@ -82,20 +84,30 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	{
 		if(!EventSystem.current.alreadySelecting){
 			EventSystem.current.SetSelectedGameObject(this.gameObject);
-			/* Debug.Log (this.gameObject.GetComponent<Button>().name + "selected"); */
+			//GameObject sel = EventSystem.current.currentSelectedGameObject;
+			// Debug.Log (this.gameObject.GetComponentInChildren<Button>().name + "selected"); 
 		namein = name;
 		clickEnter = true;
-
+ 		Button btn = this.gameObject.GetComponentInChildren<Button>();
+		Debug.Log(btn); 
+btn.onClick.AddListener(() => {LogName(btn.gameObject); }); // on pointer enter ?
 /* 		HighlightEnter(name);
 		s_pbool = true;
 		_pname = name; */
 		}
 
+		
+
 	}
+
+	public void LogName(GameObject btn){
+    	Debug.Log(btn);
+}
 
 	//Do this when the selectable UI object is selected.
 	public void OnDeselect (BaseEventData eventData) 
 	{
+		
 		this.GetComponent<Selectable>().OnPointerExit(null);
 		Debug.Log (/* this.gameObject.name +  */ "DESELECTED");
 	}
