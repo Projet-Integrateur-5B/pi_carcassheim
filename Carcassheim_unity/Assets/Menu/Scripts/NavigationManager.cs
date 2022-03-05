@@ -1,11 +1,15 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.Events;
+using System.Reflection;
 
 // include fonctions du script via la classe HomeMenu incluant elle meme (ConnectionMenu + Miscellaneous + Monobehaviour)
-public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, /* IPointerClickHandler, */ ISelectHandler /* , IPointerDownHandler */
 {
 	private OptionsMenu _option;
 	private AccountMenu _acc;
@@ -24,8 +28,11 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	public static bool s_ibool = true;
 	public static bool s_hbool = false;
 	public static bool s_pbool = false;
+	public static bool s_keyboardOn = false;
 	private string _pname;
 	private string _hname;
+	private static bool clickEnter = false;
+	private EventSystem m_EventSystem;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -40,42 +47,92 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		_cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
 		_stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
 		_sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
+	/* SetCursorVisible(false); */
+	}
+
+	void OnEnable()
+	{
+		//Fetch the current EventSystem. Make sure your Scene has one.
+		m_EventSystem = EventSystem.current;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
-	}
-
-	public void OnPointerClick(PointerEventData eventData)
-	{
-		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
-		_tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
-		bool tmp = (!GetState() && !_tmpBool) || GetState();
-		if (tmp)
+		if (Keyboard.current.anyKey.wasPressedThisFrame)
+			Debug.Log("ahhhhhhhhhhhhhhhhhhhhh");
+		// A AMELIORER
+		if (clickEnter)
 		{
-			if (hasText)
+			if (Input.GetMouseButtonDown(0))
 			{
-				_btnText = GameObject.Find(name).GetComponentInChildren<Text>();
+				Debug.Log(m_EventSystem.currentSelectedGameObject);
+				onPress(m_EventSystem.currentSelectedGameObject.name);
 			}
-
-			MethodeCall(name);
-			if (hasText)
-			{
-				if (HasMenuChanged())
-				{
-					_btnText.fontSize -= 3;
-					_btnText.color = _previousColor;
-					SetMenuChanged(false);
-				}
-				else
-					TryColorText(_btnText, Color.blue, "#1e90ff");
-			}
-
-			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		}
 	}
 
+	// PARTIE COMMUNE : 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////// FONCTIONNEL //////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	Dictionary<string, string> matching = new Dictionary<string, string>()
+	{// HomeMenu :
+	{"Btn Connexion", "ShowConnection"}, {"Btn Jouer", "Jouer"}, {"Btn Statistiques", "ShowStatistiques"}, {"Btn Options", "ShowOptions"}, {"Btn Quitter le jeu", "Quitter"}, // StatistiquesMenu :
+	{"Btn Retour Stat", "HideStatistiques"}, // OptionsMenu :
+	{"Btn Retour Opt", "HideOptions"}, {"Btn Son", "SwitchSound"}, {"Toggle French", "FlagsToggle"}, {"Toggle English", "FlagsToggle"}, {"Toggle German", "FlagsToggle"}, {"Btn Musique", "SwitchMusic"}, {"Btn Fenêtré", "FullScreen"}, {"Btn Aide", "Help"}, {"Btn Credits", "ShowCredits"}, // CreditsMenu :
+	{"Btn Retour Credits", "HideCredits"}, // ConnectionMenu :
+	{"Btn Retour Co", "HideConnection"}, {"Btn ForgottenPwdUser", "ForgottenPwdUser"}, {"Btn Se Connecter", "Connect"}, {"Btn Creer un compte", "CreateAccount"}, {"Toggle AfficherMdp", "HideShowPwd"}, // AccountMenu :
+	{"Btn Retour Crea CA", "HideAccount"}, {"Btn Creer votre compte", "CreateAccountConnected"}, {"Toggle AfficherMdp CA", "HideShowPwdConf"}, // RoomSelectionMenu :
+	{"Btn Retour RoomSelection", "HideRoomSelection"}, {"Btn Options Pop-Up", "ShowPopUpOptions"}};
+	public void MethodeCall(string myString)
+	{
+		string methode;
+		bool TGV = this.matching.TryGetValue(myString, out methode);
+		// PATCH pour que ça fonctionne 
+		// A AMELIORER (rendre ça plus propre que 50 if avec les X.invoke)
+		if (TGV)
+		{
+			if (GetCurrentMenu().name == "HomeMenu")
+				_home.Invoke(methode, 0);
+			if (GetCurrentMenu().name == "StatistiquesMenu")
+				_stat.Invoke(methode, 0);
+			if (GetCurrentMenu().name == "OptionsMenu")
+				_option.Invoke(methode, 0);
+			if (GetCurrentMenu().name == "CreditsMenu")
+				_cred.Invoke(methode, 0);
+			if (GetCurrentMenu().name == "ConnectionMenu")
+				_co.Invoke(methode, 0);
+			if (GetCurrentMenu().name == "CreateAccountMenu")
+				_acc.Invoke(methode, 0);
+			if (GetCurrentMenu().name == "RoomSelectionMenu")
+				_sroom.Invoke(methode, 0);
+		}
+		else
+			Debug.Log("CALL " + " ERROR");
+	}
+
+	void OnSelectionChange()
+	{
+		Debug.Log("selection changed");
+	}
+
+	//Do this when the selectable UI object is selected.
+	public void OnSelect(BaseEventData eventData)
+	{
+		Debug.Log("SELECTED");
+	}
+
+	//Do this when the selectable UI object is selected.
+	public void OnDeselect(BaseEventData eventData)
+	{
+		this.GetComponent<Selectable>().OnPointerExit(null);
+		Debug.Log( /* this.gameObject.name +  */"DESELECTED");
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////// A AMELIORER //////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void HighlightEnter(string name)
 	{
 		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
@@ -106,6 +163,87 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		}
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+	
+	// PARTIE SOURIS :
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////// FONCTIONNEL //////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Do this when the selectable UI object is selected.
+	public void OnPointerEnter(PointerEventData eventData)
+	{
+		if (eventData.pointerCurrentRaycast.gameObject != null)
+		{
+			// Recupère le GO du hover (text si bouton d'où parent pour avoir boutton) :
+			GameObject currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			// Marque l'objet comme "selectionné" :
+			if (!m_EventSystem.alreadySelecting)
+			{
+				// Marque l'objet comme "selectionné" :
+				m_EventSystem.SetSelectedGameObject(null);
+				m_EventSystem.SetSelectedGameObject(currentGo, eventData); // GameObject à la place de currenGo pour trigger onselect
+				Debug.Log("Selections : " + m_EventSystem.currentSelectedGameObject);
+				clickEnter = true;
+			}
+		}
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		clickEnter = false;
+		Debug.Log("EXIT");
+	/* 		HighlightExit(name);
+		s_pbool = false; */
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////// A AMELIORER //////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void onPress(string name)
+	{
+		bool hasText = !GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>(); //pour les GO qui ont du texte, sans les toggle
+		_tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
+		bool tmp = (!GetState() && !_tmpBool) || GetState();
+		if (tmp)
+		{
+			if (hasText)
+			{
+				_btnText = GameObject.Find(name).GetComponentInChildren<Text>();
+				MethodeCall(name);
+				if (HasMenuChanged())
+				{
+					_btnText.fontSize -= 3;
+					_btnText.color = _previousColor;
+					SetMenuChanged(false);
+				}
+				else
+					TryColorText(_btnText, Color.blue, "#1e90ff");
+			}
+
+			GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+	// PARTIE CLAVIER : (avec if(Keyboard.current.anyKey.wasPressedThisFrame))
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////// A REFAIRE ////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void SetCursorVisible(bool b)
 	{
 		if (b == false)
@@ -115,7 +253,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		Cursor.visible = b;
 	}
 
-	public void ForwardKey()
+	public void DirectionKey(char direction)
 	{
 		if (s_ibool)
 		{
@@ -132,13 +270,27 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				HighlightExit(foundObjects[s_i].name);
 			}
 
-			if (s_i == foundObjects.Length - 1)
+			if (direction == '+')
 			{
-				s_i = 0;
+				if (s_i == foundObjects.Length - 1)
+				{
+					s_i = 0;
+				}
+				else if (s_i < foundObjects.Length - 1 && s_i >= 0)
+				{
+					s_i++;
+				}
 			}
-			else if (s_i < foundObjects.Length - 1 && s_i >= 0)
+			else if (direction == '-')
 			{
-				s_i++;
+				if (s_i == 0)
+				{
+					s_i = foundObjects.Length - 1;
+				}
+				else if (s_i <= foundObjects.Length - 1 && s_i > 0)
+				{
+					s_i--;
+				}
 			}
 
 			HighlightEnter(foundObjects[s_i].name);
@@ -146,83 +298,46 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 			Debug.Log(foundObjects[s_i].name + " : " + s_i);
 			s_ibool = false;
 			_hname = name;
+			s_keyboardOn = true;
 		}
-	}
-
-	public void BackwardKey()
-	{
-		if (s_ibool)
-		{
-			var foundObjects = FindObjectsOfType<Button>();
-			Debug.Log(foundObjects[s_i].name + " : " + s_i);
-			if (s_pbool)
-			{ // A optimiser
-				HighlightExit(_pname);
-				SetCursorVisible(false);
-			}
-
-			if (s_hbool)
-			{
-				HighlightExit(foundObjects[s_i].name);
-			}
-
-			if (s_i == 0)
-			{
-				s_i = foundObjects.Length - 1;
-			}
-			else if (s_i <= foundObjects.Length - 1 && s_i > 0)
-			{
-				s_i--;
-			}
-
-			HighlightEnter(foundObjects[s_i].name);
-			Debug.Log(foundObjects[s_i].name + " : " + s_i);
-			s_ibool = false;
-			_hname = name;
-		}
-	}
-
-	public void EnterKeyboard()
-	{
-		Debug.Log("methodeCall : " + _hname);
-		MethodeCall(_hname);
 	}
 
 	void OnGUI()
 	{
-		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+	/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.RightArrow))
 		{ // haut/droit
-			ForwardKey();
+			DirectionKey('+');
 		}
 
 		if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow))
 		{ // bas/gauche
-			BackwardKey();
+			DirectionKey('-');
 		}
 
 		if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
 		{ // Entree
-			EnterKeyboard();
+			Debug.Log("methodeCall : " + _hname);
+			MethodeCall(_hname);
 		}
 
-		if (Input.GetKeyDown(KeyCode.Escape))
-		{ // Echape
+		if ((Input.GetAxis("Mouse X") != 0) && s_keyboardOn) // if mouse moves
+		{ 
 			HighlightExit(_hname); // A optimiser
 			SetCursorVisible(true);
+			s_keyboardOn = false;
 		// + engrenage
 		}
 
 		bool boolKeyUp = Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.Return) || Input.GetKeyUp(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Escape);
 		if (boolKeyUp)
-			s_ibool = true;
+			s_ibool = true; */
 	// A preserver : 	
 	/* 		direction = new Vector3(0, 1, 0); // up
 		btnMain = (Button)FindObjectOfType(typeof(Button));
         Selectable newSelectable = btnMain.FindSelectable(direction);
         Debug.Log(newSelectable.name);  */
 	}
-
-	public void OnPointerEnter(PointerEventData eventData)
+/* 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		HighlightEnter(name);
 		s_pbool = true;
@@ -233,97 +348,8 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	{
 		HighlightExit(name);
 		s_pbool = false;
-	}
-
-	public void MethodeCall(string name)
-	{
-		switch (name)
-		{
-			// HomeMenu :
-			case "Btn Connexion":
-				_home.ShowConnection();
-				break;
-			case "Btn Jouer":
-				if (GetState())
-					_home.Jouer();
-				break;
-			case "Btn Statistiques":
-				if (GetState())
-					_home.ShowStatistiques();
-				break;
-			case "Btn Options":
-				_home.ShowOptions();
-				break;
-			case "Btn Quitter le jeu":
-				_home.Quitter();
-				break;
-			// StatistiquesMenu : 
-			case "Btn Retour Stat":
-				_stat.HideStatistiques();
-				break;
-			// OptionsMenu :
-			case "Btn Retour Opt":
-				_option.HideOptions();
-				break;
-			case "Btn Son":
-				_option.SwitchSound();
-				break;
-			case "Toggle French":
-			case "Toggle English":
-			case "Toggle German":
-				_option.FlagsToggle();
-				break;
-			case "Btn Musique":
-				_option.SwitchMusic();
-				break;
-			case "Btn Fenêtré":
-				_option.FullScreen();
-				break;
-			case "Btn Aide":
-				_option.Help();
-				break;
-			case "Btn Credits":
-				_option.ShowCredits();
-				break;
-			// CreditsMenu :
-			case "Btn Retour Credits":
-				_cred.HideCredits();
-				break;
-			// ConnectionMenu :
-			case "Btn Retour Co":
-				_co.HideConnection();
-				break;
-			case "Btn ForgottenPwdUser":
-				_co.ForgottenPwdUser();
-				break;
-			case "Btn Se Connecter":
-				_co.Connect();
-				break;
-			case "Btn Creer un compte":
-				_co.CreateAccount();
-				break;
-			case "Toggle AfficherMdp":
-				_co.HideShowPwd();
-				break;
-			// AccountMenu
-			case "Btn Retour Crea CA":
-				_acc.HideAccount();
-				break;
-			case "Btn Creer votre compte":
-				_acc.CreateAccountConnected();
-				break;
-			case "Toggle AfficherMdp CA":
-				_acc.HideShowPwdConf();
-				break;
-			// RoomSelectionMenu
-			case "Btn Retour RoomSelection":
-				_sroom.HideRoomSelection();
-				break;
-			case "Btn Options Pop-Up":
-				_sroom.ShowPopUpOptions();
-				break;
-			default:
-				return;
-		}
-	}
+	} */
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////// A REFAIRE ////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

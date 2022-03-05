@@ -84,6 +84,8 @@ public abstract class Miscellaneous : MonoBehaviour
 		return s_menuHasChanged;
 	}
 
+
+	// A AMELIORER
 	public GameObject GetCurrentMenu()
 	{
 		_goToFind = GameObject.Find("SubMenus");
