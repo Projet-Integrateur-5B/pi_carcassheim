@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using Thread_communication;
+using Thread_connexion;
 
 public static class Serveur_main 
 {
@@ -15,8 +16,16 @@ public static class Serveur_main
 
             // Réception d'une identification (connexion login)
 
-            // Création d'un thread temporaire de gestion de la requête 
+                // Création d'un thread temporaire de gestion de la requête 
+
+                // Créer un objet pour chaque threads, comme ça pas de pb d'un attribut utilisé par plusieurs threads
+                Thread nouv_thread_connexion = new Thread(new ThreadStart(thread_connexion));
+                nouv_thread_connexion.Start();
+
+                // A FAIRE - Fonction de redirection vers thread de connexion
+
                 //(BDD - Vérifie si le login et mdp sont bons)
+            
 
             // Réception d'une connexion à une partie
             
@@ -84,9 +93,13 @@ public static class Serveur_main
 
 
         // Fermeture de tous les threads
-        foreach(Thread threa_com in _lst_threads_com){
-            threa_com.Join();
+        foreach(Thread thread_com in _lst_threads_com){
+            thread_com.Join();
         }
+
+    }
+
+    public void thread_connexion(){
 
     }
 }
