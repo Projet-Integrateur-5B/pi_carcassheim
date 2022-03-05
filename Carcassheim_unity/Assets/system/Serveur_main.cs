@@ -1,16 +1,17 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
-using Thread_communication;
-using Thread_connexion;
 
 public static class Serveur_main 
 {
-    private List<Thread_communication> _lst_threads_com;
+    private static List<Thread_communication> _lst_obj_threads_com;
+    private static List<Thread> _lst_threads_com;
 
     static void Main(string[] args){
 
         _lst_threads_com = new List<Thread>();
+
+        _lst_obj_threads_com = new List<Thread_communication>();
 
         // RESEAU - boucle de réception des communications
 
@@ -29,16 +30,20 @@ public static class Serveur_main
 
             // Réception d'une connexion à une partie
             
-            int port_partie;
+            // TEMP - DEBUG
+            int port_partie = 1;
 
             
             // Réception d'une création de partie (un if dans le while de reception global)
             
-                if(_lst_threads_com.Count() == 0){ // Aucun thread de comm n'existe
+                if(_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0){ // Aucun thread de comm n'existe
                     
                     Thread_communication thread_com = new Thread_communication(port_partie);
                     Thread nouv_thread = new Thread(new ThreadStart(thread_com.lancement_thread_com));
-                    _lst_threads_com.Add(thread_com);
+
+                    _lst_obj_threads_com.Add(thread_com);
+                    _lst_threads_com.Add(nouv_thread);
+
                     nouv_thread.Start();
 
                     // A FAIRE - Fonction de redirection vers thread de com
@@ -47,9 +52,9 @@ public static class Serveur_main
                     bool thread_com_trouve = false;
 
                     // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
-                    foreach(Thread_communication thread_com in _lst_threads_com){
+                    foreach(Thread_communication thread_com in _lst_obj_threads_com){
                         lock(thread_com){
-                            if(thread_com.get_parties_gerees() < 5){
+                            if(thread_com.get_nb_parties_gerees() < 5){
 
                                 thread_com_trouve = true;
                                 thread_com.add_partie_geree();
@@ -66,7 +71,10 @@ public static class Serveur_main
 
                         Thread_communication thread_com = new Thread_communication(port_partie);
                         Thread nouv_thread = new Thread(new ThreadStart(thread_com.lancement_thread_com));
-                        _lst_threads_com.Add(thread_com);
+
+                        _lst_obj_threads_com.Add(thread_com);
+                        _lst_threads_com.Add(nouv_thread);
+
                         nouv_thread.Start();
 
                         // A FAIRE - Fonction (dans le thread de com) de création d'accueil
@@ -93,13 +101,13 @@ public static class Serveur_main
 
 
         // Fermeture de tous les threads
-        foreach(Thread thread_com in _lst_threads_com){
-            thread_com.Join();
+        foreach(Thread thread in _lst_threads_com){
+            thread.Join();
         }
 
     }
 
-    public void thread_connexion(){
+    public static void thread_connexion(){
 
     }
 }
