@@ -1,21 +1,29 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using UnityEngine;
 
-public static class Serveur_main 
+public class Serveur_main : MonoBehaviour
 {
     private static List<Thread_communication> _lst_obj_threads_com;
     private static List<Thread> _lst_threads_com;
 
-    static void Main(string[] args){
+    void Start()
+    {
 
         _lst_threads_com = new List<Thread>();
 
         _lst_obj_threads_com = new List<Thread_communication>();
 
-        // RESEAU - boucle de réception des communications
+        int fonctionReseauRecept = 0;
 
-            // Réception d'une identification (connexion login)
+        // RESEAU - boucle de réception des communications
+        while(fonctionReseauRecept != 0){
+
+            int typeMsg = 0; // Dépendra du type : identification, connexion, etc
+
+            if(typeMsg == 1){
+                // Réception d'une identification (connexion login)
 
                 // Création d'un thread temporaire de gestion de la requête 
 
@@ -26,16 +34,18 @@ public static class Serveur_main
                 // A FAIRE - Fonction de redirection vers thread de connexion
 
                 //(BDD - Vérifie si le login et mdp sont bons)
-            
 
-            // Réception d'une connexion à une partie
-            
-            // TEMP - DEBUG
-            int port_partie = 1;
+            }
+            else if(typeMsg == 2){
+                // Réception d'une connexion à une partie
+            }
+            else if(typeMsg == 3){ 
 
-            
-            // Réception d'une création de partie (un if dans le while de reception global)
-            
+                // Réception d'une création de partie (un if dans le while de reception global)
+
+                // TEMP - DEBUG
+                int port_partie = 1;
+                    
                 if(_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0){ // Aucun thread de comm n'existe
                     
                     Thread_communication thread_com = new Thread_communication(port_partie);
@@ -84,18 +94,18 @@ public static class Serveur_main
                     }
 
                 }
-                
-
-                
-
+        
                 // Passage de la requête vers le thread de communication lié
+            }
                 
             
-
+        }
         // RESEAU - fin boucle de réception des communications
 
 
         
+        Debug.Log("Ceci est un test");
+
 
         // Prévenir tous les threads que le serveur ferme 
 
