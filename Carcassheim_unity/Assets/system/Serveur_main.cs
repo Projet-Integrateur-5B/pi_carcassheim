@@ -8,12 +8,16 @@ public class Serveur_main : MonoBehaviour
     private static List<Thread_communication> _lst_obj_threads_com;
     private static List<Thread> _lst_threads_com;
 
+    private static int compteur_id_thread_com;
+
     void Start()
     {
 
         _lst_threads_com = new List<Thread>();
 
         _lst_obj_threads_com = new List<Thread_communication>();
+
+        compteur_id_thread_com = 0;
 
         int fonctionReseauRecept = 0;
 
@@ -48,7 +52,8 @@ public class Serveur_main : MonoBehaviour
                     
                 if(_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0){ // Aucun thread de comm n'existe
                     
-                    Thread_communication thread_com = new Thread_communication(port_partie);
+                    Thread_communication thread_com = new Thread_communication(port_partie,compteur_id_thread_com);
+                    compteur_id_thread_com++;
                     Thread nouv_thread = new Thread(new ThreadStart(thread_com.lancement_thread_com));
 
                     _lst_obj_threads_com.Add(thread_com);
@@ -62,14 +67,18 @@ public class Serveur_main : MonoBehaviour
                     bool thread_com_trouve = false;
 
                     // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
-                    foreach(Thread_communication thread_com in _lst_obj_threads_com){
-                        lock(thread_com){
-                            if(thread_com.get_nb_parties_gerees() < 5){
+                    foreach(Thread_communication thread_com_iterateur in _lst_obj_threads_com){
+                        lock(thread_com_iterateur){
+                            if(thread_com_iterateur.get_nb_parties_gerees() < 5){
 
                                 thread_com_trouve = true;
-                                thread_com.add_partie_geree();
-
-                                // A FAIRE - Fonction (dans le thread de com) de création d'accueil
+                        
+                                // A FAIRE - Fonction (dans le thread de com) de création d'accueil ET DE PARTIE QUOI
+                                // Exemple:
+                                /*
+                                int nouvel_id = 2; // BDD - Rajouter requête pour récupérer le prochain id dispo
+                                thread_com_iterateur.add_partie_geree();
+                                */
 
                                 // A FAIRE - Fonction de redirection vers thread de com
                             }
@@ -79,13 +88,14 @@ public class Serveur_main : MonoBehaviour
                     // Si aucun des threads n'est libre pour héberger une partie de plus
                     if(thread_com_trouve == false){
 
-                        Thread_communication thread_com = new Thread_communication(port_partie);
-                        Thread nouv_thread = new Thread(new ThreadStart(thread_com.lancement_thread_com));
+                        Thread_communication thread_com_supplementaire = new Thread_communication(port_partie,compteur_id_thread_com);
+                        compteur_id_thread_com++;
+                        Thread nouv_thread_supplementaire = new Thread(new ThreadStart(thread_com_supplementaire.lancement_thread_com));
 
-                        _lst_obj_threads_com.Add(thread_com);
-                        _lst_threads_com.Add(nouv_thread);
+                        _lst_obj_threads_com.Add(thread_com_supplementaire);
+                        _lst_threads_com.Add(nouv_thread_supplementaire);
 
-                        nouv_thread.Start();
+                        nouv_thread_supplementaire.Start();
 
                         // A FAIRE - Fonction (dans le thread de com) de création d'accueil
 
@@ -97,18 +107,44 @@ public class Serveur_main : MonoBehaviour
         
                 // Passage de la requête vers le thread de communication lié
             }
-                
-            
+                  
         }
         // RESEAU - fin boucle de réception des communications
 
 
-        
+        // Test threads 
         Debug.Log("Ceci est un test");
+
+        // Création d'un thread de com de port 1
+        Thread_communication thread_com_test1 = new Thread_communication(1,compteur_id_thread_com);
+        compteur_id_thread_com++;
+        Thread nouv_thread_test1 = new Thread(new ThreadStart(thread_com_test1.lancement_thread_com));
+
+        _lst_obj_threads_com.Add(thread_com_test1);
+        _lst_threads_com.Add(nouv_thread_test1);
+
+        nouv_thread_test1.Start();
+
+        // Création d'un thread de com de port 2
+        Thread_communication thread_com_test2 = new Thread_communication(2,compteur_id_thread_com);
+        compteur_id_thread_com++;
+        Thread nouv_thread_test2 = new Thread(new ThreadStart(thread_com_test2.lancement_thread_com));
+
+        _lst_obj_threads_com.Add(thread_com_test2);
+        _lst_threads_com.Add(nouv_thread_test2);
+
+        nouv_thread_test2.Start();
+
+        // On indique au premier qu'il gère 1 partie et au second 2
+        _lst_obj_threads_com[0].add_partie_geree(1);
+
+        _lst_obj_threads_com[1].add_partie_geree(2);
+        _lst_obj_threads_com[1].add_partie_geree(3);
+
+
 
 
         // Prévenir tous les threads que le serveur ferme 
-
 
         // Fermeture de tous les threads
         foreach(Thread thread in _lst_threads_com){
