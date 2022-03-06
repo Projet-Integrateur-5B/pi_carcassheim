@@ -9,7 +9,7 @@ using UnityEngine.Events;
 using System.Reflection;
 
 // include fonctions du script via la classe HomeMenu incluant elle meme (ConnectionMenu + Miscellaneous + Monobehaviour)
-public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, /* IPointerClickHandler, */ ISelectHandler /* , IPointerDownHandler */
+public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler 
 {
 	private OptionsMenu _option;
 	private AccountMenu _acc;
@@ -33,6 +33,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	private string _hname;
 	private static bool clickEnter = false;
 	private EventSystem m_EventSystem;
+	private GameObject currentGo;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -112,6 +113,8 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 			Debug.Log("CALL " + " ERROR");
 	}
 
+
+	// A TESTER PLUS TARD : 
 	void OnSelectionChange()
 	{
 		Debug.Log("selection changed");
@@ -120,14 +123,18 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	//Do this when the selectable UI object is selected.
 	public void OnSelect(BaseEventData eventData)
 	{
-		Debug.Log("SELECTED");
+		Debug.Log("SELECTED" + currentGo);
+		HighlightEnter(currentGo.name);
 	}
 
 	//Do this when the selectable UI object is selected.
 	public void OnDeselect(BaseEventData eventData)
 	{
-		this.GetComponent<Selectable>().OnPointerExit(null);
-		Debug.Log( /* this.gameObject.name +  */"DESELECTED");
+		Debug.Log("DESELECTED" + currentGo);
+		if (currentGo != null)
+			HighlightExit(currentGo.name);
+		currentGo = null;
+		/* this.GetComponent<Selectable>().OnPointerExit(null); */
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,6 +159,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 
 	public void HighlightExit(string name)
 	{
+		Debug.Log(name);
 		if (!GameObject.Find(name).GetComponent<Toggle>() && GameObject.Find(name).GetComponentInChildren<Text>())
 		{
 			bool tmpBool = StrCompare(name, "Btn Jouer") || StrCompare(name, "Btn Statistiques");
@@ -180,16 +188,20 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 		if (eventData.pointerCurrentRaycast.gameObject != null)
 		{
 			// Recupère le GO du hover (text si bouton d'où parent pour avoir boutton) :
-			GameObject currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			bool tmp = currentGo.GetComponent<Button>() is Button;
+			/* Button btn = currentGo.GetComponent<Button>(); */
 			// Marque l'objet comme "selectionné" :
-			if (!m_EventSystem.alreadySelecting)
+			if (!m_EventSystem.alreadySelecting && tmp)
 			{
 				// Marque l'objet comme "selectionné" :
 				m_EventSystem.SetSelectedGameObject(null);
 				m_EventSystem.SetSelectedGameObject(currentGo, eventData); // GameObject à la place de currenGo pour trigger onselect
 				Debug.Log("Selections : " + m_EventSystem.currentSelectedGameObject);
 				clickEnter = true;
+				OnSelect(null); // Active OnSelect
 			}
+			else currentGo = null;
 		}
 	}
 
@@ -197,6 +209,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 	{
 		clickEnter = false;
 		Debug.Log("EXIT");
+		OnDeselect(null); // Active OnDeselect
 	/* 		HighlightExit(name);
 		s_pbool = false; */
 	}
@@ -222,6 +235,7 @@ public class NavigationManager : Miscellaneous, IPointerEnterHandler, IPointerEx
 				MethodeCall(name);
 				if (HasMenuChanged())
 				{
+					 currentGo = null; // Deselectionne
 					_btnText.fontSize -= 3;
 					_btnText.color = _previousColor;
 					SetMenuChanged(false);
