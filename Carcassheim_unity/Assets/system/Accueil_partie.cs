@@ -29,8 +29,8 @@ public class  Accueil_partie
         // BDD - Parcours de la liste des parties actuelles pour récupérer un ID non utilisé
         //_id_partie = ???
 
-        _lst_joueurs.Add(joueur_createur);
-        _id_moderateur = joueur_createur;
+        _lst_joueurs.Add(id_joueur_createur);
+        _id_moderateur = id_joueur_createur;
 
         _statut_partie = "ACCUEIL";
 
