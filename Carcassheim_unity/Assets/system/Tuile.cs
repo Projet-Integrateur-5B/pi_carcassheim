@@ -32,6 +32,7 @@ public partial class Tuile
         {"NOO", 11}
     };
 
+    public static Dictionary<int, Tuile> DicoTuiles { get; set; }
     public Tuile(int id, int nombreSlot, int[][] lien, TypeTerrain[] terrains)
     {
         _nombreSlot = nombreSlot;

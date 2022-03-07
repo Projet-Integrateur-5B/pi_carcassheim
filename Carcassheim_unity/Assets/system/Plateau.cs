@@ -29,32 +29,36 @@ public class Plateau
         return null;
     }
 
-    public Tuile GetTuile(int id)
-    {
-        foreach (var item in _tuiles)
-        {
-            if (item.Id == id)
-                return item;
-        }
-        return null;
-    }
-
     public Tuile[] GetTuiles => _tuiles.ToArray();/*
     {
         return _tuiles.ToArray();
     }*/
+
+    public void Poser1ereTuile(int idTuile)
+    {
+        Poser1ereTuile(Tuile.DicoTuiles[idTuile]);
+    }
 
     public void Poser1ereTuile(Tuile tuile)
     {
         PoserTuile(tuile, 0, 0, 0);
     }
 
+    public void PoserTuile(int idTuile, int x, int y, int rot)
+    {
+        PoserTuile(Tuile.DicoTuiles[idTuile], x, y, rot);
+    }
     public void PoserTuile(Tuile tuile, int x, int y, int rot)
     {
         tuile.X = x;
         tuile.Y = y;
         tuile.Rotation = rot;
         _tuiles.Add(tuile);
+    }
+
+    public Position[] PositionPlacementPossible(int idTuile)
+    {
+        return PositionsPlacementPossible(Tuile.DicoTuiles[idTuile]);
     }
 
     public Position[] PositionsPlacementPossible(Tuile tuile)
@@ -89,6 +93,11 @@ public class Plateau
         }
 
         return resultat.ToArray();
+    }
+
+    public bool PlacementLegal(int idTuile, int x, int y, int rotation)
+    {
+        return PlacementLegal(Tuile.DicoTuiles[idTuile], x, y, rotation);
     }
 
     public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
@@ -154,13 +163,20 @@ public class Plateau
         return TuilesAdjacentes(t.X, t.Y);
     }
 
+    public bool ZoneFermee(int idTuile, int idSlot)
+    {
+        return ZoneFermee(Tuile.DicoTuiles[idTuile], idSlot);
+    }
+
     public bool ZoneFermee(Tuile tuile, int idSlot)
     {
         if (!_tuiles.Contains(tuile)) // ERROR
             return false;
 
-        List<Tuile> tuilesFormantZone = new List<Tuile>();
-        tuilesFormantZone.Add(tuile);
+        List<Tuile> tuilesFormantZone = new List<Tuile>
+        {
+            tuile
+        };
 
         return ZoneFermeeAux(tuile, idSlot, tuilesFormantZone);
     }
@@ -223,11 +239,20 @@ public class Plateau
         return resultat.ToArray();
     }
 
+    public void PoserPion(int idJoueur, int idTuile, int idSlot)
+    {
+        PoserPion(idJoueur, Tuile.DicoTuiles[idTuile], idSlot);
+    }
+
     public void PoserPion(int idJoueur, Tuile tuile, int idSlot)
     {
         tuile.Slots[idSlot].IdJoueur = idJoueur;
     }
 
+    public int[] EmplacementPionPossible(int idTuile, int idJoueur)
+    {
+        return EmplacementPionPossible(Tuile.DicoTuiles[idTuile], idJoueur);
+    }
     public int[] EmplacementPionPossible(Tuile tuile, int idJoueur)
     {
         List<int> resultat = new List<int>();
@@ -242,7 +267,7 @@ public class Plateau
         return resultat.ToArray();
     }
 
-    public bool ZoneAppartientAutreJoueur(Tuile tuile, int idSlot, int idJoueur, List<Tuile> parcourues)
+    private bool ZoneAppartientAutreJoueur(Tuile tuile, int idSlot, int idJoueur, List<Tuile> parcourues)
     {
         bool vide, resultat = true;
         int[] positionsInternesProchainesTuiles;
@@ -271,7 +296,7 @@ public class Plateau
 
     public bool PionPosable(int idTuile, int idSlot, int idJoueur)
     {
-        Tuile tuile = GetTuile(idTuile);
+        Tuile tuile = Tuile.DicoTuiles[idTuile];
 
         if (tuile == null || tuile.NombreSlot < idSlot)
             return false;
