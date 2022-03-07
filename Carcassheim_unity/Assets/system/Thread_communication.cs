@@ -24,23 +24,23 @@ public class Thread_communication
     
     // Getters et setters
 
-    public int get_nb_parties_gerees(){
+    public int Get_nb_parties_gerees(){
         return _nb_parties_gerees;
     }
 
-    public List<int> get_id_parties_gerees(){
+    public List<int> Get_id_parties_gerees(){
         return _id_parties_gerees;
     }
 
     // Augmente le nombre de parties gérées de 1
-    public void add_partie_geree(int id_partie_ajoutee){
+    public void Add_partie_geree(int id_partie_ajoutee){
         _id_parties_gerees.Add(id_partie_ajoutee);
         _nb_parties_gerees++;
     }
 
     // Méthodes
 
-    public void lancement_thread_com(){
+    public void Lancement_thread_com(){
 
         Thread.Sleep(2000);
 
