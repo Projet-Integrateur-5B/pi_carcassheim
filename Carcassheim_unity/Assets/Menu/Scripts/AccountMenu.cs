@@ -32,6 +32,7 @@ public class AccountMenu : Miscellaneous
 	public void ResetWarningTextAM()
 	{
 		GameObject tmpGO = GameObject.Find("Create Account");
+		Debug.Log(tmpGO); // A DEBUGUER (connection menu fonctionne, pourtant c'est identique) => Navigation Manager
 		Text tmpText = tmpGO.GetComponent<Text>();
 		TryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Creez votre compte";
