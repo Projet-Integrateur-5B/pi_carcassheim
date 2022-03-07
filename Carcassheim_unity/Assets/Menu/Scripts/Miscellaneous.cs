@@ -43,6 +43,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	{
 		Color newCol;
 		Button tmpStat = GameObject.Find("Btn Statistiques").GetComponent<Button>();
+		
 		Button tmpJouer = GameObject.Find("Btn Jouer").GetComponent<Button>();
 		TryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
