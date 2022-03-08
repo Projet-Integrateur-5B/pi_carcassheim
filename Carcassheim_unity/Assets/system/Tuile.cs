@@ -3,11 +3,11 @@ using UnityEngine;
 
 public partial class Tuile
 {
-    Slot[] _slots;
-    int _nombreSlot;
-    int[][] _lienSlotPosition;
-
-    public int Id { get; set; }
+    private readonly Slot[] _slots;
+    private readonly int _nombreSlot;
+    private readonly int[][] _lienSlotPosition;
+    private readonly int _id;
+    public int Id => _id;
     public Slot[] Slots => _slots;
     public int[][] LienSlotPosition => _lienSlotPosition;
     public int NombreSlot => _nombreSlot;
@@ -53,10 +53,27 @@ public partial class Tuile
 
     public Tuile(int id, Slot[] slots, int[][] lien)
     {
-        Id = id;
-        _slots = slots;
-        _lienSlotPosition = lien;
         _nombreSlot = slots.Length;
+        _id = id;
+        _slots = slots;
+
+        int[][] actualLink = new int[_nombreSlot][];
+
+        for (int i = 0; i < actualLink.Length; i++)
+        {
+            int[] tab = lien[i];
+
+            for (int j = 0; j < tab.Length; j++)
+            {
+                if (tab[j] == -1)
+                {
+                    break;
+                }
+                actualLink[i][j] = tab[j];
+            }
+        }
+
+        _lienSlotPosition = actualLink;
     }
 
     public int IdSlotFromPositionInterne(int pos)
