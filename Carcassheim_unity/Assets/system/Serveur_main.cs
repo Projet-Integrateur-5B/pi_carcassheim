@@ -33,7 +33,24 @@ public class Serveur_main : MonoBehaviour
 
 
                 // Création d'un thread temporaire de gestion de la requête 
-                Thread_connexion thread_connexion = new Thread_connexion(login,mdp);
+                Thread_identification thread_identification = new Thread_identification(login,mdp);
+
+                // Créer un objet pour chaque threads, comme ça pas de pb d'un attribut utilisé par plusieurs threads
+                Thread nouv_thread_identification = new Thread(new ThreadStart(thread_identification.Lancement_thread_identification));
+                nouv_thread_identification.Start();
+
+                // A FAIRE - Fonction de redirection vers thread d'identification
+
+
+
+            }
+            else if(typeMsg == 2){ // Réception d'une connexion à une partie
+
+                string login = "Test_DEBUG_connexion";
+                int id_partie_cherchee = 1; // DEBUG
+
+                // Création d'un thread temporaire de gestion de la requête de connexion
+                Thread_connexion thread_connexion = new Thread_connexion(login, id_partie_cherchee, _lst_obj_threads_com);
 
                 // Créer un objet pour chaque threads, comme ça pas de pb d'un attribut utilisé par plusieurs threads
                 Thread nouv_thread_connexion = new Thread(new ThreadStart(thread_connexion.Lancement_thread_connexion));
@@ -41,11 +58,7 @@ public class Serveur_main : MonoBehaviour
 
                 // A FAIRE - Fonction de redirection vers thread de connexion
 
-                
 
-            }
-            else if(typeMsg == 2){ // Réception d'une connexion à une partie
-                
             }
             else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global)
 
@@ -67,7 +80,8 @@ public class Serveur_main : MonoBehaviour
                             if(thread_com_iterateur.Get_nb_parties_gerees() < 5){
 
                                 thread_com_trouve = true;
-                        
+
+
                                 // A FAIRE - Fonction (dans le thread de com) de création d'accueil ET DE PARTIE QUOI
                                 // Exemple:
                                 /*
@@ -76,6 +90,8 @@ public class Serveur_main : MonoBehaviour
                                 */
 
                                 // A FAIRE - Fonction de redirection vers thread de com
+
+                                break; // Sort du foreach
                             }
                         }
                     }
