@@ -33,18 +33,20 @@ public class Serveur_main : MonoBehaviour
 
 
                 // Création d'un thread temporaire de gestion de la requête 
-                Thread_connexion thread_connexion = new Thread_connexion(login,mdp);
+                Thread_identification thread_identification = new Thread_identification(login,mdp);
 
                 // Créer un objet pour chaque threads, comme ça pas de pb d'un attribut utilisé par plusieurs threads
-                Thread nouv_thread_connexion = new Thread(new ThreadStart(thread_connexion.Lancement_thread_connexion));
-                nouv_thread_connexion.Start();
+                Thread nouv_thread_identification = new Thread(new ThreadStart(thread_identification.Lancement_thread_identification));
+                nouv_thread_identification.Start();
 
                 // A FAIRE - Fonction de redirection vers thread de connexion
 
-                
+
 
             }
             else if(typeMsg == 2){ // Réception d'une connexion à une partie
+
+
                 
             }
             else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global)

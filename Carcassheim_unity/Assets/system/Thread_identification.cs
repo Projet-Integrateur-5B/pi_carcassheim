@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-public class Thread_connexion
+public class Thread_identification
 {
     // Attributs
 
@@ -10,7 +10,7 @@ public class Thread_connexion
 
     // Constructeur
 
-    public Thread_connexion(string login, string mdp){
+    public Thread_identification(string login, string mdp){
         _login = login;
         _mdp = mdp;
     }
@@ -20,7 +20,7 @@ public class Thread_connexion
 
     // Méthodes
 
-    public void Lancement_thread_connexion()
+    public void Lancement_thread_identification()
     {
         bool identifiants_valides = false;
 
