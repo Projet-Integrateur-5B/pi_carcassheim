@@ -51,6 +51,14 @@ public class Thread_communication
             Debug.Log(string.Format("[{0}] Je gère la partie d'ID {1}", _id_thread_com, id_ite));
         }
 
+
+        int debug = 1;
+
+        if(debug != 1) // TEMPORAIRE - A retirer plus tard
+        {
+
+        }
+
  
     }
 }
