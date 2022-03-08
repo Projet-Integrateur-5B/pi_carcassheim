@@ -1,211 +1,53 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using UnityEditor;
 
-public class HomeMenu : Miscellaneous, IPointerEnterHandler, IPointerExitHandler
+public class HomeMenu : Miscellaneous
 {
-    public Button button1;
-    public Button button2;
-    public Button button3;
-    public Button button4;
-    public Button button5;
+	void Start()
+	{
+		Color newCol;
+		if (GetState() == false && FindMenu("HomeMenu").activeSelf == true)
+		{
+			Debug.Log("BJBJKHRENJHRJHE");
+			GameObject.Find("Play").GetComponent<Button>().interactable = GetState();
+			GameObject.Find("ShowStat").GetComponent<Button>().interactable = GetState();
+			ColorUtility.TryParseHtmlString("#808080", out newCol);
+			GameObject.Find("Play").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
+			GameObject.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
+		}
+	}
 
-    private GameObject currentGo;
-    private Color _previousColor;
-    private Text _btnText;
+	void Update()
+	{
+	}
 
-    EventSystem eventSystem;
+	public void ShowConnection()
+	{
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
+	}
 
-    static private GameObject selectedGo;
-    static private GameObject previousGo;
-    static bool changement = false;
+	public void Play()
+	{
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
+	//RandomIntColor(GameObject.Find("Etat de connexion"));
+	/* SceneManager.LoadScene("InGame"); */
+	}
 
-    void Start()
-    {
-        button5.Select();
-        TryColorText(button5.GetComponentInChildren<Text>(), Color.blue, "#1e90ff");
+	public void ShowOptions()
+	{
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
+	}
 
-    }
+	public void ShowStat()
+	{
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
+	}
 
-    void Update()
-    {
-    	couleur_touches();
-    }
-
-    void OnEnable()
-    {
-        //Fetch the current EventSystem. Make sure your Scene has one.
-        eventSystem = EventSystem.current;
-
-        Color newCol;
-        if (GetState() == false && FindMenu("HomeMenu").activeSelf == true)
-        {
-            FindGOTool("HomeMenu", "Btn Jouer").GetComponent<Button>().interactable = GetState();
-            FindGOTool("HomeMenu", "Btn Statistiques").GetComponent<Button>().interactable = GetState();
-            ColorUtility.TryParseHtmlString("#808080", out newCol);
-            GameObject.Find("Btn Jouer").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
-            GameObject.Find("Btn Statistiques").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
-            button1 = GameObject.Find("Btn Connexion").GetComponent<Button>();
-            button1.onClick.AddListener(() => buttonCallBack(button1));
-        }
-        button2 = GameObject.Find("Btn Jouer").GetComponent<Button>();
-        button2.onClick.AddListener(() => buttonCallBack(button2));
-        button3 = GameObject.Find("Btn Options").GetComponent<Button>();
-        button3.onClick.AddListener(() => buttonCallBack(button3));
-        button4 = GameObject.Find("Btn Statistiques").GetComponent<Button>();
-        button4.onClick.AddListener(() => buttonCallBack(button4));
-        button5 = GameObject.Find("Btn Quitter le jeu").GetComponent<Button>();
-        button5.onClick.AddListener(() => buttonCallBack(button5));
-        button5.Select();
-    }
-
-    private void couleur_touches()
-    {
-    	 if (eventSystem.currentSelectedGameObject != selectedGo) 
-    	 {
-             previousGo = selectedGo;
-             selectedGo = eventSystem.currentSelectedGameObject;
-             changement = true; //on a changé de bouton
-         }
-        Debug.Log("Ancien : " + previousGo + " actuel : " + selectedGo);
-        if (changement == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)))
-        {
-            if (selectedGo.GetComponent<Button>())
-	        {
-	            if (!GetState() && (StrCompare(selectedGo.name, "Btn Jouer") || StrCompare(selectedGo.name, "Btn Statistiques")))
-	            {
-	                TryColorText(selectedGo.GetComponentInChildren<Text>(), Color.grey, "#808080");
-	            }
-	            else
-	            {
-	                _previousColor = selectedGo.GetComponentInChildren<Text>().color;
-	                TryColorText(selectedGo.GetComponentInChildren<Text>(), Color.blue, "#1e90ff");
-	                selectedGo.GetComponentInChildren<Text>().fontSize += 3;
-	            }
-	        }
-
-	        bool tmpBool = StrCompare(previousGo.name, "Btn Jouer") || StrCompare(previousGo.name, "Btn Statistiques");
-	        if ((GetState() || !tmpBool) && previousGo.GetComponent<Button>())
-	        {
-	            previousGo.GetComponentInChildren<Text>().color = _previousColor;
-	            previousGo.GetComponentInChildren<Text>().fontSize -= 3;
-	        }
-	        changement = false;
-        }
-    }
-
-    private void buttonCallBack(Button buttonPressed)
-    {
-        if (buttonPressed == button1)
-        {
-            Debug.Log("Clicked: " + button1.name);
-            ShowConnection();
-        }
-
-        if (buttonPressed == button2)
-        {
-            Debug.Log("Clicked: " + button2.name);
-            Jouer();
-        }
-
-        if (buttonPressed == button3)
-        {
-            Debug.Log("Clicked: " + button3.name);
-            ShowOptions();
-        }
-
-        if (buttonPressed == button4)
-        {
-            Debug.Log("Clicked: " + button4.name);
-            ShowStatistiques();
-        }
-
-        if (buttonPressed == button5)
-        {
-            Debug.Log("Clicked: " + button5.name);
-            Quitter();
-        }
-
-        if (currentGo != null)
-        {
-            bool tmpBool = StrCompare(currentGo.name, "Btn Jouer") || StrCompare(currentGo.name, "Btn Statistiques");
-            if ((GetState() || !tmpBool) && currentGo.GetComponent<Button>())
-            {
-                _btnText.color = _previousColor;
-                _btnText.fontSize -= 3;
-            }
-        }
-        GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
-    }
-
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-        Debug.Log("Mouse Enter " + currentGo.name);
-        if (currentGo.GetComponent<Button>())
-        {
-            _btnText = currentGo.GetComponentInChildren<Text>();
-            if (!GetState() && (StrCompare(currentGo.name, "Btn Jouer") || StrCompare(currentGo.name, "Btn Statistiques")))
-            {
-                TryColorText(_btnText, Color.grey, "#808080");
-            }
-            else
-            {
-                _previousColor = _btnText.color;
-                TryColorText(_btnText, Color.blue, "#1e90ff");
-                _btnText.fontSize += 3;
-            }
-        }
-
-    }
-
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        Debug.Log("Mouse Exit " + currentGo.name);
-        bool tmpBool = StrCompare(currentGo.name, "Btn Jouer") || StrCompare(currentGo.name, "Btn Statistiques");
-        if ((GetState() || !tmpBool) && currentGo.GetComponent<Button>())
-        {
-            _btnText.color = _previousColor;
-            _btnText.fontSize -= 3;
-        }
-    }
-
-    void OnDisable()
-    {
-        //Un-Register Button Events
-        button1.onClick.RemoveAllListeners();
-        button2.onClick.RemoveAllListeners();
-        button3.onClick.RemoveAllListeners();
-        button4.onClick.RemoveAllListeners();
-        button5.onClick.RemoveAllListeners();
-    }
-
-    public void Jouer()
-    {
-        ChangeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
-        //RandomIntColor(GameObject.Find("Etat de connexion"));
-        /* SceneManager.LoadScene("InGame"); */
-    }
-
-    public void ShowStatistiques()
-    {
-        ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
-    }
-
-    public void ShowOptions()
-    {
-        ChangeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
-    }
-
-    public void ShowConnection()
-    {
-        ChangeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
-    }
-
-    public void Quitter()
-    {
-        Application.Quit();
-        Debug.Log("Quit!");
-    }
+	public void QuitGame()
+	{
+		// A LA FIN : quand tout fonctionnera 
+		// RemoveAllListeners(); (bouton -> "free")
+		Application.Quit();
+		Debug.Log("Quit!");
+	}
 }

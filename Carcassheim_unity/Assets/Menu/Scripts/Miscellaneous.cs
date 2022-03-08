@@ -42,12 +42,12 @@ public abstract class Miscellaneous : MonoBehaviour
 	public void Connected()
 	{
 		Color newCol;
-		Button tmpStat = GameObject.Find("Btn Statistiques").GetComponent<Button>();
+		Button tmpStat = GameObject.Find("ShowStat").GetComponent<Button>();
 		
-		Button tmpJouer = GameObject.Find("Btn Jouer").GetComponent<Button>();
+		Button tmpJouer = GameObject.Find("Play").GetComponent<Button>();
 		TryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
-		GameObject.Find("Btn Connexion").SetActive(false);
+		GameObject.Find("ShowConnection").SetActive(false);
 		tmpJouer.interactable = true;
 		tmpStat.interactable = true;
 		Debug.Log("CMMM" + tmpJouer.interactable);
