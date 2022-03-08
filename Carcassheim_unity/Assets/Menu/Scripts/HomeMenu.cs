@@ -18,21 +18,19 @@ public class HomeMenu : Miscellaneous, IPointerEnterHandler, IPointerExitHandler
     EventSystem eventSystem;
 
     static private GameObject selectedGo;
+    static private GameObject previousGo;
+    static bool changement = false;
 
     void Start()
     {
         button5.Select();
+        TryColorText(button5.GetComponentInChildren<Text>(), Color.blue, "#1e90ff");
+
     }
 
     void Update()
     {
-        if (eventSystem.currentSelectedGameObject != null)
-        {
-            selectedGo = eventSystem.currentSelectedGameObject;
-            Debug.Log(selectedGo);
-        }
-
-
+    	couleur_touches();
     }
 
     void OnEnable()
@@ -60,6 +58,41 @@ public class HomeMenu : Miscellaneous, IPointerEnterHandler, IPointerExitHandler
         button5 = GameObject.Find("Btn Quitter le jeu").GetComponent<Button>();
         button5.onClick.AddListener(() => buttonCallBack(button5));
         button5.Select();
+    }
+
+    private void couleur_touches()
+    {
+    	 if (eventSystem.currentSelectedGameObject != selectedGo) 
+    	 {
+             previousGo = selectedGo;
+             selectedGo = eventSystem.currentSelectedGameObject;
+             changement = true; //on a changé de bouton
+         }
+        Debug.Log("Ancien : " + previousGo + " actuel : " + selectedGo);
+        if (changement == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)))
+        {
+            if (selectedGo.GetComponent<Button>())
+	        {
+	            if (!GetState() && (StrCompare(selectedGo.name, "Btn Jouer") || StrCompare(selectedGo.name, "Btn Statistiques")))
+	            {
+	                TryColorText(selectedGo.GetComponentInChildren<Text>(), Color.grey, "#808080");
+	            }
+	            else
+	            {
+	                _previousColor = selectedGo.GetComponentInChildren<Text>().color;
+	                TryColorText(selectedGo.GetComponentInChildren<Text>(), Color.blue, "#1e90ff");
+	                selectedGo.GetComponentInChildren<Text>().fontSize += 3;
+	            }
+	        }
+
+	        bool tmpBool = StrCompare(previousGo.name, "Btn Jouer") || StrCompare(previousGo.name, "Btn Statistiques");
+	        if ((GetState() || !tmpBool) && previousGo.GetComponent<Button>())
+	        {
+	            previousGo.GetComponentInChildren<Text>().color = _previousColor;
+	            previousGo.GetComponentInChildren<Text>().fontSize -= 3;
+	        }
+	        changement = false;
+        }
     }
 
     private void buttonCallBack(Button buttonPressed)
