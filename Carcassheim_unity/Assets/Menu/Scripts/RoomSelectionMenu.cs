@@ -1,16 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class RoomSelectionMenu : Miscellaneous
 {
 	public GameObject Pop_up_Options;
 	public static bool s_isOpenPanel = false;
-
 	// Start is called before the first frame update
 	void Start()
 	{
 		Pop_up_Options = FindMenu("Panel Options");
+	}
+
+	void Update()
+	{
 	}
 
 	public void HideRoomSelection()

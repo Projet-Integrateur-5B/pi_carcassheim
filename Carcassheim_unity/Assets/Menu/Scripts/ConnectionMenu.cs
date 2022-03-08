@@ -2,22 +2,29 @@
 using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class ConnectionMenu : Miscellaneous
 {
-	// Start is called before the first frame update
+	public Toggle toggle_afficher_mdp;
 	void Start()
 	{
+	// PATCH : à faire
+	/* toggle_afficher_mdp = GameObject.Find("Toggle AfficherMdp").GetComponent<Toggle>();
+		toggle_afficher_mdp.onValueChanged.AddListener(delegate { ToggleValueChanged(toggle_afficher_mdp); }); */
 	}
 
-	// Update is called once per frame
 	void Update()
 	{
 	}
 
-	void Awake()
+	void ToggleValueChanged(Toggle change)
 	{
+		if (change == toggle_afficher_mdp)
+		{
+			HidePwdCo();
+		}
+
+		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 	}
 
 	public void ResetWarningTextCM()
@@ -39,7 +46,7 @@ public class ConnectionMenu : Miscellaneous
 		Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
 	}
 
-	public void HideShowPwd()
+	public void HidePwdCo()
 	{
 		if (GameObject.Find("Toggle AfficherMdp").GetComponent<Toggle>().isOn == true)
 		{
@@ -52,6 +59,15 @@ public class ConnectionMenu : Miscellaneous
 
 		//permet le changement immediat, sans cette ligne, on doit cliquer sur l'inputfield pour que le changement se fasse
 		GameObject.Find("InputField Password").GetComponent<InputField>().ForceLabelUpdate();
+	}
+
+	public void CreateAccount()
+	{
+		GameObject tmpGO = GameObject.Find("Instructions");
+		Text tmpText = tmpGO.GetComponent<Text>();
+		TryColor(tmpGO, Color.white, "f4fefe");
+		tmpText.text = "Connectez vous";
+		ChangeMenu(FindMenu("ConnectionMenu"), FindMenu("AccountMenu"));
 	}
 
 	public void Connect()
@@ -72,14 +88,5 @@ public class ConnectionMenu : Miscellaneous
 			RandomIntColor(tmpGO);
 			tmpText.text = "Ressaissiez votre login et votre mot de passe !";
 		}
-	}
-
-	public void CreateAccount()
-	{
-		GameObject tmpGO = GameObject.Find("Instructions");
-		Text tmpText = tmpGO.GetComponent<Text>();
-		TryColor(tmpGO, Color.white, "f4fefe");
-		tmpText.text = "Connectez vous";
-		ChangeMenu(FindMenu("ConnectionMenu"), FindMenu("CreateAccountMenu"));
 	}
 }

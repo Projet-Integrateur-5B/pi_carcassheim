@@ -19,11 +19,20 @@ public class OptionsMenu : Miscellaneous
 	private static bool s_tmpOnce = true;
 	float lastSoundValue = 0;
 	float lastMusicValue = 0;
+	public Toggle toggle_french;
+	public Toggle toggle_english;
+	public Toggle toggle_german;
+	private GameObject containerButtons;
 	// Start is called before the first frame update
 	void Start()
 	{
-		_btnSon = FindGOTool("OptionsMenu", "Btn Son").GetComponent<Button>();
-		_btnMusique = FindGOTool("OptionsMenu", "Btn Musique").GetComponent<Button>();
+		// PATCH : à améliorer
+		containerButtons = FindGOTool("OptionsMenu", "Buttons");
+		Debug.Log(containerButtons);
+		_btnSon = containerButtons.transform.GetChild(1).GetComponent<Button>();
+ 		_btnMusique = containerButtons.transform.GetChild(2).GetComponent<Button>();
+		// FIN PATCH
+
 		_soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
 		_musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
 		_soundScroll = FindGOTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
@@ -36,25 +45,47 @@ public class OptionsMenu : Miscellaneous
 		lastSoundValue = _soundScroll.value;
 		_musicScroll.onValueChanged.AddListener(MusicScrollbarCallBack);
 		lastMusicValue = _musicScroll.value;
+
+		toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
+		toggle_french.onValueChanged.AddListener(delegate
+		{
+			ToggleValueChanged(toggle_french);
+		});
+		toggle_english = GameObject.Find("Toggle English").GetComponent<Toggle>();
+		toggle_english.onValueChanged.AddListener(delegate
+		{
+			ToggleValueChanged(toggle_english);
+		});
+		toggle_german = GameObject.Find("Toggle German").GetComponent<Toggle>();
+		toggle_german.onValueChanged.AddListener(delegate
+		{
+			ToggleValueChanged(toggle_german);
+		});
 	}
 
-	void Awake()
-	{
-	}
-
-	// Update is called once per frame
 	void Update()
 	{
 	}
 
-	public void HideOptions()
-	{
-		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
-	}
 
-	public void ShowCredits()
+	void ToggleValueChanged(Toggle change)
 	{
-		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("CreditsMenu"));
+		if (change == toggle_french && change.isOn)
+		{
+			Debug.Log("French");
+		}
+
+		if (change == toggle_english && change.isOn)
+		{
+			Debug.Log("English");
+		}
+
+		if (change == toggle_german && change.isOn)
+		{
+			Debug.Log("German");
+		}
+
+		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 	}
 
 	public void FlagsToggle() //affiche la langue du toggle enclenche
@@ -130,13 +161,7 @@ public class OptionsMenu : Miscellaneous
 	//Will be called when Scrollbar changes
 	public void SoundScrollbarCallBack(float value)
 	{
-		/*  if (lastSoundValue > value)
-        Debug.Log("Scrolling UP: " + value);
-    else
-        Debug.Log("Scrolling DOWN: " + value);
-*/
 		DisplayVolumeSound(value);
-	/* lastSoundValue = value; */
 	}
 
 	//Will be called when Scrollbar changes
@@ -145,12 +170,6 @@ public class OptionsMenu : Miscellaneous
 		DisplayVolumeMusic(value);
 	}
 
-	/* public void OnDisable()
-{
-    //Un-Subscribe To Scrollbar Event
-    soundScroll.onValueChanged.RemoveListener(SoundScrollbarCallBack);
-	musicScroll.onValueChanged.RemoveListener(MusicScrollbarCallBack);
-} */
 	public void SwitchSound()
 	{
 		if (_soundScroll.value != 0)
@@ -182,6 +201,11 @@ public class OptionsMenu : Miscellaneous
 	}
 
 	// -------------- Music/Sound End -----------------------//
+	public void HideOptions()
+	{
+		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
+	}
+
 	public void FullScreen()
 	{
 		Screen.fullScreen = !Screen.fullScreen;
@@ -191,5 +215,10 @@ public class OptionsMenu : Miscellaneous
 	public void Help()
 	{
 		Application.OpenURL("https://tinyurl.com/SlapDance");
+	}
+
+	public void ShowCredits()
+	{
+		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("CreditsMenu"));
 	}
 }
