@@ -1,72 +1,68 @@
 ﻿using System.Text.Json;
 using System.Net;
-using System;
+using System.Text;
 
 public class Packet
 {
-    // private bool _type; // 0 : client -> server ; 1 : server -> client
-    //
-    // // type == 0 : client -> server
-    // private IPAddress _ipAddress;
-    // private int _port;
-    // private int _idRoom; // default : 0 -> not destined to a room
-    // private int _idMessage; // à définir
-    //
-    // // type == 1 : server -> client
-    // private bool _status; // 0 : error ; 1 : success
-    // private int _permission; // 0 : unused/error ; 1 : permission ; 2 : confirmation
-    //
-    // // common to both
-    // private int _idPlayer;
-    // private String data; // à définir
-    
     public bool Type { get; } // 0 : client -> server ; 1 : server -> client
-    
+
     // type == 0 : client -> server
     public IPAddress IpAddress { get; set; }
     public ushort Port { get; set; }
-    public ulong IdRoom { get; set; }
-    public byte IdMessage { get; set; }
-    
+    public ulong IdRoom { get; set; } // default : 0 -> not destined to a room
+    public byte IdMessage { get; set; } // à définir
+
     // type == 1 : server -> client
-    public bool Status { get; set; }
-    public byte Permission { get; set; }
-    
+    public bool Status { get; set; } // 0 : error ; 1 : success
+    public byte Permission { get; set; } // 0 : unused/error ; 1 : permission ; 2 : confirmation
+
     // common to both
     public ulong IdPlayer { get; set; }
-    public String Data { get; set; }
-    
-    
-    
+    public String Data { get; set; } // à définir
+
+
+
     // basic
-    public Packet() {}
+    public Packet() { }
 
     // type == 0 : client -> server
-    public Packet(bool type, int port, IPAddress ipAddress, int idPlayer, int idRoom, int idMessage, String data)
+    public Packet(bool type, ushort port, IPAddress ipAddress, ulong idPlayer, ulong idRoom, byte idMessage, String data)
     {
-        _type = type;
-        _ipAddress = ipAddress;
-        _port = port;
-        _idPlayer = idPlayer;
-        _idRoom = idRoom;
-        _idMessage = idMessage;
-        _data = data;
+        Type = type;
+        IpAddress = ipAddress;
+        Port = port;
+        IdPlayer = idPlayer;
+        IdRoom = idRoom;
+        IdMessage = idMessage;
+        Data = data;
     }
-    
+
     // type == 1 : server -> client
-    public Packet(bool type, bool status, int permission, int idPlayer, String data)
+    public Packet(bool type, bool status, byte permission, ulong idPlayer, String data)
     {
-        _type = type;
-        _status = status;
-        _permission = permission;
-        _idPlayer = idPlayer;
-        _data = data;
+        Type = type;
+        Status = status;
+        Permission = permission;
+        IdPlayer = idPlayer;
+        Data = data;
     }
 
     public static void Main()
     {
-        Packet packet = new Packet(1, 1, 1, 1, "test");
-        string jsonString = JsonSerializer.Serialize(packet);
-        Console.WriteLine(jsonString);
+        Packet sendPacket = new Packet(true, true, 1, 1, "test");
+
+        // serialize
+        byte[] packetAsBytes = JsonSerializer.SerializeToUtf8Bytes<Packet>(sendPacket);
+
+        // insert send & recv packet
+
+        // unserialize
+        String packetAsJson = Encoding.Default.GetString(packetAsBytes);
+        Packet? recvPacket =
+            JsonSerializer.Deserialize<Packet>(packetAsJson);
+
+        /*string jsonString = JsonSerializer.Serialize<Packet>(packet);
+        byte[] bytes = Encoding.ASCII.GetBytes(jsonString);
+        Console.WriteLine(jsonString);*/
     }
 }
