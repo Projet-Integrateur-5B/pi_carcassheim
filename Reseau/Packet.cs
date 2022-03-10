@@ -52,17 +52,24 @@ public class Packet
         Packet sendPacket = new Packet(true, true, 1, 1, "test");
 
         // serialize
-        byte[] packetAsBytes = JsonSerializer.SerializeToUtf8Bytes<Packet>(sendPacket);
+        byte[] packetAsBytes = sendPacket.Serialize();
 
         // insert send & recv packet
 
         // unserialize
-        String packetAsJson = Encoding.Default.GetString(packetAsBytes);
-        Packet? recvPacket =
-            JsonSerializer.Deserialize<Packet>(packetAsJson);
+        Packet? recvPacket = Deserialize(packetAsBytes);
+    }
 
-        /*string jsonString = JsonSerializer.Serialize<Packet>(packet);
-        byte[] bytes = Encoding.ASCII.GetBytes(jsonString);
-        Console.WriteLine(jsonString);*/
+    public byte[] Serialize()
+    {
+        /*string jsonString = JsonSerializer.Serialize<Packet>(this);
+        byte[] bytes = Encoding.ASCII.GetBytes(jsonString);*/
+        return JsonSerializer.SerializeToUtf8Bytes<Packet>(this);
+    }
+
+    public static Packet Deserialize(byte[] packetAsBytes)
+    {
+        String packetAsJson = Encoding.Default.GetString(packetAsBytes);
+        return JsonSerializer.Deserialize<Packet>(packetAsJson);
     }
 }
