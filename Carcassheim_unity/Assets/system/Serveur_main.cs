@@ -7,6 +7,7 @@ public class Serveur_main : MonoBehaviour
 {
     private static List<Thread_communication> _lst_obj_threads_com;
     private static List<Thread> _lst_threads_com;
+    private static List<int> _lst_port_dispo;
 
     private static int _compteur_id_thread_com;
 
@@ -16,6 +17,8 @@ public class Serveur_main : MonoBehaviour
         _lst_threads_com = new List<Thread>();
 
         _lst_obj_threads_com = new List<Thread_communication>();
+
+        _lst_port_dispo = new List<int>();
 
         _compteur_id_thread_com = 0;
 
@@ -60,7 +63,7 @@ public class Serveur_main : MonoBehaviour
 
 
             }
-            else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global)
+            else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global) -> A DEPLACER dans thread com (faire un appel de fonction)
 
                 // TEMP - DEBUG
                 int port_partie = 1;
@@ -143,16 +146,29 @@ public class Serveur_main : MonoBehaviour
 
     }
 
-    private void Creation_thread_com(int port_partie){
+    private void Creation_thread_com(int port_lie){
 
-        Thread_communication thread_com = new Thread_communication(port_partie,_compteur_id_thread_com);
-        _compteur_id_thread_com++;
-        Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
+        if(_lst_port_dispo.Count != 0)
+        {
+            int port_choisi = _lst_port_dispo[_lst_port_dispo.Count - 1];
 
-        _lst_obj_threads_com.Add(thread_com);
-        _lst_threads_com.Add(nouv_thread);
+            Thread_communication thread_com = new Thread_communication(port_lie, _compteur_id_thread_com);
+            _compteur_id_thread_com++;
+            Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
 
-        nouv_thread.Start();
+            _lst_obj_threads_com.Add(thread_com);
+            _lst_threads_com.Add(nouv_thread);
+
+            _lst_port_dispo.RemoveAt(_lst_port_dispo.Count - 1);
+
+            nouv_thread.Start();
+        }
+        else
+        {
+            // RESEAU - Communiquer au client qu'il est impossible de créer une nouvelle partie, maximum atteint
+        }
+
+        
 
     }
 }
