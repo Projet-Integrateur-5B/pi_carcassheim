@@ -7,12 +7,15 @@ public class Thread_identification
 
     private string _login;
     private string _mdp;
+    private string _client; //TEMPORAIRE   // RESEAU - Définir objet "client"
 
     // Constructeur
 
-    public Thread_identification(string login, string mdp){
+    public Thread_identification(string login, string mdp, string client)
+    {
         _login = login;
         _mdp = mdp;
+        _client = client;
     }
     
     // Getters et setters
