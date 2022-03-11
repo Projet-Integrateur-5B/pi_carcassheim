@@ -11,6 +11,8 @@ public class Thread_communication
     private int _numero_port;
     private int _nb_parties_gerees;
     private List<int> _id_parties_gerees;
+
+    // Rajouter un objet RESEAU pour les communications ?
     
 
     // Constructeur
@@ -38,6 +40,8 @@ public class Thread_communication
         _nb_parties_gerees++;
     }
 
+    // Création d'un nouveau thread_serveur_jeu
+
     // Méthodes
 
     public void Lancement_thread_com(){
@@ -45,18 +49,31 @@ public class Thread_communication
         Thread.Sleep(2000);
 
         Debug.Log(string.Format("[{0}] Je suis un thread !", _id_thread_com));
-        Debug.Log(string.Format("[{0}] J'officie sur le port numéro {0} !", _id_thread_com, _numero_port));
+        Debug.Log(string.Format("[{0}] J'officie sur le port numéro {1} !", _id_thread_com, _numero_port));
         Debug.Log(string.Format("[{0}] Je gère actuellement {1} parties!", _id_thread_com, _nb_parties_gerees));
         foreach(int id_ite in _id_parties_gerees){
             Debug.Log(string.Format("[{0}] Je gère la partie d'ID {1}", _id_thread_com, id_ite));
         }
 
+        //Debug.Log(string.Format("Compteur d'id de strings : {0}", _compteur_id_thread_com));
+
 
         int debug = 1;
 
-        if(debug != 1) // TEMPORAIRE - A retirer plus tard
+        if(debug != 1) // TEMPORAIRE - A retirer plus tard    // A REMPLACER - Par boucle de réception
         {
+            // Types de messages qui peuvent être reçus:
+            //      • Création de partie
+            //      • Arrivée dans la partie
+            //      • Pose de tuile
+            //      • Pose de pion
+            //      • ? Fin de tour ?
 
+            // Types de message à envoyer spontanéement par le thread_com:
+            //      • Fin de partie
+            //      • Réaction à triche
+            //      • Réaction à afk
+            //      • Kick (afk ou triche)
         }
 
  

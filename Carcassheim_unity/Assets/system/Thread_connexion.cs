@@ -38,8 +38,9 @@ public class Thread_connexion
 
 
                     // Passe la main au thread de communication lié
-                    // mi RESEAU : passer via une fonction l'identité du socket du client vers le thread concerné
-                    //      Pour ça : modifier un des attributs du thread com en question ?
+                    // RESEAU : répond au client en l'informant qu'il doit à présent communiquer avec le thread de com
+                    //  (en lui filant le port)
+                    //      PUIS : modifier un des attributs du thread com en question pour lui indiquer qu'il gère un nvx joueur ?
 
 
 

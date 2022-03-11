@@ -7,6 +7,7 @@ public class Serveur_main : MonoBehaviour
 {
     private static List<Thread_communication> _lst_obj_threads_com;
     private static List<Thread> _lst_threads_com;
+    private static List<int> _lst_port_dispo;
 
     private static int _compteur_id_thread_com;
 
@@ -16,6 +17,8 @@ public class Serveur_main : MonoBehaviour
         _lst_threads_com = new List<Thread>();
 
         _lst_obj_threads_com = new List<Thread_communication>();
+
+        _lst_port_dispo = new List<int>();
 
         _compteur_id_thread_com = 0;
 
@@ -31,16 +34,15 @@ public class Serveur_main : MonoBehaviour
                 string login = "Test_DEBUG";
                 string mdp = "Test_DEBUG";
 
+                string client = "Temporaire"; // RESEAU - Prévoir un objet "client"
+
 
                 // Création d'un thread temporaire de gestion de la requête 
-                Thread_identification thread_identification = new Thread_identification(login,mdp);
+                Thread_identification thread_identification = new Thread_identification(login,mdp,client);
 
                 // Créer un objet pour chaque threads, comme ça pas de pb d'un attribut utilisé par plusieurs threads
                 Thread nouv_thread_identification = new Thread(new ThreadStart(thread_identification.Lancement_thread_identification));
                 nouv_thread_identification.Start();
-
-                // A FAIRE - Fonction de redirection vers thread d'identification
-
 
 
             }
@@ -60,16 +62,20 @@ public class Serveur_main : MonoBehaviour
 
 
             }
-            else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global)
+            else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global) -> A DEPLACER dans thread com (faire un appel de fonction)
 
-                // TEMP - DEBUG
-                int port_partie = 1;
+                // TEMP - DEBUG 
+                int port_partie = 1; // A MODIFIER : Généré en récupérant un numéro de port disponible de la liste _lst_port_dispo
                     
-                if(_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0){ // Aucun thread de comm n'existe
-                    
-                    Creation_thread_com(port_partie);
+                if (_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0) { // Aucun thread de comm n'existe
 
-                    // A FAIRE - Fonction de redirection vers thread de com
+                    if (Creation_thread_com(port_partie)) { // Seulement si un nouveau thread de com a pu être créé
+
+                        // RESEAU - Fonction de redirection du client vers le bon thread de com
+
+                    }
+
+                    
                 }
                 else{
                     bool thread_com_trouve = false;
@@ -77,7 +83,7 @@ public class Serveur_main : MonoBehaviour
                     // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
                     foreach(Thread_communication thread_com_iterateur in _lst_obj_threads_com){
                         lock(thread_com_iterateur){
-                            if(thread_com_iterateur.Get_nb_parties_gerees() < 5){
+                            if (thread_com_iterateur.Get_nb_parties_gerees() < 5) {
 
                                 thread_com_trouve = true;
 
@@ -89,7 +95,8 @@ public class Serveur_main : MonoBehaviour
                                 thread_com_iterateur.add_partie_geree();
                                 */
 
-                                // A FAIRE - Fonction de redirection vers thread de com
+
+                                // RESEAU - Fonction de redirection du client vers le bon thread de com (pour qu'il lui dise qu'il veut créer une partie)
 
                                 break; // Sort du foreach
                             }
@@ -99,11 +106,13 @@ public class Serveur_main : MonoBehaviour
                     // Si aucun des threads n'est libre pour héberger une partie de plus
                     if(thread_com_trouve == false){
 
-                        Creation_thread_com(port_partie);
+                        if (Creation_thread_com(port_partie)) { // Seulement si un nouveau thread de com a pu être créé     
 
-                        // A FAIRE - Fonction (dans le thread de com) de création d'accueil
+                            // A FAIRE - Fonction (dans le thread de com) de création d'accueil
 
-                        // A FAIRE - Fonction de redirection vers thread de com
+                            // RESEAU - Fonction de redirection du client vers le bon thread de com (pour qu'il lui dise qu'il veut créer une partie)
+                        }
+
 
                     }
 
@@ -143,16 +152,36 @@ public class Serveur_main : MonoBehaviour
 
     }
 
-    private void Creation_thread_com(int port_partie){
+    private bool Creation_thread_com(int port_lie){
 
-        Thread_communication thread_com = new Thread_communication(port_partie,_compteur_id_thread_com);
-        _compteur_id_thread_com++;
-        Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
+        if(_lst_port_dispo.Count != 0)
+        {
+            int port_choisi = _lst_port_dispo[_lst_port_dispo.Count - 1];
 
-        _lst_obj_threads_com.Add(thread_com);
-        _lst_threads_com.Add(nouv_thread);
+            Thread_communication thread_com = new Thread_communication(port_lie, _compteur_id_thread_com);
+            _compteur_id_thread_com++;
+            Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
 
-        nouv_thread.Start();
+            _lst_obj_threads_com.Add(thread_com);
+            _lst_threads_com.Add(nouv_thread);
+
+            _lst_port_dispo.RemoveAt(_lst_port_dispo.Count - 1);
+
+            nouv_thread.Start();
+
+            return true;
+        }
+        else
+        {
+            // RESEAU - Communiquer au client qu'il est impossible de créer une nouvelle partie, maximum atteint
+
+
+
+
+            return false;
+        }
+
+        
 
     }
 }
