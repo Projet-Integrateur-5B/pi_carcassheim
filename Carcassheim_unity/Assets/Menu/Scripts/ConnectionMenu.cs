@@ -61,7 +61,7 @@ public class ConnectionMenu : Miscellaneous
 		GameObject.Find("InputField Password").GetComponent<InputField>().ForceLabelUpdate();
 	}
 
-	public void CreateAccount()
+	public void ShowAccount()
 	{
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();

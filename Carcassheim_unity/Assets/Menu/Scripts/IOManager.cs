@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System.Reflection;
 
-public class IOManager : Miscellaneous , IPointerEnterHandler, IPointerExitHandler
+public class IOManager : Miscellaneous, IPointerEnterHandler//, IPointerExitHandler
 {
 	private OptionsMenu _option;
 	private AccountMenu _acc;
@@ -20,12 +20,18 @@ public class IOManager : Miscellaneous , IPointerEnterHandler, IPointerExitHandl
 	private GameObject currentGo;
 	private Color _previousColor;
 	private Text _btnText;
-	static private GameObject selectedGo;
 	static private GameObject previousGo;
 	private Texture2D _cursorTexture;
 	private CursorMode _cursorMode = CursorMode.Auto;
 	private Vector2 _cursorHotspot = Vector2.zero;
 	private EventSystem eventSystem;
+
+	//private string previousMenu;
+	private string goToMenu;
+
+	public GameObject ActualGo;
+	static bool changement = false;
+
 	void Start()
 	{
 		//Fetch the current EventSystem. Make sure your Scene has one.
@@ -51,106 +57,243 @@ public class IOManager : Miscellaneous , IPointerEnterHandler, IPointerExitHandl
 			foreach (Transform child in menu.Find("Buttons").transform) // RESOUDRE CE PROBLEME 
 			{
 				child.GetComponent<Button>().onClick.AddListener(() => MethodCall(child.name));
-			print(child.gameObject.name); 
 			}
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//selection de base lors du start : firstSelect, ce bouton sera bleu et selectionné
+		//pour l'instant ShowOptions mais à modifier
+		currentGo = GameObject.Find("ShowOptions");
+		previousGo = currentGo;
+		eventSystem.SetSelectedGameObject(currentGo);
+		_btnText = eventSystem.currentSelectedGameObject.GetComponentInChildren<Text>();
+		_previousColor = _btnText.color;
+		TryColorText(_btnText, Color.blue, "#1e90ff");
+		_btnText.fontSize += 3;
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
+	}
 
 
-	// PATCH (clavier à faire): 
-	/*         Button button5 = GameObject.Find("Btn Quitter le jeu").GetComponent<Button>();
-        button5.Select(); */
+	public void ColorButtonSelected()
+    {
+		_btnText = currentGo.GetComponentInChildren<Text>();
+		TryColorText(_btnText, Color.blue, "#1e90ff");
+		_btnText.fontSize += 3;
+	}
+
+	public void ColorButtonDeselected()
+    {
+		_btnText = previousGo.GetComponentInChildren<Text>();
+		TryColorText(_btnText, Color.blue, "#ffffff");
+		_btnText.fontSize -= 3;
+	}
+
+
+	public void Update()
+	{
+		//si on appuie sur une touche de deplacement
+		if(Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+        {
+			couleur_touches();
+		}
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		/* Debug.Log("Mouse Enter " + currentGo.name); */
-		if (currentGo.GetComponent<Button>())
-		{
-			_btnText = currentGo.GetComponentInChildren<Text>();
-			if (!GetState() && (StrCompare(currentGo.name, "Btn Jouer") || StrCompare(currentGo.name, "Btn Statistiques")))
-			{
-				TryColorText(_btnText, Color.grey, "#808080");
-			}
-			else
-			{
-				_previousColor = _btnText.color;
-				TryColorText(_btnText, Color.blue, "#1e90ff");
-				_btnText.fontSize += 3;
-			}
-		}
-	}
-
-	public void OnPointerExit(PointerEventData eventData)
-	{
-		/* Debug.Log("Mouse Exit " + currentGo.name); */
-		bool tmpBool = StrCompare(currentGo.name, "Btn Jouer") || StrCompare(currentGo.name, "Btn Statistiques");
-		if ((GetState() || !tmpBool) && currentGo.GetComponent<Button>())
-		{
-			_btnText.color = _previousColor;
-			_btnText.fontSize -= 3;
-		}
-	}
-
-	// PATCH (clavier à faire):
-	/*     private void couleur_touches()
-    {
-    	 if (eventSystem.currentSelectedGameObject != selectedGo) 
-    	 {
-             previousGo = selectedGo;
-             selectedGo = eventSystem.currentSelectedGameObject;
-             changement = true; //on a changé de bouton
-         }
-        Debug.Log("Ancien : " + previousGo + " actuel : " + selectedGo);
-        if (changement == true && (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)))
+		if (eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Button>() 
+		 || eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Toggle>())
         {
-            if (selectedGo.GetComponent<Button>())
-	        {
-	            if (!GetState() && (StrCompare(selectedGo.name, "Btn Jouer") || StrCompare(selectedGo.name, "Btn Statistiques")))
-	            {
-	                TryColorText(selectedGo.GetComponentInChildren<Text>(), Color.grey, "#808080");
-	            }
-	            else
-	            {
-	                _previousColor = selectedGo.GetComponentInChildren<Text>().color;
-	                TryColorText(selectedGo.GetComponentInChildren<Text>(), Color.blue, "#1e90ff");
-	                selectedGo.GetComponentInChildren<Text>().fontSize += 3;
-	            }
-	        }
+			//si on est sur un bouton different de celui selectionne, alors on le selectionne et celui ci devient bleu
+			if (eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject != eventSystem.currentSelectedGameObject)
+			{
+				//le bouton sera celui pointe par la souris
+				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 
-	        bool tmpBool = StrCompare(previousGo.name, "Btn Jouer") || StrCompare(previousGo.name, "Btn Statistiques");
-	        if ((GetState() || !tmpBool) && previousGo.GetComponent<Button>())
-	        {
-	            previousGo.GetComponentInChildren<Text>().color = _previousColor;
-	            previousGo.GetComponentInChildren<Text>().fontSize -= 3;
-	        }
-	        changement = false;
-        }
-    } */
+				//on le selectionne
+				if (currentGo.GetComponent<Button>().interactable)
+					eventSystem.SetSelectedGameObject(currentGo);
+
+				//si les conditions le permettent, on selectionne ce bouton
+				if (currentGo.GetComponent<Button>().interactable)
+				{
+					ColorButtonSelected();
+				}
+				//on deselectionne l'ancien
+				if (previousGo != currentGo)
+				{
+					if (currentGo.GetComponent<Button>().interactable)
+					{
+						ColorButtonDeselected();
+						previousGo = currentGo;
+					}
+				}
+			}
+		}
+	}
+
+	private void couleur_touches()
+	{
+		//le go actuel est celui qui est selectionne
+		if (currentGo != eventSystem.currentSelectedGameObject)
+		{
+			currentGo = eventSystem.currentSelectedGameObject;
+			//bouton en bleu
+			if (currentGo.GetComponent<Button>())
+			{
+				if (currentGo.GetComponent<Button>().interactable && currentGo.GetComponentInChildren<Text>())
+				{
+					ColorButtonSelected();
+				}
+			}
+			//on deselectionne l'ancien et il devient blanc
+			if (previousGo != currentGo)
+			{
+				//double condition pour eviter qu'avec les touches du clavier on aille sur un scroller, inputfield... tout ce qui n'est pas un bouton ou toggle et il faut que le bouton ai un texte
+				if (currentGo.GetComponent<Button>())
+				{
+					if (currentGo.GetComponent<Button>().interactable && currentGo.GetComponentInChildren<Text>())
+					{
+						ColorButtonDeselected();
+						previousGo = currentGo;
+					}
+				}
+			}
+		}
+	}
 	// PARTIE COMMUNE : 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////// FONCTIONNEL //////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public void MethodCall(string methode)
-	{
+	{ 
 		if (GetCurrentMenu().name == "HomeMenu")
+		{
 			_home.Invoke(methode, 0);
-		if (GetCurrentMenu().name == "StatistiquesMenu")
+			changement = false;
+			if (methode == "ShowConnection")
+			{
+				goToMenu = "ConnectionMenu";
+				//previousMenu = "HomeMenu";
+				changement = true;
+			}
+			if (methode == "ShowOptions")
+			{
+				goToMenu = "OptionsMenu";
+				//previousMenu = "HomeMenu";
+				changement = true;
+			}
+			if (methode == "ShowStat")
+			{
+				goToMenu = "StatMenu";
+				//previousMenu = "HomeMenu";
+				changement = true;
+			}
+			if (methode == "ShowRoomSelection")
+			{
+				goToMenu = "RoomSelectionMenu";
+				//previousMenu = "HomeMenu";
+				changement = true;
+			}
+	}
+		if (GetCurrentMenu().name == "StatMenu")
+		{
 			_stat.Invoke(methode, 0);
+			changement = false;
+			if (methode == "HideStat")
+			{
+				goToMenu = "HomeMenu";
+				//previousMenu = "StatMenu";
+				changement = true;
+			}
+		}
 		if (GetCurrentMenu().name == "OptionsMenu")
+		{
 			_option.Invoke(methode, 0);
+			changement = false;
+			if (methode == "HideOptions")
+			{
+				goToMenu = "HomeMenu";
+				//previousMenu = "OptionsMenu";
+				changement = true;
+			}
+			if (methode == "ShowCredits")
+			{
+				goToMenu = "CreditsMenu";
+				//previousMenu = "OptionsMenu";
+				changement = true;
+			}
+		}
 		if (GetCurrentMenu().name == "CreditsMenu")
+		{
 			_cred.Invoke(methode, 0);
+			changement = false;
+			if (methode == "HideCredits")
+			{
+				goToMenu = "OptionsMenu";
+				//previousMenu = "CreditsMenu";
+				changement = true;
+			}
+		}
 		if (GetCurrentMenu().name == "ConnectionMenu")
+		{
 			_co.Invoke(methode, 0);
-		if (GetCurrentMenu().name == "AccountMenu")
+			changement = false;
+			if (methode == "HideConnection" || methode == "Connect")
+			{
+				goToMenu = "HomeMenu";
+				//previousMenu = "ConnectionMenu";
+				changement = true;
+			}
+			if (methode == "ShowAccount")
+			{
+				goToMenu = "AccountMenu";
+				//previousMenu = "ConnectionMenu";
+				changement = true;
+			}
+		}
+		if (GetCurrentMenu().name == "AccountMenu" || methode == "CreateAccount")
+		{
 			_acc.Invoke(methode, 0);
+			changement = false;
+			if (methode == "HideAccount")
+			{
+				goToMenu = "ConnectionMenu";
+				//previousMenu = "AccountMenu";
+				changement = true;
+			}
+		}
 		if (GetCurrentMenu().name == "RoomSelectionMenu")
+		{
 			_sroom.Invoke(methode, 0);
+			changement = false;
+			if (methode == "HideRoomSelection")
+			{
+				goToMenu = "HomeMenu";
+				//previousMenu = "RoomSelectionMenu";
+				changement = true;
+			}
+		}
 
-        GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
+		//lors d'un changement de menu (bouton qui change de menu, click ou Entrée
+		if (changement == true)
+		{
+			//on selectionne le premier bouton enfant du menu dans lequel on va
+			eventSystem.SetSelectedGameObject(FindGOTool(goToMenu, "Buttons").transform.GetChild(0).gameObject);
+			currentGo = eventSystem.currentSelectedGameObject;
+
+			//comme avant pour les couleurs
+			//condition qui evite de mettre en couleur un bouton non selectionnable
+			if (currentGo.GetComponent<Button>().interactable)
+			{
+				ColorButtonSelected();
+				changement = false;
+				if (previousGo != currentGo)
+				{
+					ColorButtonDeselected();
+					previousGo = currentGo;
+				}
+			}
+		}
+		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 	}
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public class OptionsMenu : Miscellaneous
 {
@@ -23,12 +22,12 @@ public class OptionsMenu : Miscellaneous
 	public Toggle toggle_english;
 	public Toggle toggle_german;
 	private GameObject containerButtons;
+
 	// Start is called before the first frame update
 	void Start()
 	{
 		// PATCH : à améliorer
 		containerButtons = FindGOTool("OptionsMenu", "Buttons");
-		Debug.Log(containerButtons);
 		_btnSon = containerButtons.transform.GetChild(1).GetComponent<Button>();
  		_btnMusique = containerButtons.transform.GetChild(2).GetComponent<Button>();
 		// FIN PATCH
@@ -46,7 +45,7 @@ public class OptionsMenu : Miscellaneous
 		_musicScroll.onValueChanged.AddListener(MusicScrollbarCallBack);
 		lastMusicValue = _musicScroll.value;
 
-		toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
+		/*toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
 		toggle_french.onValueChanged.AddListener(delegate
 		{
 			ToggleValueChanged(toggle_french);
@@ -60,7 +59,7 @@ public class OptionsMenu : Miscellaneous
 		toggle_german.onValueChanged.AddListener(delegate
 		{
 			ToggleValueChanged(toggle_german);
-		});
+		});*/
 	}
 
 	void Update()

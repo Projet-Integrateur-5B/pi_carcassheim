@@ -8,11 +8,10 @@ public class HomeMenu : Miscellaneous
 		Color newCol;
 		if (GetState() == false && FindMenu("HomeMenu").activeSelf == true)
 		{
-			Debug.Log("BJBJKHRENJHRJHE");
-			GameObject.Find("Play").GetComponent<Button>().interactable = GetState();
+			GameObject.Find("ShowRoomSelection").GetComponent<Button>().interactable = GetState();
 			GameObject.Find("ShowStat").GetComponent<Button>().interactable = GetState();
 			ColorUtility.TryParseHtmlString("#808080", out newCol);
-			GameObject.Find("Play").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
+			GameObject.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 			GameObject.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 		}
 	}
@@ -26,7 +25,7 @@ public class HomeMenu : Miscellaneous
 		ChangeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
 	}
 
-	public void Play()
+	public void ShowRoomSelection()
 	{
 		ChangeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
 	//RandomIntColor(GameObject.Find("Etat de connexion"));
@@ -40,7 +39,7 @@ public class HomeMenu : Miscellaneous
 
 	public void ShowStat()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
+		ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatMenu"));
 	}
 
 	public void QuitGame()

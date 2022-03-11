@@ -44,7 +44,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		Color newCol;
 		Button tmpStat = GameObject.Find("ShowStat").GetComponent<Button>();
 		
-		Button tmpJouer = GameObject.Find("Play").GetComponent<Button>();
+		Button tmpJouer = GameObject.Find("ShowRoomSelection").GetComponent<Button>();
 		TryColor(GameObject.Find("Etat de connexion"), Color.green, "#90EE90");
 		GameObject.Find("Etat de connexion").GetComponent<Text>().text = "Connecte";
 		GameObject.Find("ShowConnection").SetActive(false);
