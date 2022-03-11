@@ -22,24 +22,26 @@ public class HomeMenu : Miscellaneous
 
 	public void ShowConnection()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
+		SetMenuChanged(true);
+		Debug.Log("1 : " + HasMenuChanged());
+		ChangeMenu("HomeMenu", "ConnectionMenu");
 	}
 
 	public void ShowRoomSelection()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
+		ChangeMenu("HomeMenu", "RoomSelectionMenu");
 	//RandomIntColor(GameObject.Find("Etat de connexion"));
 	/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void ShowOptions()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
+		ChangeMenu("HomeMenu", "OptionsMenu");
 	}
 
 	public void ShowStat()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatMenu"));
+		ChangeMenu("HomeMenu", "StatMenu");
 	}
 
 	public void QuitGame()

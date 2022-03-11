@@ -30,7 +30,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler//, IPointerExitHand
 	private string goToMenu;
 
 	public GameObject ActualGo;
-	static bool changement = false;
 
 	void Start()
 	{
@@ -54,7 +53,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler//, IPointerExitHand
 
 		// Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
 		foreach (Transform menu in GameObject.Find("SubMenus").transform)
-			foreach (Transform child in menu.Find("Buttons").transform) // RESOUDRE CE PROBLEME 
+			foreach (Transform child in menu.Find("Buttons").transform)
 			{
 				child.GetComponent<Button>().onClick.AddListener(() => MethodCall(child.name));
 			}
@@ -164,121 +163,20 @@ public class IOManager : Miscellaneous, IPointerEnterHandler//, IPointerExitHand
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////// FONCTIONNEL //////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public void MethodCall(string methode)
-	{ 
-		if (GetCurrentMenu().name == "HomeMenu")
-		{
-			_home.Invoke(methode, 0);
-			changement = false;
-			if (methode == "ShowConnection")
-			{
-				goToMenu = "ConnectionMenu";
-				//previousMenu = "HomeMenu";
-				changement = true;
-			}
-			if (methode == "ShowOptions")
-			{
-				goToMenu = "OptionsMenu";
-				//previousMenu = "HomeMenu";
-				changement = true;
-			}
-			if (methode == "ShowStat")
-			{
-				goToMenu = "StatMenu";
-				//previousMenu = "HomeMenu";
-				changement = true;
-			}
-			if (methode == "ShowRoomSelection")
-			{
-				goToMenu = "RoomSelectionMenu";
-				//previousMenu = "HomeMenu";
-				changement = true;
-			}
-	}
-		if (GetCurrentMenu().name == "StatMenu")
-		{
-			_stat.Invoke(methode, 0);
-			changement = false;
-			if (methode == "HideStat")
-			{
-				goToMenu = "HomeMenu";
-				//previousMenu = "StatMenu";
-				changement = true;
-			}
-		}
-		if (GetCurrentMenu().name == "OptionsMenu")
-		{
-			_option.Invoke(methode, 0);
-			changement = false;
-			if (methode == "HideOptions")
-			{
-				goToMenu = "HomeMenu";
-				//previousMenu = "OptionsMenu";
-				changement = true;
-			}
-			if (methode == "ShowCredits")
-			{
-				goToMenu = "CreditsMenu";
-				//previousMenu = "OptionsMenu";
-				changement = true;
-			}
-		}
-		if (GetCurrentMenu().name == "CreditsMenu")
-		{
-			_cred.Invoke(methode, 0);
-			changement = false;
-			if (methode == "HideCredits")
-			{
-				goToMenu = "OptionsMenu";
-				//previousMenu = "CreditsMenu";
-				changement = true;
-			}
-		}
-		if (GetCurrentMenu().name == "ConnectionMenu")
-		{
-			_co.Invoke(methode, 0);
-			changement = false;
-			if (methode == "HideConnection" || methode == "Connect")
-			{
-				goToMenu = "HomeMenu";
-				//previousMenu = "ConnectionMenu";
-				changement = true;
-			}
-			if (methode == "ShowAccount")
-			{
-				goToMenu = "AccountMenu";
-				//previousMenu = "ConnectionMenu";
-				changement = true;
-			}
-		}
-		if (GetCurrentMenu().name == "AccountMenu" || methode == "CreateAccount")
-		{
-			_acc.Invoke(methode, 0);
-			changement = false;
-			if (methode == "HideAccount")
-			{
-				goToMenu = "ConnectionMenu";
-				//previousMenu = "AccountMenu";
-				changement = true;
-			}
-		}
-		if (GetCurrentMenu().name == "RoomSelectionMenu")
-		{
-			_sroom.Invoke(methode, 0);
-			changement = false;
-			if (methode == "HideRoomSelection")
-			{
-				goToMenu = "HomeMenu";
-				//previousMenu = "RoomSelectionMenu";
-				changement = true;
-			}
-		}
 
+
+public void debug(){
+
+		Debug.Log(" 3 : " + HasMenuChanged());
 		//lors d'un changement de menu (bouton qui change de menu, click ou Entrée
-		if (changement == true)
+		if (HasMenuChanged() == true)
 		{
 			//on selectionne le premier bouton enfant du menu dans lequel on va
-			eventSystem.SetSelectedGameObject(FindGOTool(goToMenu, "Buttons").transform.GetChild(0).gameObject);
+			/* eventSystem.SetSelectedGameObject(FindGOTool(getNextMenu().name, "Buttons").transform.GetChild(0).gameObject); */
+			Debug.Log(" jeijej : "+ getNextMenu().name);
+			SetMenuChanged(false);
+			Debug.Log(HasMenuChanged());
+			/* Debug.Log("Current selected GameObject : " + eventSystem.currentSelectedGameObject); */
 			currentGo = eventSystem.currentSelectedGameObject;
 
 			//comme avant pour les couleurs
@@ -286,7 +184,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler//, IPointerExitHand
 			if (currentGo.GetComponent<Button>().interactable)
 			{
 				ColorButtonSelected();
-				changement = false;
 				if (previousGo != currentGo)
 				{
 					ColorButtonDeselected();
@@ -295,5 +192,32 @@ public class IOManager : Miscellaneous, IPointerEnterHandler//, IPointerExitHand
 			}
 		}
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
+	
+}
+
+
+	public void MethodCall(string methode)
+	{ 
+		if (GetCurrentMenu().name == "HomeMenu"){
+		// PATCH A AMELIORER : FONCTIONNEL SANS INVOKE
+			_home.ShowConnection();
+			/* _home.Invoke(methode, 0.0f); */
+/* 			Action action = dict["_home.ShowConnection"];
+ 			action(); */
+			}
+
+		if (GetCurrentMenu().name == "StatMenu")
+			_stat.Invoke(methode, 0);
+		if (GetCurrentMenu().name == "OptionsMenu")
+			_option.Invoke(methode, 0);
+		if (GetCurrentMenu().name == "CreditsMenu")
+			_cred.Invoke(methode, 0);
+		if (GetCurrentMenu().name == "ConnectionMenu")
+			_co.Invoke(methode, 0);
+		if (GetCurrentMenu().name == "AccountMenu")
+			_acc.Invoke(methode, 0);
+		if (GetCurrentMenu().name == "RoomSelectionMenu")
+			_sroom.Invoke(methode, 0);
+		debug();
 	}
 }

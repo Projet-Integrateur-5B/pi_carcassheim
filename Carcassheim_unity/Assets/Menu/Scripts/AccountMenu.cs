@@ -54,13 +54,13 @@ public class AccountMenu : Miscellaneous
 	public void HideAccount()
 	{
 		ResetWarningTextAM();
-		ChangeMenu(FindMenu("AccountMenu"), FindMenu("ConnectionMenu"));
+		ChangeMenu("AccountMenu", "ConnectionMenu");
 	}
 
 	public void HideAccountConnected()
 	{
 		ResetWarningTextAM();
-		ChangeMenu(FindMenu("AccountMenu"), FindMenu("HomeMenu"));
+		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
 	}
 

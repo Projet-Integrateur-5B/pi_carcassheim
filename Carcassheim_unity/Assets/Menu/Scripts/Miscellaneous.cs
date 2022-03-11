@@ -19,6 +19,9 @@ public abstract class Miscellaneous : MonoBehaviour
 	private static bool s_state = false;
 	private static bool s_menuHasChanged = false;
 	private static bool s_displayFlexOnce = false;
+	private static GameObject GoSubMenu = null;
+	private static GameObject previousMenu = null;
+	private static GameObject nextMenu = null;
 	void Start()
 	{
 	}
@@ -26,6 +29,12 @@ public abstract class Miscellaneous : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
+		
+	}
+
+	void awake()
+	{
+		GoSubMenu = GameObject.Find("SubMenus");
 	}
 
 	// ---- Etat de connection Account et Connection Menu ----
@@ -85,6 +94,15 @@ public abstract class Miscellaneous : MonoBehaviour
 		return s_menuHasChanged;
 	}
 
+	public GameObject getPreviousMenu(){
+		return previousMenu;
+	}
+
+	public GameObject getNextMenu(){
+		if(s_menuHasChanged)
+			return nextMenu;
+		else return null;
+	}
 
 	// A AMELIORER
 	public GameObject GetCurrentMenu()
@@ -104,6 +122,17 @@ public abstract class Miscellaneous : MonoBehaviour
 	{
 		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
 	}
+
+	public void ChangeMenu(string close, string goTo)
+	{
+		s_menuHasChanged = true;
+		previousMenu = GameObject.Find(close).gameObject;
+		nextMenu = GameObject.Find("SubMenus").transform.Find(goTo).gameObject;;
+		previousMenu.SetActive(false);
+		nextMenu.SetActive(true);
+		Debug.Log("2 : " + s_menuHasChanged);
+	}
+
 
 	public GameObject FindGOTool(string menu, string tool)
 	{
@@ -136,13 +165,6 @@ public abstract class Miscellaneous : MonoBehaviour
 		}
 	}
 
-	public void ChangeMenu(GameObject close, GameObject goTo)
-	{
-		s_menuHasChanged = false;
-		close.SetActive(false);
-		goTo.SetActive(true);
-		s_menuHasChanged = true;
-	}
 
 	public bool StrCompare(string str1, string str2)
 	{

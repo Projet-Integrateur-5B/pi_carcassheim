@@ -38,7 +38,7 @@ public class ConnectionMenu : Miscellaneous
 	public void HideConnection()
 	{
 		ResetWarningTextCM();
-		ChangeMenu(FindMenu("ConnectionMenu"), FindMenu("HomeMenu"));
+		ChangeMenu("ConnectionMenu", "HomeMenu");
 	}
 
 	public void ForgottenPwdUser()
@@ -67,7 +67,7 @@ public class ConnectionMenu : Miscellaneous
 		Text tmpText = tmpGO.GetComponent<Text>();
 		TryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Connectez vous";
-		ChangeMenu(FindMenu("ConnectionMenu"), FindMenu("AccountMenu"));
+		ChangeMenu("ConnectionMenu", "AccountMenu");
 	}
 
 	public void Connect()

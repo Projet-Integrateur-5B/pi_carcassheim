@@ -19,7 +19,7 @@ public class RoomSelectionMenu : Miscellaneous
 	{
 		s_isOpenPanel = false;
 		Pop_up_Options.SetActive(s_isOpenPanel);
-		ChangeMenu(FindMenu("RoomSelectionMenu"), FindMenu("HomeMenu"));
+		ChangeMenu("RoomSelectionMenu", "HomeMenu");
 	}
 
 	public void ShowPopUpOptions()

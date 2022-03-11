@@ -202,7 +202,7 @@ public class OptionsMenu : Miscellaneous
 	// -------------- Music/Sound End -----------------------//
 	public void HideOptions()
 	{
-		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("HomeMenu"));
+		ChangeMenu("OptionsMenu", "HomeMenu");
 	}
 
 	public void FullScreen()
@@ -218,6 +218,6 @@ public class OptionsMenu : Miscellaneous
 
 	public void ShowCredits()
 	{
-		ChangeMenu(FindMenu("OptionsMenu"), FindMenu("CreditsMenu"));
+		ChangeMenu("OptionsMenu", "CreditsMenu");
 	}
 }
