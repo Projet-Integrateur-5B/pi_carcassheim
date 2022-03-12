@@ -195,15 +195,28 @@ public void debug(){
 	
 }
 
+//PATCH DELEGATE 
+public delegate void Del();
+
 
 	public void MethodCall(string methode)
 	{ 
 		if (GetCurrentMenu().name == "HomeMenu"){
 		// PATCH A AMELIORER : FONCTIONNEL SANS INVOKE
-			_home.ShowConnection();
+/* 			_home.ShowConnection();
+ */
+			// Instantiate the delegate.
+			Del handler = _home.ShowConnection; // A FAIRE : trouver "cast" string to delegate
+
+			// Call the delegate.
+			handler();
+			Debug.Log("TEST DELEGATE");
+
 			/* _home.Invoke(methode, 0.0f); */
 /* 			Action action = dict["_home.ShowConnection"];
  			action(); */
+
+			 // DELEGATE ???
 			}
 
 		if (GetCurrentMenu().name == "StatMenu")
