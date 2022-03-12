@@ -143,15 +143,16 @@ public class Serveur_main : MonoBehaviour
         _lst_obj_threads_com[1].Add_partie_geree(2);
         _lst_obj_threads_com[1].Add_partie_geree(3);
 
-
-
-
+      
         // Prévenir tous les threads que le serveur ferme 
+
+    
 
         // Fermeture de tous les threads
         foreach(Thread thread in _lst_threads_com){
             thread.Join();
         }
+
 
     }
 

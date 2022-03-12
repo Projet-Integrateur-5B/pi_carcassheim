@@ -10,10 +10,14 @@ public class Thread_communication
     private int _id_thread_com;
     private int _numero_port;
     private int _nb_parties_gerees;
+
     private List<int> _id_parties_gerees;
+    private List<Thread_serveur_jeu> _lst_serveur_jeu;
+
+    private static int _compteur_id_thread_com;
 
     // Rajouter un objet RESEAU pour les communications ?
-    
+
 
     // Constructeur
 
@@ -74,6 +78,44 @@ public class Thread_communication
             //      • Réaction à triche
             //      • Réaction à afk
             //      • Kick (afk ou triche)
+
+
+            int typeMsg = 0; // Dépendra du type : création de partie, connexion à la partie, etc
+            int portPartie = 0; // Port de la partie en question
+
+            if(typeMsg == 1)    // Création de partie
+            {
+                int id_nouv_partie = -1;
+
+                lock (this)
+                {
+                    if (_nb_parties_gerees < 5)
+                    {
+                        id_nouv_partie = 1; // TEMPORAIRE     //  BDD - Fonction de récupération d'ID libre
+
+                        this.Add_partie_geree(id_nouv_partie);
+                    }
+                }
+
+                if (id_nouv_partie != -1) // Si la partie a pu être crée
+                {
+                    Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie);
+                    Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
+
+                    _lst_serveur_jeu.Add(thread_serveur_jeu);
+
+                    nouv_thread.Start();
+
+                    // A FAIRE - Rajouter ce joueur dans la partie
+                }
+                else
+                {
+                    // RESEAU - Fonction qui indique au client que la partie n'a pas pu être créée 
+                }
+                
+            }
+
+
         }
 
  

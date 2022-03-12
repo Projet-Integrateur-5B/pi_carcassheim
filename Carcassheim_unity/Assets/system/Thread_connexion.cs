@@ -8,7 +8,7 @@ public class Thread_connexion
 
 	private string _login;
     private int _id_partie;
-    private static List<Thread_communication> _lst_obj_threads_com;
+    private List<Thread_communication> _lst_obj_threads_com;
 
     // Constructeur
     public Thread_connexion(string login, int id_partie_cherchee, List<Thread_communication> lst_obj_threads_com)

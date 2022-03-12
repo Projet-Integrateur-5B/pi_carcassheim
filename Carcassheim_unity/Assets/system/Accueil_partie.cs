@@ -45,4 +45,7 @@ public class  Accueil_partie
 
     // Getters et setters
 
+    // Méthodes
+
+
 } 
