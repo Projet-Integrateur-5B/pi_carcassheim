@@ -19,6 +19,8 @@ public class Serveur_main : MonoBehaviour
         _lst_obj_threads_com = new List<Thread_communication>();
 
         _lst_port_dispo = new List<int>();
+        _lst_port_dispo.Add(1); // DEBUG
+        _lst_port_dispo.Add(2); // DEBUG
 
         _compteur_id_thread_com = 0;
 
@@ -58,18 +60,17 @@ public class Serveur_main : MonoBehaviour
                 Thread nouv_thread_connexion = new Thread(new ThreadStart(thread_connexion.Lancement_thread_connexion));
                 nouv_thread_connexion.Start();
 
-                // A FAIRE - Fonction de redirection vers thread de connexion
-
 
             }
             else if(typeMsg == 3){ // Réception d'une création de partie (un if dans le while de reception global) -> A DEPLACER dans thread com (faire un appel de fonction)
 
-                // TEMP - DEBUG 
-                int port_partie = 1; // A MODIFIER : Généré en récupérant un numéro de port disponible de la liste _lst_port_dispo
+ 
                     
                 if (_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0) { // Aucun thread de comm n'existe
 
-                    if (Creation_thread_com(port_partie)) { // Seulement si un nouveau thread de com a pu être créé
+                    int port_nouv_thread_com = Creation_thread_com();
+
+                    if (port_nouv_thread_com != -1) { // Seulement si un nouveau thread de com a pu être créé
 
                         // RESEAU - Fonction de redirection du client vers le bon thread de com
 
@@ -106,7 +107,9 @@ public class Serveur_main : MonoBehaviour
                     // Si aucun des threads n'est libre pour héberger une partie de plus
                     if(thread_com_trouve == false){
 
-                        if (Creation_thread_com(port_partie)) { // Seulement si un nouveau thread de com a pu être créé     
+                        int port_nouv_thread_com = Creation_thread_com();
+
+                        if (port_nouv_thread_com != -1) { // Seulement si un nouveau thread de com a pu être créé     
 
                             // A FAIRE - Fonction (dans le thread de com) de création d'accueil
 
@@ -129,10 +132,10 @@ public class Serveur_main : MonoBehaviour
         Debug.Log("Ceci est un test");
 
         // Création d'un thread de com de port 1
-        Creation_thread_com(1);
+        Creation_thread_com();
 
         // Création d'un thread de com de port 2
-        Creation_thread_com(2);
+        Creation_thread_com();
 
         // On indique au premier qu'il gère 1 partie et au second 2
         _lst_obj_threads_com[0].Add_partie_geree(1);
@@ -152,13 +155,13 @@ public class Serveur_main : MonoBehaviour
 
     }
 
-    private bool Creation_thread_com(int port_lie){
+    private int Creation_thread_com(){
 
         if(_lst_port_dispo.Count != 0)
         {
             int port_choisi = _lst_port_dispo[_lst_port_dispo.Count - 1];
 
-            Thread_communication thread_com = new Thread_communication(port_lie, _compteur_id_thread_com);
+            Thread_communication thread_com = new Thread_communication(port_choisi, _compteur_id_thread_com);
             _compteur_id_thread_com++;
             Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
 
@@ -169,7 +172,7 @@ public class Serveur_main : MonoBehaviour
 
             nouv_thread.Start();
 
-            return true;
+            return port_choisi;
         }
         else
         {
@@ -178,7 +181,7 @@ public class Serveur_main : MonoBehaviour
 
 
 
-            return false;
+            return -1;
         }
 
         
