@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
-using System.Text.Unicode;
 
 namespace Reseau;
 
@@ -11,7 +10,7 @@ public class Packet
     {
         Type = false;
     }
-    
+
     public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, bool status,
         byte permission, ulong idPlayer, string data)
     {
@@ -25,7 +24,7 @@ public class Packet
         IdPlayer = idPlayer;
         Data = data;
     }
-    
+
     // type == false (client -> server)
     public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, ulong idPlayer,
         string data)
@@ -76,8 +75,7 @@ public class Packet
         return JsonSerializer.Deserialize<Packet>(packetAsJson);
     }
 
-    static void Main()
+    private static void Main()
     {
-        
     }
 }
