@@ -113,6 +113,7 @@ public abstract class Miscellaneous : MonoBehaviour
 				firstActiveChild = child.gameObject;
 				break;
 			}
+
 		return firstActiveChild;
 	}
 
@@ -134,7 +135,6 @@ public abstract class Miscellaneous : MonoBehaviour
 		nextMenu = GameObject.Find("SubMenus").transform.Find(goTo).gameObject;
 		previousMenu.SetActive(false);
 		nextMenu.SetActive(true);
-		Debug.Log("2 : " + s_menuHasChanged);
 	}
 
 	public GameObject FindGOTool(string menu, string tool)
@@ -146,26 +146,18 @@ public abstract class Miscellaneous : MonoBehaviour
 	{
 		Color newCol;
 		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
-		{
 			change.color = newCol;
-		}
 		else
-		{
 			change.color = defaultColor;
-		}
 	}
 
 	public void TryColor(GameObject change, Color defaultColor, string coloration)
 	{
 		Color newCol;
 		if (ColorUtility.TryParseHtmlString(coloration, out newCol))
-		{
 			change.GetComponent<Text>().color = newCol;
-		}
 		else
-		{
 			change.GetComponent<Text>().color = defaultColor;
-		}
 	}
 
 	public bool StrCompare(string str1, string str2)
@@ -185,7 +177,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	/* GO.GetComponent<Text>().fontSize = r; */
 	}
 
-	//methode a ne pas utiliser pour les mots de passe car dans ceux-ci le caractere ' ' est compte comme un vrai caractere
+	//Ne pas utiliser pour les mdp car char '' est compté comme un vrai chare
 	public string RemoveLastSpace(string mot)
 	{
 		//comme les string sont immutable, on doit passer par une autre string
@@ -193,7 +185,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		//on verifie que la string ne soit pas vide
 		if (mot.Length > 1)
 		{
-			//on enleve tous les caracteres ' ' a la fin du mot
+			//on enleve tous les char '' a la fin du mot
 			modif = mot.TrimEnd();
 			return modif;
 		}

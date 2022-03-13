@@ -22,8 +22,6 @@ public class HomeMenu : Miscellaneous
 
 	public void ShowConnection()
 	{
-		SetMenuChanged(true);
-		Debug.Log("1 : " + HasMenuChanged());
 		ChangeMenu("HomeMenu", "ConnectionMenu");
 	}
 
