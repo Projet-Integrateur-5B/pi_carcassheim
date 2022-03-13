@@ -1,6 +1,6 @@
 ﻿using System;
 
-public class Thread_serveur_jeu
+public partial class Thread_serveur_jeu
 {
 
 	// Attributs
