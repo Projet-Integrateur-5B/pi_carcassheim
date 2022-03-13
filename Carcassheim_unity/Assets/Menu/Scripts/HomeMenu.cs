@@ -8,11 +8,10 @@ public class HomeMenu : Miscellaneous
 		Color newCol;
 		if (GetState() == false && FindMenu("HomeMenu").activeSelf == true)
 		{
-			Debug.Log("BJBJKHRENJHRJHE");
-			GameObject.Find("Play").GetComponent<Button>().interactable = GetState();
+			GameObject.Find("ShowRoomSelection").GetComponent<Button>().interactable = GetState();
 			GameObject.Find("ShowStat").GetComponent<Button>().interactable = GetState();
 			ColorUtility.TryParseHtmlString("#808080", out newCol);
-			GameObject.Find("Play").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
+			GameObject.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 			GameObject.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 		}
 	}
@@ -23,24 +22,24 @@ public class HomeMenu : Miscellaneous
 
 	public void ShowConnection()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("ConnectionMenu"));
+		ChangeMenu("HomeMenu", "ConnectionMenu");
 	}
 
-	public void Play()
+	public void ShowRoomSelection()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("RoomSelectionMenu"));
+		ChangeMenu("HomeMenu", "RoomSelectionMenu");
 	//RandomIntColor(GameObject.Find("Etat de connexion"));
 	/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void ShowOptions()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("OptionsMenu"));
+		ChangeMenu("HomeMenu", "OptionsMenu");
 	}
 
 	public void ShowStat()
 	{
-		ChangeMenu(FindMenu("HomeMenu"), FindMenu("StatistiquesMenu"));
+		ChangeMenu("HomeMenu", "StatMenu");
 	}
 
 	public void QuitGame()

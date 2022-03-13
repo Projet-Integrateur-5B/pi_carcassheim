@@ -13,6 +13,6 @@ public class CreditsMenu : Miscellaneous
 
 	public void HideCredits()
 	{
-		ChangeMenu(FindMenu("CreditsMenu"), FindMenu("OptionsMenu"));
+		ChangeMenu("CreditsMenu", "OptionsMenu");
 	}
 }
