@@ -31,7 +31,7 @@ reseau:style:
   needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "dotnet tool update -g dotnet-format && dotnet format --check --verbosity diagnostic"
+    - "dotnet tool update -g dotnet-format && dotnet format --verbosity diagnostic"
   only:
     - reseau
 
