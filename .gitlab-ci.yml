@@ -1,6 +1,9 @@
 stages:
   - reseau
 
+include:
+  - template: Code-Quality.gitlab-ci.yml
+    
 variables:
   RESEAU_DIRECTORY: "Reseau"
   RESEAU_OBJECTS_DIRECTORY: '$RESEAU_DIRECTORY/obj'
@@ -31,7 +34,8 @@ reseau:style:
   needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "dotnet tool update -g dotnet-format && dotnet format --verbosity diagnostic"
+  artifacts:
+      paths: [ gl-code-quality-report.json ]
   only:
     - reseau
 
