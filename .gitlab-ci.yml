@@ -28,6 +28,7 @@ reseau:build:
 reseau:test:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
+  needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
