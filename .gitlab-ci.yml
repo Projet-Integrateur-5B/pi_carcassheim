@@ -1,6 +1,5 @@
 stages:
-  - reseau_build
-  - reseau_test
+  - reseau
 
 variables:
   RESEAU_DIRECTORY: "Reseau"
@@ -14,12 +13,11 @@ cache:
     - '$RESEAU_OBJECTS_DIRECTORY/project.assets.json'
     - '$RESEAU_OBJECTS_DIRECTORY/*.csproj.nuget.*'
     - '$RESEAU_NUGET_PACKAGES_DIRECTORY'
-
   policy: pull-push
   
-build:reseau:
+reseau:build:
   image: mcr.microsoft.com/dotnet/sdk
-  stage: reseau_build
+  stage: reseau
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
@@ -27,9 +25,9 @@ build:reseau:
   only:
     - reseau
 
-test:reseau:
+reseau:test:
   image: mcr.microsoft.com/dotnet/sdk
-  stage: reseau_test
+  stage: reseau
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
