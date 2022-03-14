@@ -1,0 +1,26 @@
+stages:
+  - reseau_build
+  - reseau_test
+
+variables:
+  reseau_dir: "Reseau"
+
+build:reseau:
+  image: microsoft/dotnet:latest
+  stage: reseau_build
+  script:
+    - "cd $reseau_dir"
+    - "dotnet restore"
+    - "dotnet build"
+  only:
+    - reseau
+
+test:reseau:
+  image: microsoft/dotnet:latest
+  stage: reseau_test
+  script:
+    - "cd $reseau_dir"
+    - "dotnet restore"
+    - "dotnet test"
+  only:
+    - reseau
