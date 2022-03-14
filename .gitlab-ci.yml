@@ -30,6 +30,7 @@ reseau:style:
   stage: reseau
   needs: ["reseau:build"]
   script:
+    - "cd $RESEAU_DIRECTORY"
     - "dotnet tool update -g dotnet-format && dotnet format --check --verbosity diagnostic"
   only:
     - reseau
