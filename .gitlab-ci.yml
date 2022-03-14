@@ -18,7 +18,7 @@ cache:
   policy: pull-push
   
 build:reseau:
-  image: microsoft/dotnet:latest
+  image: mcr.microsoft.com/dotnet/samples:aspnetapp
   stage: reseau_build
   script:
     - "cd $RESEAU_DIRECTORY"
@@ -28,7 +28,7 @@ build:reseau:
     - reseau
 
 test:reseau:
-  image: microsoft/dotnet:latest
+  image: mcr.microsoft.com/dotnet/samples:aspnetapp
   stage: reseau_test
   script:
     - "cd $RESEAU_DIRECTORY"
