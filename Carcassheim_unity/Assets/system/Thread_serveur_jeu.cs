@@ -5,7 +5,7 @@ public partial class Thread_serveur_jeu
 
 	// Attributs
 
-	private int _id_partie;
+	private readonly int _id_partie;
 
 	// Constructeur
 	public Thread_serveur_jeu(int id_partie)

@@ -1,4 +1,4 @@
-﻿/*
+﻿
 
 using System;
 using System.Collections;
@@ -34,4 +34,3 @@ public partial class Thread_serveur_jeu
 }
 
 
-*/
