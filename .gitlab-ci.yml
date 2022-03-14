@@ -3,13 +3,25 @@ stages:
   - reseau_test
 
 variables:
-  reseau_dir: "Reseau"
+  RESEAU_DIRECTORY: "Reseau"
+  RESEAU_OBJECTS_DIRECTORY: '$RESEAU_DIRECTORY/obj'
+  RESEAU_NUGET_PACKAGES_DIRECTORY: '$RESEAU_DIRECTORY/.nuget'
 
+cache:
+  # Per-stage and per-branch caching.
+  key: "$CI_JOB_STAGE-$CI_COMMIT_REF_SLUG"
+  paths:
+    - '$RESEAU_OBJECTS_DIRECTORY/project.assets.json'
+    - '$RESEAU_OBJECTS_DIRECTORY/*.csproj.nuget.*'
+    - '$RESEAU_NUGET_PACKAGES_DIRECTORY'
+
+  policy: pull-push
+  
 build:reseau:
   image: microsoft/dotnet:latest
   stage: reseau_build
   script:
-    - "cd $reseau_dir"
+    - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
     - "dotnet build"
   only:
@@ -19,7 +31,7 @@ test:reseau:
   image: microsoft/dotnet:latest
   stage: reseau_test
   script:
-    - "cd $reseau_dir"
+    - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
     - "dotnet test"
   only:
