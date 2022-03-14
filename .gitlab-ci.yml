@@ -25,32 +25,21 @@ reseau:build:
   only:
     - reseau
 
-reseau:style:whitespace:
+reseau:style:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
   needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet tool update -g dotnet-format"
-    - "dotnet format whitespace --verify-no-changes -v diag"
-  only:
-    - reseau
-      
-reseau:style:errors:
-  image: mcr.microsoft.com/dotnet/sdk
-  stage: reseau
-  needs: ["reseau:style:whitespace"]
-  script:
-    - "cd $RESEAU_DIRECTORY"
-    - "dotnet tool update -g dotnet-format"
-    - "dotnet format style --verify-no-changes -v diag"
+    - "dotnet format --verify-no-changes --verbosity diag"
   only:
     - reseau
 
 reseau:test:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
-  needs: ["reseau:style:errors"]
+  needs: ["reseau:style"]
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"

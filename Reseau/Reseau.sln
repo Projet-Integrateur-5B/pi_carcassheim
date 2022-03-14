@@ -5,7 +5,7 @@ VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reseau", "Reseau\Reseau.csproj", "{CFC2640C-9294-4A91-A186-7E111A8EDC2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reseau_UnitTest", "Reseau_UnitTest\Reseau_UnitTest.csproj", "{ABF93F5D-35D9-46F4-A544-2D19E28B71AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReseauUnitTest", "ReseauUnitTest\ReseauUnitTest.csproj", "{ABF93F5D-35D9-46F4-A544-2D19E28B71AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,54 +1,55 @@
-﻿using System.Net;
+namespace Reseau;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace Reseau;
-
 public class Packet
 {
-    private static string _localhost = "127.0.0.1";
+    private const string Localhost = "127.0.0.1";
     public Packet()
     {
-        Type = false;
-        IpAddress = IPAddress.Parse(_localhost);
-        Data = new string("");
+        this.Type = false;
+        this.IpAddress = IPAddress.Parse(Localhost);
+        this.Data = new string("");
     }
 
-    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, bool status, byte permission, ulong idPlayer, string data)
+    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage,
+        bool status, byte permission, ulong idPlayer, string data)
     {
-        Type = type;
-        IpAddress = ipAddress;
-        Port = port;
-        IdRoom = idRoom;
-        IdMessage = idMessage;
-        Status = status;
-        Permission = permission;
-        IdPlayer = idPlayer;
-        Data = new string(data);
+        this.Type = type;
+        this.IpAddress = ipAddress;
+        this.Port = port;
+        this.IdRoom = idRoom;
+        this.IdMessage = idMessage;
+        this.Status = status;
+        this.Permission = permission;
+        this.IdPlayer = idPlayer;
+        this.Data = new string(data);
     }
 
     // type == false (client -> server)
-    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, ulong idPlayer,
-        string data)
+    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage,
+        ulong idPlayer, string data)
     {
-        Type = type;
-        IpAddress = ipAddress;
-        Port = port;
-        IdRoom = idRoom;
-        IdMessage = idMessage;
-        IdPlayer = idPlayer;
-        Data = new string(data);
+        this.Type = type;
+        this.IpAddress = ipAddress;
+        this.Port = port;
+        this.IdRoom = idRoom;
+        this.IdMessage = idMessage;
+        this.IdPlayer = idPlayer;
+        this.Data = new string(data);
     }
 
     // type == true (server -> client)
-    public Packet(bool type, bool status, byte permission, ulong idPlayer, string data)
+    public Packet(bool type, bool status, byte permission, ulong idPlayer,
+        string data)
     {
-        Type = type;
-        Status = status;
-        Permission = permission;
-        IdPlayer = idPlayer;
-        Data = new string(data);
-        IpAddress = IPAddress.Parse(_localhost); // unused
+        this.Type = type;
+        this.Status = status;
+        this.Permission = permission;
+        this.IdPlayer = idPlayer;
+        this.Data = new string(data);
+        this.IpAddress = IPAddress.Parse(Localhost); // unused
     }
 
     public bool Type { get; set; } // false (client -> server) - true (server -> client)
@@ -67,10 +68,7 @@ public class Packet
     public ulong IdPlayer { get; set; }
     public string Data { get; set; } // à définir
 
-    public byte[] Serialize()
-    {
-        return JsonSerializer.SerializeToUtf8Bytes(this);
-    }
+    public byte[] Serialize() => JsonSerializer.SerializeToUtf8Bytes(this);
 
     public static Packet? Deserialize(byte[] packetAsBytes)
     {

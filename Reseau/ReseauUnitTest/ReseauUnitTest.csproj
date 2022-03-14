@@ -6,7 +6,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <RootNamespace>TestProject2</RootNamespace>
+        <RootNamespace>ReseauUnitTest</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
