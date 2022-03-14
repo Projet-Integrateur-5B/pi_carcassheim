@@ -4,13 +4,13 @@ from typing import Any, Tuple, Union, List
 from PIL import Image
 import xml.etree.ElementTree as ET
 from collections import deque
-import os
+import os, sys
 
 MAXWIDTH = 1000
 MAXHEIGHT = 720
 
 Number = Union[float, int]
-
+ERR_OUT = sys.stdout
 
 UNITY_PATH = "../"
 UNITY_FILE = "Carcassheim_unity/"
@@ -18,10 +18,66 @@ UNITY_TILE_PATH = os.path.join(UNITY_FILE, "Assets/Affichage_InGame/Tile/")
 UNITY_MASK_PATH = os.path.join(UNITY_TILE_PATH, "Mask/")
 
 
-def save_front_xml(tl_file):
+def save_front_xml(tl_file: TileFile):
+    print("start save front")
     root = ET.ElementTree()
     root_el = ET.Element("carcasheim")
+    meeple_id = 0
+    zone_id = 0
+    tile_id_conv = {}
+    tile_slot_id_conv = {}
+    meeple_id_conv = {}
+    zone_id_conv = {}
 
+    for tile_id, tile in enumerate(tl_file.getTiles()):
+        tile_el = ET.Element("tuile")
+        root_el.append(tile_el)
+
+        id_el = ET.Element("id")
+        id_el.text = f"{tile_id}"
+        tile_el.append(id_el)
+        tile_id_conv[tile.id] = tile_id
+        tile_slot_id_conv[tile.id] = {}
+
+        sprite_el = ET.Element("sprite")
+        if tile.sprite is None:
+            print(f"Error : Tile {tile.id} has no sprite", file=ERR_OUT)
+            return
+        try:
+            path = os.path.relpath(
+                tile.spriteName, os.path.join(UNITY_PATH, UNITY_FILE)
+            )
+            sprite_el.text = f"{path}"
+        except:
+            print("Error: trying to create path to sprite", file=ERR_OUT)
+        tile_el.append(sprite_el)
+
+        for slot_id, slot in enumerate(tile.lslots):
+            slot_el = ET.Element("slot")
+            tile_el.append(slot_el)
+
+            id_el = ET.Element("id")
+            id_el.text = f"{slot_id}"
+            slot_el.append(id_el)
+            tile_slot_id_conv[tile.id][slot.id] = slot_id
+
+            sprite_el = ET.Element("sprite")
+            if slot.mask_name is None:
+                print(
+                    f"Error: Slot {slot.id} in tile {tile.id} has no mask",
+                    file=ERR_OUT,
+                )
+                return
+            try:
+                path = os.path.relpath(
+                    slot.mask_name, os.path.join(UNITY_PATH, UNITY_FILE)
+                )
+                sprite_el.text = f"{path}"
+            except:
+                print("Error: trying to create path for slot", file=ERR_OUT)
+            slot_el.append(sprite_el)
+
+    root = ET.ElementTree(root_el)
     root.write("config_front.xml")
 
 
@@ -34,9 +90,9 @@ def save_back_xml(tl_file: TileFile):
     tile_slot_id_conv = {}
     meeple_id_conv = {}
     zone_id_conv = {}
-    for zone_id, zone in enumerate(tl_file.slotTypes):
+    slots_el = {}
+    for zone_id, zone in enumerate(tl_file.getSlotType()):
         zone_el = ET.Element("terrain")
-        root_el.append(zone_el)
 
         id_el = ET.Element("id")  # zone id
         id_el.text = f"{zone_id}"
@@ -45,22 +101,29 @@ def save_back_xml(tl_file: TileFile):
         zone_id_conv[zone.id] = zone_id  # zone id normalization
 
         name_el = ET.Element("nom")
+        if zone.name == "":
+            print(f"Warning: Zone {zone.id} has no name", file=ERR_OUT)
         name_el.text = f"{zone.name}"
         zone_el.append(name_el)
 
-    for tile_id, tile in enumerate(tl_file.tiles):
+        root_el.append(zone_el)
+
+    for tile_id, tile in enumerate(tl_file.getTiles()):
         tile_el = ET.Element("tuile")
-        root_el.append(tile_el)
+        tile_dir = {}
+        for dir in DIR:
+            tile_dir[dir] = False
 
         id_el = ET.Element("id")  # tile id
         id_el.text = f"{tile_id}"
         tile_el.append(id_el)
         tile_id_conv[tile.id] = tile_id  # tile id normalization
         tile_slot_id_conv[tile.id] = {}
+        slots_el[tile.id] = {}
 
         for slot_id, slot in enumerate(tile.lslots):
             slot_el = ET.Element("slot")
-            tile_el.append(slot_el)
+            slots_el[tile.id][slot.id] = slot_el
 
             id_el = ET.Element("id")  # slot id
             id_el.text = f"{slot_id}"
@@ -68,12 +131,41 @@ def save_back_xml(tl_file: TileFile):
             tile_slot_id_conv[tile.id][slot.id] = slot_id  # slot id normalization
 
             zone_el = ET.Element("terrain")  # zone
+            if slot.zone is None:
+                print(
+                    f"Error: Slot {slot.id} in tile {tile.id} has no type",
+                    file=ERR_OUT,
+                )
+                return
             zone_el.text = f"{zone_id_conv[slot.zone.id]}"
             slot_el.append(zone_el)
 
             for dir in DIR:
                 if slot.dir[dir]:
+                    if tile_dir[dir]:
+                        print(
+                            f"Error: Position {dir} is linked more than once in tile {tile.id}",
+                            file=ERR_OUT,
+                        )
+                        return
                     slot_el.append(ET.Element(dir))
+                    tile_dir[dir] = True
+            tile_el.append(slot_el)
+        for dir in DIR:
+            if not tile_dir[dir]:
+                print(
+                    f"Error: Position {dir} is linked to no slot in tile {tile.id}",
+                    file=sys.stderr,
+                )
+
+        root_el.append(tile_el)
+
+    for tile_id, tile in enumerate(tl_file.getTiles()):
+        for slot_id, slot in enumerate(tile.lslots):
+            for linked in slot.slot_links:
+                link_el = ET.Element("link")
+                link_el.text = f"{tile_slot_id_conv[tile.id][linked]}"
+                slots_el[tile.id][slot.id].append(link_el)
 
     root = ET.ElementTree(root_el)
     root.write("config_back.xml")
@@ -86,8 +178,8 @@ EXPORT = {
 
 
 def relpath(path=""):
-    if path == "":
-        return path
+    if len(path) == 0:
+        return ""
     else:
         return os.path.relpath(path)
 
@@ -97,7 +189,7 @@ class SlotComptabilities:
         self.comp = {}
 
     def add(self, id0: int, id1: int):
-        print(f"ADD {id0} {id1}")
+        # print(f"ADD {id0} {id1}")
         if id0 in self.comp:
             self.comp[id0].append(id1)
         else:
@@ -122,7 +214,7 @@ class SlotComptabilities:
         self.comp.pop(id)
 
     def connectedTo(self, id0: int, id1: int):
-        print("RESULT", id0, id1, id0 in self.comp and id1 in self.comp[id0])
+        # print("RESULT", id0, id1, id0 in self.comp and id1 in self.comp[id0])
         return id0 in self.comp and id1 in self.comp[id0]
 
     def __str__(self):
@@ -166,7 +258,7 @@ class SlotType:
 
     def connectedTo(self, other: Union[SlotType, Meeples]):
         if type(other) == type(self):
-            print("SLOTTYPE", self.id, other.id)
+            # print("SLOTTYPE", self.id, other.id)
             return self.tl_master.getComptabilities().connectedTo(self.id, other.id)
         else:
             return other.connectedTo(self)
@@ -594,7 +686,7 @@ class TileFile:
                     if e is not True:
                         self.restoreNextId()
                         self.valid = (self.valid + 1) % 2
-                        print(e.__repr__())
+                        print(e.__repr__(), file=ERR_OUT)
                     else:
                         nfile.nfile.reset()
                         res = True
@@ -1150,9 +1242,7 @@ if __name__ == "__main__":
                 self.iter_index == len(self.columns_to_slot)
                 and self.iter_creation is not None
             ):
-                print("myself")
                 return self.iter_creation
-            print(type(self), self.iter_index)
             item = self.columns_to_slot[self.iter_index].pointed_object
             self.iter_index += 1
             return item
@@ -1743,7 +1833,7 @@ if __name__ == "__main__":
                 target_slt = target.slot
                 source_id = source_slt.id
                 target_id = target_slt.id
-                print(source_id, target_id)
+                # print(source_id, target_id)
                 if target_id == source_id:
                     return True
 
@@ -1763,7 +1853,7 @@ if __name__ == "__main__":
                     source.slot_links.append(l)
                     target.slot_links.append(l)
                     l.draw()
-                print(source_slt.slot_links, target_slt.slot_links)
+                # print(source_slt.slot_links, target_slt.slot_links)
                 return True
 
     class TileParameters(Editor):
@@ -2019,7 +2109,6 @@ if __name__ == "__main__":
 
         def selectStart(self, x, y):
             sel = self._findElem(x, y)
-            print(sel)
             self.node_selected = sel
             if sel is not None:
                 x0, y0 = sel.center()
@@ -2216,18 +2305,18 @@ if __name__ == "__main__":
                         or x >= self.selected_tile.tile.sprite.width
                         or y >= self.selected_tile.tile.sprite.height
                     ):
-                        print("Hors zone")
+                        # print("Hors zone")
                         self.selectSlot(None)
                     else:
                         self.MouseDown = True
                         for s in self.selected_tile.islots:
                             if s.closeTo(x, y):
-                                print("Found")
+                                # print("Found")
                                 self.selectSlot(s)
                                 return
-                        print("Not Found")
+                        # print("Not Found")
                         if self.GrapheMode == "Add":
-                            print("Adding")
+                            # print("Adding")
                             self.newSlot(x, y)
                         else:
                             self.selectSlot(None)
@@ -2262,7 +2351,7 @@ if __name__ == "__main__":
             try:
                 tile = Tile(self.tiles, relpath(filedialog.askopenfilename()))
             except FailedCreation:
-                print("Failed creation of tile")
+                print("Failed creation of tile", file=ERR_OUT)
                 self.pressid = self.tile_zone.bind(
                     "<ButtonPress-1>", self.tileZoneClick
                 )
@@ -2420,11 +2509,11 @@ if __name__ == "__main__":
 
     def save(redo=False):
         global save_file
-        print("soive")
+        # print("soive")
         if redo or save_file == "":
             name = relpath(filedialog.asksaveasfilename())
             if name == "" or type(name) == tuple or ".py" in name or ".png" in name:
-                print("Wrong filename")
+                print("Wrong filename", file=ERR_OUT)
                 return
             else:
                 save_file = name
@@ -2450,7 +2539,11 @@ if __name__ == "__main__":
     if len(EXPORT) > 0:
         export_menu = tk.Menu(file_menu, tearoff=False)
         for name in EXPORT:
-            export_menu.add_command(label=name, command=lambda: EXPORT[name](tiles))
+
+            def f(name):
+                return lambda: EXPORT[name](tiles)
+
+            export_menu.add_command(label=name, command=f(name))
         file_menu.add_cascade(menu=export_menu, label="Export")
 
     file_menu.add_command(
