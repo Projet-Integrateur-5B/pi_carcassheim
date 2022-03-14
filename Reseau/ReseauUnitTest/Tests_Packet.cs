@@ -1,5 +1,4 @@
 namespace ReseauUnitTest;
-using System.Net;
 using System.Text;
 using NUnit.Framework;
 using Reseau;
@@ -13,9 +12,9 @@ public class TestsPacket
     [SetUp]
     public void Setup()
     {
-        this.original = new Packet(true, IPAddress.Parse(Localhost), 0, 0, 0, true, 1, 1, "test");
-        this.originalAsString = "{\"Type\":true,\"IpAddress\":null,\"Port\":0,\"IdRoom\":0," +
-                                "\"IdMessage\":0,\"Status\":true,\"Permission\":1," +
+        this.original = new Packet(true, Localhost, 0, 0, 0, true, 1, 1, "test");
+        this.originalAsString = "{\"Type\":true,\"IpAddress\":\"" + Localhost + "\",\"Port\":0," +
+                                "\"IdRoom\":0,\"IdMessage\":0,\"Status\":true,\"Permission\":1," +
                                 "\"IdPlayer\":1,\"Data\":\"test\"}";
     }
 

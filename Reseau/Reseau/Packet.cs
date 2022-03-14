@@ -1,5 +1,4 @@
 namespace Reseau;
-using System.Net;
 using System.Text;
 using System.Text.Json;
 
@@ -9,15 +8,15 @@ public class Packet
     public Packet()
     {
         this.Type = false;
-        this.IpAddress = IPAddress.Parse(Localhost);
+        this.IpAddress = new string(Localhost);
         this.Data = new string("");
     }
 
-    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage,
+    public Packet(bool type, string ipAddress, ushort port, ulong idRoom, byte idMessage,
         bool status, byte permission, ulong idPlayer, string data)
     {
         this.Type = type;
-        this.IpAddress = ipAddress;
+        this.IpAddress = new string(ipAddress);
         this.Port = port;
         this.IdRoom = idRoom;
         this.IdMessage = idMessage;
@@ -28,11 +27,11 @@ public class Packet
     }
 
     // type == false (client -> server)
-    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage,
+    public Packet(bool type, string ipAddress, ushort port, ulong idRoom, byte idMessage,
         ulong idPlayer, string data)
     {
         this.Type = type;
-        this.IpAddress = ipAddress;
+        this.IpAddress = new string(ipAddress);
         this.Port = port;
         this.IdRoom = idRoom;
         this.IdMessage = idMessage;
@@ -49,13 +48,14 @@ public class Packet
         this.Permission = permission;
         this.IdPlayer = idPlayer;
         this.Data = new string(data);
-        this.IpAddress = IPAddress.Parse(Localhost); // unused
+        this.IpAddress = new string(Localhost); // unused, escape errors
     }
 
     public bool Type { get; set; } // false (client -> server) - true (server -> client)
 
     // type == false (client -> server)
-    public IPAddress IpAddress { get; set; }
+    /* public IPAddress IpAddress { get; set; } */
+    public string IpAddress { get; set; }
     public ushort Port { get; set; }
     public ulong IdRoom { get; set; } // default : 0 -> not destined to a room
     public byte IdMessage { get; set; } // à définir
