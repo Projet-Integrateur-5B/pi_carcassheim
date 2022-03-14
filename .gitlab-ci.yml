@@ -3,7 +3,7 @@ stages:
 
 variables:
   RESEAU_DIRECTORY: "Reseau"
-  RESEAU_REPORT_DIR: "Report"
+  RESEAU_SLN: "Reseau.sln"
   RESEAU_OBJECTS_DIRECTORY: '$RESEAU_DIRECTORY/obj'
   RESEAU_NUGET_PACKAGES_DIRECTORY: '$RESEAU_DIRECTORY/.nuget'
 
@@ -32,7 +32,7 @@ reseau:style:
   needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "dotnet tool update -g dotnet-format && dotnet format --verify-no-changes -v diag"
+    - "dotnet tool update -g dotnet-format && dotnet format $RESEAU_SLN style --verify-no-changes -v diag"
   only:
     - reseau
 
