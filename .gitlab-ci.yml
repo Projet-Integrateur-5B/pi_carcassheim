@@ -32,7 +32,7 @@ reseau:style:
   needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "dotnet tool update -g dotnet-format && dotnet format style -v diag"
+    - "dotnet tool update -g dotnet-format && dotnet format --verify-no-changes -v diag"
   only:
     - reseau
 
