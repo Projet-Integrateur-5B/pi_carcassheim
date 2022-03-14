@@ -11,10 +11,14 @@ public class Packet
         Type = false;
     }
 
-    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, bool status,
-        byte permission, ulong idPlayer, string data)
+    public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, bool status, byte permission, ulong idPlayer, string data)
     {
         Type = type;
+        
+        
+        
+        
+        
         IpAddress = ipAddress;
         Port = port;
         IdRoom = idRoom;
