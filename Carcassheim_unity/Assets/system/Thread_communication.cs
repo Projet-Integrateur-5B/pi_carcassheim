@@ -16,19 +16,23 @@ public class Thread_communication
 
     private static int _compteur_id_thread_com;
 
-    private readonly My_Locks _locks;
+    // Locks
+
+    private readonly object _lock_nb_parties_gerees;
+    private readonly object _lock_id_parties_gerees;
 
     // Rajouter un objet RESEAU pour les communications ?
 
 
     // Constructeur
 
-    public Thread_communication(int num_port, int id, My_Locks locks){
+    public Thread_communication(int num_port, int id){
         _numero_port = num_port;
         _nb_parties_gerees = 0;
         _id_parties_gerees = new List<int>();
         _id_thread_com = id;
-        _locks = locks;
+        _lock_nb_parties_gerees = new object();
+        _lock_id_parties_gerees = new object();
     }
     
     // Getters et setters
@@ -39,6 +43,16 @@ public class Thread_communication
 
     public List<int> Get_id_parties_gerees(){
         return _id_parties_gerees;
+    }
+
+    public object Get_lock_nb_parties_gerees()
+    {
+        return _lock_nb_parties_gerees;
+    }
+
+    public object Get_lock_id_parties_gerees()
+    {
+        return _lock_id_parties_gerees;
     }
 
     // Augmente le nombre de parties gérées de 1
@@ -91,7 +105,7 @@ public class Thread_communication
             {
                 int id_nouv_partie = -1;
 
-                lock (_locks.Get_thread_com_lock())
+                lock (this.Get_lock_nb_parties_gerees())
                 {
                     if (_nb_parties_gerees < 5)
                     {

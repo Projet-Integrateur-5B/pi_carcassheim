@@ -11,8 +11,6 @@ public class Serveur_main : MonoBehaviour
 
     private static int _compteur_id_thread_com;
 
-    private readonly My_Locks _locks = new My_Locks();
-
     void Start()
     {
         
@@ -86,7 +84,7 @@ public class Serveur_main : MonoBehaviour
 
                     // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
                     foreach(Thread_communication thread_com_iterateur in _lst_obj_threads_com){
-                        lock (_locks.Get_thread_com_lock())
+                        lock (thread_com_iterateur.Get_lock_nb_parties_gerees())
                         {
                             if (thread_com_iterateur.Get_nb_parties_gerees() < 5) {
 
@@ -166,7 +164,7 @@ public class Serveur_main : MonoBehaviour
         {
             int port_choisi = _lst_port_dispo[_lst_port_dispo.Count - 1];
 
-            Thread_communication thread_com = new Thread_communication(port_choisi, _compteur_id_thread_com, _locks);
+            Thread_communication thread_com = new Thread_communication(port_choisi, _compteur_id_thread_com);
             _compteur_id_thread_com++;
             Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
 

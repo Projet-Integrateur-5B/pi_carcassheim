@@ -6,6 +6,8 @@ public partial class Thread_serveur_jeu
 
 	// Attributs
 
+	// Champs qui paramètrent la partie
+
 	private readonly int _id_partie;
 
 	private List<int> _lst_joueurs; // Contient les ID's de chaque joueur
@@ -17,6 +19,10 @@ public partial class Thread_serveur_jeu
 	private int _timer; // En secondes
 	private int _timer_max_joueur; // En secondes
 	private int _meeples; // Nombre de meeples par joueur
+
+	// Champs nécessaires pour le bon fonctionnement du programme
+
+
 
 	// Constructeur
 	public Thread_serveur_jeu(int id_partie, int id_joueur_createur)
