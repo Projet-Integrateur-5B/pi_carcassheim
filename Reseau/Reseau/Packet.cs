@@ -6,19 +6,17 @@ namespace Reseau;
 
 public class Packet
 {
+    private static string _localhost = "127.0.0.1";
     public Packet()
     {
         Type = false;
+        IpAddress = IPAddress.Parse(_localhost);
+        Data = new string("");
     }
 
     public Packet(bool type, IPAddress ipAddress, ushort port, ulong idRoom, byte idMessage, bool status, byte permission, ulong idPlayer, string data)
     {
         Type = type;
-        
-        
-        
-        
-        
         IpAddress = ipAddress;
         Port = port;
         IdRoom = idRoom;
@@ -26,7 +24,7 @@ public class Packet
         Status = status;
         Permission = permission;
         IdPlayer = idPlayer;
-        Data = data;
+        Data = new string(data);
     }
 
     // type == false (client -> server)
@@ -39,7 +37,7 @@ public class Packet
         IdRoom = idRoom;
         IdMessage = idMessage;
         IdPlayer = idPlayer;
-        Data = data;
+        Data = new string(data);
     }
 
     // type == true (server -> client)
@@ -49,7 +47,8 @@ public class Packet
         Status = status;
         Permission = permission;
         IdPlayer = idPlayer;
-        Data = data;
+        Data = new string(data);
+        IpAddress = IPAddress.Parse(_localhost); // unused
     }
 
     public bool Type { get; set; } // false (client -> server) - true (server -> client)
