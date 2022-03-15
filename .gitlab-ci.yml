@@ -55,24 +55,17 @@ test-with-coverage:
     CI_PROJECT_DIR: "."
     CONFIGURATION: "Debug"
     COVERAGE_FLAG: "XPlat Code Coverage"
-    LOGGER_FLAG: "junit;LogFilePath=$CI_PROJECT_DIR/UnitTest/junit/junit-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
   script:
     - "cd $RESEAU_DIRECTORY"
     - 'dotnet test
-            -c $CONFIGURATION
             -r $CI_PROJECT_DIR/cobertura
-            --collect:"$COVERAGE_FLAG"
-            --test-adapter-path:.
-            --logger:"$LOGGER_FLAG"'
+            --collect:"$COVERAGE_FLAG"'
     - "chmod +x ./scripts/print-dotnet-coverage.sh"
     - "./scripts/print-dotnet-coverage.sh $CI_PROJECT_DIR/cobertura"
+  coverage: /TOTAL_COVERAGE=(\d+.\d+)/
   artifacts:
     paths:
       - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
-      - $CI_PROJECT_DIR/UnitTest/junit/junit-test-result.xml
     reports:
       cobertura:
         - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
-      junit:
-        - $CI_PROJECT_DIR/UnitTest/junit/junit-test-result.xml
-  coverage: /TOTAL_COVERAGE=(\d+.\d+)/
