@@ -60,7 +60,7 @@ reseau:coverage:
     - "cd $RESEAU_DIRECTORY"
     - 'dotnet test
                   -r $CI_PROJECT_DIR/$COVERAGE_DIR
-                  --collect:"$COVERAGE_FLAG"'
+                  --collect:"$COVERAGE_FLAG""'
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
     - "reportgenerator -reports:\"$CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/$REPORT_DIR\" -reporttypes:\"TextSummary;xml\""
@@ -69,8 +69,7 @@ reseau:coverage:
   artifacts:
     paths:
       - $RESEAU_DIRECTORY/$COVERAGE_DIR/*/coverage.cobertura.xml
-      - $RESEAU_DIRECTORY/$REPORT_DIR/
     reports:
-      cobertura: $RESEAU_DIRECTORY/$REPORT_DIR/Summary.xml
+      cobertura: $RESEAU_DIRECTORY/$COVERAGE_DIR/*/coverage.cobertura.xml
   only:
     - reseau
