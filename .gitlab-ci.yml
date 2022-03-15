@@ -43,7 +43,7 @@ reseau:test:
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
-    - "dotnet test --no-build"
+    - "dotnet test"
   only:
     - reseau
 
