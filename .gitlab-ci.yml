@@ -53,6 +53,7 @@ reseau:coverage:
   needs: ["reseau:test"]
   script:
     - "cd $RESEAU_DIRECTORY"
+    - "pwd"
     - "rm -rf UnitTest/TestResults"
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
