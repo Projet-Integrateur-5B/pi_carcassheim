@@ -55,10 +55,7 @@ reseau:coverage:
     CI_PROJECT_DIR: "Reseau/UnitTest"
   script:
     - "cd $CI_PROJECT_DIR"
-    - "dotnet add package coverlet.msbuild"
-    - 'dotnet test --collect:"XPlat Code Coverage"'
-  artifacts:
-    reports:
-      cobertura: TestResults/*/coverage.cobertura.xml
+    - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage --no-build > coverage_result.txt"
+    - "cat coverage_result.txt"
   only:
     - reseau
