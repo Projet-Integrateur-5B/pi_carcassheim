@@ -1,6 +1,8 @@
 # Projet Intégrateur
 ## Partie "Reseau"
 
+[![pipeline status](https://git.unistra.fr/projet-integrateur-5b/pi_carcassonne/badges/reseau/pipeline.svg)](https://git.unistra.fr/projet-integrateur-5b/pi_carcassonne/-/commits/reseau) [![coverage report](https://git.unistra.fr/projet-integrateur-5b/pi_carcassonne/badges/reseau/coverage.svg)](https://git.unistra.fr/projet-integrateur-5b/pi_carcassonne/-/commits/reseau) [![Latest Release](https://git.unistra.fr/projet-integrateur-5b/pi_carcassonne/-/badges/release.svg)](https://git.unistra.fr/projet-integrateur-5b/pi_carcassonne/-/releases)
+
 ### Equipe
 
 > **Développeur** : Victor HAHNSCHUTZ <br>
