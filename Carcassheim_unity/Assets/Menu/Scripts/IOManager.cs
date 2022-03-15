@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine.InputSystem;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using System.Reflection;
 
 public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHandler
 {
@@ -18,7 +14,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	private StatistiquesMenu _stat;
 	private RoomSelectionMenu _sroom;
 	private GameObject currentGo;
-	private Color _previousColor;
+	private Color _previousColor, colHover;
 	private Text _btnText;
 	static private GameObject previousGo;
 	private Texture2D _cursorTexture;
@@ -27,6 +23,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	private EventSystem eventSystem;
 	void Start()
 	{
+		ColorUtility.TryParseHtmlString("#1e90ff", out colHover);
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		_option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
 		_acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
@@ -46,12 +43,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 				child.GetComponent<Button>().onClick.AddListener(() => MethodCall(child.name));
 		//selection de base lors du start : firstSelect, ce bouton sera bleu et selectionné
 		//pour l'instant ShowOptions mais à modifier
-		currentGo = GameObject.Find("ShowOptions");
+		currentGo = firstActiveChild(GameObject.Find("Buttons"));
 		previousGo = currentGo;
 		eventSystem.SetSelectedGameObject(currentGo);
 		_btnText = eventSystem.currentSelectedGameObject.GetComponentInChildren<Text>();
 		_previousColor = _btnText.color;
-		TryColorText(_btnText, Color.blue, "#1e90ff");
+		_btnText.color = colHover;
 		_btnText.fontSize += 3;
 	}
 
@@ -65,14 +62,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	public void ColorButtonSelected()
 	{
 		_btnText = currentGo.GetComponentInChildren<Text>();
-		TryColorText(_btnText, Color.blue, "#1e90ff");
+		_btnText.color = colHover;
 		_btnText.fontSize += 3;
 	}
 
 	public void ColorButtonDeselected()
 	{
 		_btnText = previousGo.GetComponentInChildren<Text>();
-		TryColorText(_btnText, Color.blue, "#ffffff");
+		_btnText.color = Color.white;
 		_btnText.fontSize -= 3;
 	}
 

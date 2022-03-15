@@ -11,10 +11,6 @@ public class RoomSelectionMenu : Miscellaneous
 		Pop_up_Options = GameObject.Find("SubMenus").transform.Find("Panel Options").gameObject;
 	}
 
-	void Update()
-	{
-	}
-
 	public void HideRoomSelection()
 	{
 		s_isOpenPanel = false;

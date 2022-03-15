@@ -1,5 +1,3 @@
-/*using System.Collections;
-using System.Collections.Generic;*/
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,113 +34,63 @@ public class OptionsMenu : Miscellaneous
 		lastSoundValue = _soundScroll.value;
 		_musicScroll.onValueChanged.AddListener(MusicScrollbarCallBack);
 		lastMusicValue = _musicScroll.value;
-	/*toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
+	/*	toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
 		toggle_french.onValueChanged.AddListener(delegate
 		{
 			ToggleValueChanged(toggle_french);
 		}); */
 	}
 
-	void Update()
-	{
-	}
-
 	void ToggleValueChanged(Toggle change)
 	{
+		// PATCH : à faire (french/english/german)
 		if (change == toggle_french && change.isOn)
-		{
 			Debug.Log("French");
-		}
-
-		if (change == toggle_english && change.isOn)
-		{
-			Debug.Log("English");
-		}
-
-		if (change == toggle_german && change.isOn)
-		{
-			Debug.Log("German");
-		}
-
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 	}
 
-	public void FlagsToggle() //affiche la langue du toggle enclenche
-	{
-		// foreach
-		if (GameObject.Find("Toggle French").GetComponent<Toggle>().isOn == true)
-		{
-			Debug.Log("French");
-		}
-		else if (GameObject.Find("Toggle English").GetComponent<Toggle>().isOn == true)
-		{
-			Debug.Log("English");
-		}
-		else if (GameObject.Find("Toggle German").GetComponent<Toggle>().isOn == true)
-		{
-			Debug.Log("German");
-		}
-	}
-
 	//---------------------------- Music/Sound Begin ----------------------------//
-	public void VolumeSound(float value)
+	public void Volume(AudioSource ads, Text txt, Scrollbar sb)
 	{
-		_soundCtrl.volume = value;
-		_pourcentSon.text = Mathf.RoundToInt(value * 100) + "%";
+		ads.volume = sb.value;
+		txt.text = Mathf.RoundToInt(sb.value * 100) + "%";
 	}
 
-	public void VolumeMusic(float value)
-	{
-		_musicCtrl.volume = value;
-		_pourcentMusique.text = Mathf.RoundToInt(value * 100) + "%";
-	}
-
-	public void DisplayVolumeSound(float value)
-	{
-		if (value > 0 /* && soundCtrl.isPlaying */)
-		{
-			_btnSon.GetComponentInChildren<Text>().text = "Son 'ON'";
-		}
-		else
-		{
-			_btnSon.GetComponentInChildren<Text>().text = "Son 'OFF'";
-		}
-
-		VolumeSound(value);
-	}
-
-	public void DisplayVolumeMusic(float value)
+	public void DisplayVolume(int b, float value)
 	{
 		if (value > 0)
-		{
-			_btnMusique.GetComponentInChildren<Text>().text = "Musique 'ON'";
-		}
+			if (b == 0)
+				_btnSon.GetComponentInChildren<Text>().text = "Son 'ON'";
+			else
+				_btnMusique.GetComponentInChildren<Text>().text = "Musique 'ON'";
+		else if (b == 0)
+			_btnSon.GetComponentInChildren<Text>().text = "Son 'OFF'";
 		else
-		{
 			_btnMusique.GetComponentInChildren<Text>().text = "Musique 'OFF'";
-		}
-
-		VolumeMusic(value);
+		if (b == 0)
+			Volume(_soundCtrl, _pourcentSon, _soundScroll);
+		else
+			Volume(_musicCtrl, _pourcentMusique, _musicScroll);
 	}
 
 	public void DefaultMusicSound()
 	{
 		_soundScroll.numberOfSteps = _musicScroll.numberOfSteps = 11; // 0->10 = 11
 		_soundCtrl.volume = _musicCtrl.volume = _soundScroll.value = _musicScroll.value = 0.2f;
-		VolumeSound(_soundScroll.value);
-		VolumeMusic(_musicScroll.value);
+		Volume(_soundCtrl, _pourcentSon, _soundScroll);
+		Volume(_musicCtrl, _pourcentMusique, _musicScroll);
 	}
 
 	//Will be called when Scrollbar changes
 	public void SoundScrollbarCallBack(float value)
 	{
-		DisplayVolumeSound(value);
+		DisplayVolume(0, value);
 	}
 
 	//Will be called when Scrollbar changes
 	public void MusicScrollbarCallBack(float value)
 	{
-		DisplayVolumeMusic(value);
+		DisplayVolume(1, value);
 	}
 
 	public void SwitchSound()
@@ -151,12 +99,12 @@ public class OptionsMenu : Miscellaneous
 		{
 			_previousSoundVol = _soundCtrl.volume;
 			_soundScroll.value = 0.0f;
-			SoundScrollbarCallBack(_soundScroll.value);
+			DisplayVolume(0, _soundScroll.value);
 		}
 		else
 		{
 			_soundScroll.value = _previousSoundVol;
-			SoundScrollbarCallBack(_previousSoundVol);
+			DisplayVolume(0, _previousSoundVol);
 		}
 	}
 
@@ -166,12 +114,12 @@ public class OptionsMenu : Miscellaneous
 		{
 			_previousMusicVol = _musicCtrl.volume;
 			_musicScroll.value = 0.0f;
-			MusicScrollbarCallBack(_musicScroll.value);
+			DisplayVolume(1, _musicScroll.value);
 		}
 		else
 		{
 			_musicScroll.value = _previousMusicVol;
-			MusicScrollbarCallBack(_previousMusicVol);
+			DisplayVolume(1, _previousMusicVol);
 		}
 	}
 
@@ -184,7 +132,6 @@ public class OptionsMenu : Miscellaneous
 	public void FullScreen()
 	{
 		Screen.fullScreen = !Screen.fullScreen;
-		Debug.Log("Windowed");
 	}
 
 	public void Help()

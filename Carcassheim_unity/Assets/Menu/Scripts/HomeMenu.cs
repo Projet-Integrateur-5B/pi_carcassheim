@@ -4,20 +4,16 @@ using UnityEngine.UI;
 public class HomeMenu : Miscellaneous
 {
 	private Transform HCB; // Home Container Buttons
+	private Color btnInactivColor;
 	void Start()
 	{
-		Color newCol;
 		// INITIALISATION
 		HCB = GameObject.Find("SubMenus").transform.Find("HomeMenu").transform.Find("Buttons").transform;
 		HCB.Find("ShowRoomSelection").GetComponent<Button>().interactable = GetState();
 		HCB.Find("ShowStat").GetComponent<Button>().interactable = GetState();
-		ColorUtility.TryParseHtmlString("#808080", out newCol);
-		HCB.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
-		HCB.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
-	}
-
-	void Update()
-	{
+		ColorUtility.TryParseHtmlString("#808080", out btnInactivColor);
+		HCB.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = btnInactivColor;
+		HCB.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = btnInactivColor;
 	}
 
 	public void ShowConnection()
@@ -28,7 +24,6 @@ public class HomeMenu : Miscellaneous
 	public void ShowRoomSelection()
 	{
 		ChangeMenu("HomeMenu", "RoomSelectionMenu");
-	//RandomIntColor(GameObject.Find("Etat de connexion"));
 	/* SceneManager.LoadScene("InGame"); */
 	}
 
@@ -42,11 +37,8 @@ public class HomeMenu : Miscellaneous
 		ChangeMenu("HomeMenu", "StatMenu");
 	}
 
-	public void QuitGame()
+	public void QuitGame() // A LA FIN : quand tout fonctionnera : RemoveAllListeners(); (bouton -> "free")
 	{
-		// A LA FIN : quand tout fonctionnera 
-		// RemoveAllListeners(); (bouton -> "free")
 		Application.Quit();
-		Debug.Log("Quit!");
 	}
 }
