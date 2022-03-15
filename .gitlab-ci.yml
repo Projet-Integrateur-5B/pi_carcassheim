@@ -56,7 +56,7 @@ reseau:coverage:
     - "rmdir UnitTest/TestResults"
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
-    - "reportgenerator -reports:\"UnitTest\TestResults\*\coverage.cobertura.xml\" -targetdir:\"Reports\" -reporttypes:\"Cobertura\""
+    - "reportgenerator -reports:\"UnitTest/TestResults/*/overage.cobertura.xml\" -targetdir:\"Reports\" -reporttypes:\"Cobertura\""
   artifacts:
     reports:
       cobertura: Reports/Cobertura.xml
