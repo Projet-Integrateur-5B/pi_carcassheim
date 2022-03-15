@@ -58,7 +58,7 @@ reseau:coverage:
     LOGGER_FLAG: "junit;LogFilePath=$CI_PROJECT_DIR/junit/junit-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
     REPORT_DIR: "report"
   script:
-    - "cd $RESEAU_DIRECTORY/UnitTests"
+    - "cd Reseau/UnitTest"
     - 'dotnet test
                   -r $CI_PROJECT_DIR/$COVERAGE_DIR
                   --collect:"$COVERAGE_FLAG"
