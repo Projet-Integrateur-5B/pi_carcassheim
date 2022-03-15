@@ -5,11 +5,13 @@ using System;
 
 public class DB : MonoBehaviour
 {
-    private string dbName = "URI=file:projet.db";
+    private string dbName = "URI=file:Assets/projet.db";
 
     // Start is called before the first frame update
     void Start()
-    {}
+    {
+        print(GetXP(1));
+    }
     // Update is called once per frame
     void Update()
     {}
@@ -72,6 +74,10 @@ public class DB : MonoBehaviour
 
     /// <summary>
     /// Fonction renvoyant l'XP de'un utilisateur
+    /// Elle est essentiellement une fonction intermediaire pour
+    /// incrémentation de l'XP d'un utilisateur pour ne pas
+    /// exécuter deux commandes SQLite en même temps
+    /// et bloquer la BDD
     /// </summary>
     /// <param name="IDU">Identifiant de l'utilisateur</param>
     /// <returns></returns>
