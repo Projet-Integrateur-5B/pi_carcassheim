@@ -53,7 +53,7 @@ reseau:coverage:
   needs: ["reseau:test"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "rmdir UnitTest/TestResults"
+    - "rm -rf UnitTest/TestResults"
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "reportgenerator -reports:\"UnitTest/TestResults/*/overage.cobertura.xml\" -targetdir:\"Reports\" -reporttypes:\"Cobertura\""
