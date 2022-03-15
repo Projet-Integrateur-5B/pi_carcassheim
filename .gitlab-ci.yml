@@ -2,7 +2,6 @@ stages:
   - reseau
 
 variables:
-  PATH_TO_RESEAU: "/builds/projet-integrateur-5b/pi_carcassonne"
   RESEAU_DIRECTORY: "Reseau"
   RESEAU_OBJECTS_DIRECTORY: '$RESEAU_DIRECTORY/obj'
   RESEAU_NUGET_PACKAGES_DIRECTORY: '$RESEAU_DIRECTORY/.nuget'
@@ -26,17 +25,6 @@ reseau:build:
   only:
     - reseau
 
-reseau:style:
-  image: mcr.microsoft.com/dotnet/sdk
-  stage: reseau
-  needs: ["reseau:build"]
-  script:
-    - "cd $RESEAU_DIRECTORY"
-    - "dotnet tool update -g dotnet-format"
-    - "dotnet format --verify-no-changes --verbosity diag"
-  only:
-    - reseau
-
 reseau:test:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
@@ -47,10 +35,22 @@ reseau:test:
     - "dotnet test"
   only:
     - reseau
+      
+reseau:style:
+  image: mcr.microsoft.com/dotnet/sdk
+  stage: reseau
+  needs: [ "reseau:build" ]
+  script:
+    - "cd $RESEAU_DIRECTORY"
+    - "dotnet tool update -g dotnet-format"
+    - "dotnet format --verify-no-changes --verbosity diag"
+  only:
+    - reseau
 
 reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
+  needs: [ "reseau:style" ]
   variables:
     CI_PROJECT_DIR: "Reseau/UnitTest"
   coverage: /Total\s*\|\s*(\d+(?:\.\d+)?)/
