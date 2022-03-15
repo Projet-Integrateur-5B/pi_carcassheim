@@ -1,6 +1,6 @@
 namespace UnitTest;
-using Assets;
 using System.Text;
+using Assets;
 using NUnit.Framework;
 
 public class TestsAssetsPacket
