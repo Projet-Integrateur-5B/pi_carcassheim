@@ -2,6 +2,7 @@ stages:
   - reseau
 
 variables:
+  PATH_TO_RESEAU: "/builds/projet-integrateur-5b/pi_carcassonne"
   RESEAU_DIRECTORY: "Reseau"
   RESEAU_OBJECTS_DIRECTORY: '$RESEAU_DIRECTORY/obj'
   RESEAU_NUGET_PACKAGES_DIRECTORY: '$RESEAU_DIRECTORY/.nuget'
@@ -58,7 +59,7 @@ reseau:coverage:
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"$PATH/$RESEAU_DIRECTORY/coverage.cobertura.xml\" -targetdir:\"Reports/Coverage\" -reporttypes:\"TextSummary;Html\""
+    - "reportgenerator -reports:\"PATH_TO_RESEAU/$RESEAU_DIRECTORY/coverage.cobertura.xml\" -targetdir:\"Reports/Coverage\" -reporttypes:\"TextSummary;Html\""
     - "cat Reports/Coverage/Summary.txt"
   coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
   artifacts:
