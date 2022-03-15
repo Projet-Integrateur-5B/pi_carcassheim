@@ -55,7 +55,6 @@ reseau:coverage:
     CI_PROJECT_DIR: "Reseau/UnitTest"
   script:
     - "cd $CI_PROJECT_DIR"
-    - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage --no-build > coverage_result.txt"
-    - "cat coverage_result.txt"
+    - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage --no-build"
   only:
     - reseau
