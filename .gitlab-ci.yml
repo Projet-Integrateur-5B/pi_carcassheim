@@ -51,20 +51,25 @@ reseau:test:
 reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
+  variables:
+    CI_PROJECT_DIR: "."
+    COVERAGE_FLAG: "XPlat Code Coverage"
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "dotnet test --collect:\"XPlat Code Coverage\" -r cobertura --no-build"
+    - 'dotnet test
+                  -r $CI_PROJECT_DIR/cobertura
+                  --collect:"$COVERAGE_FLAG"'
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"coverage/*/coverage.cobertura.xml\" -targetdir:\"coverage/report\" -reporttypes:\"TextSummary;Html\""
-    - "cat Reports/Coverage/Summary.txt"
+    - "reportgenerator -reports:\"$CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/report\" -reporttypes:\"TextSummary;Html\""
+    - "cat $CI_PROJECT_DIR/report/Summary.txt"
   coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
   artifacts:
     paths:
-      - coverage/*/coverage.cobertura.xml
-      - coverage/report/Summary.txt
-      - coverage/report/Cobertura.xml
+      - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
+      - $CI_PROJECT_DIR/report/Summary.txt
+      - $CI_PROJECT_DIR/report/Cobertura.xml
     reports:
-      cobertura: coverage/report/Cobertura.xml
+      cobertura: $CI_PROJECT_DIR/report/Cobertura.xml
   only:
     - reseau
