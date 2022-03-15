@@ -41,8 +41,6 @@ reseau:test:
   stage: reseau
   needs: ["reseau:build"]
   script:
-    - "echo \"##vso[task.prependpath]$HOME/.dotnet/tools\""
-    - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
     - "dotnet test"
@@ -57,6 +55,8 @@ reseau:coverage:
     - "cd $RESEAU_DIRECTORY"
     - "rm -rf UnitTest/TestResults"
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
+    - "dotnet tool update -g dotnet-reportgenerator-globaltool"
+    - "export PATH=\"$PATH:/root/.dotnet/tools\""
     - "reportgenerator -reports:\"UnitTest/TestResults/*/overage.cobertura.xml\" -targetdir:\"Reports\" -reporttypes:\"Cobertura\""
   artifacts:
     reports:
