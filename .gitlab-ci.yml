@@ -55,6 +55,8 @@ reseau:coverage:
     CI_PROJECT_DIR: "Reseau/UnitTest"
   script:
     - "cd $CI_PROJECT_DIR"
+    - "dotnet add package coverlet.collector"
+    - "dotnet add package coverlet.msbuild"
     - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage --no-build"
   only:
     - reseau
