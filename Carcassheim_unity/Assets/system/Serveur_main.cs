@@ -3,7 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Serveur_main : MonoBehaviour
+public class Serveur_main
 {
     private static List<Thread_communication> _lst_obj_threads_com;
     private static List<Thread> _lst_threads_com;
@@ -11,7 +11,7 @@ public class Serveur_main : MonoBehaviour
 
     private static int _compteur_id_thread_com;
 
-    void Start()
+    static void Main(string[] args)
     {
         
 
@@ -160,7 +160,7 @@ public class Serveur_main : MonoBehaviour
 
     }
 
-    private int Creation_thread_com(){
+    private static int Creation_thread_com(){
 
         if(_lst_port_dispo.Count != 0)
         {
