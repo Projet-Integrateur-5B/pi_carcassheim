@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "Appli_serveur_test/1.0.0": {
+        "runtime": {
+          "Appli_serveur_test.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Appli_serveur_test/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
