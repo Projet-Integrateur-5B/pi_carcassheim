@@ -15,7 +15,7 @@ cache:
     - '$RESEAU_OBJECTS_DIRECTORY/*.csproj.nuget.*'
     - '$RESEAU_NUGET_PACKAGES_DIRECTORY'
   policy: pull-push
-  
+
 reseau:build:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
@@ -46,26 +46,25 @@ reseau:test:
     - "dotnet restore"
     - "dotnet test"
   only:
-    - reseau      
-      
-test-with-coverage:
+    - reseau
+
+reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
-  variables:
-    CI_PROJECT_DIR: "."
-    CONFIGURATION: "Debug"
-    COVERAGE_FLAG: "XPlat Code Coverage"
   script:
     - "cd $RESEAU_DIRECTORY"
-    - 'dotnet test
-            -r $CI_PROJECT_DIR/cobertura
-            --collect:"$COVERAGE_FLAG"'
-    - "chmod +x ./scripts/print-dotnet-coverage.sh"
-    - "./scripts/print-dotnet-coverage.sh $CI_PROJECT_DIR/cobertura"
-  coverage: /TOTAL_COVERAGE=(\d+.\d+)/
+    - "dotnet test --collect:\"XPlat Code Coverage\" -r cobertura --no-build"
+    - "dotnet tool update -g dotnet-reportgenerator-globaltool"
+    - "export PATH=\"$PATH:/root/.dotnet/tools\""
+    - "reportgenerator -reports:\"coverage/*/coverage.cobertura.xml\" -targetdir:\"coverage/report\" -reporttypes:\"TextSummary;Html\""
+    - "cat Reports/Coverage/Summary.txt"
+  coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
+      - coverage/*/coverage.cobertura.xml
+      - coverage/report/Summary.txt
+      - coverage/report/Cobertura.xml
     reports:
-      cobertura:
-        - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
+      cobertura: coverage/report/Cobertura.xml
+  only:
+    - reseau
