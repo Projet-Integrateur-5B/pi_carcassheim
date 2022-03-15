@@ -55,21 +55,28 @@ reseau:coverage:
     CI_PROJECT_DIR: "."
     COVERAGE_DIR: "coverage"
     COVERAGE_FLAG: "XPlat Code Coverage"
+    LOGGER_FLAG: "junit;LogFilePath=$CI_PROJECT_DIR/junit/junit-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
     REPORT_DIR: "report"
   script:
-    - "cd $RESEAU_DIRECTORY"
+    - "cd $RESEAU_DIRECTORY/UnitTests"
     - 'dotnet test
                   -r $CI_PROJECT_DIR/$COVERAGE_DIR
-                  --collect:"$COVERAGE_FLAG"'
+                  --collect:"$COVERAGE_FLAG"
+                  --test-adapter-path:.
+                  --logger:"$LOGGER_FLAG"'
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
     - "reportgenerator -reports:\"$CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/$REPORT_DIR\" -reporttypes:\"TextSummary;xml\""
     - "cat $CI_PROJECT_DIR/report/Summary.txt"
-  coverage: /Summary\n[\s\S]*/
+    - "chmod +x ./scripts/print-dotnet-coverage.sh"
+    - "./scripts/print-dotnet-coverage.sh $CI_PROJECT_DIR/$COVERAGE_DIR"
+  coverage: /TOTAL_COVERAGE=(\d+.\d+)/
   artifacts:
     paths:
-      - $RESEAU_DIRECTORY/$COVERAGE_DIR/*/coverage.cobertura.xml
+      - $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
+      - $CI_PROJECT_DIR/junit/junit-test-result.xml
     reports:
-      cobertura: $RESEAU_DIRECTORY/$COVERAGE_DIR/*/coverage.cobertura.xml
+      cobertura: $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
+      junit: $CI_PROJECT_DIR/junit/junit-test-result.xml
   only:
     - reseau
