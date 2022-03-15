@@ -53,19 +53,18 @@ reseau:coverage:
   needs: ["reseau:test"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "ls UnitTest"
-    - "ls UnitTest/TestResults"
     - "rm -rf UnitTest/TestResults"
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"UnitTest/TestResults/*/overage.cobertura.xml\" -targetdir:\"Reports/Coverage\" -reporttypes:\"TextSummary;Html\""
+    - "reportgenerator -reports:\"UnitTest/TestResults/*/coverage.cobertura.xml\" -targetdir:\"Reports/Coverage\" -reporttypes:\"TextSummary;Html\""
     - "cat Reports/Coverage/Summary.txt"
-  coverage: /^\s*Line coverage:\s*\d+.\d+\%$/
+  coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
   artifacts:
     paths:
-      - UnitTest/TestResults
-      - Reports/Coverage
+      - UnitTest/TestResults/*/coverage.cobertura.xml
+      - Reports/Coverage/Summary.txt
+      - Reports/Coverage/Cobertura.xml
     reports:
       cobertura: Reports/Coverage/Cobertura.xml
   only:
