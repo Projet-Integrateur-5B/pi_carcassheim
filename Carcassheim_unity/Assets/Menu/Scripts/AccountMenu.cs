@@ -17,16 +17,6 @@ public class AccountMenu : Miscellaneous
 		accMenu.Find("InputField Year CA").GetComponent<InputField>().characterLimit = 4;
 		passwordCA = accMenu.Find("InputField Password CA").GetComponent<InputField>();
 		confirmPwdCA = accMenu.Find("InputField ConfirmPwd CA").GetComponent<InputField>();
-	// PATCH : (à faire)
-	/* 	toggle_afficher_mdp_ca = GameObject.Find("Toggle AfficherMdp CA").GetComponent<Toggle>();
-		toggle_afficher_mdp_ca.onValueChanged.AddListener(delegate { ToggleValueChanged(toggle_afficher_mdp_ca); }); */
-	}
-
-	void ToggleValueChanged(Toggle change)
-	{
-		if (change == toggle_afficher_mdp_ca)
-			HidePwdAcc();
-		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 	}
 
 	public void ResetWarningTextAM()
@@ -50,9 +40,9 @@ public class AccountMenu : Miscellaneous
 		Connected();
 	}
 
-	public void HidePwdAcc()
+	public void ShowPwdAcc()
 	{
-		if (GameObject.Find("Toggle AfficherMdp CA").GetComponent<Toggle>().isOn == true)
+		if (GameObject.Find("ShowPwdAcc").GetComponent<Toggle>().isOn == true)
 			passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Standard;
 		else
 			passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password;

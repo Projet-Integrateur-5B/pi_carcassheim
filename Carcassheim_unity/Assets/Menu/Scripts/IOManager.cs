@@ -40,7 +40,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 		// Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
 		foreach (Transform menu in GameObject.Find("SubMenus").transform)
 			foreach (Transform child in menu.Find("Buttons").transform)
-				child.GetComponent<Button>().onClick.AddListener(() => MethodCall(child.name));
+			{
+				if(child.GetComponent<Button>())
+					child.GetComponent<Button>().onClick.AddListener(() => MethodCall(child.name));
+				if(child.GetComponent<Toggle>())
+					child.GetComponent<Toggle>().onValueChanged.AddListener(delegate { MethodCall(child.name); });
+			}
 		//selection de base lors du start : firstSelect, ce bouton sera bleu et selectionné
 		//pour l'instant ShowOptions mais à modifier
 		currentGo = firstActiveChild(GameObject.Find("Buttons"));
@@ -83,15 +88,15 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 				//le bouton sera celui pointe par la souris
 				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 				//on le selectionne
-				if (currentGo.GetComponent<Button>().interactable)
+				if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
 					eventSystem.SetSelectedGameObject(currentGo);
 				//si les conditions le permettent, on selectionne ce bouton
-				if (currentGo.GetComponent<Button>().interactable)
+				if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
 					ColorButtonSelected();
 				//on deselectionne l'ancien
 				if (previousGo != currentGo)
 				{
-					if (currentGo.GetComponent<Button>().interactable)
+					if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
 					{
 						ColorButtonDeselected();
 						previousGo = currentGo;

@@ -6,16 +6,6 @@ public class ConnectionMenu : Miscellaneous
 	private Toggle toggle_afficher_mdp;
 	void Start()
 	{
-	// PATCH : à faire
-	/* toggle_afficher_mdp = GameObject.Find("Toggle AfficherMdp").GetComponent<Toggle>();
-		toggle_afficher_mdp.onValueChanged.AddListener(delegate { ToggleValueChanged(toggle_afficher_mdp); }); */
-	}
-
-	void ToggleValueChanged(Toggle change)
-	{
-		if (change == toggle_afficher_mdp)
-			HidePwdCo();
-		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 	}
 
 	public void ResetWarningTextCM()
@@ -37,9 +27,9 @@ public class ConnectionMenu : Miscellaneous
 		Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
 	}
 
-	public void HidePwdCo()
+	public void ShowPwd()
 	{
-		if (GameObject.Find("Toggle AfficherMdp").GetComponent<Toggle>().isOn == true)
+		if (GameObject.Find("ShowPwd").GetComponent<Toggle>().isOn == true)
 			GameObject.Find("InputField Password").GetComponent<InputField>().inputType = InputField.InputType.Standard;
 		else
 			GameObject.Find("InputField Password").GetComponent<InputField>().inputType = InputField.InputType.Password;
