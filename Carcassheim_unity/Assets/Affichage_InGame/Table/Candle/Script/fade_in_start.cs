@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class fade_in_start : StateMachineBehaviour
 {
-    
+
     public GameObject light = null;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
@@ -12,11 +12,11 @@ public class fade_in_start : StateMachineBehaviour
     {
         if (light == null)
         {
-            Debug.Log("Hey you tried");
+            // Debug.Log("Hey you tried");
             light = animator.gameObject.transform.Find("candle_light").gameObject;
         }
-       Debug.Log("Object enabled");
-       light.SetActive(true);
+        // Debug.Log("Object enabled");
+        light.SetActive(true);
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

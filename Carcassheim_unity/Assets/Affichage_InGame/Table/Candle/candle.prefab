@@ -5024,7 +5024,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 0.94212276, b: 0.71132076, a: 1}
   m_Intensity: 1.6
-  m_Range: 3.7
+  m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -5116,6 +5116,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8282779949987807876}
   - component: {fileID: 8771192203686975548}
+  - component: {fileID: 1308843514943920255}
   m_Layer: 3
   m_Name: candle
   m_TagString: Untagged
@@ -5158,3 +5159,16 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1308843514943920255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8771192203686975550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f376af4dc8da8543912b2c0db7bebae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myAnimator: {fileID: 8771192203686975548}

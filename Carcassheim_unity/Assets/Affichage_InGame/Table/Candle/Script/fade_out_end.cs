@@ -22,11 +22,11 @@ public class fade_out_end : StateMachineBehaviour
     {
         if (light == null)
         {
-            Debug.Log("Hey you tried");
-            light = animator.gameObject.transform.Find("candle_light").gameObject;    
+            // Debug.Log("Hey you tried");
+            light = animator.gameObject.transform.Find("candle_light").gameObject;
         }
-       Debug.Log("Object disabled");
-       light.SetActive(false);
+        //    Debug.Log("Object disabled");
+        light.SetActive(false);
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()
