@@ -39,7 +39,7 @@ reseau:style:
 reseau:test:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
-  needs: ["reseau:buid"]
+  needs: ["reseau:build"]
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet restore"
@@ -50,7 +50,7 @@ reseau:test:
 reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
-  needs: [ "reseau:test" ]
+  needs: ["reseau:test"]
   script:
     - "cd $RESEAU_DIRECTORY"
     - "dotnet test --no-build --collect \"Code Coverage\" --logger trx"
