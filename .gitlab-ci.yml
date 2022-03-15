@@ -52,11 +52,12 @@ reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
   variables:
-    CI_PROJECT_DIR: "Reseau/"
+    CI_PROJECT_DIR: "."
     COVERAGE_DIR: "coverage"
     COVERAGE_FLAG: "XPlat Code Coverage"
     REPORT_DIR: "report"
   script:
+    - "cd $RESEAU_DIRECTORY"
     - 'dotnet test
                   -r $CI_PROJECT_DIR/$COVERAGE_DIR
                   --collect:"$COVERAGE_FLAG"'
@@ -67,9 +68,9 @@ reseau:coverage:
   coverage: /Summary\n[\s\S]*/
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
-      - $CI_PROJECT_DIR/$REPORT_DIR/
+      - $RESEAU_DIRECTORY/$COVERAGE_DIR/*/coverage.cobertura.xml
+      - $RESEAU_DIRECTORY/$REPORT_DIR/
     reports:
-      cobertura: $CI_PROJECT_DIR/$REPORT_DIR/Summary.xml
+      cobertura: $RESEAU_DIRECTORY/$REPORT_DIR/Summary.xml
   only:
     - reseau
