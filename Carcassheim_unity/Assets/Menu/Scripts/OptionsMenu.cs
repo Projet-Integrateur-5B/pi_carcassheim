@@ -11,7 +11,6 @@ public class OptionsMenu : Miscellaneous
 	private Text _pourcentSon, _pourcentMusique;
 	private float _previousSoundVol = 0.0f;
 	private float _previousMusicVol = 0.0f;
-	private static bool s_tmpOnce = true;
 	float lastSoundValue = 0;
 	float lastMusicValue = 0;
 	public Toggle toggle_french, toggle_english, toggle_german;
@@ -128,14 +127,10 @@ public class OptionsMenu : Miscellaneous
 
 	public void DefaultMusicSound()
 	{
-		if (s_tmpOnce == true)
-		{
-			_soundScroll.numberOfSteps = _musicScroll.numberOfSteps = 11; // 0->10 = 11
-			_soundCtrl.volume = _musicCtrl.volume = _soundScroll.value = _musicScroll.value = 0.2f;
-			VolumeSound(_soundScroll.value);
-			VolumeMusic(_musicScroll.value);
-			s_tmpOnce = !s_tmpOnce;
-		}
+		_soundScroll.numberOfSteps = _musicScroll.numberOfSteps = 11; // 0->10 = 11
+		_soundCtrl.volume = _musicCtrl.volume = _soundScroll.value = _musicScroll.value = 0.2f;
+		VolumeSound(_soundScroll.value);
+		VolumeMusic(_musicScroll.value);
 	}
 
 	//Will be called when Scrollbar changes
