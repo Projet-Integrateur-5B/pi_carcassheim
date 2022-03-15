@@ -53,6 +53,12 @@ reseau:coverage:
   needs: ["reseau:test"]
   script:
     - "cd $RESEAU_DIRECTORY"
-    - "dotnet test --no-build --collect \"Code Coverage\" --logger trx"
+    - "rmdir UnitTest/TestResults"
+    - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
+    - "dotnet tool update -g dotnet-reportgenerator-globaltool"
+    - "reportgenerator -reports:'UnitTest\TestResults\*\coverage.cobertura.xml' -targetdir:'Reports' -reporttypes:'Cobertura'"
+  artifacts:
+    reports:
+      cobertura: Reports/Cobertura.xml
   only:
     - reseau
