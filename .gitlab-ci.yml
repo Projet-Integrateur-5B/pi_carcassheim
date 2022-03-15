@@ -53,30 +53,9 @@ reseau:coverage:
   stage: reseau
   variables:
     CI_PROJECT_DIR: "Reseau/UnitTest"
-    COVERAGE_DIR: "coverage"
-    COVERAGE_FLAG: "XPlat Code Coverage"
-    LOGGER_FLAG: "junit;LogFilePath=$CI_PROJECT_DIR/junit/junit-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
-    REPORT_DIR: "report"
   script:
     - "cd $CI_PROJECT_DIR"
-    - 'dotnet test
-                  -r $COVERAGE_DIR
-                  --collect:"$COVERAGE_FLAG"
-                  --test-adapter-path:.
-                  --logger:"$LOGGER_FLAG"'
-    - "dotnet tool update -g dotnet-reportgenerator-globaltool"
-    - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"$COVERAGE_DIR/*/coverage.cobertura.xml\" -targetdir:\"$REPORT_DIR\" -reporttypes:\"TextSummary;xml\""
-    - "cat report/Summary.txt"
-    - "chmod +x ./scripts/print-dotnet-coverage.sh"
-    - "./scripts/print-dotnet-coverage.sh $COVERAGE_DIR"
-  coverage: /TOTAL_COVERAGE=(\d+.\d+)/
-  artifacts:
-    paths:
-      - $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
-      - $CI_PROJECT_DIR/junit/junit-test-result.xml
-    reports:
-      cobertura: $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
-      junit: $CI_PROJECT_DIR/junit/junit-test-result.xml
+    - "dotnet test /p:CollectCoverage=true --no-build"
+  coverage: /Total\s*\|\s*(\d+(?:\.\d+)?)/
   only:
     - reseau
