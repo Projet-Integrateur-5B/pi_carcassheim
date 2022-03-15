@@ -5,67 +5,48 @@ using UnityEngine.UI;
 
 public class OptionsMenu : Miscellaneous
 {
-	private Button _btnSon;
-	private Button _btnMusique;
-	private AudioSource _soundCtrl;
-	private AudioSource _musicCtrl;
-	private Scrollbar _soundScroll;
-	private Scrollbar _musicScroll;
-	private Text _pourcentSon;
-	private Text _pourcentMusique;
+	private Button _btnSon, _btnMusique;
+	private AudioSource _soundCtrl, _musicCtrl;
+	private Scrollbar _soundScroll, _musicScroll;
+	private Text _pourcentSon, _pourcentMusique;
 	private float _previousSoundVol = 0.0f;
 	private float _previousMusicVol = 0.0f;
 	private static bool s_tmpOnce = true;
 	float lastSoundValue = 0;
 	float lastMusicValue = 0;
-	public Toggle toggle_french;
-	public Toggle toggle_english;
-	public Toggle toggle_german;
+	public Toggle toggle_french, toggle_english, toggle_german;
 	private GameObject containerButtons;
-
+	private Transform optionsMenu, OCB; // Options Container Buttons
 	// Start is called before the first frame update
 	void Start()
 	{
-		// PATCH : à améliorer
-		containerButtons = FindGOTool("OptionsMenu", "Buttons");
-		_btnSon = containerButtons.transform.GetChild(1).GetComponent<Button>();
- 		_btnMusique = containerButtons.transform.GetChild(2).GetComponent<Button>();
-		// FIN PATCH
-
+		// INITIALISATION
+		optionsMenu = GameObject.Find("SubMenus").transform.Find("OptionsMenu").transform;
+		OCB = optionsMenu.Find("Buttons").transform;
+		_soundScroll = optionsMenu.Find("Scrollbar Son").GetComponent<Scrollbar>();
+		_musicScroll = optionsMenu.Find("Scrollbar Musique").GetComponent<Scrollbar>();
+		_pourcentMusique = optionsMenu.Find("Pourcent Musique").GetComponent<Text>();
+		_pourcentSon = optionsMenu.Find("Pourcent Son").GetComponent<Text>();
+		_btnMusique = OCB.Find("SwitchMusic").GetComponent<Button>();
+		_btnSon = OCB.Find("SwitchSound").GetComponent<Button>();
 		_soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
 		_musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
-		_soundScroll = FindGOTool("OptionsMenu", "Scrollbar Son").GetComponent<Scrollbar>();
-		_musicScroll = FindGOTool("OptionsMenu", "Scrollbar Musique").GetComponent<Scrollbar>();
-		_pourcentSon = FindGOTool("OptionsMenu", "Pourcent Son").GetComponent<Text>();
-		_pourcentMusique = FindGOTool("OptionsMenu", "Pourcent Musique").GetComponent<Text>();
 		DefaultMusicSound();
 		//Subscribe to the Scrollbar event
 		_soundScroll.onValueChanged.AddListener(SoundScrollbarCallBack);
 		lastSoundValue = _soundScroll.value;
 		_musicScroll.onValueChanged.AddListener(MusicScrollbarCallBack);
 		lastMusicValue = _musicScroll.value;
-
-		/*toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
+	/*toggle_french = GameObject.Find("Toggle French").GetComponent<Toggle>();
 		toggle_french.onValueChanged.AddListener(delegate
 		{
 			ToggleValueChanged(toggle_french);
-		});
-		toggle_english = GameObject.Find("Toggle English").GetComponent<Toggle>();
-		toggle_english.onValueChanged.AddListener(delegate
-		{
-			ToggleValueChanged(toggle_english);
-		});
-		toggle_german = GameObject.Find("Toggle German").GetComponent<Toggle>();
-		toggle_german.onValueChanged.AddListener(delegate
-		{
-			ToggleValueChanged(toggle_german);
-		});*/
+		}); */
 	}
 
 	void Update()
 	{
 	}
-
 
 	void ToggleValueChanged(Toggle change)
 	{

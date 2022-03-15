@@ -6,22 +6,20 @@ using UnityEngine.UI;
 /* using System.Text.RegularExpressions; // needed for Regex */
 public class AccountMenu : Miscellaneous
 {
-	public Toggle toggle_afficher_mdp_ca;
+	private Toggle toggle_afficher_mdp_ca;
+	private Transform accMenu;
 	// Start is called before the first frame update
 	void Start()
 	{
-		if (FindMenu("AccountMenu").activeSelf == true)
-		{
-			GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn = false;
-			InputField tmpDay = GameObject.Find("InputField Day CA").GetComponent<InputField>();
-			tmpDay.characterLimit = 2;
-			InputField tmpDay2 = GameObject.Find("InputField Month CA").GetComponent<InputField>();
-			tmpDay2.characterLimit = 2;
-			InputField tmpDay3 = GameObject.Find("InputField Year CA").GetComponent<InputField>();
-			tmpDay3.characterLimit = 4;
-		/*  InputField.CharacterValidation =  tmpDay.CharacterValidation.None; */
-		/* Regex.Replace(tmpDay.text, @"[^a-zA-Z0-9 ]", ""); */
-		}
+		// INITIALISATION
+		accMenu = GameObject.Find("SubMenus").transform.Find("AccountMenu").transform;
+		accMenu.Find("Toggle CA").GetComponent<Toggle>().isOn = false;
+		InputField tmpDay = accMenu.Find("InputField Day CA").GetComponent<InputField>();
+		tmpDay.characterLimit = 2;
+		InputField tmpDay2 = accMenu.Find("InputField Month CA").GetComponent<InputField>();
+		tmpDay2.characterLimit = 2;
+		InputField tmpDay3 = accMenu.Find("InputField Year CA").GetComponent<InputField>();
+		tmpDay3.characterLimit = 4;
 	// PATCH : (à faire)
 	/* 		toggle_afficher_mdp_ca = GameObject.Find("Toggle AfficherMdp CA").GetComponent<Toggle>();
 		toggle_afficher_mdp_ca.onValueChanged.AddListener(delegate { ToggleValueChanged(toggle_afficher_mdp_ca); }); */
@@ -43,9 +41,9 @@ public class AccountMenu : Miscellaneous
 
 	public void ResetWarningTextAM()
 	{
-		Debug.Log("grgrqgr"); 
-		GameObject tmpGO = FindGOTool("AccountMenu","Create Account");
-		Debug.Log("lpkooopl"+ tmpGO); // A DEBUGUER (connection menu fonctionne, pourtant c'est identique) => Navigation Manager
+		Debug.Log("grgrqgr");
+		GameObject tmpGO = GameObject.Find("Create Account");
+		Debug.Log("lpkooopl" + tmpGO);
 		Text tmpText = tmpGO.GetComponent<Text>();
 		TryColor(tmpGO, Color.white, "f4fefe");
 		tmpText.text = "Creez votre compte";

@@ -8,7 +8,7 @@ public class RoomSelectionMenu : Miscellaneous
 	// Start is called before the first frame update
 	void Start()
 	{
-		Pop_up_Options = FindMenu("Panel Options");
+		Pop_up_Options = GameObject.Find("SubMenus").transform.Find("Panel Options").gameObject;
 	}
 
 	void Update()

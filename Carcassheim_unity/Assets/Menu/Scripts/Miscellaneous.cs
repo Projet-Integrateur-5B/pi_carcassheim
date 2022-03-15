@@ -14,11 +14,9 @@ using UnityEngine.EventSystems;
  */
 public abstract class Miscellaneous : MonoBehaviour
 {
-	private GameObject _goToFind;
 	private static bool s_state = false;
 	private static bool s_menuHasChanged = false;
 	private static bool s_displayFlexOnce = false;
-	private static GameObject GoSubMenu = null;
 	private static GameObject previousMenu = null;
 	private static GameObject nextMenu = null;
 	void Start()
@@ -30,9 +28,9 @@ public abstract class Miscellaneous : MonoBehaviour
 	{
 	}
 
-	void awake()
+	void Awake()
 	{
-		GoSubMenu = GameObject.Find("SubMenus");
+		nextMenu = GameObject.Find("HomeMenu"); // Menu courant au lancement du jeu
 	}
 
 	// ---- Etat de connection Account et Connection Menu ----
@@ -69,7 +67,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		//bool s_displayFlexOnce : l'ajout en y ne se fasse qu'une seule fois
 		GameObject tmpDF = null;
 		if (GetCurrentMenu().name == "ConnectionMenu")
-			tmpDF = FindGOTool("ConnectionMenu", "Instructions");
+			tmpDF = GameObject.Find("Instructions");
 		else
 			tmpDF = GameObject.Find("Create Account");
 		Text tmpDFText = tmpDF.GetComponent<Text>();
@@ -84,6 +82,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	public void SetMenuChanged(bool b)
 	{
 		s_menuHasChanged = b;
+		GetCurrentMenu();
 	}
 
 	public bool HasMenuChanged()
@@ -107,7 +106,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	public GameObject firstActiveChild(GameObject FAGO)
 	{
 		GameObject firstActiveChild = null;
-		foreach (Transform child in transform)
+		foreach (Transform child in FAGO.transform)
 			if (child.gameObject.activeSelf)
 			{
 				firstActiveChild = child.gameObject;
@@ -119,13 +118,8 @@ public abstract class Miscellaneous : MonoBehaviour
 
 	public GameObject GetCurrentMenu()
 	{
-		_goToFind = GameObject.Find("SubMenus");
-		return firstActiveChild(_goToFind);
-	}
-
-	public GameObject FindMenu(string menu)
-	{
-		return GameObject.Find("SubMenus").transform.Find(menu).gameObject;
+		Debug.Log(nextMenu);
+		return nextMenu;
 	}
 
 	public void ChangeMenu(string close, string goTo)
@@ -135,11 +129,6 @@ public abstract class Miscellaneous : MonoBehaviour
 		nextMenu = GameObject.Find("SubMenus").transform.Find(goTo).gameObject;
 		previousMenu.SetActive(false);
 		nextMenu.SetActive(true);
-	}
-
-	public GameObject FindGOTool(string menu, string tool)
-	{
-		return FindMenu(menu).transform.Find(tool).gameObject;
 	}
 
 	public void TryColorText(Text change, Color defaultColor, string coloration)

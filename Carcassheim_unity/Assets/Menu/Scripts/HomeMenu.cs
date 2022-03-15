@@ -3,17 +3,17 @@ using UnityEngine.UI;
 
 public class HomeMenu : Miscellaneous
 {
+	private Transform HCB; // Home Container Buttons
 	void Start()
 	{
 		Color newCol;
-		if (GetState() == false && FindMenu("HomeMenu").activeSelf == true)
-		{
-			GameObject.Find("ShowRoomSelection").GetComponent<Button>().interactable = GetState();
-			GameObject.Find("ShowStat").GetComponent<Button>().interactable = GetState();
-			ColorUtility.TryParseHtmlString("#808080", out newCol);
-			GameObject.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
-			GameObject.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
-		}
+		// INITIALISATION
+		HCB = GameObject.Find("SubMenus").transform.Find("HomeMenu").transform.Find("Buttons").transform;
+		HCB.Find("ShowRoomSelection").GetComponent<Button>().interactable = GetState();
+		HCB.Find("ShowStat").GetComponent<Button>().interactable = GetState();
+		ColorUtility.TryParseHtmlString("#808080", out newCol);
+		HCB.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
+		HCB.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = newCol;
 	}
 
 	void Update()

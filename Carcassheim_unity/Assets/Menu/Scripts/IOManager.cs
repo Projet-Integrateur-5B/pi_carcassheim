@@ -131,7 +131,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 		if (HasMenuChanged() == true)
 		{
 			//on selectionne le premier bouton enfant du menu dans lequel on va
-			eventSystem.SetSelectedGameObject(FindGOTool(getNextMenu().name, "Buttons").transform.GetChild(0).gameObject);
+			eventSystem.SetSelectedGameObject(firstActiveChild(GameObject.Find("Buttons")));
 			SetMenuChanged(false);
 			currentGo = eventSystem.currentSelectedGameObject;
 			//comme avant pour les couleurs
