@@ -66,7 +66,6 @@ test-with-coverage:
   artifacts:
     paths:
       - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
-      - ./scripts/print-dotnet-coverage.sh
     reports:
       cobertura:
         - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
