@@ -53,6 +53,7 @@ reseau:coverage:
   stage: reseau
   variables:
     CI_PROJECT_DIR: "Reseau/UnitTest"
+  coverage: /Total\s*\|\s*(\d+(?:\.\d+)?)/
   script:
     - "cd $CI_PROJECT_DIR"
     - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage"

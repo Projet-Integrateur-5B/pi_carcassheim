@@ -33,11 +33,6 @@ public class TestsAssetsPacket
         var originalAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
         var result = Packet.Deserialize(originalAsBytes);
 
-        var bla = 0;
-
-        if (bla != 0)
-            Assert.Fail();
-
         if (result is null)
         {
             Assert.Fail();
