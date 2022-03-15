@@ -46,25 +46,32 @@ reseau:test:
     - "dotnet restore"
     - "dotnet test"
   only:
-    - reseau
-
-reseau:coverage:
+    - reseau      
+      
+test-with-coverage:
   image: mcr.microsoft.com/dotnet/sdk
-  stage: reseau
+  stage: tests
+  variables:
+    CI_PROJECT_DIR: "Reseau"
+    CONFIGURATION: "Debug"
+    COVERAGE_FLAG: "XPlat Code Coverage"
+    LOGGER_FLAG: "junit;LogFilePath=$CI_PROJECT_DIR/junit/junit-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
   script:
-    - "cd $RESEAU_DIRECTORY"
-    - "dotnet test --logger:\"LogFileName=$PATH_TO_RESEAU/$RESEAU_DIRECTORY/coverage.cobertura.xml\" --collect:\"XPlat Code Coverage\" --no-build"
-    - "dotnet tool update -g dotnet-reportgenerator-globaltool"
-    - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"$PATH_TO_RESEAU/$RESEAU_DIRECTORY/coverage.cobertura.xml\" -targetdir:\"Reports/Coverage\" -reporttypes:\"TextSummary;Html\""
-    - "cat Reports/Coverage/Summary.txt"
-  coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
+    - 'dotnet test
+            -c $CONFIGURATION
+            -r $CI_PROJECT_DIR/cobertura
+            --collect:"$COVERAGE_FLAG"
+            --test-adapter-path:.
+            --logger:"$LOGGER_FLAG"'
+    - "chmod +x ./scripts/print-dotnet-coverage.sh"
+    - "./scripts/print-dotnet-coverage.sh $CI_PROJECT_DIR/cobertura"
   artifacts:
     paths:
-      - $RESEAU_DIRECTORY/coverage.cobertura.xml
-      - $RESEAU_DIRECTORY/Reports/Coverage/Summary.txt
-      - $RESEAU_DIRECTORY/Reports/Coverage/Cobertura.xml
+      - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
+      - $CI_PROJECT_DIR/junit/junit-test-result.xml
     reports:
-      cobertura: $RESEAU_DIRECTORY/Reports/Coverage/Cobertura.xml
-  only:
-    - reseau
+      cobertura:
+        - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
+      junit:
+        - $CI_PROJECT_DIR/junit/junit-test-result.xml
+  coverage: /TOTAL_COVERAGE=(\d+.\d+)/
