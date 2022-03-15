@@ -67,10 +67,10 @@ reseau:coverage:
   coverage: /Summary\n[\s\S]*/
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
-      - $CI_PROJECT_DIR/report/Summary.txt
-      - $CI_PROJECT_DIR/report/Cobertura.xml
+      - $RESEAU_DIRECTORY/$CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
+      - $RESEAU_DIRECTORY/$CI_PROJECT_DIR/report/Summary.txt
+      - $RESEAU_DIRECTORY/$CI_PROJECT_DIR/report/Cobertura.xml
     reports:
-      cobertura: $CI_PROJECT_DIR/report/Cobertura.xml
+      cobertura: $RESEAU_DIRECTORY/$CI_PROJECT_DIR/report/Cobertura.xml
   only:
     - reseau
