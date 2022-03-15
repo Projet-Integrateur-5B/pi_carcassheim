@@ -50,7 +50,7 @@ reseau:test:
       
 test-with-coverage:
   image: mcr.microsoft.com/dotnet/sdk
-  stage: tests
+  stage: reseau
   variables:
     CI_PROJECT_DIR: "Reseau"
     CONFIGURATION: "Debug"
