@@ -57,7 +57,9 @@ reseau:coverage:
     - "dotnet test --collect:\"XPlat Code Coverage\" --no-build"
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"UnitTest/TestResults/*/overage.cobertura.xml\" -targetdir:\"Reports\" -reporttypes:\"Cobertura\""
+    - "reportgenerator -reports:\"UnitTest/TestResults/*/overage.cobertura.xml\" -targetdir:\"Reports/Coverage\" -reporttypes:\"TextSummary;Html\""
+    - "cat Reports/Coverage/Summary.txt"
+  coverage: /^\s*Line coverage:\s*\d+.\d+\%$/
   artifacts:
     reports:
       cobertura: Reports/Cobertura.xml
