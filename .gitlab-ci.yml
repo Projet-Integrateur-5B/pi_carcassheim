@@ -73,10 +73,10 @@ reseau:coverage:
   coverage: /TOTAL_COVERAGE=(\d+.\d+)/
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
-      - $CI_PROJECT_DIR/junit/junit-test-result.xml
+      - Reseau/UnitTest/$COVERAGE_DIR/*/coverage.cobertura.xml
+      - Reseau/UnitTest/junit/junit-test-result.xml
     reports:
-      cobertura: $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
-      junit: $CI_PROJECT_DIR/junit/junit-test-result.xml
+      cobertura: Reseau/UnitTest/$COVERAGE_DIR/*/coverage.cobertura.xml
+      junit: Reseau/UnitTest/junit/junit-test-result.xml
   only:
     - reseau
