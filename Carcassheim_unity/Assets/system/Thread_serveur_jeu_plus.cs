@@ -1,11 +1,11 @@
 ﻿
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 
-public partial class Thread_serveur_jeu
+public partial class Thread_serveur_jeu :  MonoBehaviour
 {
 
     public static int tuile_a_tirer(int id, int x, Dictionary<int,int>dico)
@@ -13,11 +13,13 @@ public partial class Thread_serveur_jeu
         int sum = 0;
         foreach (var item in dico)          //Parcourir dico:
         {
-            if (sum < x) {
+            if (sum+item.Value < x) {
                 sum += item.Value;          //chercher l'id correspondant
             }
                
             else {
+                //Debug.Log("sum = " + sum);
+                //Debug.Log("id = " + id + "   proba= "+item.Value + "  x = "+x);
                 id = item.Key;              //id trouvé
                 break;
             }
@@ -31,14 +33,12 @@ public partial class Thread_serveur_jeu
     {
         List<int> list = null;
         list = new List<int>();
-        Random MyRand = new Random();
+        System.Random MyRand = new System.Random();
         int x = 0, idTuile = 0, booleen = 1, sumDesProbas = 0, sumDesProbas_tmp=0;
 
         //Recuperer les id des tuiles et leurs probas depuis la bdd
 
-        //Dictionary<int,int> map = new Dictionary<int,int>();
-
-
+        Dictionary<int,int> map = new Dictionary<int,int>();
 
 
         /*
@@ -47,9 +47,7 @@ public partial class Thread_serveur_jeu
          * 
          * Section du test
          * 
-         */
-
-
+        
         Dictionary<int, int> map = new Dictionary<int, int>()
         {
             { 0, 2},
@@ -63,11 +61,7 @@ public partial class Thread_serveur_jeu
             { 8, 14}
         };
 
-   
-
-        /*
-         * 
-         * 
+  
          *Fin de section 
          * 
          */
@@ -80,12 +74,7 @@ public partial class Thread_serveur_jeu
 
         }
 
-        //Test mode du jeu depuis partie en question:
-
-        //Si mode avec un nombre de tuiles limité :
-        //n est le nombre de tuiles:
-        //recupere la proba de chaque tuile en proba
-        //faire pour chaque tuile : ajouter la tuile (proba*n) fois dans la liste 
+        //Tirage aléatoire des tuiles
         for (int i = 0;i<nbTuiles;i++)
         {
             x = MyRand.Next(sumDesProbas);
@@ -93,42 +82,32 @@ public partial class Thread_serveur_jeu
             list.Add(idTuile);
 
         }
-        //Sinon, on tire 60 en attendant
-        //60 est le nb de tuile de demarage 
-        // recupere la proba de chaque tuile en proba
-        //faire pour chaque tuile : ajouter la tuile (proba*60) fois dans la liste 
-        
-        
-        /* Y a plus besoin
-
-        //Melanger la liste 
-        int arrayLength = list.Count;
-        list.ToArray();
-
-        for (int i = arrayLength - 1; i > 1; --i)
-        {
-            // tirage au sort d'un index entre 0 et la valeur courante de "i"
-            int randomIndex = MyRand.Next(i);
-            // intervertion des éléments situés aux index "i" et "randomIndex"
-            int temp = list[i];
-            list[i] = list[randomIndex];
-            list[randomIndex] = temp;
-        }
-        */
-
+   
+       
         //Retourner la liste 
         return list;
     }
 
-    void Start()
+   /*
+    * 
+    * void Start()
     {
         int n = 70;
         List<int> list = null;
         list = new List<int>();
 
-        Random_sort_tuiles(n);
-    }
+        list = Random_sort_tuiles(n);
+        foreach (int k in list)
 
+        {
+
+            Debug.Log(k);
+
+
+
+        }
+    }
+   */
 
 }
 
