@@ -63,7 +63,10 @@ reseau:coverage:
     - "cat Reports/Coverage/Summary.txt"
   coverage: /^\s*Line coverage:\s*\d+.\d+\%$/
   artifacts:
+    paths:
+      - UnitTest/TestResults
+      - Reports/Coverage
     reports:
-      cobertura: Reports/Cobertura.xml
+      cobertura: Reports/Coverage/Cobertura.xml
   only:
     - reseau
