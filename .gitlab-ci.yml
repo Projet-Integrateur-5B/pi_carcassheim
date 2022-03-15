@@ -63,7 +63,8 @@ reseau:coverage:
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
     - "reportgenerator -reports:\"$CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/report\" -reporttypes:\"TextSummary;Html\""
     - "cat $CI_PROJECT_DIR/report/Summary.txt"
-  coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
+    - "echo 'End Summary'"
+  coverage: /Summary\n[\s\S]*/
   artifacts:
     paths:
       - $CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
