@@ -13,6 +13,7 @@ public class Serveur_main : MonoBehaviour
 
     void Start()
     {
+        
 
         _lst_threads_com = new List<Thread>();
 
@@ -82,8 +83,10 @@ public class Serveur_main : MonoBehaviour
                     bool thread_com_trouve = false;
 
                     // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
-                    foreach(Thread_communication thread_com_iterateur in _lst_obj_threads_com){
-                        lock(thread_com_iterateur){
+                    foreach(Thread_communication thread_com_iterateur in _lst_obj_threads_com)
+                    {
+                        lock (thread_com_iterateur.Get_lock_nb_parties_gerees())
+                        {
                             if (thread_com_iterateur.Get_nb_parties_gerees() < 5) {
 
                                 thread_com_trouve = true;
@@ -105,7 +108,8 @@ public class Serveur_main : MonoBehaviour
                     }
 
                     // Si aucun des threads n'est libre pour héberger une partie de plus
-                    if(thread_com_trouve == false){
+                    if(thread_com_trouve == false) 
+                    {
 
                         int port_nouv_thread_com = Creation_thread_com();
 

@@ -27,7 +27,7 @@ public class Thread_connexion
         // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
         foreach (Thread_communication thread_com_iterateur in _lst_obj_threads_com)
         {
-            lock (thread_com_iterateur)
+            lock (thread_com_iterateur.Get_lock_id_parties_gerees())
             {
                 List<int> lst_id_parties_gerees = thread_com_iterateur.Get_id_parties_gerees();
                 if (lst_id_parties_gerees.Contains(_id_partie))

@@ -11,6 +11,8 @@ public partial class Tuile
     public Slot[] Slots => _slots;
     public int[][] LienSlotPosition => _lienSlotPosition;
     public int NombreSlot => _nombreSlot;
+    private readonly int _proba;
+    public int Pobabilite => _proba;
 
     public int X { get; set; }
     public int Y { get; set; }
@@ -51,16 +53,18 @@ public partial class Tuile
         _lienSlotPosition = lien;
     }
 
-    public Tuile(int id, Slot[] slots, int[][] lien)
+    public Tuile(int id, Slot[] slots, int[][] lien, int proba)
     {
         _nombreSlot = slots.Length;
         _id = id;
         _slots = slots;
+        _proba = proba;
 
         int[][] actualLink = new int[_nombreSlot][];
 
         for (int i = 0; i < actualLink.Length; i++)
         {
+            var temp = new List<int>();
             int[] tab = lien[i];
 
             for (int j = 0; j < tab.Length; j++)
@@ -69,8 +73,9 @@ public partial class Tuile
                 {
                     break;
                 }
-                actualLink[i][j] = tab[j];
+                temp.Add(tab[j]);
             }
+            actualLink[i] = temp.ToArray();
         }
 
         _lienSlotPosition = actualLink;
@@ -133,5 +138,10 @@ public partial class Tuile
         }
 
         return resultat;
+    }
+
+    static Tuile()
+    {
+        DicoTuiles = new Dictionary<int, Tuile>();
     }
 }

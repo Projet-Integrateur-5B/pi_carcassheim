@@ -16,6 +16,11 @@ public class Thread_communication
 
     private static int _compteur_id_thread_com;
 
+    // Locks
+
+    private readonly object _lock_nb_parties_gerees;
+    private readonly object _lock_id_parties_gerees;
+
     // Rajouter un objet RESEAU pour les communications ?
 
 
@@ -26,6 +31,8 @@ public class Thread_communication
         _nb_parties_gerees = 0;
         _id_parties_gerees = new List<int>();
         _id_thread_com = id;
+        _lock_nb_parties_gerees = new object();
+        _lock_id_parties_gerees = new object();
     }
     
     // Getters et setters
@@ -36,6 +43,16 @@ public class Thread_communication
 
     public List<int> Get_id_parties_gerees(){
         return _id_parties_gerees;
+    }
+
+    public object Get_lock_nb_parties_gerees()
+    {
+        return _lock_nb_parties_gerees;
+    }
+
+    public object Get_lock_id_parties_gerees()
+    {
+        return _lock_id_parties_gerees;
     }
 
     // Augmente le nombre de parties gérées de 1
@@ -80,14 +97,15 @@ public class Thread_communication
             //      • Kick (afk ou triche)
 
 
-            int typeMsg = 0; // Dépendra du type : création de partie, connexion à la partie, etc
-            int portPartie = 0; // Port de la partie en question
+            int typeMsg = 0; // (Dépend du RESEAU) Dépendra du type : création de partie, connexion à la partie, etc
+            int portPartie = 0; // (Dépend du RESEAU) Port de la partie en question
+            int id_joueur_client = 0; // (Dépend du RESEAU)
 
-            if(typeMsg == 1)    // Création de partie
+            if (typeMsg == 1)    // Création de partie
             {
                 int id_nouv_partie = -1;
 
-                lock (this)
+                lock (this.Get_lock_nb_parties_gerees())
                 {
                     if (_nb_parties_gerees < 5)
                     {
@@ -99,7 +117,7 @@ public class Thread_communication
 
                 if (id_nouv_partie != -1) // Si la partie a pu être crée
                 {
-                    Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie);
+                    Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, id_joueur_client);
                     Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
 
                     _lst_serveur_jeu.Add(thread_serveur_jeu);
