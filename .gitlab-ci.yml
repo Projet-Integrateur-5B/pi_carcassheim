@@ -52,31 +52,32 @@ reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
   variables:
-    CI_PROJECT_DIR: "."
+    CI_PROJECT_DIR: "Reseau/UnitTest"
     COVERAGE_DIR: "coverage"
     COVERAGE_FLAG: "XPlat Code Coverage"
     LOGGER_FLAG: "junit;LogFilePath=$CI_PROJECT_DIR/junit/junit-test-result.xml;MethodFormat=Class;FailureBodyFormat=Verbose"
     REPORT_DIR: "report"
   script:
-    - "cd Reseau/UnitTest"
+    - "cd $CI_PROJECT_DIR"
     - 'dotnet test
-                  -r $CI_PROJECT_DIR/$COVERAGE_DIR
+                  -r $COVERAGE_DIR
                   --collect:"$COVERAGE_FLAG"
                   --test-adapter-path:.
                   --logger:"$LOGGER_FLAG"'
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"$CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/$REPORT_DIR\" -reporttypes:\"TextSummary;xml\""
-    - "cat $CI_PROJECT_DIR/report/Summary.txt"
+    - "reportgenerator -reports:\"$COVERAGE_DIR/*/coverage.cobertura.xml\" -targetdir:\"$REPORT_DIR\" -reporttypes:\"TextSummary;xml\""
+    - "cat report/Summary.txt"
     - "chmod +x ./scripts/print-dotnet-coverage.sh"
-    - "./scripts/print-dotnet-coverage.sh $CI_PROJECT_DIR/$COVERAGE_DIR"
+    - "./scripts/print-dotnet-coverage.sh $COVERAGE_DIR"
+    - "grep -oP '<coverage.*line-rate=\K\"0.[0-9][0-9][0-9][0-9]\"' $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml"
   coverage: /TOTAL_COVERAGE=(\d+.\d+)/
   artifacts:
     paths:
-      - Reseau/UnitTest/$COVERAGE_DIR/*/coverage.cobertura.xml
-      - Reseau/UnitTest/junit/junit-test-result.xml
+      - $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
+      - $CI_PROJECT_DIR/junit/junit-test-result.xml
     reports:
-      cobertura: Reseau/UnitTest/$COVERAGE_DIR/*/coverage.cobertura.xml
-      junit: Reseau/UnitTest/junit/junit-test-result.xml
+      cobertura: $CI_PROJECT_DIR/$COVERAGE_DIR/*/coverage.cobertura.xml
+      junit: $CI_PROJECT_DIR/junit/junit-test-result.xml
   only:
     - reseau
