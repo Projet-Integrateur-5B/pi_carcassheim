@@ -31,8 +31,9 @@
 
 Lors d'un push sur la branche "reseau", on vérifie :
 - le build
-- le style
 - les tests unitaires
+- le style
+- le coverage
 
 ### Le style
 

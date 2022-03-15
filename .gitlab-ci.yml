@@ -3,6 +3,7 @@ stages:
 
 variables:
   RESEAU_DIRECTORY: "Reseau"
+  RESEAU_UNITTEST_DIRECTORY: "Reseau/UnitTest"
   RESEAU_OBJECTS_DIRECTORY: '$RESEAU_DIRECTORY/obj'
   RESEAU_NUGET_PACKAGES_DIRECTORY: '$RESEAU_DIRECTORY/.nuget'
 
@@ -51,11 +52,9 @@ reseau:coverage:
   image: mcr.microsoft.com/dotnet/sdk
   stage: reseau
   needs: [ "reseau:style" ]
-  variables:
-    CI_PROJECT_DIR: "Reseau/UnitTest"
-  coverage: /Total\s*\|\s*(\d+(?:\.\d+)?)/
   script:
-    - "cd $CI_PROJECT_DIR"
+    - "cd $RESEAU_UNITTEST_DIRECTORY"
     - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage"
+  coverage: /Total\s*\|\s*(\d+(?:\.\d+)?)/
   only:
     - reseau
