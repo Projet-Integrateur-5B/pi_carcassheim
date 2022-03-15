@@ -1,9 +1,9 @@
-namespace ReseauUnitTest;
+namespace UnitTest;
+using Assets;
 using System.Text;
 using NUnit.Framework;
-using Reseau;
 
-public class TestsPacket
+public class TestsAssetsPacket
 {
     private const string Localhost = "127.0.0.1";
     private Packet original = new();

@@ -1,4 +1,4 @@
-namespace Reseau;
+namespace Assets;
 using System.Text;
 using System.Text.Json;
 
@@ -74,9 +74,5 @@ public class Packet
     {
         var packetAsJson = Encoding.Default.GetString(packetAsBytes);
         return JsonSerializer.Deserialize<Packet>(packetAsJson);
-    }
-
-    private static void Main()
-    {
     }
 }
