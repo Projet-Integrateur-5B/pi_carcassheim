@@ -62,10 +62,10 @@ reseau:coverage:
   coverage: /^\s*Line coverage:\s*g\d+.\d+\%$/
   artifacts:
     paths:
-      - UnitTest/TestResults/*/coverage.cobertura.xml
-      - Reports/Coverage/Summary.txt
-      - Reports/Coverage/Cobertura.xml
+      - Reseau/UnitTest/TestResults/*/coverage.cobertura.xml
+      - Reseau/Reports/Coverage/Summary.txt
+      - Reseau/Reports/Coverage/Cobertura.xml
     reports:
-      cobertura: Reports/Coverage/Cobertura.xml
+      cobertura: Reseau/Reports/Coverage/Cobertura.xml
   only:
     - reseau
