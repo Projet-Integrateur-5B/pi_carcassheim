@@ -76,12 +76,12 @@ namespace system
 
             Thread.Sleep(2000);
 
-            Debug.Log(string.Format("[{0}] Je suis un thread !", _id_thread_com));
-            Debug.Log(string.Format("[{0}] J'officie sur le port numéro {1} !", _id_thread_com, _numero_port));
-            Debug.Log(string.Format("[{0}] Je gère actuellement {1} parties!", _id_thread_com, _nb_parties_gerees));
+            Console.WriteLine(string.Format("[{0}] Je suis un thread !", _id_thread_com));
+            Console.WriteLine(string.Format("[{0}] J'officie sur le port numéro {1} !", _id_thread_com, _numero_port));
+            Console.WriteLine(string.Format("[{0}] Je gère actuellement {1} parties!", _id_thread_com, _nb_parties_gerees));
             foreach (int id_ite in _id_parties_gerees)
             {
-                Debug.Log(string.Format("[{0}] Je gère la partie d'ID {1}", _id_thread_com, id_ite));
+                Console.WriteLine(string.Format("[{0}] Je gère la partie d'ID {1}", _id_thread_com, id_ite));
             }
 
             //Debug.Log(string.Format("Compteur d'id de strings : {0}", _compteur_id_thread_com));

@@ -144,7 +144,7 @@ namespace system
 
 
             // Test threads 
-            Debug.Log("Ceci est un test");
+            Console.WriteLine("Ceci est un test");
 
             // Création d'un thread de com de port 1
             Creation_thread_com();
