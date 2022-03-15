@@ -9,9 +9,7 @@ public class DB : MonoBehaviour
 
     // Start is called before the first frame update
     void Start()
-    {
-        print(GetXP(1));
-    }
+    {}
     // Update is called once per frame
     void Update()
     {}
@@ -114,5 +112,13 @@ public class DB : MonoBehaviour
             }
             connection.Close();
         }
+    }
+
+    int GetAge(string DateNaiss)
+    {
+        DateTime toDate = DateTime.Parse(DateNaiss);
+        int age = DateTime.Now.Subtract(toDate).Days;
+        age = age / 365;
+        return age;
     }
 }
