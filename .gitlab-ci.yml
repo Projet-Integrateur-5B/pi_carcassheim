@@ -61,16 +61,16 @@ reseau:coverage:
                   --collect:"$COVERAGE_FLAG"'
     - "dotnet tool update -g dotnet-reportgenerator-globaltool"
     - "export PATH=\"$PATH:/root/.dotnet/tools\""
-    - "reportgenerator -reports:\"$CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/report\" -reporttypes:\"TextSummary;Html\""
+    - "reportgenerator -reports:\"$CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml\" -targetdir:\"$CI_PROJECT_DIR/report\" -reporttypes:\"TextSummary;xml\""
     - "cat $CI_PROJECT_DIR/report/Summary.txt"
     - "echo 'End Summary'"
   coverage: /Summary\n[\s\S]*/
   artifacts:
     paths:
-      - $RESEAU_DIRECTORY/$CI_PROJECT_DIR/cobertura/*/coverage.cobertura.xml
-      - $RESEAU_DIRECTORY/$CI_PROJECT_DIR/report/Summary.txt
-      - $RESEAU_DIRECTORY/$CI_PROJECT_DIR/report/Cobertura.xml
+      - $RESEAU_DIRECTORY/cobertura/*/coverage.cobertura.xml
+      - $RESEAU_DIRECTORY/report/Summary.txt
+      - $RESEAU_DIRECTORY/report/Cobertura.xml
     reports:
-      cobertura: $RESEAU_DIRECTORY/$CI_PROJECT_DIR/report/Cobertura.xml
+      cobertura: $RESEAU_DIRECTORY/report/Cobertura.xml
   only:
     - reseau
