@@ -18,8 +18,7 @@ public class ConnectionMenu : Miscellaneous
 
 	public void HideConnection()
 	{
-		SetPanelOpen(false);
-		Pop_up_Options.SetActive(GetPanelOpen());
+		HidePopUpOptions();
 		ResetWarningTextCM();
 		ChangeMenu("ConnectionMenu", "HomeMenu");
 	}

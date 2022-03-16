@@ -38,7 +38,6 @@ public class AccountMenu : Miscellaneous
 	{
 		ResetWarningTextAM();
 		HidePopUpOptions();
-		Pop_up_Options.SetActive(GetPanelOpen());
 		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
 	}
