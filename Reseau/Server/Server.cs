@@ -79,7 +79,7 @@ public class Server
             var handler = listener.EndAccept(ar);
 
             // Create the state object.
-            var state = new StateObject {WorkSocket = handler};
+            var state = new StateObject { WorkSocket = handler };
             handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
         }
