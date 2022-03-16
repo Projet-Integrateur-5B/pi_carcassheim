@@ -32,6 +32,10 @@ public class Client
 
                 Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint);
                 var packet = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
+                packet.Debug();
+
+                var packetAsBytes = packet.Serialize();
+                bytes = new byte[packetAsBytes.Length];
 
                 // Send the data through the socket.
                 var bytesSent = sender.Send(packet.Serialize());
@@ -39,8 +43,10 @@ public class Client
                 // Receive the response from the remote device.
                 var bytesRec = sender.Receive(bytes);
                 packet = Packet.Deserialize(bytes);
-                Console.WriteLine("Type : {0} \nStatus : {1} \nPermission : {2} \n IdPlayer : {3} \nData : {4} \nIpAdress : {5}",
-                    packet.Type, packet.Status, packet.Permission, packet.IdPlayer, packet.Data, packet.IpAddress);
+                Console.WriteLine(
+                    "Type : {0} \nStatus : {1} \nPermission : {2} \n IdPlayer : {3} \nData : {4} \nIpAdress : {5}",
+                    packet.Type, packet.Status, packet.Permission, packet.IdPlayer, packet.Data,
+                    packet.IpAddress);
 
                 //Release the socket.
                 sender.Shutdown(SocketShutdown.Both);

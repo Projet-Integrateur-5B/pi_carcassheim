@@ -28,6 +28,7 @@ public class Server
 
     public static void StartListening()
     {
+        Console.WriteLine("StartListening");
         // Establish the local endpoint for the socket.
         // The DNS name of the computer
         // running the listener is "host.contoso.com".
@@ -69,6 +70,7 @@ public class Server
 
     public static void AcceptCallback(IAsyncResult ar)
     {
+        Console.WriteLine("AcceptCallback");
         // Signal the main thread to continue.
         AllDone.Set();
 
@@ -89,6 +91,7 @@ public class Server
 
     public static void ReadCallback(IAsyncResult ar)
     {
+        Console.WriteLine("ReadCallback");
         // Retrieve the state object and the handler socket
         // from the asynchronous state object.
         var state = (StateObject?)ar.AsyncState;
@@ -104,7 +107,10 @@ public class Server
 
                 if (bytesRead > 0)
                 {
-                    var packet = Packet.Deserialize(state.Buffer);
+                    var packetAsBytes = new byte[bytesRead];
+                    Array.Copy(state.Buffer, packetAsBytes, bytesRead);
+                    var packet = Packet.Deserialize(packetAsBytes);
+                    packet.Debug();
 
                     // There  might be more data, so store the data received so far.
                     state.Sb.Append(packet.Data);
@@ -128,14 +134,27 @@ public class Server
                             ReadCallback, state);
                     }
                 }
+                else
+                {
+                    Console.WriteLine("0 bytes to read");
+                }
             }
-            // si c'est null ?
+            else
+            {
+                // si c'est null ?
+                Console.WriteLine("handler is null");
+            }
         }
-        // si c'est null ?
+        else
+        {
+            // si c'est null ?
+            Console.WriteLine("state is null");
+        }
     }
 
     private static void Send(Socket handler, Packet packet)
     {
+        Console.WriteLine("Send");
         var packetAsBytes = packet.Serialize();
         var size = packetAsBytes.Length;
 
@@ -145,6 +164,7 @@ public class Server
 
     private static void SendCallback(IAsyncResult ar)
     {
+        Console.WriteLine("SendCallback");
         try
         {
             // Retrieve the socket from the state object.
