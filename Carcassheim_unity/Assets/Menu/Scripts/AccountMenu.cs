@@ -30,12 +30,15 @@ public class AccountMenu : Miscellaneous
 	public void HideAccount()
 	{
 		ResetWarningTextAM();
+		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "ConnectionMenu");
 	}
 
 	public void HideAccountConnected()
 	{
 		ResetWarningTextAM();
+		HidePopUpOptions();
+		Pop_up_Options.SetActive(GetPanelOpen());
 		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
 	}

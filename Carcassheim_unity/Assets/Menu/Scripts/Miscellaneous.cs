@@ -16,14 +16,32 @@ public abstract class Miscellaneous : MonoBehaviour
 	private static GameObject previousMenu = null;
 	private static GameObject nextMenu = null;
 	private Color colState;
-	void Start()
-	{
-	}
+	public GameObject Pop_up_Options;
+	public static bool s_isOpenPanel = false;
+	// Start is called before the first frame update
 
 	void Awake()
 	{
+		Pop_up_Options = GameObject.Find("SubMenus").transform.Find("Panel Options").gameObject;
 		nextMenu = GameObject.Find("HomeMenu"); // Menu courant au lancement du jeu
 	}
+
+
+	public void HidePopUpOptions()
+	{
+		SetPanelOpen(false);
+		Pop_up_Options.SetActive(GetPanelOpen());
+	}
+
+	public void SetPanelOpen(bool b)
+    {
+		s_isOpenPanel = b;
+    }
+
+	public bool GetPanelOpen()
+    {
+		return s_isOpenPanel;
+    }
 
 	public bool GetState()
 	{

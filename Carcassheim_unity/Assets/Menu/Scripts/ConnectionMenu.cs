@@ -18,6 +18,8 @@ public class ConnectionMenu : Miscellaneous
 
 	public void HideConnection()
 	{
+		SetPanelOpen(false);
+		Pop_up_Options.SetActive(GetPanelOpen());
 		ResetWarningTextCM();
 		ChangeMenu("ConnectionMenu", "HomeMenu");
 	}
@@ -43,6 +45,7 @@ public class ConnectionMenu : Miscellaneous
 		Text tmpText = tmpGO.GetComponent<Text>();
 		tmpText.color = Color.white;
 		tmpText.text = "Connectez vous";
+		HidePopUpOptions();
 		ChangeMenu("ConnectionMenu", "AccountMenu");
 	}
 
