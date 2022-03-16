@@ -8,11 +8,7 @@ public class RoomSelectionMenu : Miscellaneous
 	// Start is called before the first frame update
 	void Start()
 	{
-		Pop_up_Options = FindMenu("Panel Options");
-	}
-
-	void Update()
-	{
+		Pop_up_Options = GameObject.Find("SubMenus").transform.Find("Panel Options").gameObject;
 	}
 
 	public void HideRoomSelection()
@@ -26,5 +22,15 @@ public class RoomSelectionMenu : Miscellaneous
 	{
 		s_isOpenPanel = !s_isOpenPanel;
 		Pop_up_Options.SetActive(s_isOpenPanel);
+	}
+
+	public void ShowJoinById()
+	{
+
+	}
+
+	public void ShowJoinPublicRoom()
+	{
+				
 	}
 }
