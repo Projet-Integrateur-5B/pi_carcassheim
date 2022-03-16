@@ -56,5 +56,8 @@ reseau:coverage:
     - "cd $RESEAU_UNITTEST_DIRECTORY"
     - "dotnet test /p:CollectCoverage=true /p:CoverletOutput=coverage"
   coverage: /Total\s*\|\s*(\d+(?:\.\d+)?)/
+  artifacts: 
+    paths:
+      - "$RESEAU_UNITTEST_DIRECTORY/coverage.json"
   only:
     - reseau
