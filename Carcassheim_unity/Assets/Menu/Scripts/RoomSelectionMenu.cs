@@ -23,4 +23,14 @@ public class RoomSelectionMenu : Miscellaneous
 		s_isOpenPanel = !s_isOpenPanel;
 		Pop_up_Options.SetActive(s_isOpenPanel);
 	}
+
+	public void ShowJoinById()
+	{
+
+	}
+
+	public void ShowJoinPublicRoom()
+	{
+				
+	}
 }

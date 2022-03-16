@@ -109,7 +109,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	private void couleur_touches()
 	{
 		//le go actuel est celui qui est selectionne
-		if (currentGo != eventSystem.currentSelectedGameObject)
+		if (currentGo != eventSystem.currentSelectedGameObject /*&& eventSystem.currentSelectedGameObject != null*/)
 		{
 			currentGo = eventSystem.currentSelectedGameObject;
 			//bouton en bleu
