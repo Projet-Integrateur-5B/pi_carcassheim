@@ -6,12 +6,13 @@ using System.Text.Json;
 public class Packet
 {
     private const string Localhost = "127.0.0.1";
+    private const string DataEof = "<EOF>";
 
     public Packet()
     {
         this.Type = false;
         this.IpAddress = new string(Localhost);
-        this.Data = new string("");
+        this.Data = new string("" + DataEof);
     }
 
     public Packet(bool type, string ipAddress, ushort port, ulong idRoom, byte idMessage,
@@ -25,7 +26,7 @@ public class Packet
         this.Status = status;
         this.Permission = permission;
         this.IdPlayer = idPlayer;
-        this.Data = new string(data);
+        this.Data = new string(data + DataEof);
     }
 
     // type == false (client -> server)
@@ -38,7 +39,7 @@ public class Packet
         this.IdRoom = idRoom;
         this.IdMessage = idMessage;
         this.IdPlayer = idPlayer;
-        this.Data = new string(data);
+        this.Data = new string(data + DataEof);
     }
 
     // type == true (server -> client)
@@ -49,7 +50,7 @@ public class Packet
         this.Status = status;
         this.Permission = permission;
         this.IdPlayer = idPlayer;
-        this.Data = new string(data);
+        this.Data = new string(data + DataEof);
         this.IpAddress = new string(Localhost); // unused, escape errors
     }
 
@@ -70,11 +71,17 @@ public class Packet
     public ulong IdPlayer { get; set; }
     public string Data { get; set; } // à définir
 
-    public byte[] Serialize() => JsonSerializer.SerializeToUtf8Bytes(this);
+    public byte[] Serialize()
+    {
+        var jso = new JsonSerializerOptions();
+        jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+        var jsonString = JsonSerializer.Serialize<Packet>(this, jso);
+        return Encoding.ASCII.GetBytes(jsonString);
+    }
 
     public static Packet? Deserialize(byte[] packetAsBytes)
     {
-        var packetAsJson = Encoding.Default.GetString(packetAsBytes);
+        var packetAsJson = Encoding.ASCII.GetString(packetAsBytes);
         return JsonSerializer.Deserialize<Packet>(packetAsJson);
     }
 }

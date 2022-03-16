@@ -1,12 +1,15 @@
 namespace UnitTest;
 
+using System;
 using System.Text;
+using System.Text.Json;
 using Assets;
 using NUnit.Framework;
 
 public class TestsAssetsPacket
 {
     private const string Localhost = "127.0.0.1";
+    private const string DataEof = "<EOF>";
     private Packet original = new();
     private string originalAsString = new("");
 
@@ -16,16 +19,28 @@ public class TestsAssetsPacket
         this.original = new Packet(true, Localhost, 0, 0, 0, true, 1, 1, "test");
         this.originalAsString = "{\"Type\":true,\"IpAddress\":\"" + Localhost + "\",\"Port\":0," +
                                 "\"IdRoom\":0,\"IdMessage\":0,\"Status\":true,\"Permission\":1," +
-                                "\"IdPlayer\":1,\"Data\":\"test\"}";
+                                "\"IdPlayer\":1,\"Data\":\"test" + DataEof + "\"}";
     }
 
     [Test]
-    public void TestPacketSerializationSuccess()
+    public void TestPacketDataEofSuccess()
     {
-        var originalAsBytes = this.original.Serialize();
-        var resultAsString = Encoding.Default.GetString(originalAsBytes);
+        var packet = new Packet();
+        Assert.AreEqual(packet.Data, "<EOF>");
+        Assert.AreEqual(this.original.Data, "test<EOF>");
 
-        Assert.AreEqual(this.originalAsString, resultAsString);
+        var sb = new StringBuilder();
+        sb.Append(packet.Data);
+        var content = sb.ToString();
+
+        if (content.IndexOf("<EOF>", System.StringComparison.Ordinal) > -1)
+        {
+            Assert.IsTrue(true);
+        }
+        else
+        {
+            Assert.IsTrue(false);
+        }
     }
 
     [Test]
@@ -50,5 +65,14 @@ public class TestsAssetsPacket
             Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
             Assert.AreEqual(this.original.Data, result.Data);
         }
+    }
+
+    [Test]
+    public void TestPacketSerializationSuccess()
+    {
+        var originalAsBytes = this.original.Serialize();
+        var resultAsString =  Encoding.ASCII.GetString(originalAsBytes);
+
+        Assert.AreEqual(this.originalAsString, resultAsString);
     }
 }
