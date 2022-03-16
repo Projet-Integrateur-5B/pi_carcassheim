@@ -2,7 +2,6 @@ namespace UnitTest;
 
 using System;
 using System.Text;
-using System.Text.Json;
 using Assets;
 using NUnit.Framework;
 
@@ -33,7 +32,7 @@ public class TestsAssetsPacket
         sb.Append(packet.Data);
         var content = sb.ToString();
 
-        if (content.IndexOf("<EOF>", System.StringComparison.Ordinal) > -1)
+        if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
         {
             Assert.IsTrue(true);
         }
@@ -71,7 +70,7 @@ public class TestsAssetsPacket
     public void TestPacketSerializationSuccess()
     {
         var originalAsBytes = this.original.Serialize();
-        var resultAsString =  Encoding.ASCII.GetString(originalAsBytes);
+        var resultAsString = Encoding.ASCII.GetString(originalAsBytes);
 
         Assert.AreEqual(this.originalAsString, resultAsString);
     }

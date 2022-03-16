@@ -1,6 +1,7 @@
 namespace Assets;
 
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 
 public class Packet
@@ -73,9 +74,8 @@ public class Packet
 
     public byte[] Serialize()
     {
-        var jso = new JsonSerializerOptions();
-        jso.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-        var jsonString = JsonSerializer.Serialize<Packet>(this, jso);
+        var jso = new JsonSerializerOptions {Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping};
+        var jsonString = JsonSerializer.Serialize(this, jso);
         return Encoding.ASCII.GetBytes(jsonString);
     }
 
