@@ -2,11 +2,12 @@ namespace Client;
 
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using Assets;
 
 public class Client
 {
-    public static void StartClient()
+    //private static Packet packet = new();
+    public static void StartClient(byte number, string data)
     {
         // Data buffer for incoming data.
         var bytes = new byte[1024];
@@ -30,19 +31,18 @@ public class Client
                 sender.Connect(remoteEP);
 
                 Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint);
-
-                // Encode the data string into a byte array.
-                var msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
+                var packet = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
 
                 // Send the data through the socket.
-                var bytesSent = sender.Send(msg);
+                var bytesSent = sender.Send(packet.Serialize());
 
                 // Receive the response from the remote device.
                 var bytesRec = sender.Receive(bytes);
-                Console.WriteLine("Echoed test = {0}",
-                    Encoding.ASCII.GetString(bytes, 0, bytesRec));
+                packet = Packet.Deserialize(bytes);
+                Console.WriteLine("Type : {0} \nStatus : {1} \nPermission : {2} \n IdPlayer : {3} \nData : {4} \nIpAdress : {5}",
+                    packet.Type, packet.Status, packet.Permission, packet.IdPlayer, packet.Data, packet.IpAddress);
 
-                // Release the socket.
+                //Release the socket.
                 sender.Shutdown(SocketShutdown.Both);
                 sender.Close();
             }
@@ -67,7 +67,9 @@ public class Client
 
     public static int Main()
     {
-        StartClient();
+        byte nb = 18;
+        var data = "petit test des familles";
+        StartClient(nb, data);
         return 0;
     }
 }
