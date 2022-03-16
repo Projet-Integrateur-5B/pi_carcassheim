@@ -3,6 +3,7 @@ namespace Server;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Assets;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -103,9 +104,10 @@ public class Server
 
                 if (bytesRead > 0)
                 {
+                    var packet = Packet.Deserialize(state.Buffer);
+
                     // There  might be more data, so store the data received so far.
-                    state.Sb.Append(Encoding.ASCII.GetString(
-                        state.Buffer, 0, bytesRead));
+                    state.Sb.Append(packet.Data);
 
                     // Check for end-of-file tag. If it is not there, read
                     // more data.
@@ -117,7 +119,7 @@ public class Server
                         Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
                             content.Length, content);
                         // Echo the data back to the client.
-                        Send(handler, content);
+                        Send(handler, packet);
                     }
                     else
                     {
@@ -132,13 +134,13 @@ public class Server
         // si c'est null ?
     }
 
-    private static void Send(Socket handler, string data)
+    private static void Send(Socket handler, Packet packet)
     {
-        // Convert the string data to byte data using ASCII encoding.
-        var byteData = Encoding.ASCII.GetBytes(data);
+        var packetAsBytes = packet.Serialize();
+        var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
-        handler.BeginSend(byteData, 0, byteData.Length, 0, SendCallback, handler);
+        handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, handler);
     }
 
     private static void SendCallback(IAsyncResult ar)
