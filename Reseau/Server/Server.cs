@@ -19,6 +19,8 @@ public class StateObject
 
     // Client socket.
     public Socket? WorkSocket { get; set; }
+
+    public Packet? Packet { get; set; }
 }
 
 public class Server
@@ -26,9 +28,16 @@ public class Server
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
 
+    public static string SocketToString(Socket socket) => socket.LocalEndPoint is not IPEndPoint iep
+        ? ""
+        : "AddressFamily:" + iep.AddressFamily + " ; " +
+          "IPAddress:" + iep.Address + " ; " +
+          "Port:" + iep.Port + " ; ";
+
     public static void StartListening()
     {
-        Console.WriteLine("StartListening");
+        Console.WriteLine("Server is setting up...");
+
         // Establish the local endpoint for the socket.
         // The DNS name of the computer
         // running the listener is "host.contoso.com".
@@ -37,14 +46,15 @@ public class Server
         var localEndPoint = new IPEndPoint(ipAddress, 11000);
 
         // Create a TCP/IP socket.
-        var listener = new Socket(ipAddress.AddressFamily,
-            SocketType.Stream, ProtocolType.Tcp);
+        var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
         // Bind the socket to the local endpoint and listen for incoming connections.
         try
         {
             listener.Bind(localEndPoint);
             listener.Listen(100);
+
+            Console.WriteLine("Server is ready : " + SocketToString(listener));
 
             while (true)
             {
@@ -70,7 +80,7 @@ public class Server
 
     public static void AcceptCallback(IAsyncResult ar)
     {
-        Console.WriteLine("AcceptCallback");
+        Console.WriteLine("New connection is being established...");
         // Signal the main thread to continue.
         AllDone.Set();
 
@@ -81,17 +91,22 @@ public class Server
         {
             var handler = listener.EndAccept(ar);
 
+            Console.WriteLine("Connection with client is established : " + SocketToString(handler));
+
             // Create the state object.
             var state = new StateObject { WorkSocket = handler };
             handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
         }
-        // si c'est null ??
+        else
+        {
+            // si c'est null ??
+            Console.WriteLine("Connection with client failed !");
+        }
     }
 
     public static void ReadCallback(IAsyncResult ar)
     {
-        Console.WriteLine("ReadCallback");
         // Retrieve the state object and the handler socket
         // from the asynchronous state object.
         var state = (StateObject?)ar.AsyncState;
@@ -109,26 +124,30 @@ public class Server
                 {
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
-                    var packet = Packet.Deserialize(packetAsBytes);
-                    packet.Debug();
+                    state.Packet = Packet.Deserialize(packetAsBytes);
 
                     // There  might be more data, so store the data received so far.
-                    state.Sb.Append(packet.Data);
+                    state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
 
-                    // Check for end-of-file tag. If it is not there, read
-                    // more data.
+                    // Check for end-of-file tag. If it is not there, read more data.
                     var content = state.Sb.ToString();
                     if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
                     {
-                        // All the data has been read from the
-                        // client. Display it on the console.
-                        Console.WriteLine("Read {0} bytes from socket. \n Data : {1}",
-                            content.Length, content);
+                        Console.WriteLine("Reading from : " + SocketToString(handler) +
+                                          "\n\t Read {0} bytes =>\t" + state.Packet +
+                                          "\n\t Data buffer =>\t" + state.Sb +
+                                          "\n\t => Every packet has been received !", bytesRead);
+
                         // Echo the data back to the client.
-                        Send(handler, packet);
+                        Send(ar);
                     }
                     else
                     {
+                        Console.WriteLine("Reading from : " + SocketToString(handler) +
+                                          "\n\t Read {0} bytes =>\t" + state.Packet +
+                                          "\n\t Data buffer =>\t" + state.Sb +
+                                          "\n\t => Waiting for the rest to be send...", bytesRead);
+
                         // Not all data received. Get more.
                         handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                             ReadCallback, state);
@@ -136,7 +155,7 @@ public class Server
                 }
                 else
                 {
-                    Console.WriteLine("0 bytes to read");
+                    Console.WriteLine("0 bytes to read from : " + SocketToString(handler));
                 }
             }
             else
@@ -152,34 +171,51 @@ public class Server
         }
     }
 
-    private static void Send(Socket handler, Packet packet)
+    private static void Send(IAsyncResult ar)
     {
-        Console.WriteLine("Send");
-        var packetAsBytes = packet.Serialize();
+        var state = (StateObject?)ar.AsyncState;
+        var packetAsBytes = state.Packet.Serialize();
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
-        handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, handler);
+        var handler = state.WorkSocket;
+        handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, state);
     }
 
     private static void SendCallback(IAsyncResult ar)
     {
-        Console.WriteLine("SendCallback");
         try
         {
-            // Retrieve the socket from the state object.
-            var handler = (Socket?)ar.AsyncState;
+            var state = (StateObject?)ar.AsyncState;
 
-            if (handler is not null)
+            if (state is not null)
             {
-                // Complete sending the data to the remote device.
-                var bytesSent = handler.EndSend(ar);
-                Console.WriteLine("Sent {0} bytes to client.", bytesSent);
+                // Retrieve the socket from the state object.
+                var handler = state.WorkSocket;
 
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
+                if (handler is not null)
+                {
+                    // Complete sending the data to the remote device.
+                    var bytesSent = handler.EndSend(ar);
+
+                    Console.WriteLine("Sending back : " + SocketToString(handler) +
+                                      "\n\t Sent {0} bytes =>\t" + state.Packet +
+                                      "\n\t => Closing connection...", bytesSent);
+
+                    handler.Shutdown(SocketShutdown.Both);
+                    handler.Close();
+                }
+                else
+                {
+                    // si c'est null ?
+                    Console.WriteLine("handler is null");
+                }
             }
-            // si c'est null ??
+            else
+            {
+                // si c'est null ?
+                Console.WriteLine("state is null");
+            }
         }
         catch (Exception e)
         {

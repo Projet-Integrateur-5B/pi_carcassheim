@@ -32,7 +32,7 @@ public class Client
 
                 Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint);
                 var packet = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
-                packet.Debug();
+                Console.WriteLine(packet.ToString());
 
                 var packetAsBytes = packet.Serialize();
                 bytes = new byte[packetAsBytes.Length];

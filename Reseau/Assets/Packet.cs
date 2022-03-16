@@ -82,20 +82,16 @@ public class Packet
     public static Packet? Deserialize(byte[] packetAsBytes)
     {
         var packetAsJson = Encoding.ASCII.GetString(packetAsBytes);
-        Console.WriteLine(packetAsJson);
         return JsonSerializer.Deserialize<Packet>(packetAsJson);
     }
 
-    public void Debug()
-    {
-        Console.WriteLine(this.Type);
-        Console.WriteLine(this.IpAddress);
-        Console.WriteLine(this.Port);
-        Console.WriteLine(this.IdRoom);
-        Console.WriteLine(this.IdMessage);
-        Console.WriteLine(this.Status);
-        Console.WriteLine(this.Permission);
-        Console.WriteLine(this.IdPlayer);
-        Console.WriteLine(this.Data);
-    }
+    public override string ToString() => "Type:" + this.Type + "; "
+                                         + "IpAddress:" + this.IpAddress + "; "
+                                         + "Port:" + this.Port + "; "
+                                         + "IdRoom:" + this.IdRoom + "; "
+                                         + "IdMessage:" + this.IdMessage + "; "
+                                         + "Status:" + this.Status + "; "
+                                         + "Permission:" + this.Permission + "; "
+                                         + "IdPlayer:" + this.IdPlayer + "; "
+                                         + "Data:" + this.Data + "; ";
 }
