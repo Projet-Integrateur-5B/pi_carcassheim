@@ -1,10 +1,12 @@
 namespace Assets;
+
 using System.Text;
 using System.Text.Json;
 
 public class Packet
 {
     private const string Localhost = "127.0.0.1";
+
     public Packet()
     {
         this.Type = false;

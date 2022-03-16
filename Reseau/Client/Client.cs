@@ -1,8 +1,9 @@
 namespace Client;
-using System;
+
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+
 public class Client
 {
     public static void StartClient()
@@ -28,8 +29,7 @@ public class Client
             {
                 sender.Connect(remoteEP);
 
-                Console.WriteLine("Socket connected to {0}",
-                    sender.RemoteEndPoint.ToString());
+                Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint);
 
                 // Encode the data string into a byte array.
                 var msg = Encoding.ASCII.GetBytes("This is a test<EOF>");
@@ -45,21 +45,19 @@ public class Client
                 // Release the socket.
                 sender.Shutdown(SocketShutdown.Both);
                 sender.Close();
-
             }
             catch (ArgumentNullException ane)
             {
-                Console.WriteLine("ArgumentNullException : {0}", ane.ToString());
+                Console.WriteLine("ArgumentNullException : {0}", ane);
             }
             catch (SocketException se)
             {
-                Console.WriteLine("SocketException : {0}", se.ToString());
+                Console.WriteLine("SocketException : {0}", se);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unexpected exception : {0}", e.ToString());
+                Console.WriteLine("Unexpected exception : {0}", e);
             }
-
         }
         catch (Exception e)
         {

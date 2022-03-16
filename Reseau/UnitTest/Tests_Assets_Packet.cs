@@ -1,4 +1,5 @@
 namespace UnitTest;
+
 using System.Text;
 using Assets;
 using NUnit.Framework;

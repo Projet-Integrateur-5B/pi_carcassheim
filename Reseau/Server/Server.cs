@@ -1,10 +1,8 @@
 namespace Server;
 
-using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -13,14 +11,15 @@ public class StateObject
     public const int BufferSize = 1024;
 
     // Receive buffer.
-    public byte[] Buffer { get; set; } = new byte[BufferSize];
+    public byte[] Buffer { get; } = new byte[BufferSize];
 
     // Received data string.
-    public StringBuilder Sb { get; set; } = new StringBuilder();
+    public StringBuilder Sb { get; } = new();
 
     // Client socket.
     public Socket? WorkSocket { get; set; }
 }
+
 public class Server
 {
     // Thread signal.
@@ -57,7 +56,6 @@ public class Server
                 // Wait until a connection is made before continuing.
                 AllDone.WaitOne();
             }
-
         }
         catch (Exception e)
         {
@@ -66,7 +64,6 @@ public class Server
 
         Console.WriteLine("\nPress ENTER to continue...");
         Console.Read();
-
     }
 
     public static void AcceptCallback(IAsyncResult ar)
@@ -82,10 +79,7 @@ public class Server
             var handler = listener.EndAccept(ar);
 
             // Create the state object.
-            var state = new StateObject
-            {
-                WorkSocket = handler
-            };
+            var state = new StateObject {WorkSocket = handler};
             handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
         }
@@ -94,7 +88,6 @@ public class Server
 
     public static void ReadCallback(IAsyncResult ar)
     {
-
         // Retrieve the state object and the handler socket
         // from the asynchronous state object.
         var state = (StateObject?)ar.AsyncState;
