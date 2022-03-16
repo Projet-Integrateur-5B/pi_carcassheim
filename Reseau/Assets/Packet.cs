@@ -74,7 +74,7 @@ public class Packet
 
     public byte[] Serialize()
     {
-        var jso = new JsonSerializerOptions {Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping};
+        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
         var jsonString = JsonSerializer.Serialize(this, jso);
         return Encoding.ASCII.GetBytes(jsonString);
     }
