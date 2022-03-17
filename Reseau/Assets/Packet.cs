@@ -94,7 +94,7 @@ public class Packet
                                          + "Status:" + this.Status + "; "
                                          + "Permission:" + this.Permission + "; "
                                          + "IdPlayer:" + this.IdPlayer + "; "
-                                         + "Data:" + this.Data + "; ";
+                                         + "Data:" + this.Data + ";";
 
     public List<Packet> Prepare()
     {
@@ -127,10 +127,12 @@ public class Packet
             if (i + dataBytesMaxLength > dataBytesTotalLength)
             {
                 el.Data = dataString[i..dataBytesTotalLength];
+                Console.WriteLine(dataString[i..dataBytesTotalLength]);
             }
             else
             {
                 el.Data = dataString.Substring(i, dataBytesMaxLength);
+                Console.WriteLine(dataString.Substring(i, dataBytesMaxLength));
             }
 
             packets.Add(el);
