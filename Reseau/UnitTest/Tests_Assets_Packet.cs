@@ -32,38 +32,30 @@ public class TestsAssetsPacket
         sb.Append(packet.Data);
         var content = sb.ToString();
 
+        var result = false;
         if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
         {
-            Assert.IsTrue(true);
+            result = true;
         }
-        else
-        {
-            Assert.IsTrue(false);
-        }
+
+        Assert.IsTrue(result);
     }
 
     [Test]
     public void TestPacketDeserializationSuccess()
     {
         var originalAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
-        var result = Packet.Deserialize(originalAsBytes);
+        var result = Packet.Deserialize(originalAsBytes) ?? new Packet();
 
-        if (result is null)
-        {
-            Assert.Fail();
-        }
-        else
-        {
-            Assert.AreEqual(this.original.Type, result.Type);
-            Assert.AreEqual(this.original.IpAddress, result.IpAddress);
-            Assert.AreEqual(this.original.Port, result.Port);
-            Assert.AreEqual(this.original.IdRoom, result.IdRoom);
-            Assert.AreEqual(this.original.IdMessage, result.IdMessage);
-            Assert.AreEqual(this.original.Status, result.Status);
-            Assert.AreEqual(this.original.Permission, result.Permission);
-            Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
-            Assert.AreEqual(this.original.Data, result.Data);
-        }
+        Assert.AreEqual(this.original.Type, result.Type);
+        Assert.AreEqual(this.original.IpAddress, result.IpAddress);
+        Assert.AreEqual(this.original.Port, result.Port);
+        Assert.AreEqual(this.original.IdRoom, result.IdRoom);
+        Assert.AreEqual(this.original.IdMessage, result.IdMessage);
+        Assert.AreEqual(this.original.Status, result.Status);
+        Assert.AreEqual(this.original.Permission, result.Permission);
+        Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
+        Assert.AreEqual(this.original.Data, result.Data);
     }
 
     [Test]
