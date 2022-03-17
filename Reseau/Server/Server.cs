@@ -28,12 +28,6 @@ public class Server
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
 
-    public static string SocketToString(Socket socket) => socket.LocalEndPoint is not IPEndPoint iep
-        ? ""
-        : "AddressFamily:" + iep.AddressFamily + " ; " +
-          "IPAddress:" + iep.Address + " ; " +
-          "Port:" + iep.Port + " ; ";
-
     public static void StartListening()
     {
         Console.WriteLine("Server is setting up...");
@@ -53,8 +47,7 @@ public class Server
         {
             listener.Bind(localEndPoint);
             listener.Listen(100);
-
-            Console.WriteLine("Server is ready : " + SocketToString(listener));
+            Console.WriteLine("Server is ready : " + listener.LocalEndPoint);
 
             while (true)
             {
@@ -62,8 +55,8 @@ public class Server
                 AllDone.Reset();
 
                 // Start an asynchronous socket to listen for connections.
-                Console.WriteLine("Waiting for a connection...");
                 listener.BeginAccept(AcceptCallback, listener);
+                Console.WriteLine("Waiting for a connection...");
 
                 // Wait until a connection is made before continuing.
                 AllDone.WaitOne();
@@ -81,6 +74,7 @@ public class Server
     public static void AcceptCallback(IAsyncResult ar)
     {
         Console.WriteLine("New connection is being established...");
+
         // Signal the main thread to continue.
         AllDone.Set();
 
@@ -90,8 +84,7 @@ public class Server
         if (listener is not null)
         {
             var handler = listener.EndAccept(ar);
-
-            Console.WriteLine("Connection with client is established : " + SocketToString(handler));
+            Console.WriteLine("Connection with client is established : " + handler.RemoteEndPoint);
 
             // Create the state object.
             var state = new StateObject { WorkSocket = handler };
@@ -133,7 +126,7 @@ public class Server
                     var content = state.Sb.ToString();
                     if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
                     {
-                        Console.WriteLine("Reading from : " + SocketToString(handler) +
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
                                           "\n\t Data buffer =>\t" + state.Sb +
                                           "\n\t => Every packet has been received !", bytesRead);
@@ -143,7 +136,7 @@ public class Server
                     }
                     else
                     {
-                        Console.WriteLine("Reading from : " + SocketToString(handler) +
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
                                           "\n\t Data buffer =>\t" + state.Sb +
                                           "\n\t => Waiting for the rest to be send...", bytesRead);
@@ -155,7 +148,7 @@ public class Server
                 }
                 else
                 {
-                    Console.WriteLine("0 bytes to read from : " + SocketToString(handler));
+                    Console.WriteLine("0 bytes to read from : " + handler.RemoteEndPoint);
                 }
             }
             else
@@ -198,7 +191,7 @@ public class Server
                     // Complete sending the data to the remote device.
                     var bytesSent = handler.EndSend(ar);
 
-                    Console.WriteLine("Sending back : " + SocketToString(handler) +
+                    Console.WriteLine("Sending back : " + handler.RemoteEndPoint +
                                       "\n\t Sent {0} bytes =>\t" + state.Packet +
                                       "\n\t => Closing connection...", bytesSent);
 

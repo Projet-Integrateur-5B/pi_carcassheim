@@ -15,6 +15,8 @@ public class Client
         // Connect to a remote device.
         try
         {
+            Console.WriteLine("Client is setting up...");
+
             // Establish the remote endpoint for the socket.
             // This example uses port 11000 on the local computer.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
@@ -29,28 +31,25 @@ public class Client
             try
             {
                 sender.Connect(remoteEP);
+                Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
 
-                Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint);
                 var packet = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
-                Console.WriteLine(packet.ToString());
-
                 var packetAsBytes = packet.Serialize();
                 bytes = new byte[packetAsBytes.Length];
 
                 // Send the data through the socket.
                 var bytesSent = sender.Send(packet.Serialize());
+                Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
 
                 // Receive the response from the remote device.
                 var bytesRec = sender.Receive(bytes);
                 packet = Packet.Deserialize(bytes);
-                Console.WriteLine(
-                    "Type : {0} \nStatus : {1} \nPermission : {2} \n IdPlayer : {3} \nData : {4} \nIpAdress : {5}",
-                    packet.Type, packet.Status, packet.Permission, packet.IdPlayer, packet.Data,
-                    packet.IpAddress);
+                Console.WriteLine("Read {0} bytes => \t" + packet, bytesRec);
 
                 //Release the socket.
                 sender.Shutdown(SocketShutdown.Both);
                 sender.Close();
+                Console.WriteLine("Closing connection...");
             }
             catch (ArgumentNullException ane)
             {
