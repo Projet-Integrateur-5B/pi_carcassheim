@@ -9,7 +9,7 @@ using Assets;
 public class StateObject
 {
     // Size of receive buffer.
-    public const int BufferSize = 1024;
+    public const int BufferSize = Packet.MaxPacketSize;
 
     // Receive buffer.
     public byte[] Buffer { get; } = new byte[BufferSize];
@@ -115,6 +115,7 @@ public class Server
 
                 if (bytesRead > 0)
                 {
+                    Console.WriteLine(bytesRead);
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
                     state.Packet = Packet.Deserialize(packetAsBytes);

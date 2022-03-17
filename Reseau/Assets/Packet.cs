@@ -8,6 +8,7 @@ public class Packet
 {
     private const string Localhost = "127.0.0.1";
     private const string DataEof = "<EOF>";
+    public const int MaxPacketSize = 149;
 
     public Packet()
     {
@@ -94,4 +95,54 @@ public class Packet
                                          + "Permission:" + this.Permission + "; "
                                          + "IdPlayer:" + this.IdPlayer + "; "
                                          + "Data:" + this.Data + "; ";
+
+    public List<Packet> Prepare()
+    {
+        var packets = new List<Packet>();
+        //Console.WriteLine("Length : " + this.Serialize().Length);
+        //Console.WriteLine(this);
+
+        // within authorized range of size
+        if (this.Serialize().Length < MaxPacketSize)
+        {
+            packets.Add(this);
+            return packets;
+        }
+
+        var data = this.Data;
+        var packet = this;
+        packet.Data = "";
+
+        //Console.WriteLine(packet.ToString());
+        var mainBytes = packet.Serialize();
+        var mainBytesLength = mainBytes.Length;
+        var dataBytesMaxLength = MaxPacketSize - mainBytesLength;
+        //Console.WriteLine("mainBytesLength : " + mainBytesLength + " ; dataBytesMaxLength : " + dataBytesMaxLength);
+
+        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        var dataString = JsonSerializer.Serialize(data, jso);
+        dataString = dataString[1..^1];
+        var dataBytes = Encoding.ASCII.GetBytes(dataString);
+        var dataBytesTotalLength = dataBytes.Length;
+        //Console.WriteLine("dataBytesTotalLength : " + dataBytesTotalLength + " ; All data to send : " + dataString);
+
+        for (var i = 0; i < dataBytesTotalLength; i += dataBytesMaxLength)
+        {
+            var el = Deserialize(mainBytes);
+            if (i + dataBytesMaxLength > dataBytesTotalLength)
+            {
+                //Console.WriteLine(dataString.Substring(i, dataBytesTotalLength-i));
+                el.Data = dataString[i..dataBytesTotalLength];
+            }
+            else
+            {
+                //Console.WriteLine(dataString.Substring(i, dataBytesMaxLength));
+                el.Data = dataString.Substring(i, dataBytesMaxLength);
+            }
+
+            packets.Add(el);
+        }
+
+        return packets;
+    }
 }

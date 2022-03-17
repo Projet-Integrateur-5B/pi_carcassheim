@@ -10,7 +10,7 @@ public class Client
     public static void StartClient(byte number, string data)
     {
         // Data buffer for incoming data.
-        var bytes = new byte[1024];
+        var bytes = new byte[Packet.MaxPacketSize];
 
         // Connect to a remote device.
         try
@@ -33,18 +33,23 @@ public class Client
                 sender.Connect(remoteEP);
                 Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
 
-                var packet = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
-                var packetAsBytes = packet.Serialize();
-                bytes = new byte[packetAsBytes.Length];
+                var original = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
+                var packets = original.Prepare();
 
-                // Send the data through the socket.
-                var bytesSent = sender.Send(packet.Serialize());
-                Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
+                foreach (var packet in packets)
+                {
+                    var packetAsBytes = packet.Serialize();
+                    bytes = new byte[packetAsBytes.Length];
+
+                    // Send the data through the socket.
+                    var bytesSent = sender.Send(packet.Serialize());
+                    Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
+                }
 
                 // Receive the response from the remote device.
                 var bytesRec = sender.Receive(bytes);
-                packet = Packet.Deserialize(bytes);
-                Console.WriteLine("Read {0} bytes => \t" + packet, bytesRec);
+                var recv = Packet.Deserialize(bytes);
+                Console.WriteLine("Read {0} bytes => \t" + recv, bytesRec);
 
                 //Release the socket.
                 sender.Shutdown(SocketShutdown.Both);
