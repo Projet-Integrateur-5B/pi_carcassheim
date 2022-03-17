@@ -30,12 +30,14 @@ public class AccountMenu : Miscellaneous
 	public void HideAccount()
 	{
 		ResetWarningTextAM();
+		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "ConnectionMenu");
 	}
 
 	public void HideAccountConnected()
 	{
 		ResetWarningTextAM();
+		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
 	}

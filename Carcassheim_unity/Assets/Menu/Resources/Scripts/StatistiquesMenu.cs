@@ -2,6 +2,7 @@
 {
 	public void HideStat()
 	{
+		HidePopUpOptions();
 		ChangeMenu("StatMenu", "HomeMenu");
 	}
 }

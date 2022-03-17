@@ -25,6 +25,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	{
 		ColorUtility.TryParseHtmlString("#1e90ff", out colHover);
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
+		// ---------------------------------- PATCH : ------------------------------------
+		// à ameliorer :
+		Debug.Log("Liste des scripts : ");
+		getScripts();
+		// à enlever : 
 		_option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
 		_acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
 		_home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
@@ -32,19 +37,26 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 		_cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
 		_stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
 		_sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
+		// ---------------------------------- FIN PATCH : --------------------------------
 		//Fetch the current EventSystem. Make sure your Scene has one.
 		eventSystem = EventSystem.current;
 		// Cursor Texture :
-		_cursorTexture = Resources.Load("basic_01 BLUE") as Texture2D;
+		_cursorTexture = Resources.Load("Miscellaneous/basic_01 BLUE") as Texture2D;
 		Cursor.SetCursor(_cursorTexture, _cursorHotspot, _cursorMode);
 		// Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
 		foreach (Transform menu in GameObject.Find("SubMenus").transform)
 			foreach (Transform child in menu.Find("Buttons").transform)
 			{
-				if(child.GetComponent<Button>())
-					child.GetComponent<Button>().onClick.AddListener(() => MethodCall(child.name));
-				if(child.GetComponent<Toggle>())
-					child.GetComponent<Toggle>().onValueChanged.AddListener(delegate { MethodCall(child.name); });
+				if (child.GetComponent<Button>())
+					child.GetComponent<Button>().onClick.AddListener(delegate
+					{
+						MethodCall(child.name);
+					});
+				if (child.GetComponent<Toggle>())
+					child.GetComponent<Toggle>().onValueChanged.AddListener(delegate
+					{
+						MethodCall(child.name);
+					});
 			}
 		//selection de base lors du start : firstSelect, ce bouton sera bleu et selectionné
 		//pour l'instant ShowOptions mais à modifier
@@ -87,45 +99,31 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 			{
 				//le bouton sera celui pointe par la souris
 				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-				//on le selectionne
 				if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
 					eventSystem.SetSelectedGameObject(currentGo);
-				//si les conditions le permettent, on selectionne ce bouton
-				if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
-					ColorButtonSelected();
-				//on deselectionne l'ancien
-				if (previousGo != currentGo)
-				{
-					if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
-					{
-						ColorButtonDeselected();
-						previousGo = currentGo;
-					}
-				}
+				selectionChange();
+			}
+		}
+	}
+
+	private void selectionChange()
+	{
+		currentGo = eventSystem.currentSelectedGameObject;
+		if (currentGo.GetComponent<Button>().interactable && currentGo.GetComponentInChildren<Text>())
+		{
+			ColorButtonSelected();
+			if (previousGo != currentGo)
+			{
+				ColorButtonDeselected();
+				previousGo = currentGo;
 			}
 		}
 	}
 
 	private void couleur_touches()
 	{
-		//le go actuel est celui qui est selectionne
-		if (currentGo != eventSystem.currentSelectedGameObject /*&& eventSystem.currentSelectedGameObject != null*/)
-		{
-			currentGo = eventSystem.currentSelectedGameObject;
-			//bouton en bleu
-			if (currentGo.GetComponent<Button>())
-				if (currentGo.GetComponent<Button>().interactable && currentGo.GetComponentInChildren<Text>())
-					ColorButtonSelected();
-			//on deselectionne l'ancien et il devient blanc
-			if (previousGo != currentGo)
-				//double condition pour eviter qu'avec les touches du clavier on aille sur un scroller, inputfield... tout ce qui n'est pas un bouton ou toggle et il faut que le bouton ai un texte
-				if (currentGo.GetComponent<Button>())
-					if (currentGo.GetComponent<Button>().interactable && currentGo.GetComponentInChildren<Text>())
-					{
-						ColorButtonDeselected();
-						previousGo = currentGo;
-					}
-		}
+		if (currentGo != eventSystem.currentSelectedGameObject)
+			selectionChange();
 	}
 
 	public void selectionButton()
@@ -135,25 +133,13 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 			//on selectionne le premier bouton enfant du menu dans lequel on va
 			eventSystem.SetSelectedGameObject(firstActiveChild(GameObject.Find("Buttons")));
 			SetMenuChanged(false);
-			currentGo = eventSystem.currentSelectedGameObject;
-			//comme avant pour les couleurs
-			//condition qui evite de mettre en couleur un bouton non selectionnable
-			if (currentGo.GetComponent<Button>().interactable)
-			{
-				ColorButtonSelected();
-				if (previousGo != currentGo)
-				{
-					ColorButtonDeselected();
-					previousGo = currentGo;
-				}
-			}
+			selectionChange();
 		}
 	}
 
 	/* Broadcast message will call the passed in function for all the scripts on the game object 
    that have that function and for all children objects that also have that function. 
-   Sendmessage only calls that function for scripts on the gameobject that have that function.
- */
+   Sendmessage only calls that function for scripts on the gameobject that have that function. */
 	public void MethodCall(string methode)
 	{
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
