@@ -48,7 +48,9 @@ public class Client
 
                 // Receive the response from the remote device.
                 var bytesRec = sender.Receive(bytes);
-                var recv = Packet.Deserialize(bytes);
+                var packetAsBytes2 = new byte[bytesRec];
+                Array.Copy(bytes, packetAsBytes2, bytesRec);
+                var recv = Packet.Deserialize(packetAsBytes2);
                 Console.WriteLine("Read {0} bytes => \t" + recv, bytesRec);
 
                 //Release the socket.
@@ -78,7 +80,7 @@ public class Client
     public static int Main()
     {
         byte nb = 18;
-        var data = "petit test des familles";
+        var data = "petit test des familles petit test des familles petit test des familles";
         StartClient(nb, data);
         return 0;
     }

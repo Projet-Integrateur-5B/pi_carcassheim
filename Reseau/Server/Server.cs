@@ -168,6 +168,7 @@ public class Server
     private static void Send(IAsyncResult ar)
     {
         var state = (StateObject?)ar.AsyncState;
+        state.Packet.Data = "test reussit";
         var packetAsBytes = state.Packet.Serialize();
         var size = packetAsBytes.Length;
 
