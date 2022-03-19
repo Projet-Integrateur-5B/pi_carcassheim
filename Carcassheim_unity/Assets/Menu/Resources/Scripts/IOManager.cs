@@ -92,18 +92,22 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		if (eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Button>() || eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Toggle>())
+		//si on est sur un bouton different de celui selectionne, alors on le selectionne et celui ci devient bleu
+		if (eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject != eventSystem.currentSelectedGameObject)
 		{
-			//si on est sur un bouton different de celui selectionne, alors on le selectionne et celui ci devient bleu
-			if (eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject != eventSystem.currentSelectedGameObject)
-			{
+			if(eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Button>() 
+			&& eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Button>().interactable)
+            {
 				//le bouton sera celui pointe par la souris
 				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-				if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
-				{ 
-					eventSystem.SetSelectedGameObject(currentGo);
-					selectionChange();
-				}
+				eventSystem.SetSelectedGameObject(currentGo);
+				selectionChange();
+			}
+			else if(eventData.pointerCurrentRaycast.gameObject.transform.parent.transform.parent.gameObject.GetComponent<Toggle>())
+            {
+				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.transform.parent.gameObject;
+				eventSystem.SetSelectedGameObject(currentGo);
+				selectionChange();
 			}
 		}
 	}
@@ -111,17 +115,30 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	private void selectionChange()
 	{
 		currentGo = eventSystem.currentSelectedGameObject;
-		if (!currentGo.GetComponent<InputField>() && currentGo.GetComponent<Button>().interactable)
+		if (/*currentGo.GetComponent<Toggle>() ||*/ !currentGo.GetComponent<InputField>() /*|| currentGo.GetComponent<Button>().interactable*/)
 		{
 			if (currentGo.GetComponentInChildren<Text>())
 				ColorButtonSelected();
-			else currentGo.GetComponent<Image>().color = colHover;
-
+			else if (currentGo.GetComponent<Image>())
+				currentGo.GetComponent<Image>().color = colHover;
+			else if(currentGo.GetComponent<Toggle>())
+			{
+				ColorBlock cd = currentGo.GetComponent<Toggle>().colors;
+				cd.selectedColor = colHover;
+				currentGo.GetComponent<Toggle>().colors = cd;
+			}
 			if (previousGo != currentGo)
 			{
 				if (previousGo.GetComponentInChildren<Text>())
 					ColorButtonDeselected();
-				else previousGo.GetComponent<Image>().color = Color.white;
+				else if (previousGo.GetComponent<Image>())
+					previousGo.GetComponent<Image>().color = Color.white;
+				else if(previousGo.GetComponent<Toggle>())
+				{
+					ColorBlock cb = previousGo.GetComponent<Toggle>().colors;
+					cb.selectedColor = Color.white;
+					previousGo.GetComponent<Toggle>().colors = cb;
+				}
 				previousGo = currentGo;
 			}
 		}
