@@ -44,6 +44,13 @@ public class Plateau
         PoserTuile(tuile, 0, 0, 0);
     }
 
+    public void PoserTuile(Tuile tuile, Position pos)
+    {
+        PoserTuile(tuile, pos.X, pos.Y, pos.ROT);
+    }
+
+
+
     public void PoserTuile(int idTuile, int x, int y, int rot)
     {
         PoserTuile(Tuile.DicoTuiles[idTuile], x, y, rot);

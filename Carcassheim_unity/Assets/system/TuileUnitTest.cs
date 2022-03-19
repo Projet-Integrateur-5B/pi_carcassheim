@@ -34,9 +34,9 @@ public class TuileUnitTest
         for (int i = 0; i < 12; i++)
         {
             actualResult[i] = subject.IdSlotFromPositionInterne(i);
-            
+
             Debug.Log(actualResult[i] == expectedResult[i]);
-            
+
         }
     }
 }

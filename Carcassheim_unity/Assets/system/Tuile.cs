@@ -53,12 +53,11 @@ public partial class Tuile
         _lienSlotPosition = lien;
     }
 
-    public Tuile(int id, Slot[] slots, int[][] lien, int proba)
+    public Tuile(int id, Slot[] slots, int[][] lien)
     {
         _nombreSlot = slots.Length;
         _id = id;
         _slots = slots;
-        _proba = proba;
 
         int[][] actualLink = new int[_nombreSlot][];
 
@@ -144,4 +143,6 @@ public partial class Tuile
     {
         DicoTuiles = new Dictionary<int, Tuile>();
     }
+
+    public static implicit operator Tuile(int id) => DicoTuiles[id];
 }
