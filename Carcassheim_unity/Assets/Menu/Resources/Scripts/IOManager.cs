@@ -100,8 +100,10 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 				//le bouton sera celui pointe par la souris
 				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 				if (currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable)
+				{ 
 					eventSystem.SetSelectedGameObject(currentGo);
-				selectionChange();
+					selectionChange();
+				}
 			}
 		}
 	}
