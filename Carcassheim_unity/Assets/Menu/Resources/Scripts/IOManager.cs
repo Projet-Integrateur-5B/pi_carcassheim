@@ -111,12 +111,17 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	private void selectionChange()
 	{
 		currentGo = eventSystem.currentSelectedGameObject;
-		if (currentGo.GetComponent<Button>().interactable && currentGo.GetComponentInChildren<Text>())
+		if (!currentGo.GetComponent<InputField>() && currentGo.GetComponent<Button>().interactable)
 		{
-			ColorButtonSelected();
+			if (currentGo.GetComponentInChildren<Text>())
+				ColorButtonSelected();
+			else currentGo.GetComponent<Image>().color = colHover;
+
 			if (previousGo != currentGo)
 			{
-				ColorButtonDeselected();
+				if (previousGo.GetComponentInChildren<Text>())
+					ColorButtonDeselected();
+				else previousGo.GetComponent<Image>().color = Color.white;
 				previousGo = currentGo;
 			}
 		}
