@@ -7,9 +7,7 @@ public class Dbtest : MonoBehaviour
 {
    
    private void Start(){
-       string test = "chèvre";
-       AddExtension(test);
-       ReadDatabase();
+       //mettre les fonctions ici 
        
    }
    int GetAge(string DateNaiss)
