@@ -86,7 +86,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	public void ColorButtonDeselected()
 	{
 		_btnText = previousGo.GetComponentInChildren<Text>();
-		_btnText.color = Color.white;
+		if (_btnText.transform.parent.name == "CGU" || _btnText.transform.parent.name == "ForgottenPwdUser")
+			_btnText.color = Color.green;
+		else _btnText.color = Color.white;
 		_btnText.fontSize -= 3;
 	}
 
@@ -133,7 +135,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 					ColorButtonDeselected();
 				else if (previousGo.GetComponent<Image>())
 					previousGo.GetComponent<Image>().color = Color.white;
-				else if(previousGo.GetComponent<Toggle>())
+				else if (previousGo.GetComponent<Toggle>())
 				{
 					ColorBlock cb = previousGo.GetComponent<Toggle>().colors;
 					cb.selectedColor = Color.white;
