@@ -159,11 +159,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			string previousMenu = GetPreviousMenu().name.Substring(0, GetPreviousMenu().name.Length - 4);
 			foreach (Transform child in GameObject.Find("Buttons").transform)
 			{
-				eventSystem.SetSelectedGameObject(FirstActiveChild(GameObject.Find("Buttons")));
-				if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
+				if (child.gameObject.activeSelf)
 				{
-					eventSystem.SetSelectedGameObject(child.gameObject);
-					break;
+					eventSystem.SetSelectedGameObject(FirstActiveChild(GameObject.Find("Buttons")));
+					if (child.name.Contains(previousMenu))
+					{
+						eventSystem.SetSelectedGameObject(child.gameObject);
+						break;
+					}
 				}
 			}
 			SetMenuChanged(false);
