@@ -156,8 +156,16 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	{
 		if (HasMenuChanged() == true)
 		{
-			//on selectionne le premier bouton enfant du menu dans lequel on va
-			eventSystem.SetSelectedGameObject(firstActiveChild(GameObject.Find("Buttons")));
+			string previousMenu = getPreviousMenu().name.Substring(0, getPreviousMenu().name.Length - 4);
+			foreach (Transform child in GameObject.Find("Buttons").transform)
+			{
+				eventSystem.SetSelectedGameObject(firstActiveChild(GameObject.Find("Buttons")));
+				if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
+				{
+					eventSystem.SetSelectedGameObject(child.gameObject);
+					break;
+				}
+			}
 			SetMenuChanged(false);
 			selectionChange();
 		}
