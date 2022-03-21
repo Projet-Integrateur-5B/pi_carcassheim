@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHandler
+public class IOManager : Miscellaneous, IPointerEnterHandler
 {
 	private OptionsMenu _option;
 	private AccountMenu _acc;
@@ -28,7 +28,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 		// ---------------------------------- PATCH : ------------------------------------
 		// à ameliorer :
 		Debug.Log("Liste des scripts : ");
-		getScripts();
+		GetScripts();
 		// à enlever : 
 		_option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
 		_acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
@@ -60,7 +60,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 			}
 		//selection de base lors du start : firstSelect, ce bouton sera bleu et selectionné
 		//pour l'instant ShowOptions mais à modifier
-		currentGo = firstActiveChild(GameObject.Find("Buttons"));
+		currentGo = FirstActiveChild(GameObject.Find("Buttons"));
 		previousGo = currentGo;
 		eventSystem.SetSelectedGameObject(currentGo);
 		_btnText = eventSystem.currentSelectedGameObject.GetComponentInChildren<Text>();
@@ -73,7 +73,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	{
 		//si on appuie sur une touche de deplacement
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-			couleur_touches();
+			Couleur_touches();
 	}
 
 	public void ColorButtonSelected()
@@ -103,18 +103,18 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 				//le bouton sera celui pointe par la souris
 				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 				eventSystem.SetSelectedGameObject(currentGo);
-				selectionChange();
+				SelectionChange();
 			}
 			else if(eventData.pointerCurrentRaycast.gameObject.transform.parent.transform.parent.gameObject.GetComponent<Toggle>())
             {
 				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.transform.parent.gameObject;
 				eventSystem.SetSelectedGameObject(currentGo);
-				selectionChange();
+				SelectionChange();
 			}
 		}
 	}
 
-	private void selectionChange()
+	private void SelectionChange()
 	{
 		currentGo = eventSystem.currentSelectedGameObject;
 		if (/*currentGo.GetComponent<Toggle>() ||*/ !currentGo.GetComponent<InputField>() /*|| currentGo.GetComponent<Button>().interactable*/)
@@ -146,20 +146,20 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 		}
 	}
 
-	private void couleur_touches()
+	private void Couleur_touches()
 	{
 		if (currentGo != eventSystem.currentSelectedGameObject)
-			selectionChange();
+			SelectionChange();
 	}
 
-	public void selectionButton()
+	public void SelectionButton()
 	{
 		if (HasMenuChanged() == true)
 		{
-			string previousMenu = getPreviousMenu().name.Substring(0, getPreviousMenu().name.Length - 4);
+			string previousMenu = GetPreviousMenu().name.Substring(0, GetPreviousMenu().name.Length - 4);
 			foreach (Transform child in GameObject.Find("Buttons").transform)
 			{
-				eventSystem.SetSelectedGameObject(firstActiveChild(GameObject.Find("Buttons")));
+				eventSystem.SetSelectedGameObject(FirstActiveChild(GameObject.Find("Buttons")));
 				if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
 				{
 					eventSystem.SetSelectedGameObject(child.gameObject);
@@ -167,7 +167,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 				}
 			}
 			SetMenuChanged(false);
-			selectionChange();
+			SelectionChange();
 		}
 	}
 
@@ -178,6 +178,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler //, IPointerExitHan
 	{
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		gameObject.SendMessage(methode, null);
-		selectionButton();
+		SelectionButton();
 	}
 }

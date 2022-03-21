@@ -26,7 +26,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	}
 
 	// PATCH : 
-	public void getScripts()
+	public void GetScripts()
 	{
 		var scripts = Resources.LoadAll<MonoScript>("Scripts");
 		int len = scripts.Length;
@@ -85,17 +85,17 @@ public abstract class Miscellaneous : MonoBehaviour
 		return s_menuHasChanged;
 	}
 
-	public GameObject getPreviousMenu()
+	public GameObject GetPreviousMenu()
 	{
 		return previousMenu;
 	}
 
-	public GameObject getNextMenu()
+	public GameObject GetNextMenu()
 	{
 		return nextMenu;
 	}
 
-	public GameObject firstActiveChild(GameObject FAGO)
+	public GameObject FirstActiveChild(GameObject FAGO)
 	{
 		foreach (Transform child in FAGO.transform)
 			if (child.gameObject.activeSelf)
