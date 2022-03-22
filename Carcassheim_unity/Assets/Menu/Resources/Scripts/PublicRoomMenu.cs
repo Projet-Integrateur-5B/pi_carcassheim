@@ -5,9 +5,6 @@ public class PublicRoomMenu : Miscellaneous
 {
 	void Start()
 	{
-		Transform tmpGO = GameObject.Find("ShowRoomParameters").transform;
-		tmpGO.Find("WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = true;
-		Debug.Log(tmpGO);
 	}
 
 	public void HideRoom()
