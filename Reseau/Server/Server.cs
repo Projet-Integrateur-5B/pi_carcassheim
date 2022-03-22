@@ -37,7 +37,7 @@ public class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, 11000);
+        var localEndPoint = new IPEndPoint(ipAddress, Packet.PortPrincipale);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -168,7 +168,8 @@ public class Server
     private static void Send(IAsyncResult ar)
     {
         var state = (StateObject?)ar.AsyncState;
-        state.Packet.Data = "test reussit";
+        state.Packet.Data = "";
+        state.Packet.Status = true; //false si probleme
         var packetAsBytes = state.Packet.Serialize();
         var size = packetAsBytes.Length;
 

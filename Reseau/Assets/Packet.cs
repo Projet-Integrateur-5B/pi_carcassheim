@@ -9,6 +9,7 @@ public class Packet
     private const string Localhost = "127.0.0.1";
     private const string DataEof = "<EOF>";
     public const int MaxPacketSize = 512;
+    public const int PortPrincipale = 19000;
 
     public Packet()
     {

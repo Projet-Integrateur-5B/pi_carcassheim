@@ -18,10 +18,9 @@ public class Client
             Console.WriteLine("Client is setting up...");
 
             // Establish the remote endpoint for the socket.
-            // This example uses port 11000 on the local computer.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, 11000);
+            var remoteEP = new IPEndPoint(ipAddress, Packet.PortPrincipale);
 
             // Create a TCP/IP  socket.
             var sender = new Socket(ipAddress.AddressFamily,
@@ -33,7 +32,7 @@ public class Client
                 sender.Connect(remoteEP);
                 Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
 
-                var original = new Packet(false, ipAddress.ToString(), 11000, 0, number, 999, data);
+                var original = new Packet(false, ipAddress.ToString(), Packet.PortPrincipale, 0, number, 999, data);
                 var packets = original.Prepare();
 
                 foreach (var packet in packets)
@@ -51,7 +50,7 @@ public class Client
                 var packetAsBytes2 = new byte[bytesRec];
                 Array.Copy(bytes, packetAsBytes2, bytesRec);
                 var recv = Packet.Deserialize(packetAsBytes2);
-                Console.WriteLine("Read {0} bytes => \t" + recv, bytesRec);
+                Console.WriteLine("Read {0} bytes => permission : {1} \n", bytesRec,recv.Status);
 
                 //Release the socket.
                 sender.Shutdown(SocketShutdown.Both);
@@ -80,7 +79,7 @@ public class Client
     public static int Main()
     {
         byte nb = 18;
-        var data = "petit test des familles petit test des familles petit test des familles";
+        var data = "petit test";
         StartClient(nb, data);
         return 0;
     }
