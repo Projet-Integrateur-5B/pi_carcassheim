@@ -136,6 +136,8 @@ public class Server
                             case 1:
                                 //fonction connection test
                                 break;
+                            default:
+                                break;
                         }
                         // Echo the data back to the client.
                         Send(ar);
