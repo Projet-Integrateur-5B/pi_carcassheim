@@ -6,24 +6,20 @@ using System.Text.Json;
 
 public class Packet
 {
-    private const string Localhost = "127.0.0.1";
     private const string DataEof = "<EOF>";
-    public const int MaxPacketSize = 512;
+    public const int MaxPacketSize = 256;
     public const int PortPrincipale = 19000;
 
     public Packet()
     {
         this.Type = false;
-        this.IpAddress = new string(Localhost);
         this.Data = new string("" + DataEof);
     }
 
-    public Packet(bool type, string ipAddress, ushort port, ulong idRoom, byte idMessage,
+    public Packet(bool type, ulong idRoom, byte idMessage,
         bool status, byte permission, ulong idPlayer, string data)
     {
         this.Type = type;
-        this.IpAddress = new string(ipAddress);
-        this.Port = port;
         this.IdRoom = idRoom;
         this.IdMessage = idMessage;
         this.Status = status;
@@ -33,12 +29,10 @@ public class Packet
     }
 
     // type == false (client -> server)
-    public Packet(bool type, string ipAddress, ushort port, ulong idRoom, byte idMessage,
+    public Packet(bool type, ulong idRoom, byte idMessage,
         ulong idPlayer, string data)
     {
         this.Type = type;
-        this.IpAddress = new string(ipAddress);
-        this.Port = port;
         this.IdRoom = idRoom;
         this.IdMessage = idMessage;
         this.IdPlayer = idPlayer;
@@ -54,15 +48,11 @@ public class Packet
         this.Permission = permission;
         this.IdPlayer = idPlayer;
         this.Data = new string(data + DataEof);
-        this.IpAddress = new string(Localhost); // unused, escape errors
     }
 
     public bool Type { get; set; } // false (client -> server) - true (server -> client)
 
     // type == false (client -> server)
-    /* public IPAddress IpAddress { get; set; } */
-    public string IpAddress { get; set; }
-    public ushort Port { get; set; }
     public ulong IdRoom { get; set; } // default : 0 -> not destined to a room
     public byte IdMessage { get; set; } // à définir
 
@@ -88,8 +78,6 @@ public class Packet
     }
 
     public override string ToString() => "Type:" + this.Type + "; "
-                                         + "IpAddress:" + this.IpAddress + "; "
-                                         + "Port:" + this.Port + "; "
                                          + "IdRoom:" + this.IdRoom + "; "
                                          + "IdMessage:" + this.IdMessage + "; "
                                          + "Status:" + this.Status + "; "

@@ -131,7 +131,17 @@ public class Server
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
                                           "\n\t Data buffer =>\t" + state.Sb +
                                           "\n\t => Every packet has been received !", bytesRead);
-
+                        switch (state.Packet.IdMessage)
+                        {
+                            case 1:
+                                //fonction connection test
+                                break;
+                            case 2:
+                                //inscription
+                                break;
+                            default:
+                                break;
+                        }
                         // Echo the data back to the client.
                         Send(ar);
                     }

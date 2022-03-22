@@ -32,7 +32,7 @@ public class Client
                 sender.Connect(remoteEP);
                 Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
 
-                var original = new Packet(false, ipAddress.ToString(), Packet.PortPrincipale, 0, number, 999, data);
+                var original = new Packet(false, 0, number, 999, data);
                 var packets = original.Prepare();
 
                 foreach (var packet in packets)
@@ -50,7 +50,14 @@ public class Client
                 var packetAsBytes2 = new byte[bytesRec];
                 Array.Copy(bytes, packetAsBytes2, bytesRec);
                 var recv = Packet.Deserialize(packetAsBytes2);
-                Console.WriteLine("Read {0} bytes => permission : {1} \n", bytesRec,recv.Status);
+                if (recv.Status)
+                {
+                    Console.WriteLine("Read {0} bytes => permission accepted \n", bytesRec);
+                }
+                else
+                {
+                    Console.WriteLine("Read {0} bytes => permission denied \n", bytesRec);
+                }
 
                 //Release the socket.
                 sender.Shutdown(SocketShutdown.Both);
@@ -79,6 +86,7 @@ public class Client
     public static int Main()
     {
         byte nb = 18;
+        //string[] data = { "petit", "test" };
         var data = "petit test";
         StartClient(nb, data);
         return 0;
