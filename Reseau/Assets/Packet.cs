@@ -7,7 +7,7 @@ using System.Text.Json;
 public class Packet
 {
     private const string DataEof = "<EOF>";
-    public const int MaxPacketSize = 256;
+    public const int MaxPacketSize = 512;
     public const int PortPrincipale = 19000;
 
     public Packet()

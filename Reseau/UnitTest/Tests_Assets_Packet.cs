@@ -7,7 +7,6 @@ using NUnit.Framework;
 
 public class TestsAssetsPacket
 {
-    private const string Localhost = "127.0.0.1";
     private const string DataEof = "<EOF>";
     private Packet original = new();
     private string originalAsString = new("");
@@ -70,7 +69,7 @@ public class TestsAssetsPacket
         var permission = this.original.Permission;
         var idPlayer = this.original.IdPlayer;
 
-        var packet = new Packet(type,idRoom, idMessage, status, permission,
+        var packet = new Packet(type, idRoom, idMessage, status, permission,
             idPlayer,
             "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
         var p0 = new Packet(type, idRoom, idMessage, status, permission, idPlayer,
