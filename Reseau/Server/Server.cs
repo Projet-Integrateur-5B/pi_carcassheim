@@ -136,9 +136,6 @@ public class Server
                             case 1:
                                 //fonction connection test
                                 break;
-                            case 2:
-                                //inscription
-                                break;
                             default:
                                 break;
                         }
