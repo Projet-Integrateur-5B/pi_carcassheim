@@ -3,6 +3,8 @@ using Mono.Data.Sqlite;
 using System.Data;
 using System;
 
+private string commandResult = "";
+
 public class DB : MonoBehaviour
 {
     private string dbName = "URI=file:Assets/projet.db";
@@ -13,68 +15,67 @@ public class DB : MonoBehaviour
     // Update is called once per frame
     void Update()
     {}
+  
+/* -------------------------------- COMMAND --------------------------------- */
+    public void command(string s)
+    {
+        using (var connection = new SqliteConnection(dbName))
+        {
+            connection.Open();
+            using (var cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = s;
+                cmd.ExecuteNonQuery();
+                try { commandResult = cmd.ExecuteScalar().ToString(); }
+                catch {Console.Write("Erreur :" + commandResult);} 
+            }
+            connection.Close();
+        }
+    }
+
+    public string getCommandResult()
+    {
+        return commandResult;
+    }
+/* -------------------------------------------------------------------------- */
 
     /// <summary>
-    /// Fonction qui incrémente le nombre de parties jouées par un utilisateur
-    /// appelée systematiquement à la fin de chaque partie pour tous les
+    /// Fonction qui incremente le nombre de parties jouees par un utilisateur
+    /// appelee systematiquement e la fin de chaque partie pour tous les
     /// joueurs
     /// </summary>
     /// <param name="IDU">Identifiant de l'utilisateur</param>
     public void IncrementeNbParties(int IDU)
     {
-        using (var connection = new SqliteConnection(dbName))
-        {
-            connection.Open(); 
-            using (var cmd = connection.CreateCommand())
-            {
-                cmd.CommandText = "update Utilisateur set NbParties =  NbParties + 1 where IDU = " + IDU +";";
-                cmd.ExecuteNonQuery();
-            }
-            connection.Close();
-        }
+        string s = "update Utilisateur set NbParties =  NbParties + 1 where IDU = " + IDU +";";
+        command(s);
     }
 
     /// <summary>
-    /// Fonction qui incrémente le nombre de parties gagnées par un utilisateur le cas échaeant
+    /// Fonction qui incremente le nombre de parties gagnees par un utilisateur le cas echaeant
     /// </summary>
     /// <param name="IDU">Identifiant du vainqueur</param>
     public void IncrementeVictoires(int IDU)
     {
-        using (var connection = new SqliteConnection(dbName))
-        {
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
-            {
-                cmd.CommandText = "update Utilisateur set victoires =  victoires + 1 where IDU = " + IDU + ";";
-                cmd.ExecuteNonQuery();
-            }
-            connection.Close();
-        }
+        string s = "update Utilisateur set victoires =  victoires + 1 where IDU = " + IDU + ";";
+        command(s);
     }
 
     /// <summary>
-    /// Fonction qui incrémente le nombre de parties perdues par un utilisateur le cas échaeant
+    /// Fonction qui incremente le nombre de parties perdues par un utilisateur le cas echaeant
     /// </summary>
     /// <param name="IDU">Identifiant du vaincu</param>
     public void IncrementeDefaites(int IDU)
     {
-        using (var connection = new SqliteConnection(dbName))
-        {
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
-            {
-                cmd.CommandText = "update Utilisateur set defaites =  defaites + 1 where IDU = " + IDU + ";";
-                cmd.ExecuteNonQuery();
-            }
-            connection.Close();
-        }
+        string s = "update Utilisateur set defaites =  defaites + 1 where IDU = " + IDU + ";";
+        command(s);
     }
 
     /// <summary>
     /// Fonction renvoyant l'XP de'un utilisateur
     /// Elle est essentiellement une fonction intermediaire pour
-    /// incrémentation de l'XP d'un utilisateur pour ne pas
-    /// exécuter deux commandes SQLite en même temps
+    /// incrementation de l'XP d'un utilisateur pour ne pas
+    /// executer deux commandes SQLite en meme temps
     /// et bloquer la BDD
     /// </summary>
     /// <param name="IDU">Identifiant de l'utilisateur</param>
@@ -91,10 +92,10 @@ public class DB : MonoBehaviour
     }
 
     /// <summary>
-    /// Fonction qui incrémente l'XP et le cas échéant le niveau d'un utilisateur qui arrive à XP
+    /// Fonction qui incremente l'XP et le cas echeant le niveau d'un utilisateur qui arrive e XP
     /// </summary>
     /// <param name="IDU">Identifiant de l'utilisateur</param>
-    /// <param name="XP">Le nombre de points d'expérience à rajouter à l'utilisateur</param>
+    /// <param name="XP">Le nombre de points d'experience e rajouter e l'utilisateur</param>
     public void AddXP(int IDU, int XP)
     {
         int CurExp = GetXP(IDU);
@@ -121,4 +122,26 @@ public class DB : MonoBehaviour
         age = age / 365;
         return age;
     }
+
+    //  Renvoie une ID libre pour gÃ©nÃ©rer une nouvelle partie
+    public int idPartieLibre()
+    {
+        string s = "select count(*) from table Partie;";
+        command(s);
+        return Int32.Parse(getCommandResult());
+    }
+
+/* ---------------------------------- DROP ---------------------------------- */
+    public void Drop(string tableName)
+    {
+        string s = "DROP Table '" + tableName + "';";
+        command(s);
+    }
+
+    public void DropPartie()
+    {
+        Drop("PartieExt");
+        Drop("Partie");
+    }
+/* -------------------------------------------------------------------------- */
 }
