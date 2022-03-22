@@ -15,11 +15,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Etudes\\UFR\\L3\\S6\\Appli_serveur_test\\Appli_serveur_test\\Appli_serveur_test.csproj",
+      "projectUniqueName": "D:\\Etudes\\UFR\\L3\\S6\\pi_carcassonne\\Appli_serveur_test\\Appli_serveur_test\\Appli_serveur_test.csproj",
       "projectName": "Appli_serveur_test",
-      "projectPath": "D:\\Etudes\\UFR\\L3\\S6\\Appli_serveur_test\\Appli_serveur_test\\Appli_serveur_test.csproj",
+      "projectPath": "D:\\Etudes\\UFR\\L3\\S6\\pi_carcassonne\\Appli_serveur_test\\Appli_serveur_test\\Appli_serveur_test.csproj",
       "packagesPath": "C:\\Users\\Axel\\.nuget\\packages\\",
-      "outputPath": "D:\\Etudes\\UFR\\L3\\S6\\Appli_serveur_test\\Appli_serveur_test\\obj\\",
+      "outputPath": "D:\\Etudes\\UFR\\L3\\S6\\pi_carcassonne\\Appli_serveur_test\\Appli_serveur_test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
@@ -67,7 +67,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

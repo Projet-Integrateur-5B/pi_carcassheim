@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 
+using Server;
+
 namespace system
 {
 
@@ -168,6 +170,14 @@ namespace system
             {
                 thread.Join();
             }
+
+
+            // TEST COM
+            
+            //Ecoute serveur
+            Server.Server.StartListening();
+
+            // 
 
 
         }
