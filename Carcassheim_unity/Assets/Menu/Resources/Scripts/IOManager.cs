@@ -13,6 +13,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private CreditsMenu _cred;
 	private StatistiquesMenu _stat;
 	private RoomSelectionMenu _sroom;
+	private JoinByIdMenu _jid;
+	private PublicRoomMenu _proom;
+
 	private GameObject currentGo;
 	private Color _previousColor, colHover;
 	private Text _btnText;
@@ -27,8 +30,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		// ---------------------------------- PATCH : ------------------------------------
 		// à ameliorer :
-		Debug.Log("Liste des scripts : ");
-		GetScripts();
+/* 		Debug.Log("Liste des scripts : ");
+		GetScripts(); */
 		// à enlever : 
 		_option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
 		_acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
@@ -37,6 +40,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		_cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
 		_stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
 		_sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
+		_jid = gameObject.AddComponent(typeof(JoinByIdMenu)) as JoinByIdMenu;
+		_proom = gameObject.AddComponent(typeof(PublicRoomMenu)) as PublicRoomMenu;
 		// ---------------------------------- FIN PATCH : --------------------------------
 		//Fetch the current EventSystem. Make sure your Scene has one.
 		eventSystem = EventSystem.current;
@@ -93,31 +98,23 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
-	{
+	{	currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 		//si on est sur un bouton different de celui selectionne, alors on le selectionne et celui ci devient bleu
-		if (eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject != eventSystem.currentSelectedGameObject)
-		{
-			if(eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Button>() 
-			&& eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<Button>().interactable)
+		if (currentGo != eventSystem.currentSelectedGameObject)
+			if((currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable) || currentGo.transform.parent.gameObject.GetComponent<Toggle>())
             {
-				//le bouton sera celui pointe par la souris
-				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+				if(currentGo.transform.parent.gameObject.GetComponent<Toggle>())
+					currentGo = currentGo.transform.parent.gameObject;
 				eventSystem.SetSelectedGameObject(currentGo);
 				SelectionChange();
 			}
-			else if(eventData.pointerCurrentRaycast.gameObject.transform.parent.transform.parent.gameObject.GetComponent<Toggle>())
-            {
-				currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.transform.parent.gameObject;
-				eventSystem.SetSelectedGameObject(currentGo);
-				SelectionChange();
-			}
-		}
 	}
 
 	private void SelectionChange()
 	{
 		currentGo = eventSystem.currentSelectedGameObject;
-		if (/*currentGo.GetComponent<Toggle>() ||*/ !currentGo.GetComponent<InputField>() /*|| currentGo.GetComponent<Button>().interactable*/)
+		ColorBlock cb;
+		if (!currentGo.GetComponent<InputField>())
 		{
 			if (currentGo.GetComponentInChildren<Text>())
 				ColorButtonSelected();
@@ -125,9 +122,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 				currentGo.GetComponent<Image>().color = colHover;
 			else if(currentGo.GetComponent<Toggle>())
 			{
-				ColorBlock cd = currentGo.GetComponent<Toggle>().colors;
-				cd.selectedColor = colHover;
-				currentGo.GetComponent<Toggle>().colors = cd;
+				cb = currentGo.GetComponent<Toggle>().colors;
+				cb.selectedColor = colHover;
+				currentGo.GetComponent<Toggle>().colors = cb;
 			}
 			if (previousGo != currentGo)
 			{
@@ -137,7 +134,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 					previousGo.GetComponent<Image>().color = Color.white;
 				else if (previousGo.GetComponent<Toggle>())
 				{
-					ColorBlock cb = previousGo.GetComponent<Toggle>().colors;
+					cb = previousGo.GetComponent<Toggle>().colors;
 					cb.selectedColor = Color.white;
 					previousGo.GetComponent<Toggle>().colors = cb;
 				}

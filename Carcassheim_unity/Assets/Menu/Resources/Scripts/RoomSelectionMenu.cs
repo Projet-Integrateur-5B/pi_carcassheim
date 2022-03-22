@@ -17,11 +17,13 @@ public class RoomSelectionMenu : Miscellaneous
 
 	public void ShowJoinById()
 	{
-
+		HidePopUpOptions();
+		ChangeMenu("RoomSelectionMenu", "JoinByIdMenu");
 	}
 
 	public void ShowJoinPublicRoom()
 	{
-				
+		HidePopUpOptions();
+		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");	
 	}
 }
