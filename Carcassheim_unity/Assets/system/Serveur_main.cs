@@ -158,6 +158,12 @@ public class Serveur_main : MonoBehaviour
         }
 
 
+        // Test de communication réseau
+        byte nb = 18;
+        var data = "petit test";
+        Client.StartClient(nb, data);
+
+
     }
 
     private int Creation_thread_com(){

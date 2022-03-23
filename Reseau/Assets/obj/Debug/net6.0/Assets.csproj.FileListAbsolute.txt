@@ -1,0 +1,12 @@
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\bin\Debug\net6.0\Assets.deps.json
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\bin\Debug\net6.0\Assets.dll
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\bin\Debug\net6.0\Assets.pdb
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.csproj.AssemblyReference.cache
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.GeneratedMSBuildEditorConfig.editorconfig
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.AssemblyInfoInputs.cache
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.AssemblyInfo.cs
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.csproj.CoreCompileInputs.cache
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.dll
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\refint\Assets.dll
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\Assets.pdb
+D:\Etudes\UFR\L3\S6\pi_carcassonne\Reseau\Assets\obj\Debug\net6.0\ref\Assets.dll
