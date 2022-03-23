@@ -3,9 +3,12 @@ using UnityEngine.UI;
 
 public class ConnectionMenu : Miscellaneous
 {
-	private Toggle toggle_afficher_mdp;
+	private Transform accMenu;
+	private InputField passwordCM;
 	void Start()
 	{
+		accMenu = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform;
+		passwordCM = accMenu.Find("InputField Password CM").GetComponent<InputField>();
 	}
 
 	public void ResetWarningTextCM()
@@ -28,14 +31,17 @@ public class ConnectionMenu : Miscellaneous
 		Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
 	}
 
-	public void ShowPwd()
+	public void ToggleValueChangedCM(Toggle curT)
 	{
-		if (GameObject.Find("ShowPwd").GetComponent<Toggle>().isOn == true)
-			GameObject.Find("InputField Password").GetComponent<InputField>().inputType = InputField.InputType.Standard;
-		else
-			GameObject.Find("InputField Password").GetComponent<InputField>().inputType = InputField.InputType.Password;
-		// Permet le changement immediat, sans cette ligne, on doit cliquer sur l'inputfield pour que le changement se fasse
-		GameObject.Find("InputField Password").GetComponent<InputField>().ForceLabelUpdate();
+		if (curT.name == "Toggle ShowPwdCM")
+		{
+			if (curT.isOn)
+				passwordCM.inputType = InputField.InputType.Standard;
+			else
+				passwordCM.inputType = InputField.InputType.Password;
+			//Changement immédiat sans reclic InputField
+			passwordCM.ForceLabelUpdate();
+		}
 	}
 
 	public void ShowAccount()
@@ -51,7 +57,7 @@ public class ConnectionMenu : Miscellaneous
 	public void Connect()
 	{
 		bool a = string.Equals(RemoveLastSpace(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text), "");
-		bool b = string.Equals(GameObject.Find("InputField Password").GetComponent<InputField>().text, "");
+		bool b = string.Equals(passwordCM.text, "");
 		SetState(a && b);
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
