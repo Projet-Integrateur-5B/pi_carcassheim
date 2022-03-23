@@ -27,6 +27,7 @@ public class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
+    private const int Port = 10000;
 
     public static void StartListening()
     {
@@ -37,7 +38,7 @@ public class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, 19000);
+        var localEndPoint = new IPEndPoint(ipAddress, Port);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -118,7 +119,7 @@ public class Server
                     Console.WriteLine(bytesRead);
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
-                    state.Packet = Packet.Deserialize(packetAsBytes);
+                    state.Packet = packetAsBytes.ByteArrayToPacket();
 
                     // There  might be more data, so store the data received so far.
                     state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
@@ -131,7 +132,14 @@ public class Server
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
                                           "\n\t Data buffer =>\t" + state.Sb +
                                           "\n\t => Every packet has been received !", bytesRead);
-
+                        switch (state.Packet.IdMessage)
+                        {
+                            case 1:
+                                //fonction connection test
+                                break;
+                            default:
+                                break;
+                        }
                         // Echo the data back to the client.
                         Send(ar);
                     }
@@ -168,8 +176,9 @@ public class Server
     private static void Send(IAsyncResult ar)
     {
         var state = (StateObject?)ar.AsyncState;
-        state.Packet.Data = "test reussit";
-        var packetAsBytes = state.Packet.Serialize();
+        state.Packet.Data = "";
+        state.Packet.Status = true; //false si probleme
+        var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
@@ -218,4 +227,9 @@ public class Server
         }
     }
 
+    public static int Main()
+    {
+        StartListening();
+        return 0;
+    }
 }
