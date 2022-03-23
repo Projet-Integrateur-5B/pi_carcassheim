@@ -41,12 +41,10 @@ public class OptionsMenu : Miscellaneous
 		}); */
 	}
 
-	void ToggleValueChanged(Toggle change)
+	public void ToggleValueChangedOM(Toggle curT)
 	{
-		// PATCH : à faire (french/english/german)
-		if (change == toggle_french && change.isOn)
-			Debug.Log("French");
-		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
+		if (curT.isOn)
+			Debug.Log(curT.name);
 	}
 
 	//---------------------------- Music/Sound Begin ----------------------------//

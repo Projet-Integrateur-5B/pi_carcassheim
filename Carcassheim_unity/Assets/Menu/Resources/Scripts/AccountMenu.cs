@@ -3,15 +3,13 @@ using UnityEngine.UI; /* using System.Text.RegularExpressions; // needed for Reg
 
 public class AccountMenu : Miscellaneous
 {
-	private Toggle toggle_afficher_mdp_ca;
 	private Transform accMenu;
 	private InputField passwordCA, confirmPwdCA;
-
+	private static bool boolCGU = false;
 	void Start()
 	{
 		// INITIALISATION
 		accMenu = GameObject.Find("SubMenus").transform.Find("AccountMenu").transform;
-		accMenu.Find("Toggle CA").GetComponent<Toggle>().isOn = false;
 		accMenu.Find("InputField Day CA").GetComponent<InputField>().characterLimit = 2;
 		accMenu.Find("InputField Month CA").GetComponent<InputField>().characterLimit = 2;
 		accMenu.Find("InputField Year CA").GetComponent<InputField>().characterLimit = 4;
@@ -42,15 +40,21 @@ public class AccountMenu : Miscellaneous
 		Connected();
 	}
 
-	public void ShowPwdAcc()
+	public void ToggleValueChangedAM(Toggle curT)
 	{
-		if (GameObject.Find("ShowPwdAcc").GetComponent<Toggle>().isOn == true)
-			passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Standard;
-		else
-			passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password;
-		//permet le changement immediat, sans cette ligne, on doit cliquer sur l'inputfield pour que le changement se fasse
-		passwordCA.ForceLabelUpdate();
-		confirmPwdCA.ForceLabelUpdate();
+		if (curT.name == "Toggle ShowPwdAcc")
+		{
+			if (curT.isOn)
+				passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Standard;
+			else
+				passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password;
+			//Changement immédiat sans reclic InputField
+			passwordCA.ForceLabelUpdate();
+			confirmPwdCA.ForceLabelUpdate();
+		}
+
+		if (curT.name == "Toggle CGU")
+			boolCGU = !boolCGU;
 	}
 
 	public bool GetInputFields()
@@ -69,12 +73,12 @@ public class AccountMenu : Miscellaneous
 
 	public void CreateAccount()
 	{
-		bool tmpBool = GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn;
+		//bool tmpBool = GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn;
 		GameObject tmpGO = GameObject.Find("Create Account");
 		//Texte deborde sur formulaire. Rendre code portable et utilisable :
 		// Modification position texte en ajoutant a sa coordonne la moitie de sa hauteur.
 		Text tmpText = tmpGO.GetComponent<Text>();
-		SetState(tmpBool && GetInputFields());
+		SetState(boolCGU && GetInputFields());
 		if (GetState() == true)
 			HideAccountConnected();
 		else
