@@ -20,8 +20,9 @@ public class Client
 
             // Establish the remote endpoint for the socket.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            var ipAddress = ipHostInfo.AddressList[0];
+            IPAddress ipAddress = IPAddress.Parse("185.165.93.185");
             var remoteEP = new IPEndPoint(ipAddress, Port);
+            
 
             // Create a TCP/IP  socket.
             var sender = new Socket(ipAddress.AddressFamily,
@@ -84,12 +85,5 @@ public class Client
         }
     }
 
-    public static int Main()
-    {
-        byte nb = 18;
-        //string[] data = { "petit", "test" };
-        var data = "petit test";
-        StartClient(nb, data);
-        return 0;
-    }
+
 }
