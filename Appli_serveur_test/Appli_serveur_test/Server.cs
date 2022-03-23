@@ -226,10 +226,4 @@ public class Server
             Console.WriteLine(e.ToString());
         }
     }
-
-    public static int Main()
-    {
-        StartListening();
-        return 0;
-    }
 }
