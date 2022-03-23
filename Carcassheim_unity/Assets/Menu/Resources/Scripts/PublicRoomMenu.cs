@@ -14,7 +14,9 @@ public class PublicRoomMenu : Miscellaneous
 	}
 
 	public void ShowRoomParameters(){
-		Application.OpenURL("https://tinyurl.com/SlapDance");
+		//Application.OpenURL("https://tinyurl.com/SlapDance");
+		HidePopUpOptions();
+		ChangeMenu("PublicRoomMenu", "RoomParametersMenu");
 	}
 
 	public void Ready(){

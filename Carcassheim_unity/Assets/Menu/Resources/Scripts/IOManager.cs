@@ -15,6 +15,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private RoomSelectionMenu _sroom;
 	private JoinByIdMenu _jid;
 	private PublicRoomMenu _proom;
+	private RoomParameters _rparam;
+	private CreateRoom _croom;
+	private RoomIsCreated _rcreated;
 
 	private GameObject currentGo;
 	private Color _previousColor, colHover;
@@ -42,6 +45,10 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		_sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
 		_jid = gameObject.AddComponent(typeof(JoinByIdMenu)) as JoinByIdMenu;
 		_proom = gameObject.AddComponent(typeof(PublicRoomMenu)) as PublicRoomMenu;
+		_rparam = gameObject.AddComponent(typeof(RoomParameters)) as RoomParameters;
+		_croom = gameObject.AddComponent(typeof(CreateRoom)) as CreateRoom;
+		_rcreated = gameObject.AddComponent(typeof(RoomIsCreated)) as RoomIsCreated;
+		
 		// ---------------------------------- FIN PATCH : --------------------------------
 		//Fetch the current EventSystem. Make sure your Scene has one.
 		eventSystem = EventSystem.current;

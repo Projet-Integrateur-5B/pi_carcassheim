@@ -35,4 +35,10 @@ public class RoomSelectionMenu : Miscellaneous
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");	
 	}
+
+	public void ShowCreateRoom()
+	{
+		HidePopUpOptions();
+		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");	
+	}
 }
