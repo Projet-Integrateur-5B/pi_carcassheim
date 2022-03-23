@@ -27,6 +27,7 @@ public class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
+    private const int Port = 10000;
 
     public static void StartListening()
     {
@@ -37,7 +38,7 @@ public class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, Packet.PortPrincipale);
+        var localEndPoint = new IPEndPoint(ipAddress, Port);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -118,7 +119,7 @@ public class Server
                     Console.WriteLine(bytesRead);
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
-                    state.Packet = Packet.Deserialize(packetAsBytes);
+                    state.Packet = packetAsBytes.ByteArrayToPacket();
 
                     // There  might be more data, so store the data received so far.
                     state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
@@ -177,7 +178,7 @@ public class Server
         var state = (StateObject?)ar.AsyncState;
         state.Packet.Data = "";
         state.Packet.Status = true; //false si probleme
-        var packetAsBytes = state.Packet.Serialize();
+        var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.

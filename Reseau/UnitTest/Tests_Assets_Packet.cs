@@ -35,7 +35,7 @@ public class TestsAssetsPacket
         Assert.IsTrue(result);
     }
 
-    [Test]
+    /*[Test]
     public void TestPacketDeserializationSuccess()
     {
         var originalAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
@@ -48,18 +48,18 @@ public class TestsAssetsPacket
         Assert.AreEqual(this.original.Permission, result.Permission);
         Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
         Assert.AreEqual(this.original.Data, result.Data);
-    }
+    }*/
 
-    [Test]
+    /*[Test]
     public void TestPacketSerializationSuccess()
     {
         var originalAsBytes = this.original.Serialize();
         var resultAsString = Encoding.ASCII.GetString(originalAsBytes);
 
         Assert.AreEqual(this.originalAsString, resultAsString);
-    }
+    }*/
 
-    [Test]
+    /*[Test]
     public void TestPacketPrepareMultipacketsSuccess()
     {
         var type = this.original.Type;
@@ -84,14 +84,14 @@ public class TestsAssetsPacket
         var packets = packet.Prepare();
         Assert.AreEqual(p0.Data, packets[0].Data);
         Assert.AreEqual(p1.Data, packets[1].Data);
-    }
+    }*/
 
-    [Test]
+    /*[Test]
     public void TestPacketPrepareSolopacketSuccess()
     {
         var packets = this.original.Prepare();
         Assert.AreEqual(this.original, packets[0]);
-    }
+    }*/
 
     [Test]
     public void TestPacketConstructorClienttoserverSuccess()

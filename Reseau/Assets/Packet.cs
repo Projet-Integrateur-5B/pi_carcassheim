@@ -1,14 +1,9 @@
 namespace Assets;
 
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-
 public class Packet
 {
     private const string DataEof = "<EOF>";
     public const int MaxPacketSize = 512;
-    public const int PortPrincipale = 19000;
 
     public Packet()
     {
@@ -64,19 +59,6 @@ public class Packet
     public ulong IdPlayer { get; set; }
     public string Data { get; set; } // à définir
 
-    public byte[] Serialize()
-    {
-        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-        var jsonString = JsonSerializer.Serialize(this, jso);
-        return Encoding.ASCII.GetBytes(jsonString);
-    }
-
-    public static Packet? Deserialize(byte[] packetAsBytes)
-    {
-        var packetAsJson = Encoding.ASCII.GetString(packetAsBytes);
-        return JsonSerializer.Deserialize<Packet>(packetAsJson);
-    }
-
     public override string ToString() => "Type:" + this.Type + "; "
                                          + "IdRoom:" + this.IdRoom + "; "
                                          + "IdMessage:" + this.IdMessage + "; "
@@ -84,49 +66,4 @@ public class Packet
                                          + "Permission:" + this.Permission + "; "
                                          + "IdPlayer:" + this.IdPlayer + "; "
                                          + "Data:" + this.Data + ";";
-
-    public List<Packet> Prepare()
-    {
-        var packets = new List<Packet>();
-
-        // within authorized range of size
-        if (this.Serialize().Length < MaxPacketSize)
-        {
-            packets.Add(this);
-            return packets;
-        }
-
-        var data = this.Data;
-        var packet = this;
-        packet.Data = "";
-
-        var mainBytes = packet.Serialize();
-        var mainBytesLength = mainBytes.Length;
-        var dataBytesMaxLength = MaxPacketSize - mainBytesLength;
-
-        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-        var dataString = JsonSerializer.Serialize(data, jso);
-        dataString = dataString[1..^1];
-        var dataBytes = Encoding.ASCII.GetBytes(dataString);
-        var dataBytesTotalLength = dataBytes.Length;
-
-        for (var i = 0; i < dataBytesTotalLength; i += dataBytesMaxLength)
-        {
-            var el = Deserialize(mainBytes) ?? new Packet();
-            if (i + dataBytesMaxLength > dataBytesTotalLength)
-            {
-                el.Data = dataString[i..dataBytesTotalLength];
-                Console.WriteLine(dataString[i..dataBytesTotalLength]);
-            }
-            else
-            {
-                el.Data = dataString.Substring(i, dataBytesMaxLength);
-                Console.WriteLine(dataString.Substring(i, dataBytesMaxLength));
-            }
-
-            packets.Add(el);
-        }
-
-        return packets;
-    }
 }

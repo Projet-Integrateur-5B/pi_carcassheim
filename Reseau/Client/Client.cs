@@ -7,6 +7,8 @@ using Assets;
 public class Client
 {
     //private static Packet packet = new();
+    private const int Port = 19000;
+
     public static void StartClient(byte number, string data)
     {
         // Data buffer for incoming data.
@@ -20,7 +22,7 @@ public class Client
             // Establish the remote endpoint for the socket.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, Packet.PortPrincipale);
+            var remoteEP = new IPEndPoint(ipAddress, Port);
 
             // Create a TCP/IP  socket.
             var sender = new Socket(ipAddress.AddressFamily,
@@ -37,11 +39,11 @@ public class Client
 
                 foreach (var packet in packets)
                 {
-                    var packetAsBytes = packet.Serialize();
+                    var packetAsBytes = packet.PacketToByteArray();
                     bytes = new byte[packetAsBytes.Length];
 
                     // Send the data through the socket.
-                    var bytesSent = sender.Send(packet.Serialize());
+                    var bytesSent = sender.Send(packetAsBytes);
                     Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
                 }
 
@@ -49,7 +51,7 @@ public class Client
                 var bytesRec = sender.Receive(bytes);
                 var packetAsBytes2 = new byte[bytesRec];
                 Array.Copy(bytes, packetAsBytes2, bytesRec);
-                var recv = Packet.Deserialize(packetAsBytes2);
+                var recv = packetAsBytes2.ByteArrayToPacket();
                 if (recv.Status)
                 {
                     Console.WriteLine("Read {0} bytes => permission accepted \n", bytesRec);
