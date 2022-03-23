@@ -1,4 +1,4 @@
-namespace Assets;
+namespace ClassLibrary;
 
 [Serializable]
 public class Packet

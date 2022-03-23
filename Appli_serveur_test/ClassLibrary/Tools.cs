@@ -1,6 +1,6 @@
 namespace Server;
 
-using Assets;
+using ClassLibrary;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
