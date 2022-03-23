@@ -1,4 +1,7 @@
+using System;
 
+
+[Serializable()]
 public class Packet
 {
     private const string DataEof = "<EOF>";

@@ -20,7 +20,7 @@ public class Client
 
             // Establish the remote endpoint for the socket.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = IPAddress.Parse("185.165.93.185");
+            IPAddress ipAddress = IPAddress.Parse("185.155.93.105");
             var remoteEP = new IPEndPoint(ipAddress, Port);
             
 
