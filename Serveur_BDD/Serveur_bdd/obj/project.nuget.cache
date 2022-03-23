@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "dgSpecHash": "PO1OUQ6wnP1SPof+HCPy4GzL0lXL8OgXw75+q1lz6mxRSzXLUPvLXKnCJ7n5O1Cu6oCm49QVwsK0nilxcT2FoQ==",
+  "success": true,
+  "projectFilePath": "D:\\Projet\\pi_carcassonne\\Serveur_BDD\\Serveur_bdd\\Serveur_bdd.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\the_s\\.nuget\\packages\\mono.data.sqlite\\1.0.61\\mono.data.sqlite.1.0.61.nupkg.sha512",
+    "C:\\Users\\the_s\\.nuget\\packages\\sqlite\\3.13.0\\sqlite.3.13.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Le package 'Mono.Data.Sqlite 1.0.61' a été restauré en utilisant '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' au lieu du framework cible du projet 'net6.0'. Ce package n'est peut-être pas totalement compatible avec votre projet.",
+      "libraryId": "Mono.Data.Sqlite",
+      "targetGraphs": [
+        "net6.0"
+      ]
+    }
+  ]
+}
