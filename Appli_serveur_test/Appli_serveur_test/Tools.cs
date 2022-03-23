@@ -9,24 +9,32 @@ using System.IO;
 public static class Tools
 {
 
-    public static byte[] ObjectToByteArray(Object obj)
+    public static byte[] PacketToByteArray(this Packet? packet)
     {
-        BinaryFormatter bf = new BinaryFormatter();
+        if (packet == null)
+        {
+            return Array.Empty<byte>();
+        }
+        var bf = new BinaryFormatter();
         using (var ms = new MemoryStream())
         {
-            bf.Serialize(ms, obj);
+            bf.Serialize(ms, packet);
             return ms.ToArray();
         }
     }
 
-    public static Object ByteArrayToObject(byte[] arrBytes)
+    public static Packet ByteArrayToPacket(this byte[]? byteArray)
     {
+        if (byteArray == null)
+        {
+            return new Packet();
+        }
         using (var memStream = new MemoryStream())
         {
             var binForm = new BinaryFormatter();
-            memStream.Write(arrBytes, 0, arrBytes.Length);
+            memStream.Write(byteArray, 0, byteArray.Length);
             memStream.Seek(0, SeekOrigin.Begin);
-            var obj = binForm.Deserialize(memStream);
+            var obj = (Packet)binForm.Deserialize(memStream);
             return obj;
         }
     }
