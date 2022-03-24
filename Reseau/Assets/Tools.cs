@@ -20,7 +20,6 @@ public static class Tools
     public static List<Packet> Prepare(this Packet original)
     {
         var packets = new List<Packet>();
-        original ??= new Packet();
 
         // within authorized range of size
         if (original.PacketToByteArray().Length < Packet.MaxPacketSize)
@@ -29,16 +28,14 @@ public static class Tools
             return packets;
         }
 
+        var dataString = original.Data;
         var header = original; // copy the original packet
         header.Data = ""; // empty the data field (= keep the packet's header)
 
         var headerBytes = header.PacketToByteArray(); // header to bytes
         var headerBytesLength = headerBytes.Length; // length
-
         var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength; // max length allowed
-        var dataString = JsonConvert.SerializeObject(original.Data);
-        dataString = dataString[1..^1];
-        // test = test.Substring(1, test.Length - 2);
+
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
         var dataBytesTotalLength = dataBytes.Length;
 
@@ -47,9 +44,9 @@ public static class Tools
             var packet = headerBytes.ByteArrayToPacket();
             if (i + headerBytesMaxLength > dataBytesTotalLength)
             {
-                packet.Data = dataString[i..dataBytesTotalLength];
-                Console.WriteLine(dataString[i..dataBytesTotalLength]);
-                // packet.Data = dataString.Substring(i, dataBytesTotalLength-i);
+                packet.Data = dataString.Substring(i, dataBytesTotalLength - i);
+                Console.WriteLine(dataString.Substring(i, dataBytesTotalLength - i));
+                // dataString.Substring(i, dataBytesTotalLength - i);
             }
             else
             {

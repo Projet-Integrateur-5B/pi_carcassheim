@@ -1,5 +1,5 @@
 namespace UnitTest;
-/*
+
 using System;
 using System.Text;
 using Assets;
@@ -7,7 +7,6 @@ using NUnit.Framework;
 
 public class TestsAssetsPacket
 {
-    private const string Localhost = "127.0.0.1";
     private const string DataEof = "<EOF>";
     private Packet original = new();
     private string originalAsString = new("");
@@ -15,10 +14,9 @@ public class TestsAssetsPacket
     [SetUp]
     public void Setup()
     {
-        this.original = new Packet(true, Localhost, 0, 0, 0, true, 1, 1, "test");
-        this.originalAsString = "{\"Type\":true,\"IpAddress\":\"" + Localhost + "\",\"Port\":0," +
-                                "\"IdRoom\":0,\"IdMessage\":0,\"Status\":true,\"Permission\":1," +
-                                "\"IdPlayer\":1,\"Data\":\"test" + DataEof + "\"}";
+        this.original = new Packet(false, 0, 18, false, 0, 999, "test");
+        this.originalAsString = "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":18,\"Status\":false,\"Permission\":0," +
+                                "\"IdPlayer\":999,\"Data\":\"test" + DataEof + "\"}";
     }
 
     [Test]
@@ -39,12 +37,10 @@ public class TestsAssetsPacket
     [Test]
     public void TestPacketDeserializationSuccess()
     {
-        var originalAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
-        var result = Packet.Deserialize(originalAsBytes) ?? new Packet();
+        var resultAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
+        var result = resultAsBytes.ByteArrayToPacket();
 
         Assert.AreEqual(this.original.Type, result.Type);
-        Assert.AreEqual(this.original.IpAddress, result.IpAddress);
-        Assert.AreEqual(this.original.Port, result.Port);
         Assert.AreEqual(this.original.IdRoom, result.IdRoom);
         Assert.AreEqual(this.original.IdMessage, result.IdMessage);
         Assert.AreEqual(this.original.Status, result.Status);
@@ -54,10 +50,10 @@ public class TestsAssetsPacket
     }
 
     [Test]
-    public void TestPacketSerializationSuccess()
+    public void TestPacketToByteArraySuccess()
     {
-        var originalAsBytes = this.original.Serialize();
-        var resultAsString = Encoding.ASCII.GetString(originalAsBytes);
+        var resultAsBytes = this.original.PacketToByteArray();
+        var resultAsString = Encoding.ASCII.GetString(resultAsBytes);
 
         Assert.AreEqual(this.originalAsString, resultAsString);
     }
@@ -66,27 +62,25 @@ public class TestsAssetsPacket
     public void TestPacketPrepareMultipacketsSuccess()
     {
         var type = this.original.Type;
-        var ipAddress = this.original.IpAddress;
-        var port = this.original.Port;
         var idRoom = this.original.IdRoom;
         var idMessage = this.original.IdMessage;
         var status = this.original.Status;
         var permission = this.original.Permission;
         var idPlayer = this.original.IdPlayer;
 
-        var packet = new Packet(type, ipAddress, port, idRoom, idMessage, status, permission,
-            idPlayer,
+        var packet = new Packet(type, idRoom, idMessage, status, permission, idPlayer,
             "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
-        var p0 = new Packet(type, ipAddress, port, idRoom, idMessage, status, permission, idPlayer,
-            "")
+        var p0 = new Packet(type, idRoom, idMessage, status, permission, idPlayer, "")
         {
             Data =
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijk"
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijkl"
         };
-        var p1 = new Packet(type, ipAddress, port, idRoom, idMessage, status, permission, idPlayer,
-            "lmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
+        var p1 = new Packet(type, idRoom, idMessage, status, permission, idPlayer,
+            "mnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
 
         var packets = packet.Prepare();
+        Console.WriteLine(p0.Data);
+        Console.WriteLine(packets[0].Data);
         Assert.AreEqual(p0.Data, packets[0].Data);
         Assert.AreEqual(p1.Data, packets[1].Data);
     }
@@ -97,53 +91,4 @@ public class TestsAssetsPacket
         var packets = this.original.Prepare();
         Assert.AreEqual(this.original, packets[0]);
     }
-
-    [Test]
-    public void TestPacketConstructorClienttoserverSuccess()
-    {
-        var type = this.original.Type;
-        var ipAddress = this.original.IpAddress;
-        var port = this.original.Port;
-        var idRoom = this.original.IdRoom;
-        var idMessage = this.original.IdMessage;
-        var idPlayer = this.original.IdPlayer;
-        var data = this.original.Data;
-
-        var packet = new Packet(type, ipAddress, port, idRoom, idMessage, idPlayer, data);
-        Assert.AreEqual(type, packet.Type);
-        Assert.AreEqual(ipAddress, packet.IpAddress);
-        Assert.AreEqual(port, packet.Port);
-        Assert.AreEqual(idRoom, packet.IdRoom);
-        Assert.AreEqual(idMessage, packet.IdMessage);
-        Assert.AreEqual(idPlayer, packet.IdPlayer);
-        Assert.AreEqual(data + DataEof, packet.Data);
-    }
-
-    [Test]
-    public void TestPacketConstructorServertoclientSuccess()
-    {
-        var type = this.original.Type;
-        var ipAddress = this.original.IpAddress;
-        var status = this.original.Status;
-        var permission = this.original.Permission;
-        var idPlayer = this.original.IdPlayer;
-        var data = this.original.Data;
-
-        var packet = new Packet(type, status, permission, idPlayer, data);
-        Assert.AreEqual(type, packet.Type);
-        Assert.AreEqual(ipAddress, packet.IpAddress);
-        Assert.AreEqual(status, packet.Status);
-        Assert.AreEqual(permission, packet.Permission);
-        Assert.AreEqual(idPlayer, packet.IdPlayer);
-        Assert.AreEqual(data + DataEof, packet.Data);
-    }
-
-    [Test]
-    public void TestPacketTostringSuccess()
-    {
-        var result =
-            "Type:True; IpAddress:127.0.0.1; Port:0; IdRoom:0; IdMessage:0; Status:True; Permission:1; IdPlayer:1; Data:test<EOF>;";
-        Assert.AreEqual(result, this.original.ToString());
-    }
 }
-*/
