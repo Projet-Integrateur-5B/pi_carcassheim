@@ -57,9 +57,58 @@ public partial class Thread_serveur_jeu
 
 	public void Lancement_thread_serveur_jeu()
     {
+		//bool tour = true;
+		//bool partie = true;
+        //while (partie) {
+			//LireXml?
+			//Initialisation du plateau
+
+			//boucle_Tour:
+			//while (tour) { 
+			//Phase tirage de 3 tuiles
+			//while(bool)
+			//Tirage de 3 tuiles de la fin du tableau
+			//ecoute client
+				//if client repond avec confirmation que l'une des tuile est posable
+				//bool = false
+				
+			//else continue
+
+			//idTuile=idTuileChoisie
+			//Timer
+
+			//Phase actions
+			//While(1)
+			//Attendre une action:
+				//Action recue:
+					//si tentative de poser une tuile :
+						//verification positionsInternes
+					//si tentative de poser un pion Et/Ou abbé
+						//verfication position pion en slot
+						//verification position abbé
+					//si demande de validation:
+						//si fermeture: Palteau.ZoneFermee(idTuile,idSlot)
+							//comptageDesPoints(idTuile)
+						//verification pion/abbé & tuile
+		//passage du tour:
+
+		//}
 
 		
-
+		//}
 		// A FAIRE - Fin/retour de la fonction pour libérer l'objet associé dans le thread_com à la fin de la partie et donc de ce thread
+		//return 0;	//cas ou' tout s'est bien passé et la partie est finie
     }
+    public void comptageDesPoints(int[] idSlots)
+    {
+	//Règles d'évaluation:
+		// route : 1 point par tuile
+		// ville : Chaque tuile dans une ville complétée rapporte 2 points.
+			// De plus, chaque blason dans une ville complétée rapporte
+			// 2 points de plus.
+		// abbaye : Une abbaye est complétée lorsqu’elle est complètement entourée de tuiles.
+			// Lors de l’évaluation, une abbaye complétée rapporte 1 point par tuile la
+			// complétant(incluant celle de l’abbaye).
+
+	}
 }
