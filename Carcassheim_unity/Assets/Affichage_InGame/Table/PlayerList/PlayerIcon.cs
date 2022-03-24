@@ -6,9 +6,9 @@ using TMPro;
 
 public class PlayerIcon : MonoBehaviour
 {
-    public Image player_color;
-    public TMP_Text player_score;
-    public TMP_Text player_meeple;
+    [SerializeField] private Image player_color;
+    [SerializeField] private TMP_Text player_score;
+    [SerializeField] private TMP_Text player_meeple;
     public PlayerRepre Player { get => _player; private set => setPlayer(value); }
     private PlayerRepre _player;
 
