@@ -1,47 +1,24 @@
-
-using UnityEngine;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-
 using System.Text;
-
+using Newtonsoft.Json;
 
 public static class Tools
 {
 
-    public static byte[] PacketToByteArray(this Packet? packet)
+    public static byte[] PacketToByteArray(this Packet packet)
     {
-        if (packet == null)
-        {
-            return Array.Empty<byte>();
-        }
-        var bf = new BinaryFormatter();
-        using (var ms = new MemoryStream())
-        {
-            bf.Serialize(ms, packet);
-            return ms.ToArray();
-        }
+        var serialized = JsonConvert.SerializeObject(packet);
+        return Encoding.ASCII.GetBytes(serialized);
     }
 
-    public static Packet ByteArrayToPacket(this byte[]? byteArray)
+    public static Packet ByteArrayToPacket(this byte[] byteArray)
     {
-        if (byteArray == null)
-        {
-            return new Packet();
-        }
-        using (var memStream = new MemoryStream())
-        {
-            var binForm = new BinaryFormatter();
-            memStream.Write(byteArray, 0, byteArray.Length);
-            memStream.Seek(0, SeekOrigin.Begin);
-            var obj = (Packet)binForm.Deserialize(memStream);
-            return obj;
-        }
+        var packetAsJson = Encoding.ASCII.GetString(byteArray);
+        return JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? new Packet();
     }
-
-    public static List<Packet> Prepare(this Packet? original)
+    
+    public static List<Packet> Prepare(this Packet original)
     {
         var packets = new List<Packet>();
         original ??= new Packet();
@@ -60,7 +37,7 @@ public static class Tools
         var headerBytesLength = headerBytes.Length; // length
 
         var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength; // max length allowed
-        string dataString = UnityEngine.JsonUtility.ToJson(original.Data);
+        var dataString = JsonConvert.SerializeObject(original.Data);
         dataString = dataString.Substring(1, dataString.Length - 2);
         // test = test.Substring(1, test.Length - 2);
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
@@ -82,11 +59,8 @@ public static class Tools
             }
             packets.Add(packet);
         }
-
         return packets;
     }
-
 }
-
 
 
