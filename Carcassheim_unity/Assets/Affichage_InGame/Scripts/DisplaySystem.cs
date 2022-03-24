@@ -5,6 +5,7 @@ using UnityEngine;
 public class DisplaySystem : MonoBehaviour
 {
 
+    public event System.Action<PlayerRepre> OnPlayerDisconnected;
     // Start is called before the first frame update
     void Start()
     {
