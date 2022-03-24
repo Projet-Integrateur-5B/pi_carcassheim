@@ -4,6 +4,7 @@ public class Packet
 {
     private const string DataEof = "<EOF>";
     public const int MaxPacketSize = 512;
+    public const int Port = 19000;
 
     public Packet()
     {
@@ -67,3 +68,4 @@ public class Packet
                                          + "IdPlayer:" + this.IdPlayer + "; "
                                          + "Data:" + this.Data + ";";
 }
+

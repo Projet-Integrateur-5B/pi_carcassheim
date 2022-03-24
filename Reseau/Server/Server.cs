@@ -3,6 +3,7 @@ namespace Server;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Assets;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -26,7 +27,6 @@ public class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-    private const int Port = 19000;
 
     public static void StartListening()
     {
@@ -37,7 +37,7 @@ public class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, Port);
+        var localEndPoint = new IPEndPoint(ipAddress, Packet.Port);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -129,7 +129,7 @@ public class Server
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
-                                          "\n\t Data buffer =>\t" + state.Sb +
+                                          "\n\t Data buffer =>\t\t" + state.Sb +
                                           "\n\t => Every packet has been received !", bytesRead);
                         switch (state.Packet.IdMessage)
                         {

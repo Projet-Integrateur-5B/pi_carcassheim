@@ -2,13 +2,11 @@ namespace Client;
 
 using System.Net;
 using System.Net.Sockets;
+using Assets;
 
 public class Client
 {
-    //private static Packet packet = new();
-    private const int Port = 19000;
-
-    public static void StartClient(byte number, string data)
+    public static void StartClient(byte idMessage, string data)
     {
         // Data buffer for incoming data.
         var bytes = new byte[Packet.MaxPacketSize];
@@ -21,7 +19,8 @@ public class Client
             // Establish the remote endpoint for the socket.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, Port);
+            var remoteEP = new IPEndPoint(ipAddress, Packet.Port);
+
 
             // Create a TCP/IP  socket.
             var sender = new Socket(ipAddress.AddressFamily,
@@ -33,7 +32,7 @@ public class Client
                 sender.Connect(remoteEP);
                 Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
 
-                var original = new Packet(false, 0, number, 999, data);
+                var original = new Packet(false, 0, idMessage, 999, data);
                 var packets = original.Prepare();
 
                 foreach (var packet in packets)
@@ -53,11 +52,11 @@ public class Client
                 var recv = packetAsBytes2.ByteArrayToPacket();
                 if (recv.Status)
                 {
-                    Console.WriteLine("Read {0} bytes => permission accepted \n", bytesRec);
+                    Console.WriteLine("Read {0} bytes => \tpermission accepted \n", bytesRec);
                 }
                 else
                 {
-                    Console.WriteLine("Read {0} bytes => permission denied \n", bytesRec);
+                    Console.WriteLine("Read {0} bytes => \tpermission denied \n", bytesRec);
                 }
 
                 //Release the socket.
@@ -86,10 +85,9 @@ public class Client
 
     public static int Main()
     {
-        byte nb = 18;
-        //string[] data = { "petit", "test" };
-        var data = "petit test";
-        StartClient(nb, data);
+        const byte idMessage = 18;
+        const string data = "petit test";
+        StartClient(idMessage, data);
         return 0;
     }
 }

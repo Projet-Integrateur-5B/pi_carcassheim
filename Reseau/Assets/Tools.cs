@@ -1,29 +1,23 @@
-namespace Client;
+namespace Assets;
 
 using System.Text;
-using System.Text.Encodings.Web;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 public static class Tools
 {
-    public static byte[] PacketToByteArray(this Packet? packet)
+    public static byte[] PacketToByteArray(this Packet packet)
     {
-        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-        var jsonString = JsonSerializer.Serialize(packet, jso);
-        return Encoding.ASCII.GetBytes(jsonString);
+        var serialized = JsonConvert.SerializeObject(packet);
+        return Encoding.ASCII.GetBytes(serialized);
     }
 
-    public static Packet ByteArrayToPacket(this byte[]? byteArray)
+    public static Packet ByteArrayToPacket(this byte[] byteArray)
     {
-        if (byteArray == null)
-        {
-            return new Packet();
-        }
         var packetAsJson = Encoding.ASCII.GetString(byteArray);
-        return JsonSerializer.Deserialize<Packet>(packetAsJson) ?? new Packet();
+        return JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? new Packet();
     }
 
-    public static List<Packet> Prepare(this Packet? original)
+    public static List<Packet> Prepare(this Packet original)
     {
         var packets = new List<Packet>();
         original ??= new Packet();
@@ -42,9 +36,8 @@ public static class Tools
         var headerBytesLength = headerBytes.Length; // length
 
         var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength; // max length allowed
-        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-        var dataString = JsonSerializer.Serialize(original.Data, jso);
-        dataString = dataString.Substring(1, dataString.Length - 2);
+        var dataString = JsonConvert.SerializeObject(original.Data);
+        dataString = dataString[1..^1];
         // test = test.Substring(1, test.Length - 2);
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
         var dataBytesTotalLength = dataBytes.Length;
@@ -54,8 +47,8 @@ public static class Tools
             var packet = headerBytes.ByteArrayToPacket();
             if (i + headerBytesMaxLength > dataBytesTotalLength)
             {
-                packet.Data = dataString.Substring(i, dataBytesTotalLength-i);
-                Console.WriteLine(dataString.Substring(i,dataBytesTotalLength-i));
+                packet.Data = dataString[i..dataBytesTotalLength];
+                Console.WriteLine(dataString[i..dataBytesTotalLength]);
                 // packet.Data = dataString.Substring(i, dataBytesTotalLength-i);
             }
             else
@@ -65,11 +58,6 @@ public static class Tools
             }
             packets.Add(packet);
         }
-
         return packets;
     }
-
 }
-
-
-
