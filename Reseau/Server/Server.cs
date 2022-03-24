@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Assets;
+using System.Configuration;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -30,6 +31,9 @@ public class Server
 
     public static void StartListening()
     {
+        // get config from file
+        var Port = ConfigurationManager.AppSettings.Get("ServerPort");
+
         Console.WriteLine("Server is setting up...");
 
         // Establish the local endpoint for the socket.

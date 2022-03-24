@@ -1,13 +1,18 @@
 namespace Client;
 
+using Assets;
 using System.Net;
 using System.Net.Sockets;
-using Assets;
+using System.Configuration;
 
 public class Client
 {
     public static void StartClient(byte idMessage, string data)
     {
+        // get config from file
+        var Port = ConfigurationManager.AppSettings.Get("ServerPort");
+        var IP = ConfigurationManager.AppSettings.Get("ServerIP");
+
         // Data buffer for incoming data.
         var bytes = new byte[Packet.MaxPacketSize];
 
