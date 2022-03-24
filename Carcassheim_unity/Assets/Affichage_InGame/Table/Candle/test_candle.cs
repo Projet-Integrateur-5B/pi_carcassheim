@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class test_candle : MonoBehaviour
 {
-    public candle_manager activated;
+    [SerializeField] private candle_manager activated;
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)){
+        if (Input.GetMouseButtonUp(0))
+        {
             activated.swicthCandle();
         }
     }

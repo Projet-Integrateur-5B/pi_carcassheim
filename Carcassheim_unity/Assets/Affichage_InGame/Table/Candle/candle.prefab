@@ -5024,7 +5024,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 0.94212276, b: 0.71132076, a: 1}
   m_Intensity: 1.6
-  m_Range: 10
+  m_Range: 12
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -5116,7 +5116,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8282779949987807876}
   - component: {fileID: 8771192203686975548}
-  - component: {fileID: 1308843514943920255}
+  - component: {fileID: 1718730932}
   m_Layer: 3
   m_Name: candle
   m_TagString: Untagged
@@ -5131,9 +5131,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8771192203686975550}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.274, y: 0.618, z: -1.76}
-  m_LocalScale: {x: 0.09, y: 0.1184, z: 0.09}
+  m_LocalScale: {x: 0.048600003, y: 0.075740986, z: 0.162}
   m_Children:
   - {fileID: 7673295191929108487}
   - {fileID: 6014906077264211135}
@@ -5159,7 +5159,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &1308843514943920255
+--- !u!114 &1718730932
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

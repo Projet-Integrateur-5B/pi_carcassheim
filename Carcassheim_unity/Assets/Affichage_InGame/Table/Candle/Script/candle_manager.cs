@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class candle_manager : MonoBehaviour
 {
-    public Animator myAnimator;
+    [SerializeField] private Animator myAnimator;
     private bool candle_is_lit = false;
 
     public void lightCandle()
