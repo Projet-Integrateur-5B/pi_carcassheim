@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 3d6a53f2d683ce3468eb941182ef2ef0
+guid: 554951f838e6a8548867622f80962750
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable: []
@@ -14,21 +14,6 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: dos
     second: {fileID: 2100000, guid: 877bde7a490cbb6418b75e047901b16c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: face
-    second: {fileID: 2100000, guid: bfc9947e19de172498e8fe0958b58dc2, type: 2}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: back_card
-    second: {fileID: 2800000, guid: bbcf23e0eef7a8b44a7fdc675b762b81, type: 3}
-  - first:
-      type: UnityEngine:Texture2D
-      assembly: UnityEngine.CoreModule
-      name: default_face
-    second: {fileID: 2800000, guid: a54321ae185c6804e828bfaec57de680, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -60,7 +45,7 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 0
+    meshCompression: 3
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
