@@ -3,7 +3,6 @@ namespace Server;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Assets;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -27,7 +26,7 @@ public class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-    private const int Port = 10000;
+    private const int Port = 19000;
 
     public static void StartListening()
     {

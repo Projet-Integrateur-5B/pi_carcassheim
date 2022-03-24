@@ -3,7 +3,6 @@ namespace Server;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Assets;
 
 public static class Tools
 {

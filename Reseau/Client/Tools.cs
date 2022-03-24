@@ -1,30 +1,16 @@
 namespace Client;
 
-using Assets;
-using UnityEngine;
-using System.Collections;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
-
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
 public static class Tools
 {
-
     public static byte[] PacketToByteArray(this Packet? packet)
     {
-        if (packet == null)
-        {
-            return Array.Empty<byte>();
-        }
-        var bf = new BinaryFormatter();
-        using (var ms = new MemoryStream())
-        {
-            bf.Serialize(ms, packet);
-            return ms.ToArray();
-        }
+        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        var jsonString = JsonSerializer.Serialize(packet, jso);
+        return Encoding.ASCII.GetBytes(jsonString);
     }
 
     public static Packet ByteArrayToPacket(this byte[]? byteArray)
@@ -33,14 +19,8 @@ public static class Tools
         {
             return new Packet();
         }
-        using (var memStream = new MemoryStream())
-        {
-            var binForm = new BinaryFormatter();
-            memStream.Write(byteArray, 0, byteArray.Length);
-            memStream.Seek(0, SeekOrigin.Begin);
-            var obj = (Packet)binForm.Deserialize(memStream);
-            return obj;
-        }
+        var packetAsJson = Encoding.ASCII.GetString(byteArray);
+        return JsonSerializer.Deserialize<Packet>(packetAsJson) ?? new Packet();
     }
 
     public static List<Packet> Prepare(this Packet? original)
@@ -62,7 +42,8 @@ public static class Tools
         var headerBytesLength = headerBytes.Length; // length
 
         var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength; // max length allowed
-        string dataString = UnityEngine.JsonUtility.ToJson(original.Data);
+        var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        var dataString = JsonSerializer.Serialize(original.Data, jso);
         dataString = dataString.Substring(1, dataString.Length - 2);
         // test = test.Substring(1, test.Length - 2);
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
