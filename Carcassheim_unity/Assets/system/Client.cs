@@ -2,14 +2,26 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
+using Newtonsoft.Json;
 
 public class Client
 {
     //private static Packet packet = new();
     private const int Port = 19000;
 
+    [Serializable]
+    public class ServerParameters
+    {
+        public int serverPort;
+        public string serverIP;
+    }
+    
     public static void StartClient(byte number, string data)
     {
+        // get config from file
+        TextAsset contents = Resources.Load<TextAsset>("network/config");
+        ServerParameters serverParameters = JsonConvert.DeserializeObject<ServerParameters>(contents.ToString());
+
         // Data buffer for incoming data.
         var bytes = new byte[Packet.MaxPacketSize];
 
@@ -19,10 +31,11 @@ public class Client
             Debug.Log(string.Format("Client is setting up..."));
 
             // Establish the remote endpoint for the socket.
-            var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddress = IPAddress.Parse(serverParameters.serverIP);
+            var remoteEP = new IPEndPoint(ipAddress, serverParameters.serverPort);
+            /*var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddress = IPAddress.Parse("185.155.93.105");
-            var remoteEP = new IPEndPoint(ipAddress, Port);
-            
+            var remoteEP = new IPEndPoint(ipAddress, 19000);*/
 
             // Create a TCP/IP  socket.
             var sender = new Socket(ipAddress.AddressFamily,
