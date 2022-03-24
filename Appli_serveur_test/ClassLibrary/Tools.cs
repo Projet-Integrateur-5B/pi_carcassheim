@@ -1,19 +1,11 @@
 namespace ClassLibrary;
 
-/*using ClassLibrary;
-using System;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;*/
-
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 
-
-
 public static class Tools
 {
-
     public static byte[] PacketToByteArray(this Packet? packet)
     {
         var jso = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
@@ -21,10 +13,15 @@ public static class Tools
         return Encoding.ASCII.GetBytes(jsonString);
     }
 
-    public static Packet? ByteArrayToPacket(this byte[]? byteArray)
+    public static Packet ByteArrayToPacket(this byte[]? byteArray)
     {
+        if (byteArray == null)
+        {
+            return new Packet();
+        }
         var packetAsJson = Encoding.ASCII.GetString(byteArray);
-        return JsonSerializer.Deserialize<Packet>(packetAsJson);
+        return JsonSerializer.Deserialize<Packet>(packetAsJson) ?? new Packet();
     }
 }
+
 

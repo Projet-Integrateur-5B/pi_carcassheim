@@ -1,6 +1,5 @@
 namespace ClassLibrary;
 
-[Serializable]
 public class Packet
 {
     private const string DataEof = "<EOF>";
