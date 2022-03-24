@@ -4,6 +4,7 @@ using ClassLibrary;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Configuration;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -27,18 +28,34 @@ public class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-    private const int Port = 10000;
 
     public static void StartListening()
     {
         Console.WriteLine("Server is setting up...");
+        
+        // get config from file
+        var strPort = ConfigurationManager.AppSettings.Get("ServerPort");
+        var port = 0;
+        try
+        {
+            port = Convert.ToInt32(strPort);
+        }
+        catch (OverflowException)
+        {
+            Console.WriteLine("{0} is outside the range of the Int32 type.", strPort);
+        }
+        catch (FormatException)
+        {
+            Console.WriteLine("The {0} value '{1}' is not in a recognizable format.",
+                strPort.GetType().Name, strPort);
+        }
 
         // Establish the local endpoint for the socket.
         // The DNS name of the computer
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, Port);
+        var localEndPoint = new IPEndPoint(ipAddress, port);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
