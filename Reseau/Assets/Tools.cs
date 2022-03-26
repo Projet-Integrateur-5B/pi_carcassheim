@@ -44,8 +44,8 @@ public static class Tools
             var packet = headerBytes.ByteArrayToPacket();
             if (i + headerBytesMaxLength > dataBytesTotalLength)
             {
-                packet.Data = dataString.Substring(i, dataBytesTotalLength - i);
-                Console.WriteLine(dataString.Substring(i, dataBytesTotalLength - i));
+                packet.Data = dataString[i..dataBytesTotalLength];
+                Console.WriteLine(dataString[i..dataBytesTotalLength]);
                 // dataString.Substring(i, dataBytesTotalLength - i);
             }
             else

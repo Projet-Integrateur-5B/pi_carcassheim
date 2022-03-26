@@ -1,11 +1,11 @@
 namespace Server;
 
+using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Assets;
 using Fonction;
-using System.Configuration;
 
 // State object for reading client data asynchronously
 public class StateObject

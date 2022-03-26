@@ -1,9 +1,9 @@
 namespace Client;
 
-using Assets;
+using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
-using System.Configuration;
+using Assets;
 
 
 public class ClientMain
