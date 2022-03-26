@@ -127,7 +127,7 @@ public class Server
                     {
                         state.Packet = packetAsBytes.ByteArrayToPacket();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read : {0} bytes" +
@@ -183,7 +183,22 @@ public class Server
                                 break;
                         }
                         // Echo the data back to the client.
-                        Send(ar);
+                        Send(ar, false);
+                        state = new StateObject
+                        {
+                            WorkSocket = state.WorkSocket
+                        };
+                        handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                            ReadCallback, state);
+                    }
+                    else if (content.IndexOf("<FIN>", StringComparison.Ordinal) > -1)
+                    {
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
+                                          "\n\t Read {0} bytes =>\t" + state.Packet +
+                                          "\n\t Data buffer =>\t\t" + state.Sb +
+                                          "\n\t => FIN !", bytesRead);
+                        state.Packet.Status = true;
+                        Send(ar, true);
                     }
                     else
                     {
@@ -201,6 +216,7 @@ public class Server
                 {
                     Console.WriteLine("0 bytes to read from : " + handler.RemoteEndPoint);
                 }
+
             }
             else
             {
@@ -213,9 +229,10 @@ public class Server
             // si c'est null ?
             Console.WriteLine("state is null");
         }
+
     }
 
-    private static void Send(IAsyncResult ar)
+    private static void Send(IAsyncResult ar, bool end)
     {
         var state = (StateObject?)ar.AsyncState;
         var packetAsBytes = state.Packet.PacketToByteArray();
@@ -223,7 +240,14 @@ public class Server
 
         // Begin sending the data to the remote device.
         var handler = state.WorkSocket;
-        handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, state);
+        if (end)
+        {
+            handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, state);
+        }
+        else
+        {
+            handler.BeginSend(packetAsBytes, 0, size, 0, null, state);
+        }
     }
 
     private static void SendCallback(IAsyncResult ar)

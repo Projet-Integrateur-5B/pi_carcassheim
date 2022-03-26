@@ -56,6 +56,7 @@ public class FonctionServer
     public static string ListeRoom(Packet packet)
     {
         var room = "r1 : 2 joueur";
+        packet.Status = true;
         return room;
     }
 
@@ -100,6 +101,7 @@ public class FonctionServer
     // status true si parametre bien modifier, false si erreur
     public static Packet ParametreRoom(Packet packet)
     {
+        packet.Data = " nb personne : 1";
         packet.Status = true;
         return packet;
     }
@@ -110,6 +112,4 @@ public class FonctionServer
         var data = "joueur arriver";
         return data;
     }
-
 }
-
