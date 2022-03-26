@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Timers;
 
 
 public partial class Thread_serveur_jeu
@@ -54,8 +55,19 @@ public partial class Thread_serveur_jeu
 	}
 
 	// Méthodes
-
-	public void Lancement_thread_serveur_jeu()
+	/*
+	private static System.Timers.Timer aTimer;
+	private static void SetTimer()
+	{
+		// Create a timer with a two second interval.
+		aTimer = new System.Timers.Timer(2000);
+		// Hook up the Elapsed event for the timer. 
+		aTimer.Elapsed += OnTimedEvent;
+		aTimer.AutoReset = true;
+		aTimer.Enabled = true;
+	}
+	*/
+	public void Lancement_thread_serveur_jeu()//int?
     {
 		//bool tour = true;
 		//bool partie = true;
@@ -65,31 +77,43 @@ public partial class Thread_serveur_jeu
 
 			//boucle_Tour:
 			//while (tour) { 
-			//Phase tirage de 3 tuiles
+			//Phase tirage de 3 tuiles:
 			//while(bool)
 			//Tirage de 3 tuiles de la fin du tableau
 			//ecoute client
 				//if client repond avec confirmation que l'une des tuile est posable
-				//bool = false
+					//bool = false
 				
-			//else continue
+				//else continue
 
 			//idTuile=idTuileChoisie
 			//Timer
 
 			//Phase actions
-			//While(1)
+			//While(bool2)
 			//Attendre une action:
-				//Action recue:
-					//si tentative de poser une tuile :
-						//verification positionsInternes
-					//si tentative de poser un pion Et/Ou abbé
-						//verfication position pion en slot
-						//verification position abbé
-					//si demande de validation:
-						//si fermeture: Palteau.ZoneFermee(idTuile,idSlot)
-							//comptageDesPoints(idTuile)
-						//verification pion/abbé & tuile
+				//while(timerNonExpirer)
+					//Action recue:
+						//si tentative de poser une tuile :
+							//verification positionsInternes
+						//si tentative de poser un pion Et/Ou abbé
+							//verfication position pion en slot
+							//verification position abbé
+						//si demande de validation:
+							//verificationFinal:
+								//si triche:
+									//j._tricheJoueur++;
+									//if(j._tricheJoueur==2)
+										//disconnectJoueur(j);
+									//else 
+										//avertissement(j)
+							//si fermeture: Palteau.ZoneFermee(idTuile,idSlot)
+								//comptageDesPoints(idTuile)
+							//verification pion/abbé & tuile
+				//Si timer expiré 
+				//j._noteJoueu--;
+				//if (j._noteJoueu==0)
+					//disconnectJoueur(j._id);
 		//passage du tour:
 
 		//}
@@ -110,5 +134,14 @@ public partial class Thread_serveur_jeu
 			// Lors de l’évaluation, une abbaye complétée rapporte 1 point par tuile la
 			// complétant(incluant celle de l’abbaye).
 
+	}
+
+	public void disconnectJoueur( int id_joueur)
+    {
+
+    }
+	public void avertissement(int id_joueur) 
+	{
+	
 	}
 }
