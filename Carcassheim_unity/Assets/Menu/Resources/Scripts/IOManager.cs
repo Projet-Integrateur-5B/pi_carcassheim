@@ -51,7 +51,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		//Fetch the current EventSystem. Make sure your Scene has one.
 		eventSystem = EventSystem.current;
 		// Cursor Texture :
-		_cursorTexture = Resources.Load("Miscellaneous/basic_01 BLUE") as Texture2D;
+		_cursorTexture = Resources.Load("Miscellaneous/Cursors/BlueCursor") as Texture2D; // Texture Type = Cursor
 		Cursor.SetCursor(_cursorTexture, _cursorHotspot, _cursorMode);
 		// Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
 		foreach (Transform menu in GameObject.Find("SubMenus").transform)
