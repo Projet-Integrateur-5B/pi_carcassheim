@@ -9,6 +9,7 @@ public class Packet
     {
         this.Type = false;
         this.Final = true;
+        this.Data = new string("");
     }
 
     public Packet(bool type, ulong idRoom, byte idMessage,

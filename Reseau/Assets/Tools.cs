@@ -39,21 +39,22 @@ public static class Tools
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
         var dataBytesTotalLength = dataBytes.Length;
 
-        for (var i = 0; i < dataBytesTotalLength; i += headerBytesMaxLength)
+        for (var i = 0; i < dataBytesTotalLength; i += headerBytesMaxLength - 1)
         {
             var packet = headerBytes.ByteArrayToPacket();
-            if (i + headerBytesMaxLength > dataBytesTotalLength)
+            if (i + headerBytesMaxLength - 1 > dataBytesTotalLength)
             {
+                packet.Final = true;
                 packet.Data = dataString[i..dataBytesTotalLength];
-                packet.Final = false;
                 Console.WriteLine(dataString[i..dataBytesTotalLength]);
                 // dataString.Substring(i, dataBytesTotalLength - i);
             }
             else
             {
-                packet.Data = dataString.Substring(i, headerBytesMaxLength);
-                packet.Final = true;
-                Console.WriteLine(dataString.Substring(i, headerBytesMaxLength));
+                packet.Final = false;
+                packet.Data = dataString.Substring(i, headerBytesMaxLength - 1);
+                Console.WriteLine(dataString.Substring(i, headerBytesMaxLength - 1));
+                // dataString.Substring(i, headerBytesMaxLength - 1);
             }
             packets.Add(packet);
         }

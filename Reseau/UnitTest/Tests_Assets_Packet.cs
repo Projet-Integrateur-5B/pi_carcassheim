@@ -1,37 +1,20 @@
 namespace UnitTest;
 
-using System;
 using System.Text;
 using Assets;
 using NUnit.Framework;
 
 public class TestsAssetsPacket
 {
-    private const string DataEof = "<EOF>";
     private Packet original = new();
     private string originalAsString = new("");
 
     [SetUp]
     public void Setup()
     {
-        this.original = new Packet(false, 0, 18, false, 0, 999, "test");
-        this.originalAsString = "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":18,\"Status\":false,\"Permission\":0," +
-                                "\"IdPlayer\":999,\"Data\":\"test" + DataEof + "\"}";
-    }
-
-    [Test]
-    public void TestPacketDataEofSuccess()
-    {
-        var packet = new Packet();
-        Assert.AreEqual(packet.Data, "<EOF>");
-        Assert.AreEqual(this.original.Data, "test<EOF>");
-
-        var sb = new StringBuilder();
-        sb.Append(packet.Data);
-        var content = sb.ToString();
-
-        var result = false || content.IndexOf("<EOF>", StringComparison.Ordinal) > -1;
-        Assert.IsTrue(result);
+        this.original = new Packet(false, 0, 1, false, 0, true, 999, "test");
+        this.originalAsString = "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
+                                "\"Final\":true,\"IdPlayer\":999,\"Data\":\"test\"}";
     }
 
     [Test]
@@ -45,6 +28,7 @@ public class TestsAssetsPacket
         Assert.AreEqual(this.original.IdMessage, result.IdMessage);
         Assert.AreEqual(this.original.Status, result.Status);
         Assert.AreEqual(this.original.Permission, result.Permission);
+        Assert.AreEqual(this.original.Final, result.Final);
         Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
         Assert.AreEqual(this.original.Data, result.Data);
     }
@@ -59,6 +43,13 @@ public class TestsAssetsPacket
     }
 
     [Test]
+    public void TestPacketPrepareSolopacketSuccess()
+    {
+        var packets = this.original.Prepare();
+        Assert.AreEqual(this.original, packets[0]);
+    }
+
+    [Test]
     public void TestPacketPrepareMultipacketsSuccess()
     {
         var type = this.original.Type;
@@ -66,29 +57,21 @@ public class TestsAssetsPacket
         var idMessage = this.original.IdMessage;
         var status = this.original.Status;
         var permission = this.original.Permission;
+        var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var packet = new Packet(type, idRoom, idMessage, status, permission, idPlayer,
+        var packet = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer,
             "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
-        var p0 = new Packet(type, idRoom, idMessage, status, permission, idPlayer, "")
+        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer, "")
         {
             Data =
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijkl"
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
         };
-        var p1 = new Packet(type, idRoom, idMessage, status, permission, idPlayer,
-            "mnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
+        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
+            "-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
 
         var packets = packet.Prepare();
-        Console.WriteLine(p0.Data);
-        Console.WriteLine(packets[0].Data);
         Assert.AreEqual(p0.Data, packets[0].Data);
         Assert.AreEqual(p1.Data, packets[1].Data);
-    }
-
-    [Test]
-    public void TestPacketPrepareSolopacketSuccess()
-    {
-        var packets = this.original.Prepare();
-        Assert.AreEqual(this.original, packets[0]);
     }
 }

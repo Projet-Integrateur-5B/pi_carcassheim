@@ -235,7 +235,6 @@ public class Server
         var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 
-        Console.WriteLine(state.Packet);
         // Begin sending the data to the remote device.
         var handler = state.WorkSocket;
         if (end)
