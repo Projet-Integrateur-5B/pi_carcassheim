@@ -8,18 +8,12 @@ public partial class Client
     public static void Communication(Socket sender, byte idMessage, string data)
     {
         var bytes = new byte[Packet.MaxPacketSize];
-
-        var original = new Packet(false, 0, idMessage, 999, data);
-        if (idMessage == 2)
-        {
-            original.Data = "<FIN>";
-        }
+        var original = new Packet(false, 0, idMessage, true, 999, data);
         var packets = original.Prepare();
 
         foreach (var packet in packets)
         {
             var packetAsBytes = packet.PacketToByteArray();
-            bytes = new byte[packetAsBytes.Length];
 
             // Send the data through the socket.
             var bytesSent = sender.Send(packetAsBytes);
@@ -27,6 +21,7 @@ public partial class Client
         }
 
         // Receive the response from the remote device.
+        bytes = new byte[Packet.MaxPacketSize];
         var bytesRec = sender.Receive(bytes);
         var packetAsBytes2 = new byte[bytesRec];
         Array.Copy(bytes, packetAsBytes2, bytesRec);

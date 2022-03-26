@@ -140,7 +140,16 @@ public class Server
 
                     // Check for end-of-file tag. If it is not there, read more data.
                     var content = state.Sb.ToString();
-                    if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
+                    if (state.Packet.IdMessage == 2)
+                    {
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
+                                          "\n\t Read {0} bytes =>\t" + state.Packet +
+                                          "\n\t Data buffer =>\t\t" + state.Sb +
+                                          "\n\t => FIN !", bytesRead);
+                        state.Packet.Status = true;
+                        Send(ar, true);
+                    }
+                    else if (state.Packet.Final)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
@@ -150,9 +159,6 @@ public class Server
                         {
                             case 1:
                                 state.Packet.Status = FonctionServer.IsConnection(state.Packet);
-                                break;
-                            case 2:
-                                state.Packet.Status = FonctionServer.Deconnexion(state.Packet);
                                 break;
                             case 3:
                                 state.Packet.Status = FonctionServer.Inscription(state.Packet);
@@ -190,15 +196,6 @@ public class Server
                         };
                         handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                             ReadCallback, state);
-                    }
-                    else if (content.IndexOf("<FIN>", StringComparison.Ordinal) > -1)
-                    {
-                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
-                                          "\n\t Read {0} bytes =>\t" + state.Packet +
-                                          "\n\t Data buffer =>\t\t" + state.Sb +
-                                          "\n\t => FIN !", bytesRead);
-                        state.Packet.Status = true;
-                        Send(ar, true);
                     }
                     else
                     {
@@ -238,6 +235,7 @@ public class Server
         var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 
+        Console.WriteLine(state.Packet);
         // Begin sending the data to the remote device.
         var handler = state.WorkSocket;
         if (end)

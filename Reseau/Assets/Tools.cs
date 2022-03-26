@@ -45,12 +45,14 @@ public static class Tools
             if (i + headerBytesMaxLength > dataBytesTotalLength)
             {
                 packet.Data = dataString[i..dataBytesTotalLength];
+                packet.Final = false;
                 Console.WriteLine(dataString[i..dataBytesTotalLength]);
                 // dataString.Substring(i, dataBytesTotalLength - i);
             }
             else
             {
                 packet.Data = dataString.Substring(i, headerBytesMaxLength);
+                packet.Final = true;
                 Console.WriteLine(dataString.Substring(i, headerBytesMaxLength));
             }
             packets.Add(packet);
