@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Assets;
+using Fonction;
 using System.Configuration;
 
 // State object for reading client data asynchronously
@@ -111,7 +112,6 @@ public class Server
         if (state is not null)
         {
             var handler = state.WorkSocket;
-
             if (handler is not null)
             {
                 // Read data from the client socket.
@@ -138,9 +138,37 @@ public class Server
                         switch (state.Packet.IdMessage)
                         {
                             case 1:
-                                //fonction connection test
+                                state.Packet.Status = FonctionServer.IsConnection(state.Packet);
+                                break;
+                            case 2:
+                                state.Packet.Status = FonctionServer.Deconnexion(state.Packet);
+                                break;
+                            case 3:
+                                state.Packet.Status = FonctionServer.Inscription(state.Packet);
+                                break;
+                            case 4:
+                                state.Packet = FonctionServer.Statistique(state.Packet);
+                                break;
+                            case 5:
+                                state.Packet.Data = FonctionServer.ListeRoom(state.Packet);
+                                break;
+                            case 6:
+                                state.Packet = FonctionServer.JoinRoom(state.Packet);
+                                break;
+                            case 7:
+                                state.Packet.Status = FonctionServer.LeaveRoom(state.Packet);
+                                break;
+                            case 8:
+                                state.Packet.Status = FonctionServer.ReadyRoom(state.Packet);
+                                break;
+                            case 9:
+                                state.Packet = FonctionServer.ParametreRoom(state.Packet);
+                                break;
+                            case 10:
+                                state.Packet.Data = FonctionServer.ChangementRoom(state.Packet);
                                 break;
                             default:
+                                state.Packet.Status = false;
                                 break;
                         }
                         // Echo the data back to the client.
@@ -179,8 +207,6 @@ public class Server
     private static void Send(IAsyncResult ar)
     {
         var state = (StateObject?)ar.AsyncState;
-        state.Packet.Data = "";
-        state.Packet.Status = true; //false si probleme
         var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 

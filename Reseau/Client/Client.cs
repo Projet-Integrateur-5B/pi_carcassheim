@@ -1,98 +1,41 @@
 namespace Client;
 
-using Assets;
-using System.Net;
 using System.Net.Sockets;
-using System.Configuration;
+using Assets;
 
 public class Client
 {
-    public static void StartClient(byte idMessage, string data)
+    public static void StartEnvoye(Socket sender, byte idMessage, string data)
     {
-        // get config from file
-        var Port = ConfigurationManager.AppSettings.Get("ServerPort");
-        var IP = ConfigurationManager.AppSettings.Get("ServerIP");
-
-        // Data buffer for incoming data.
         var bytes = new byte[Packet.MaxPacketSize];
 
-        // Connect to a remote device.
-        try
+        var original = new Packet(false, 0, idMessage, 999, data);
+        var packets = original.Prepare();
+
+        foreach (var packet in packets)
         {
-            Console.WriteLine("Client is setting up...");
+            Thread.Sleep(1000);
+            var packetAsBytes = packet.PacketToByteArray();
+            bytes = new byte[packetAsBytes.Length];
 
-            // Establish the remote endpoint for the socket.
-            var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, Packet.Port);
-
-
-            // Create a TCP/IP  socket.
-            var sender = new Socket(ipAddress.AddressFamily,
-                SocketType.Stream, ProtocolType.Tcp);
-
-            // Connect the socket to the remote endpoint. Catch any errors.
-            try
-            {
-                sender.Connect(remoteEP);
-                Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
-
-                var original = new Packet(false, 0, idMessage, 999, data);
-                var packets = original.Prepare();
-
-                foreach (var packet in packets)
-                {
-                    var packetAsBytes = packet.PacketToByteArray();
-                    bytes = new byte[packetAsBytes.Length];
-
-                    // Send the data through the socket.
-                    var bytesSent = sender.Send(packetAsBytes);
-                    Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
-                }
-
-                // Receive the response from the remote device.
-                var bytesRec = sender.Receive(bytes);
-                var packetAsBytes2 = new byte[bytesRec];
-                Array.Copy(bytes, packetAsBytes2, bytesRec);
-                var recv = packetAsBytes2.ByteArrayToPacket();
-                if (recv.Status)
-                {
-                    Console.WriteLine("Read {0} bytes => \tpermission accepted \n", bytesRec);
-                }
-                else
-                {
-                    Console.WriteLine("Read {0} bytes => \tpermission denied \n", bytesRec);
-                }
-
-                //Release the socket.
-                sender.Shutdown(SocketShutdown.Both);
-                sender.Close();
-                Console.WriteLine("Closing connection...");
-            }
-            catch (ArgumentNullException ane)
-            {
-                Console.WriteLine("ArgumentNullException : {0}", ane);
-            }
-            catch (SocketException se)
-            {
-                Console.WriteLine("SocketException : {0}", se);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Unexpected exception : {0}", e);
-            }
+            // Send the data through the socket.
+            var bytesSent = sender.Send(packetAsBytes);
+            Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
         }
-        catch (Exception e)
+
+        // Receive the response from the remote device.
+        var bytesRec = sender.Receive(bytes);
+        var packetAsBytes2 = new byte[bytesRec];
+        Array.Copy(bytes, packetAsBytes2, bytesRec);
+        var recv = packetAsBytes2.ByteArrayToPacket();
+        if (recv.Status)
         {
-            Console.WriteLine(e.ToString());
+            Console.WriteLine("Read {0} bytes => \tpermission accepted \n", bytesRec);
         }
-    }
+        else
+        {
+            Console.WriteLine("Read {0} bytes => \tpermission denied \n", bytesRec);
+        }
 
-    public static int Main()
-    {
-        const byte idMessage = 18;
-        const string data = "petit test";
-        StartClient(idMessage, data);
-        return 0;
     }
 }
