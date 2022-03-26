@@ -1,10 +1,11 @@
-namespace Fonction;
+namespace Server;
 
 using Assets;
-public class FonctionServer
+
+public partial class Server
 {
     // vérifie si les informations de connecction sont valide, si oui return true sinon false
-    public static bool IsConnection(Packet packet) //fonction a modifier pour la connection
+    public static bool Connection(Packet packet) //fonction a modifier pour la connection
     {
         if (packet.IdPlayer == 999)
         {
@@ -17,7 +18,7 @@ public class FonctionServer
     }
 
     // deconnecte le joueur du serveur, true si deconnexion reussit , false sinon
-    public static bool Deconnexion(Packet packet) // fonction pour deconnecter le joueur
+    public static bool Disconnection(Packet packet) // fonction pour deconnecter le joueur
     {
         if (packet.IdPlayer == 999)
         {
@@ -30,7 +31,7 @@ public class FonctionServer
     }
 
     // vérifie si l'inscription est valide et si oui retur, true sinon false
-    public static bool Inscription(Packet packet) //fonction a modifier pour l'inscription
+    public static bool Signup(Packet packet) //fonction a modifier pour l'inscription
     {
         if (packet.IdPlayer == 999)
         {
@@ -45,7 +46,7 @@ public class FonctionServer
     // rentre les stats du joueur dans packet.Data ( string ) ou dans une nouvelle classe ( a crée et modifier alors )
     // id du joueur présent dans packet.IdPlayer
     // Status = true si aucune erreur, sinon false
-    public static Packet Statistique(Packet packet) //fonction a modifier pour stat d'un joueur
+    public static Packet Statistics(Packet packet) //fonction a modifier pour stat d'un joueur
     {
         packet.Data = "joueur 1 : 23/12 ";
         packet.Status = true;
@@ -53,7 +54,7 @@ public class FonctionServer
     }
 
     // return la liste des rooms dispo dans un string ( ou une classe a crée )
-    public static string ListeRoom(Packet packet)
+    public static string RoomJoin(Packet packet)
     {
         var room = "r1 : 2 joueur";
         packet.Status = true;
@@ -63,7 +64,7 @@ public class FonctionServer
     // met dans Data les info de la room ( ou une classe a crée )
     // modifie les info de la room cote server
     // Status = true si tout c'est bien passer sinon false
-    public static Packet JoinRoom(Packet packet)
+    public static Packet RoomList(Packet packet)
     {
         packet.Data = "joueur 1";
         packet.Status = true;
@@ -72,7 +73,7 @@ public class FonctionServer
 
     // return true si room bien quitter, false si erreur
     // modifier donnee room cote serveur
-    public static bool LeaveRoom(Packet packet)
+    public static bool RoomLeave(Packet packet)
     {
         if (packet.IdPlayer == 999)
         {
@@ -85,7 +86,7 @@ public class FonctionServer
     }
 
     // met le joueur prêt ( true si bien passer, false sinon )
-    public static bool ReadyRoom(Packet packet)
+    public static bool RoomReady(Packet packet)
     {
         if (packet.IdPlayer == 999)
         {
@@ -99,7 +100,7 @@ public class FonctionServer
 
     // modifie les parametres de la room
     // status true si parametre bien modifier, false si erreur
-    public static Packet ParametreRoom(Packet packet)
+    public static Packet RoomSettings(Packet packet)
     {
         packet.Data = " nb personne : 1";
         packet.Status = true;
@@ -107,7 +108,7 @@ public class FonctionServer
     }
 
     // envoye les changement de la room ( joueur join ou modification parametre ou joueur pret )
-    public static string ChangementRoom(Packet packet)
+    public static string RoomEdit(Packet packet)
     {
         packet.Status = true;
         var data = "joueur arriver";

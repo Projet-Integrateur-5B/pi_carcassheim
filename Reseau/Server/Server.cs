@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Assets;
-using Fonction;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -25,7 +24,7 @@ public class StateObject
     public Packet? Packet { get; set; }
 }
 
-public class Server
+public partial class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
@@ -138,8 +137,10 @@ public class Server
                     // There  might be more data, so store the data received so far.
                     state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
 
-                    // Check for end-of-file tag. If it is not there, read more data.
+                    // Buffer with all the data
                     var content = state.Sb.ToString();
+
+                    // Disconnection
                     if ((IdMessage)state.Packet.IdMessage == IdMessage.Disconnection)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
@@ -149,6 +150,7 @@ public class Server
                         state.Packet.Status = true;
                         Send(ar, true);
                     }
+                    // Final packet of the series
                     else if (state.Packet.Final)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
@@ -158,33 +160,33 @@ public class Server
                         switch ((IdMessage)state.Packet.IdMessage)
                         {
                             case IdMessage.Connection:
-                                state.Packet.Status = FonctionServer.IsConnection(state.Packet);
+                                state.Packet.Status = Connection(state.Packet);
                                 break;
                             case IdMessage.Signup:
-                                state.Packet.Status = FonctionServer.Inscription(state.Packet);
+                                state.Packet.Status = Signup(state.Packet);
                                 break;
                             case IdMessage.Statistics:
-                                state.Packet = FonctionServer.Statistique(state.Packet);
+                                state.Packet = Statistics(state.Packet);
                                 break;
                             case IdMessage.RoomList:
-                                state.Packet.Data = FonctionServer.ListeRoom(state.Packet);
+                                state.Packet = RoomList(state.Packet);
                                 break;
                             case IdMessage.RoomJoin:
-                                state.Packet = FonctionServer.JoinRoom(state.Packet);
+                                state.Packet.Data = RoomJoin(state.Packet);
                                 break;
                             case IdMessage.RoomLeave:
-                                state.Packet.Status = FonctionServer.LeaveRoom(state.Packet);
+                                state.Packet.Status = RoomLeave(state.Packet);
                                 break;
                             case IdMessage.RoomReady:
-                                state.Packet.Status = FonctionServer.ReadyRoom(state.Packet);
+                                state.Packet.Status = RoomReady(state.Packet);
                                 break;
                             case IdMessage.RoomSettings:
-                                state.Packet = FonctionServer.ParametreRoom(state.Packet);
+                                state.Packet = RoomSettings(state.Packet);
                                 break;
                             case IdMessage.RoomEdit:
-                                state.Packet.Data = FonctionServer.ChangementRoom(state.Packet);
+                                state.Packet.Data = RoomEdit(state.Packet);
                                 break;
-                            case IdMessage.Disconnection:
+                            case IdMessage.Disconnection: // impossible
                                 break;
                             case IdMessage.Default:
                             default:
@@ -200,6 +202,7 @@ public class Server
                         handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                             ReadCallback, state);
                     }
+                    // More packets to receive
                     else
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
@@ -240,7 +243,7 @@ public class Server
 
         // Begin sending the data to the remote device.
         var handler = state.WorkSocket;
-        if (end)
+        if (end) // disconnection
         {
             handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, state);
         }
