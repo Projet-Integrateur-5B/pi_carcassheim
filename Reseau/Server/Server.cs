@@ -33,7 +33,7 @@ public class Server
     public static void StartListening()
     {
         // get config from file
-        var Port = ConfigurationManager.AppSettings.Get("ServerPort");
+        var port = ConfigurationManager.AppSettings.Get("ServerPort");
 
         Console.WriteLine("Server is setting up...");
 

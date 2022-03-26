@@ -109,6 +109,7 @@ public class FonctionServer
     // envoye les changement de la room ( joueur join ou modification parametre ou joueur pret )
     public static string ChangementRoom(Packet packet)
     {
+        packet.Status = true;
         var data = "joueur arriver";
         return data;
     }

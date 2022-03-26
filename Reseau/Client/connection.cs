@@ -5,12 +5,12 @@ using System.Net;
 using System.Net.Sockets;
 using Assets;
 
-public class connect
+public class Connect
 {
     public static Socket? Connection()
     {
-        var Port = ConfigurationManager.AppSettings.Get("ServerPort");
-        var IP = ConfigurationManager.AppSettings.Get("ServerIP");
+        var port = ConfigurationManager.AppSettings.Get("ServerPort");
+        var ip = ConfigurationManager.AppSettings.Get("ServerIP");
         try
         {
             Console.WriteLine("Client is setting up...");

@@ -4,7 +4,7 @@ public partial class Client
 {
     public static int Main()
     {
-        var sender = connect.Connection();
+        var sender = Connect.Connection();
         Communication(sender, 1, "petit test");
         Communication(sender, 5, "test deux");
         Communication(sender, 9, "test trois");
