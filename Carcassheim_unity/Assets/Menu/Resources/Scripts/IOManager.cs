@@ -99,8 +99,10 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	public void ColorButtonDeselected()
 	{
 		_btnText = previousGo.GetComponentInChildren<Text>();
+		Color tmp; 
+		ColorUtility.TryParseHtmlString("#FFA500", out tmp);
 		if (_btnText.transform.parent.name == "CGU" || _btnText.transform.parent.name == "ForgottenPwdUser")
-			_btnText.color = Color.green;
+			_btnText.color = tmp; 
 		else
 			_btnText.color = Color.white;
 		_btnText.fontSize -= 3;

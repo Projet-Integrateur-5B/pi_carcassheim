@@ -69,7 +69,7 @@ public class ConnectionMenu : Miscellaneous
 		else
 		{
 			tmpGO.GetComponent<Text>().color = Color.yellow;
-			tmpText.text = "Ressaissiez votre login et votre mot de passe !";
+			tmpText.text = "Ressaissez votre login et votre mot de passe !";
 		}
 	}
 }
