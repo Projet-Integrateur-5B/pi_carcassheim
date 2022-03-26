@@ -140,7 +140,7 @@ public class Server
 
                     // Check for end-of-file tag. If it is not there, read more data.
                     var content = state.Sb.ToString();
-                    if (state.Packet.IdMessage == 2)
+                    if ((IdMessage)state.Packet.IdMessage == IdMessage.Disconnection)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
@@ -155,35 +155,38 @@ public class Server
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
                                           "\n\t Data buffer =>\t\t" + state.Sb +
                                           "\n\t => Every packet has been received !", bytesRead);
-                        switch (state.Packet.IdMessage)
+                        switch ((IdMessage)state.Packet.IdMessage)
                         {
-                            case 1:
+                            case IdMessage.Connection:
                                 state.Packet.Status = FonctionServer.IsConnection(state.Packet);
                                 break;
-                            case 3:
+                            case IdMessage.Signup:
                                 state.Packet.Status = FonctionServer.Inscription(state.Packet);
                                 break;
-                            case 4:
+                            case IdMessage.Statistics:
                                 state.Packet = FonctionServer.Statistique(state.Packet);
                                 break;
-                            case 5:
+                            case IdMessage.RoomList:
                                 state.Packet.Data = FonctionServer.ListeRoom(state.Packet);
                                 break;
-                            case 6:
+                            case IdMessage.RoomJoin:
                                 state.Packet = FonctionServer.JoinRoom(state.Packet);
                                 break;
-                            case 7:
+                            case IdMessage.RoomLeave:
                                 state.Packet.Status = FonctionServer.LeaveRoom(state.Packet);
                                 break;
-                            case 8:
+                            case IdMessage.RoomReady:
                                 state.Packet.Status = FonctionServer.ReadyRoom(state.Packet);
                                 break;
-                            case 9:
+                            case IdMessage.RoomSettings:
                                 state.Packet = FonctionServer.ParametreRoom(state.Packet);
                                 break;
-                            case 10:
+                            case IdMessage.RoomEdit:
                                 state.Packet.Data = FonctionServer.ChangementRoom(state.Packet);
                                 break;
+                            case IdMessage.Disconnection:
+                                break;
+                            case IdMessage.Default:
                             default:
                                 state.Packet.Status = false;
                                 break;

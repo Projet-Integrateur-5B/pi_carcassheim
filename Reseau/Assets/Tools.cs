@@ -3,8 +3,24 @@ namespace Assets;
 using System.Text;
 using Newtonsoft.Json;
 
+public enum IdMessage : byte
+{
+    Default = 0,
+    Connection = 1,
+    Disconnection = 2,
+    Signup = 3,
+    Statistics = 4,
+    RoomList = 5,
+    RoomJoin = 6,
+    RoomLeave = 7,
+    RoomReady = 8,
+    RoomSettings = 9,
+    RoomEdit = 10
+}
+
 public static class Tools
 {
+
     public static byte[] PacketToByteArray(this Packet packet)
     {
         var serialized = JsonConvert.SerializeObject(packet);
