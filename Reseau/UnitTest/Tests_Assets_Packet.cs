@@ -1,5 +1,6 @@
 namespace UnitTest;
 
+using System.Collections.Generic;
 using System.Text;
 using Assets;
 using NUnit.Framework;
@@ -18,7 +19,7 @@ public class TestsAssetsPacket
     }
 
     [Test]
-    public void TestPacketDeserializationSuccess()
+    public void TestPacketByteArrayToPacketSuccess()
     {
         var resultAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
         var result = resultAsBytes.ByteArrayToPacket();
@@ -43,14 +44,14 @@ public class TestsAssetsPacket
     }
 
     [Test]
-    public void TestPacketPrepareSolopacketSuccess()
+    public void TestPacketSplitSolopacketSuccess()
     {
-        var packets = this.original.Prepare();
+        var packets = this.original.Split();
         Assert.AreEqual(this.original, packets[0]);
     }
 
     [Test]
-    public void TestPacketPrepareMultipacketsSuccess()
+    public void TestPacketSplitMultipacketsSuccess()
     {
         var type = this.original.Type;
         var idRoom = this.original.IdRoom;
@@ -70,8 +71,50 @@ public class TestsAssetsPacket
         var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
             "-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
 
-        var packets = packet.Prepare();
+        var packets = packet.Split();
         Assert.AreEqual(p0.Data, packets[0].Data);
         Assert.AreEqual(p1.Data, packets[1].Data);
+    }
+
+    [Test]
+    public void TestPacketCatenateSolopacketSuccess()
+    {
+        var packets = new List<Packet>
+        {
+            this.original
+        };
+        var packet = packets.Catenate();
+        Assert.AreEqual(this.original, packet);
+    }
+
+    [Test]
+    public void TestPacketCatenateMultipacketSuccess()
+    {
+        var type = this.original.Type;
+        var idRoom = this.original.IdRoom;
+        var idMessage = this.original.IdMessage;
+        var status = this.original.Status;
+        var permission = this.original.Permission;
+        var final = this.original.Final;
+        var idPlayer = this.original.IdPlayer;
+
+        var original = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer,
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
+        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer, "")
+        {
+            Data =
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+        };
+        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
+            "-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
+
+        var packets = new List<Packet>
+        {
+            p0,
+            p1
+        };
+        var packet = packets.Catenate();
+
+        Assert.AreEqual(original.Data, packet.Data);
     }
 }

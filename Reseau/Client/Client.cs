@@ -80,7 +80,7 @@ public partial class Client
     {
         var bytes = new byte[Packet.MaxPacketSize];
         var original = new Packet(false, 0, idMessage, true, 999, data);
-        var packets = original.Prepare();
+        var packets = original.Split();
 
         var count_errors = 0;
         for (var i = 0; i < 1; i++)

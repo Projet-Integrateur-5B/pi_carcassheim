@@ -33,7 +33,7 @@ public static class Tools
         return JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? new Packet();
     }
 
-    public static List<Packet> Prepare(this Packet original)
+    public static List<Packet> Split(this Packet original)
     {
         var packets = new List<Packet>();
 
@@ -75,5 +75,15 @@ public static class Tools
             packets.Add(packet);
         }
         return packets;
+    }
+
+    public static Packet Catenate(this List<Packet> packets)
+    {
+        var original = packets[0];
+        foreach (var packet in packets.Skip(1))
+        {
+            original.Data += packet.Data;
+        }
+        return original;
     }
 }
