@@ -1,41 +1,69 @@
 namespace Client;
 
+using System.Configuration;
+using System.Net;
 using System.Net.Sockets;
 using Assets;
 
-public class Client
+public partial class Client
 {
-    public static void StartEnvoye(Socket sender, byte idMessage, string data)
+    public static void StartClient(byte idMessage, string data)
     {
-        var bytes = new byte[Packet.MaxPacketSize];
+        // get config from file
+        var Port = ConfigurationManager.AppSettings.Get("ServerPort");
+        var IP = ConfigurationManager.AppSettings.Get("ServerIP");
 
-        var original = new Packet(false, 0, idMessage, 999, data);
-        var packets = original.Prepare();
-
-        foreach (var packet in packets)
+        // Connect to a remote device.
+        try
         {
-            Thread.Sleep(1000);
-            var packetAsBytes = packet.PacketToByteArray();
-            bytes = new byte[packetAsBytes.Length];
+            Console.WriteLine("Client is setting up...");
 
-            // Send the data through the socket.
-            var bytesSent = sender.Send(packetAsBytes);
-            Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
+            // Establish the remote endpoint for the socket.
+            var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            var ipAddress = ipHostInfo.AddressList[0];
+            var remoteEP = new IPEndPoint(ipAddress, Packet.Port);
+
+            // Create a TCP/IP  socket.
+            var sender = new Socket(ipAddress.AddressFamily,
+                SocketType.Stream, ProtocolType.Tcp);
+
+            // Connect the socket to the remote endpoint. Catch any errors.
+            try
+            {
+                sender.Connect(remoteEP);
+                Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
+
+                // envoye / reception message
+                Communication(sender, idMessage, data);
+
+                //Release the socket.
+                sender.Shutdown(SocketShutdown.Both);
+                sender.Close();
+                Console.WriteLine("Closing connection...");
+            }
+            catch (ArgumentNullException ane)
+            {
+                Console.WriteLine("ArgumentNullException : {0}", ane);
+            }
+            catch (SocketException se)
+            {
+                Console.WriteLine("SocketException : {0}", se);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unexpected exception : {0}", e);
+            }
         }
-
-        // Receive the response from the remote device.
-        var bytesRec = sender.Receive(bytes);
-        var packetAsBytes2 = new byte[bytesRec];
-        Array.Copy(bytes, packetAsBytes2, bytesRec);
-        var recv = packetAsBytes2.ByteArrayToPacket();
-        if (recv.Status)
+        catch (Exception e)
         {
-            Console.WriteLine("Read {0} bytes => \tpermission accepted \n", bytesRec);
+            Console.WriteLine(e.ToString());
         }
-        else
-        {
-            Console.WriteLine("Read {0} bytes => \tpermission denied \n", bytesRec);
-        }
-
+    }
+    public static int Main()
+    {
+        const byte idMessage = 2;
+        const string data = "petit test";
+        StartClient(idMessage, data);
+        return 0;
     }
 }

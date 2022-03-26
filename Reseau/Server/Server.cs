@@ -122,7 +122,18 @@ public class Server
                     Console.WriteLine(bytesRead);
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
-                    state.Packet = packetAsBytes.ByteArrayToPacket();
+
+                    try
+                    {
+                        state.Packet = packetAsBytes.ByteArrayToPacket();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
+                                          "\n\t Read : {0} bytes" +
+                                          "\n\t => Wrong format, message ignored !", bytesRead);
+                        return;
+                    }
 
                     // There  might be more data, so store the data received so far.
                     state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
