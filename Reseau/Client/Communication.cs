@@ -11,8 +11,8 @@ public partial class Client
         var original = new Packet(false, 0, idMessage, true, 999, data);
         var packets = original.Prepare();
 
-        int count_errors = 0;
-        for (int i = 0; i<1; i++)
+        var count_errors = 0;
+        for (var i = 0; i < 1; i++)
         {
             foreach (var packet in packets)
             {
