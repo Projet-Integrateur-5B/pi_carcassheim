@@ -52,9 +52,15 @@ public partial class Client
 
     private static void Disconnection(Socket sender)
     {
-        var value = Communication(sender, (byte) IdMessage.Disconnection, "");
-        if(value.Item1 == -1) // TODO : handle error
-            Console.WriteLine("Error");
+        try
+        {
+            Communication(sender, (byte)IdMessage.Disconnection, "");
+        }
+        catch (ReceivedInvalidPacketFormatException e)
+        {
+            // TODO : handle case where errors is catch i.e. when connection is already closed
+            Console.WriteLine(e);
+        }
 
         // Deconnect to a remote device.
         try
@@ -77,7 +83,7 @@ public partial class Client
         }
     }
 
-    private static (int, Packet) Communication(Socket sender, byte idMessage, string data)
+    private static Packet Communication(Socket sender, byte idMessage, string data)
     {
         var original = new Packet(false, 0, idMessage, true, 999, data);
         var packets = original.Split();
@@ -105,16 +111,17 @@ public partial class Client
                     received.Status
                         ? "Read {0} bytes => \tpermission accepted \n"
                         : "Read {0} bytes => \tpermission denied \n", bytesRec);
-                return (0, received);
+                return received;
             }
-            catch (Exception) // received wrong format, deserialize failed
+            catch (Exception e) // received wrong format, deserialize failed
             {
                 count_errors++;
-                if (count_errors == 3) // has failed 3 times, return code error -1
+                if (count_errors != 3)
                 {
-                    Console.WriteLine("An errors has occured, please try again !");
-                    return (-1, new Packet());
+                    continue;
                 }
+                Console.WriteLine("An errors has occured, please try again !");
+                throw new ReceivedInvalidPacketFormatException("Received Invalid Packet Format Exception: " + e);
             }
         }
     }
