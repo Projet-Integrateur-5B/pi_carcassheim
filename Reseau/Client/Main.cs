@@ -6,7 +6,7 @@ public partial class Client
     {
         var sender = Connection();
 
-        // TODO : handle case where value == -1 (error has occured)
+        // TODO : handle case where value[0] == -1 (error has occured)
         var value = Communication(sender, 1, "petit test");
         value = Communication(sender, 5, "test deux");
         value = Communication(sender, 9, "test trois");

@@ -1,16 +1,15 @@
 namespace Client;
-
-using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using Assets;
 
 public partial class Client
 {
-    public static Socket? Connection()
+    private static Socket? Connection()
     {
-        var port = ConfigurationManager.AppSettings.Get("ServerPort");
-        var ip = ConfigurationManager.AppSettings.Get("ServerIP");
+        /*var port = ConfigurationManager.AppSettings.Get("ServerPort");
+        var ip = ConfigurationManager.AppSettings.Get("ServerIP");*/
+
         try
         {
             Console.WriteLine("Client is setting up...");
@@ -19,7 +18,6 @@ public partial class Client
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
             var remoteEP = new IPEndPoint(ipAddress, Packet.Port);
-
 
             // Create a TCP/IP  socket.
             var sender = new Socket(ipAddress.AddressFamily,
@@ -31,7 +29,6 @@ public partial class Client
                 sender.Connect(remoteEP);
                 Console.WriteLine("Client is connected to {0}", sender.RemoteEndPoint);
                 return sender;
-
             }
             catch (ArgumentNullException ane)
             {
@@ -53,7 +50,7 @@ public partial class Client
         return null;
     }
 
-    public static void Disconnection(Socket sender)
+    private static void Disconnection(Socket sender)
     {
         // Deconnect to a remote device.
         try
@@ -76,53 +73,45 @@ public partial class Client
         }
     }
 
-    public static int Communication(Socket sender, byte idMessage, string data)
+    private static (int, Packet) Communication(Socket sender, byte idMessage, string data)
     {
-        var bytes = new byte[Packet.MaxPacketSize];
         var original = new Packet(false, 0, idMessage, true, 999, data);
         var packets = original.Split();
 
         var count_errors = 0;
-        for (var i = 0; i < 1; i++)
+        while (true)
         {
             foreach (var packet in packets)
             {
-                var packetAsBytes = packet.PacketToByteArray();
-
                 // Send the data through the socket.
-                var bytesSent = sender.Send(packetAsBytes);
+                var bytesSent = sender.Send(packet.PacketToByteArray());
                 Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
             }
 
             // Receive the response from the remote device.
-            bytes = new byte[Packet.MaxPacketSize];
+            var bytes = new byte[Packet.MaxPacketSize];
             var bytesRec = sender.Receive(bytes);
-            var packetAsBytes2 = new byte[bytesRec];
-            Array.Copy(bytes, packetAsBytes2, bytesRec);
+            var packetAsBytes = new byte[bytesRec];
+            Array.Copy(bytes, packetAsBytes, bytesRec);
 
             try
             {
-                var recv = packetAsBytes2.ByteArrayToPacket();
-                if (recv.Status)
-                {
-                    Console.WriteLine("Read {0} bytes => \tpermission accepted \n", bytesRec);
-                }
-                else
-                {
-                    Console.WriteLine("Read {0} bytes => \tpermission denied \n", bytesRec);
-                }
+                var received = packetAsBytes.ByteArrayToPacket();
+                Console.WriteLine(
+                    received.Status
+                        ? "Read {0} bytes => \tpermission accepted \n"
+                        : "Read {0} bytes => \tpermission denied \n", bytesRec);
+                return (0, received);
             }
             catch (Exception) // received wrong format, deserialize failed
             {
                 count_errors++;
-                i = -1; // try sending again, except if :
                 if (count_errors == 3) // has failed 3 times, return code error -1
                 {
                     Console.WriteLine("An errors has occured, please try again !");
-                    return -1;
+                    return (-1, new Packet());
                 }
             }
         }
-        return 0;
     }
 }
