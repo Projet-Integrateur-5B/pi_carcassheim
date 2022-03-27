@@ -238,6 +238,7 @@ public partial class Server
     private static void Send(IAsyncResult ar, bool end)
     {
         var state = (StateObject?)ar.AsyncState;
+        // TODO : get and put into Data what the client asked for
         var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 

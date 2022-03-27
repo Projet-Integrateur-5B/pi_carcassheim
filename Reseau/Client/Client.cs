@@ -2,6 +2,7 @@ namespace Client;
 using System.Net;
 using System.Net.Sockets;
 using Assets;
+using Newtonsoft.Json;
 
 public partial class Client
 {
@@ -58,8 +59,20 @@ public partial class Client
         }
         catch (ReceivedInvalidPacketFormatException e)
         {
-            // TODO : handle case where errors is catch i.e. when connection is already closed
-            Console.WriteLine(e);
+            Console.WriteLine("ReceivedInvalidPacketFormatException : {0}", e);
+        }
+        catch (ArgumentNullException ane)
+        {
+            Console.WriteLine("ArgumentNullException : {0}", ane);
+        }
+        catch (SocketException se)
+        {
+            // TODO : handle case : connection is already closed on the server side
+            Console.WriteLine("SocketException : {0}", se);
+        }
+        catch (Exception e) when (e is not ReceivedInvalidPacketFormatException)
+        {
+            Console.WriteLine("Unexpected exception : {0}", e);
         }
 
         // Deconnect to a remote device.
@@ -113,15 +126,14 @@ public partial class Client
                         : "Read {0} bytes => \tpermission denied \n", bytesRec);
                 return received;
             }
-            catch (Exception e) // received wrong format, deserialize failed
+            catch (JsonReaderException jre) // received wrong format, deserialize failed
             {
                 count_errors++;
                 if (count_errors != 3)
                 {
                     continue;
                 }
-                Console.WriteLine("An errors has occured, please try again !");
-                throw new ReceivedInvalidPacketFormatException("Received Invalid Packet Format Exception: " + e);
+                throw new ReceivedInvalidPacketFormatException("" + jre);
             }
         }
     }
