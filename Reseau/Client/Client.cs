@@ -52,6 +52,10 @@ public partial class Client
 
     private static void Disconnection(Socket sender)
     {
+        var value = Communication(sender, (byte) IdMessage.Disconnection, "");
+        if(value.Item1 == -1) // TODO : handle error
+            Console.WriteLine("Error");
+
         // Deconnect to a remote device.
         try
         {
