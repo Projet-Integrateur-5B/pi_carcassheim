@@ -3,18 +3,22 @@ using UnityEngine.UI; /* using System.Text.RegularExpressions; // needed for Reg
 
 public class AccountMenu : Miscellaneous
 {
-	private Transform accMenu;
-	private InputField passwordCA, confirmPwdCA;
+	private Transform accMenu, AMCI; // Account Menu Container InputField
+	private InputField pseudoCA, emailCA, passwordCA, confirmPwdCA;
 	private static bool boolCGU = false;
 	void Start()
 	{
 		// INITIALISATION
 		accMenu = GameObject.Find("SubMenus").transform.Find("AccountMenu").transform;
-		accMenu.Find("InputField Day CA").GetComponent<InputField>().characterLimit = 2;
-		accMenu.Find("InputField Month CA").GetComponent<InputField>().characterLimit = 2;
-		accMenu.Find("InputField Year CA").GetComponent<InputField>().characterLimit = 4;
-		passwordCA = accMenu.Find("InputField Password CA").GetComponent<InputField>();
-		confirmPwdCA = accMenu.Find("InputField ConfirmPwd CA").GetComponent<InputField>();
+		AMCI = accMenu.Find("InputField").transform;
+		AMCI.Find("InputField Day CA").GetComponent<InputField>().characterLimit = 2;
+		AMCI.Find("InputField Month CA").GetComponent<InputField>().characterLimit = 2;
+		AMCI.Find("InputField Year CA").GetComponent<InputField>().characterLimit = 4;
+		pseudoCA = AMCI.Find("InputField Pseudo CA").GetComponent<InputField>();
+		emailCA = AMCI.Find("InputField Email CA").GetComponent<InputField>();
+		passwordCA = AMCI.Find("InputField Password CA").GetComponent<InputField>();
+		confirmPwdCA = AMCI.Find("InputField ConfirmPwd CA").GetComponent<InputField>();
+		passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password; // Hide password by default
 	}
 
 	public void ResetWarningTextAM()
@@ -59,8 +63,8 @@ public class AccountMenu : Miscellaneous
 
 	public bool GetInputFields()
 	{
-		bool a = string.Equals(RemoveLastSpace(GameObject.Find("InputField Pseudo CA").GetComponent<InputField>().text), "a");
-		bool b = string.Equals(RemoveLastSpace(GameObject.Find("InputField Email CA").GetComponent<InputField>().text), "b");
+		bool a = string.Equals(RemoveLastSpace(pseudoCA.text), "a");
+		bool b = string.Equals(RemoveLastSpace(emailCA.text), "b");
 		bool c = string.Equals(GameObject.Find("InputField Day CA").GetComponent<InputField>().text, "01");
 		bool d = string.Equals(GameObject.Find("InputField Month CA").GetComponent<InputField>().text, "02");
 		bool e = string.Equals(GameObject.Find("InputField Year CA").GetComponent<InputField>().text, "0304");

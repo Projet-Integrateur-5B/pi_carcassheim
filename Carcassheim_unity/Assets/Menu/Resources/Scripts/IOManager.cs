@@ -76,7 +76,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		currentGo = FirstActiveChild(GameObject.Find("Buttons"));
 		previousGo = currentGo;
 		eventSystem.SetSelectedGameObject(currentGo);
-		_btnText = eventSystem.currentSelectedGameObject.GetComponentInChildren<Text>();
+		_btnText = currentGo.GetComponentInChildren<Text>();
 		_previousColor = _btnText.color;
 		_btnText.color = colHover;
 		_btnText.fontSize += 3;

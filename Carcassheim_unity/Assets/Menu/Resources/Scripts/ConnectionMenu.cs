@@ -3,12 +3,15 @@ using UnityEngine.UI;
 
 public class ConnectionMenu : Miscellaneous
 {
-	private Transform accMenu;
-	private InputField passwordCM;
+	private Transform coMenu, CMCI; // Account Menu Container InputField
+	private InputField loginCM, passwordCM;
 	void Start()
 	{
-		accMenu = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform;
-		passwordCM = accMenu.Find("InputField Password CM").GetComponent<InputField>();
+		coMenu = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform;
+		CMCI = coMenu.Find("InputField").transform;
+		loginCM = CMCI.GetChild(0).GetComponent<InputField>();
+		passwordCM = CMCI.GetChild(1).GetComponent<InputField>();
+		passwordCM.inputType = InputField.InputType.Password; // Hide password by default
 	}
 
 	public void ResetWarningTextCM()
@@ -56,7 +59,7 @@ public class ConnectionMenu : Miscellaneous
 
 	public void Connect()
 	{
-		bool a = string.Equals(RemoveLastSpace(GameObject.Find("InputField Email/Login").GetComponent<InputField>().text), "");
+		bool a = string.Equals(RemoveLastSpace(loginCM.text), "");
 		bool b = string.Equals(passwordCM.text, "");
 		SetState(a && b);
 		GameObject tmpGO = GameObject.Find("Instructions");
@@ -69,7 +72,7 @@ public class ConnectionMenu : Miscellaneous
 		else
 		{
 			tmpGO.GetComponent<Text>().color = Color.yellow;
-			tmpText.text = "Ressaissez votre login et votre mot de passe !";
+			tmpText.text = "Ressaisissez votre login et votre mot de passe !";
 		}
 	}
 }
