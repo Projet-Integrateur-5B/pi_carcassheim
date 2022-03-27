@@ -239,7 +239,6 @@ public partial class Server
     {
         var state = (StateObject?)ar.AsyncState;
         var packetAsBytes = state.Packet.PacketToByteArray();
-        packetAsBytes = Encoding.ASCII.GetBytes("failed");
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
