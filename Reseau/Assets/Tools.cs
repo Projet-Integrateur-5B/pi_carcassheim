@@ -3,6 +3,17 @@ namespace Assets;
 using System.Text;
 using Newtonsoft.Json;
 
+public enum Errors : int
+{
+    None = 0,
+    Unknown = -1,
+    Socket = 1,
+    Format = 2,
+    ConfigFile = 3,
+    Receive = 4,
+    Data = 5,
+    ToBeDetermined = 999
+}
 public enum IdMessage : byte
 {
     Default = 0,
