@@ -131,6 +131,55 @@ public class DB : MonoBehaviour
         return Int32.Parse(getCommandResult());
     }
 
+
+/* ------------------------------ RECUPERATION INFO COMPTE --------------------------- */
+    //Pseudo
+    public string Pseudo(int IDU)
+        {
+            string s = "select Pseudo from table Utilisateur where IDU = " + IDU +";";
+            command(s);
+            return Parse(getCommandResult());
+        }
+    //Photo
+    public string Photo(int IDU)
+        {
+            string s = "select Photo from table Utilisateur where IDU = " + IDU +";";
+            command(s);
+            return Parse(getCommandResult());
+        }
+    //Victoires
+    public int Victoires(int IDU)
+        {
+            string s = "select Victoires from table Utilisateur where IDU = " + IDU +";";
+            command(s);
+            return Int32.Parse(getCommandResult());
+        }
+    //Niveau
+    public int Niveau(int IDU)
+        {
+            string s = "select Niveau from table Utilisateur where IDU = " + IDU +";";
+            command(s);
+            return Int32.Parse(getCommandResult());
+        }
+    //Defaites
+    public int Defaites(int IDU)
+        {
+            string s = "select Defaites from table Utilisateur where IDU = " + IDU +";";
+            command(s);
+            return Int32.Parse(getCommandResult());
+        }
+    //NbParties
+    public int NbParties(int IDU)
+        {
+            string s = "select NbParties from table Utilisateur where IDU = " + IDU +";";
+            command(s);
+            return Int32.Parse(getCommandResult());
+        }
+
+/* -------------------------------------------------------------------------- */
+
+
+
 /* ---------------------------------- DROP ---------------------------------- */
     public void Drop(string tableName)
     {
