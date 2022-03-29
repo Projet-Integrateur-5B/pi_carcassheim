@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Assets.system;
 
 public class Plateau
 {
-    public static readonly int[,] PositionAdjacentes = new int[,]
-        { { 0, -1 }, { 1, 0 }, { 0, 1 }, { -1, 0 } };
+    public static readonly int[,] PositionAdjacentes;
     
     private List<Tuile> _tuiles;
     public List<Tuile> Tuiles
@@ -19,6 +19,16 @@ public class Plateau
         _tuiles = new List<Tuile>();
     }
 
+    static Plateau()
+    {
+        PositionAdjacentes = new int[,]
+        {
+            { 0, -1 },
+            { 1, 0 },
+            { 0, 1 },
+            { -1, 0 }
+        };
+    }
     public Tuile GetTuile(int x, int y)
     {
         foreach (var item in _tuiles)
@@ -315,26 +325,5 @@ public class Plateau
                 return true;
         }
         return false;
-    }
-}
-
-public struct Position
-{
-    int _x, _y, _rot;
-
-    public int X => _x;
-    public int Y => _y;
-    public int ROT => _rot;
-
-    public Position(int x, int y, int rot)
-    {
-        _x = x;
-        _y = y;
-        _rot = rot;
-    }
-
-    public override string ToString()
-    {
-        return _x.ToString() + _y.ToString() + _rot.ToString();
     }
 }
