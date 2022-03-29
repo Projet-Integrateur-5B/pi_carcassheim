@@ -14,7 +14,7 @@ public class Banner : MonoBehaviour
     [SerializeField] private DisplaySystem master;
 
     private PlayerRepre _player = null;
-    uint _nb_player = 0;
+    int _nb_player = 0;
     // Start is called before the first frame update
 
     void Start()
@@ -74,17 +74,17 @@ public class Banner : MonoBehaviour
         }
     }
 
-    public void setPlayerNumber(uint number)
+    public void setPlayerNumber(int number)
     {
         _nb_player = number;
         nbPlayerTMP.text = _nb_player.ToString();
     }
 
-    public void setTimerTour(TimerRepre timer)
+    public void setTimerTour(int min, int sec)
     {
-        timerTour.setTime(timer);
+        timerTour.setTime(min, sec);
         timerTour.OnSecondPassed += tourUpdated;
-        timerTourTMP.text = timer.ToString();
+        timerTourTMP.text = timerTour.ToString();
     }
 
     void scoreUpdated(uint old_score, uint new_score)
@@ -97,7 +97,7 @@ public class Banner : MonoBehaviour
         nbMeepleTMP.text = meeple.ToString();
     }
 
-    void playerUpdated(uint nb_player)
+    void playerUpdated(int nb_player)
     {
         _nb_player = nb_player;
         nbPlayerTMP.text = nb_player.ToString();
