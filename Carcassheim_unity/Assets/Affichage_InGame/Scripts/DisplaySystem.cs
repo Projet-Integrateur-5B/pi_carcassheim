@@ -64,7 +64,7 @@ public class DisplaySystem : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    async void Start()
     {
         TableLayer = LayerMask.NameToLayer("Table");
         BoardLayer = LayerMask.NameToLayer("Board");
@@ -80,6 +80,13 @@ public class DisplaySystem : MonoBehaviour
         tiles_drawned = new Queue<Tuile>();
         lifespan_tiles_drawned = new Queue<bool>();
 
+        if (players_color.Count == 0)
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                players_color.Add(new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f)));
+            }
+        }
         //! TEST
         gameBegin();
         setNextState(DisplaySystemState.turnStart);
