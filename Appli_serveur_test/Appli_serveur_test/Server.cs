@@ -28,24 +28,43 @@ public partial class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-
+    
     public static void StartListening()
     {
         // get config from file
-        var strPort = ConfigurationManager.AppSettings.Get("ServerPort");
+        var strServerPort = ConfigurationManager.AppSettings.Get("ServerPort");
+        var serverPort = 0;
+
         var port = 0;
         try
         {
-            port = Convert.ToInt32(strPort);
+            serverPort = Convert.ToInt32(strServerPort);
         }
-        catch (OverflowException)
+        catch (OverflowException oe)
         {
-            Console.WriteLine("{0} is outside the range of the Int32 type.", strPort);
+            Console.WriteLine("OverflowException : {0}", oe);
         }
-        catch (FormatException)
+        catch (FormatException fe)
         {
-            Console.WriteLine("The {0} value '{1}' is not in a recognizable format.",
-                strPort.GetType().Name, strPort);
+            Console.WriteLine("FormatException : {0}", fe);
+        }
+
+        try
+        {
+            Console.WriteLine("Server is connecting to the database...");
+            var strDatabaseAddress = ConfigurationManager.AppSettings.Get("DatabaseAddress");
+            var databaseAddress = IPAddress.Parse(strDatabaseAddress);
+            var strDatabasePort = ConfigurationManager.AppSettings.Get("DatabasePort");
+            var databasePort = Convert.ToInt32(strDatabasePort);
+            var remoteEp = new IPEndPoint(databaseAddress, databasePort);
+            var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            database.Connect(remoteEp);
+            Console.WriteLine("Client is connected to the database : {0}", database.RemoteEndPoint);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Exception (database) : {0}", e);
+            return;
         }
 
         Console.WriteLine("Server is setting up...");
