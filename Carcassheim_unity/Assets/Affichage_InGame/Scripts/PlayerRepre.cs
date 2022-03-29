@@ -46,4 +46,12 @@ public class PlayerRepre
         _nb_meeple = 0;
         _score = 0;
     }
+
+    public PlayerRepre(int id, Color col)
+    {
+        Id = id;
+        color = col;
+        _score = 0;
+        _nb_meeple = 0;
+    }
 }
