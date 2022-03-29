@@ -11,6 +11,8 @@ public partial class Thread_serveur_jeu
 	// Champs qui paramètrent la partie
 
 	private readonly int _id_partie;
+	private int _nbJoueur;
+
 
 	private Dictionary<int, int> _dico_joueur_score; // Contient les ID's de chaque joueur
 	private int _id_moderateur; // Identifiant du joueur modérateur
@@ -52,6 +54,15 @@ public partial class Thread_serveur_jeu
 		_timer = 3600; // Une heure par défaut
 		_timer_max_joueur = 40;
 		_meeples = 8;
+		_nbJoueur = 1;
+
+	}
+	public void ajoutJoueur(int idJoueur)
+    {
+		Joueur j = new Joueur(idJoueur);
+		_nbJoueur++;
+		_dico_joueur_score.Add(idJoueur , 0);
+
 	}
 
 	// Méthodes
@@ -69,57 +80,84 @@ public partial class Thread_serveur_jeu
 	*/
 	public void Lancement_thread_serveur_jeu()//int?
     {
-		//bool tour = true;
-		//bool partie = true;
-        //while (partie) {
-			//LireXml?
-			//Initialisation du plateau
+		_statut_partie = "EN_COURS";
 
-			//boucle_Tour:
-			//while (tour) { 
-			//Phase tirage de 3 tuiles:
-			//while(bool)
-			//Tirage de 3 tuiles de la fin du tableau
-			//ecoute client
-				//if client repond avec confirmation que l'une des tuile est posable
-					//bool = false
-				
-				//else continue
+		bool tour = true;
+		bool partie = true;
+		bool choisirTuile = true;
+		bool timerNonExpire = true;
+		int idTuile = 0; 
+		//Lecture du fichier xml / Récupération des infos des tuiles et des terrains / Création des objets
+		String file = "Assets/system/infos.xml";
+		LireXml l = new LireXml(file);
 
-			//idTuile=idTuileChoisie
-			//Timer
+		//Initialisation du plateau + poser 1ere tuile
+		Plateau p = new Plateau();
+		p.Poser1ereTuile(0);//a changer, la tuile va être aléatoirement décidée (contenant riviere!)
+		
+		//Génération des tuiles:
+		List<int> listeTuiles = null;
+		listeTuiles = new List<int>();
+		listeTuiles = Random_sort_tuiles(_nb_tuiles);
 
-			//Phase actions
-			//While(bool2)
-			//Attendre une action:
+		List<int> troisTuiles = null;
+		troisTuiles = new List<int>();
+
+		//Envoie infos au client:
+		//..Fct res
+
+		while (partie) {
+			
+			choisirTuile = true;
+			//<-- Res tour du joueur x:
+			//..
+			while (tour) {
+                //Phase tirage de 3 tuiles:
+                while (choisirTuile)
+                {
+					//Tirage de 3 tuiles de la fin du tableau
+					troisTuiles = tirageTroisTuiles(listeTuiles);
+					//ecoute client FCT RES
+						//if client repond avec confirmation que l'une des tuile est posable
+							//listeTuiles = suppTuileChoisie(idTuileChoisie);
+							//bool = false
+						//else continue
+				}
+				timerNonExpire = true;
+				//Timer:
+				//..
+
+				//Phase actions
+				//While(actions)
+				//Attendre une action:
 				//while(timerNonExpirer)
-					//Action recue:
-						//si tentative de poser une tuile :
-							//verification positionsInternes
-						//si tentative de poser un pion Et/Ou abbé
-							//verfication position pion en slot
-							//verification position abbé
-						//si demande de validation:
-							//verificationFinal:
-								//si triche:
-									//j._tricheJoueur++;
-									//if(j._tricheJoueur==2)
-										//disconnectJoueur(j);
-									//else 
-										//avertissement(j)
-							//si fermeture: Palteau.ZoneFermee(idTuile,idSlot)
-								//comptageDesPoints(idTuile)
-							//verification pion/abbé & tuile
+				//Action recue:
+				//si tentative de poser une tuile :
+				//verification positionsInternes
+				//si tentative de poser un pion Et/Ou abbé
+				//verfication position pion en slot
+				//verification position abbé
+				//si demande de validation:
+				//verificationFinal:
+				//si triche:
+				//j._tricheJoueur++;
+				//if(j._tricheJoueur==2)
+				//disconnectJoueur(j);
+				//else 
+				//avertissement(j)
+				//si fermeture: Palteau.ZoneFermee(idTuile,idSlot)
+				//comptageDesPoints(idTuile)
+				//verification pion/abbé & tuile
 				//Si timer expiré 
 				//j._noteJoueu--;
 				//if (j._noteJoueu==0)
-					//disconnectJoueur(j._id);
-		//passage du tour:
+				//disconnectJoueur(j._id);
+				//passage du tour:
 
-		//}
+			}
 
-		
-		//}
+
+		}
 		// A FAIRE - Fin/retour de la fonction pour libérer l'objet associé dans le thread_com à la fin de la partie et donc de ce thread
 		//return 0;	//cas ou' tout s'est bien passé et la partie est finie
     }
@@ -136,12 +174,31 @@ public partial class Thread_serveur_jeu
 
 	}
 
-	public void disconnectJoueur( int id_joueur)
-    {
 
-    }
+	public static List<int> tirageTroisTuiles(List<int> tuiles)
+	{
+		List<int> list = new List<int>();
+		for (int i = tuiles.Count-1;i>= tuiles.Count-4;i++)
+			list.Add(tuiles[i]);
+		return list;
+	}
+	public static List<int> suppTuileChoisie(List<int> tuiles, int idTuile)
+	{
+		for (int i = tuiles.Count - 1; i>0 && tuiles[i] != idTuile; i++)
+			tuiles.Remove(tuiles[i]);
+
+		return tuiles;
+	}
+
 	public void avertissement(int id_joueur) 
 	{
 	
 	}
+
+	public void disconnectJoueur(int id_joueur)
+	{
+
+	}
+
+
 }
