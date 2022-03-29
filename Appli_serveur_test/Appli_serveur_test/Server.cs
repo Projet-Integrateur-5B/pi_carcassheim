@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace Server;
 
 using ClassLibrary;
@@ -26,36 +28,30 @@ public class StateObject
 
 public partial class Server
 {
+    [Serializable]
+    public class ServerParameters
+    {
+        public int serverPort;
+        public string databaseIP;
+        public int databasePort;
+    }
+
+    private static string PathToConfig = "../../../../Resources/network/config.json";
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-    
+
     public static void StartListening()
     {
         // get config from file
-        var strServerPort = ConfigurationManager.AppSettings.Get("ServerPort");
-        var serverPort = 0;
-        
-        try
-        {
-            serverPort = Convert.ToInt32(strServerPort);
-        }
-        catch (OverflowException oe)
-        {
-            Console.WriteLine("OverflowException : {0}", oe);
-        }
-        catch (FormatException fe)
-        {
-            Console.WriteLine("FormatException : {0}", fe);
-        }
+        var fileParameters = File.ReadAllText(PathToConfig);
+        ServerParameters serverParameters = JsonConvert.DeserializeObject<ServerParameters>(fileParameters);
 
         try
         {
+            // Connecting to the database server
             Console.WriteLine("Server is connecting to the database...");
-            var strDatabaseAddress = ConfigurationManager.AppSettings.Get("DatabaseAddress");
-            var strDatabasePort = ConfigurationManager.AppSettings.Get("DatabasePort");
-            var databaseAddress = IPAddress.Parse(strDatabaseAddress);
-            var databasePort = Convert.ToInt32(strDatabasePort);
-            var remoteEp = new IPEndPoint(databaseAddress, databasePort);
+            var databaseAddress = IPAddress.Parse(serverParameters.databaseIP);
+            var remoteEp = new IPEndPoint(databaseAddress, serverParameters.databasePort);
             var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             database.Connect(remoteEp);
             Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
@@ -72,7 +68,7 @@ public partial class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, serverPort);
+        var localEndPoint = new IPEndPoint(ipAddress, serverParameters.serverPort);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
