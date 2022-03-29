@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using UnityEngine;
 
 public class Serveur_main : MonoBehaviour
@@ -159,9 +160,74 @@ public class Serveur_main : MonoBehaviour
 
 
         // Test de communication réseau
-        byte nb = 18;
-        var data = "petit test";
-        Client.StartClient(nb, data);
+        var return_value = 0;
+        Socket? socket = null;
+        var original = new Packet();
+
+        return_value = Client.Connection(ref socket);
+        switch (return_value)
+        {
+            case (int)Errors.None:
+                break;
+            case (int)Errors.ConfigFile:
+                // TODO : handle case : config file is bad or issue while extracting the data
+               Debug.Log("Errors.ConfigFile");
+                break;
+            case (int)Errors.Socket:
+                // TODO : handle case : connection could not be established
+               Debug.Log("Errors.Socket");
+                break;
+            case (int)Errors.ToBeDetermined:
+                break;
+            default:
+                // TODO : handle case : default
+               Debug.Log("Errors.Unknown");
+                break;
+        }
+        
+        return_value = Client.Communication(socket, ref original, (byte)IdMessage.Default, "petit test");
+        switch (return_value)
+        {
+            case (int)Errors.None:
+                break;
+            case (int)Errors.Format: // == Errors.Receive ?
+                // TODO : handle case : wrong format
+                Console.WriteLine("Errors.Format");
+                break;
+            case (int)Errors.Socket:
+                // TODO : handle case : connection error
+                Console.WriteLine("Errors.Socket");
+                break;
+            case (int)Errors.Data:
+                // TODO : handle case : error while getting the packet ready
+                Console.WriteLine("Errors.Data");
+                break;
+            case (int)Errors.Receive:
+                // TODO : handle case : error while receiving an answer
+                Console.WriteLine("Errors.Receive");
+                break;
+            default:
+                // TODO : handle case : default
+                Console.WriteLine("Errors.Unknown");
+                break;
+        }
+
+        return_value = Client.Disconnection(socket);
+        switch (return_value)
+        {
+            case (int)Errors.None:
+                break;
+            case (int)Errors.Socket:
+                // TODO : handle case : connection could not be closed
+               Debug.Log("Errors.Socket");
+                break;
+            default:
+                // TODO : handle case : default
+               Debug.Log("Errors.Unknown");
+                break;
+        }
+
+
 
 
     }

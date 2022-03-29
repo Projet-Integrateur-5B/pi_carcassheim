@@ -1,8 +1,35 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 
+public enum Errors : int
+{
+    None = 0,
+    Unknown = -1,
+    Socket = 1,
+    Format = 2,
+    ConfigFile = 3,
+    Receive = 4,
+    Data = 5,
+    ToBeDetermined = 999
+}
+public enum IdMessage : byte
+{
+    Default = 0,
+    Connection = 1,
+    Disconnection = 2,
+    Signup = 3,
+    Statistics = 4,
+    RoomList = 5,
+    RoomJoin = 6,
+    RoomLeave = 7,
+    RoomReady = 8,
+    RoomSettings = 9,
+    RoomEdit = 10
+}
+    
 public static class Tools
 {
 
@@ -18,7 +45,7 @@ public static class Tools
         return JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? new Packet();
     }
     
-    public static List<Packet> Prepare(this Packet original)
+    public static List<Packet> Split(this Packet original)
     {
         var packets = new List<Packet>();
 
@@ -40,24 +67,36 @@ public static class Tools
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
         var dataBytesTotalLength = dataBytes.Length;
 
-        for (var i = 0; i < dataBytesTotalLength; i += headerBytesMaxLength)
+        for (var i = 0; i < dataBytesTotalLength; i += headerBytesMaxLength - 1)
         {
             var packet = headerBytes.ByteArrayToPacket();
-            if (i + headerBytesMaxLength > dataBytesTotalLength)
+            if (i + headerBytesMaxLength - 1 > dataBytesTotalLength)
             {
+                packet.Final = true;
                 packet.Data = dataString.Substring(i, dataBytesTotalLength - i);
-                Console.WriteLine(dataString.Substring(i, dataBytesTotalLength - i));
-                // dataString.Substring(i, dataBytesTotalLength - i);
+                // Console.WriteLine(dataString.Substring(i, dataBytesTotalLength - i));
             }
             else
             {
-                packet.Data = dataString.Substring(i, headerBytesMaxLength);
-                Console.WriteLine(dataString.Substring(i, headerBytesMaxLength));
+                packet.Final = false;
+                packet.Data = dataString.Substring(i, headerBytesMaxLength - 1);
+                // Console.WriteLine(dataString.Substring(i, headerBytesMaxLength - 1));
             }
             packets.Add(packet);
         }
         return packets;
     }
+    
+    public static Packet Catenate(this List<Packet> packets)
+    {
+        var original = packets[0];
+        foreach (var packet in packets.Skip(1))
+        {
+            original.Data += packet.Data;
+        }
+        return original;
+    }
+
 }
 
 
