@@ -10,8 +10,7 @@ public class test_banner : MonoBehaviour
     void Start()
     {
         timer = banner.timerTour;
-        timer.setTime(0, 10);
-        banner.setTimerTour(timer);
+        banner.setTimerTour(0, 10);
     }
 
     // Update is called once per frame

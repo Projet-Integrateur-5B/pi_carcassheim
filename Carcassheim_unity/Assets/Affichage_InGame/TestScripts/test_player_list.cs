@@ -31,7 +31,7 @@ public class test_player_list : MonoBehaviour
                     banner.setPlayer(pl);
                 }
                 // Debug.Log("Player nb : " + ((uint)pl_list.nbPlayer()).ToString());
-                banner.setPlayerNumber((uint)pl_list.nbPlayer());
+                banner.setPlayerNumber(pl_list.nbPlayer());
             }
             else if (Input.GetKeyUp("n"))
             {
