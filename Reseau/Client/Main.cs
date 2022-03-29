@@ -29,8 +29,8 @@ public partial class Client
                 Console.WriteLine("Errors.Unknown");
                 break;
         }
-
-        return_value = Communication(socket, ref original, (byte)IdMessage.Default, "petit test");
+        string[] test = { "pseudo", "mdp18" };
+        return_value = Communication(socket, ref original, 1, test);
         switch (return_value)
         {
             case (int)Errors.None:

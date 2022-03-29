@@ -3,7 +3,6 @@ namespace Server;
 using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using Assets;
 
 // State object for reading client data asynchronously
@@ -15,13 +14,12 @@ public class StateObject
     // Receive buffer.
     public byte[] Buffer { get; } = new byte[BufferSize];
 
-    // Received data string.
-    public StringBuilder Sb { get; } = new();
-
     // Client socket.
     public Socket? WorkSocket { get; set; }
 
     public Packet? Packet { get; set; }
+
+    public string[] Tableau { get; set; } = Array.Empty<string>();
 }
 
 public partial class Server
@@ -135,35 +133,40 @@ public partial class Server
                     }
 
                     // There  might be more data, so store the data received so far.
-                    state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
+                    state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
 
                     // Buffer with all the data
-                    var content = state.Sb.ToString();
+                    var content = state.Tableau.ToString();
 
                     // Disconnection
                     if ((IdMessage)state.Packet.IdMessage == IdMessage.Disconnection)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
-                                          "\n\t Data buffer =>\t\t" + state.Sb +
+                                          "\n\t Data buffer =>\t\t" + state.Tableau +
                                           "\n\t => FIN !", bytesRead);
                         state.Packet.Status = true;
+                        Array.Clear(state.Packet.Data);
                         Send(ar, true);
                     }
                     // Final packet of the series
                     else if (state.Packet.Final)
                     {
+                        state.Packet.Data = state.Tableau;
+
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
-                                          "\n\t Data buffer =>\t\t" + state.Sb +
+                                          "\n\t Data buffer =>\t\t" + state.Tableau +
                                           "\n\t => Every packet has been received !", bytesRead);
                         switch ((IdMessage)state.Packet.IdMessage)
                         {
                             case IdMessage.Connection:
                                 state.Packet.Status = Connection(state.Packet);
+                                Array.Clear(state.Packet.Data);
                                 break;
                             case IdMessage.Signup:
                                 state.Packet.Status = Signup(state.Packet);
+                                Array.Clear(state.Packet.Data);
                                 break;
                             case IdMessage.Statistics:
                                 state.Packet = Statistics(state.Packet);
@@ -172,21 +175,24 @@ public partial class Server
                                 state.Packet = RoomList(state.Packet);
                                 break;
                             case IdMessage.RoomJoin:
-                                state.Packet.Data = RoomJoin(state.Packet);
+                                state.Packet = RoomJoin(state.Packet);
                                 break;
                             case IdMessage.RoomLeave:
                                 state.Packet.Status = RoomLeave(state.Packet);
+                                Array.Clear(state.Packet.Data);
                                 break;
                             case IdMessage.RoomReady:
                                 state.Packet.Status = RoomReady(state.Packet);
+                                Array.Clear(state.Packet.Data);
                                 break;
                             case IdMessage.RoomSettings:
                                 state.Packet = RoomSettings(state.Packet);
                                 break;
                             case IdMessage.RoomEdit:
-                                state.Packet.Data = RoomEdit(state.Packet);
+                                state.Packet = RoomEdit(state.Packet);
                                 break;
                             case IdMessage.Disconnection: // impossible
+                                Array.Clear(state.Packet.Data);
                                 break;
                             case IdMessage.Default:
                             default:
@@ -207,7 +213,7 @@ public partial class Server
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
-                                          "\n\t Data buffer =>\t" + state.Sb +
+                                          "\n\t Data buffer =>\t" + state.Tableau +
                                           "\n\t => Waiting for the rest to be send...", bytesRead);
 
                         // Not all data received. Get more.

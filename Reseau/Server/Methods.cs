@@ -7,7 +7,7 @@ public partial class Server
     // vérifie si les informations de connecction sont valide, si oui return true sinon false
     public static bool Connection(Packet packet) //fonction a modifier pour la connection
     {
-        if (packet.IdPlayer == 999)
+        if (packet.Data[1] == "mdp18" && packet.Data[0] == "pseudo")
         {
             return true;
         }
@@ -30,7 +30,7 @@ public partial class Server
         }
     }
 
-    // vérifie si l'inscription est valide et si oui retur, true sinon false
+    // vérifie si l'inscription est valide et si oui return true sinon false
     public static bool Signup(Packet packet) //fonction a modifier pour l'inscription
     {
         if (packet.IdPlayer == 999)
@@ -48,17 +48,30 @@ public partial class Server
     // Status = true si aucune erreur, sinon false
     public static Packet Statistics(Packet packet) //fonction a modifier pour stat d'un joueur
     {
-        packet.Data = "joueur 1 : 23/12 ";
+        Array.Clear(packet.Data);
+        var retour = "joueur 1 : 23/12 ";
+        var list = new List<string>(packet.Data.ToList())
+        {
+            retour
+        };
+        packet.Data = list.ToArray();
+
         packet.Status = true;
         return packet;
     }
 
     // return la liste des rooms dispo dans un string ( ou une classe a crée )
-    public static string RoomJoin(Packet packet)
+    public static Packet RoomJoin(Packet packet)
     {
-        var room = "r1 : 2 joueur";
+        Array.Clear(packet.Data);
+        var retour = "r1 : 2 joueur";
+        var list = new List<string>(packet.Data.ToList())
+        {
+            retour
+        };
+        packet.Data = list.ToArray();
         packet.Status = true;
-        return room;
+        return packet;
     }
 
     // met dans Data les info de la room ( ou une classe a crée )
@@ -66,7 +79,13 @@ public partial class Server
     // Status = true si tout c'est bien passer sinon false
     public static Packet RoomList(Packet packet)
     {
-        packet.Data = "joueur 1";
+        Array.Clear(packet.Data);
+        var retour = " room 1";
+        var list = new List<string>(packet.Data.ToList())
+        {
+            retour
+        };
+        packet.Data = list.ToArray();
         packet.Status = true;
         return packet;
     }
@@ -102,16 +121,28 @@ public partial class Server
     // status true si parametre bien modifier, false si erreur
     public static Packet RoomSettings(Packet packet)
     {
-        packet.Data = " nb personne : 1";
+        Array.Clear(packet.Data);
+        var retour = " nb personne : 1";
+        var list = new List<string>(packet.Data.ToList())
+        {
+            retour
+        };
+        packet.Data = list.ToArray();
         packet.Status = true;
         return packet;
     }
 
     // envoye les changement de la room ( joueur join ou modification parametre ou joueur pret )
-    public static string RoomEdit(Packet packet)
+    public static Packet RoomEdit(Packet packet)
     {
         packet.Status = true;
-        var data = "joueur arriver";
-        return data;
+        Array.Clear(packet.Data);
+        var retour = "joueur arriver";
+        var list = new List<string>(packet.Data.ToList())
+        {
+            retour
+        };
+        packet.Data = list.ToArray();
+        return packet;
     }
 }

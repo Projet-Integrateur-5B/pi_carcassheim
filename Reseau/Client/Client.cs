@@ -103,7 +103,7 @@ public partial class Client
     private static int Disconnection(Socket socket)
     {
         var original = new Packet();
-        Communication(socket, ref original, (byte)IdMessage.Disconnection, "");
+        Communication(socket, ref original, (byte)IdMessage.Disconnection, Array.Empty<string>());
         // if Errors.Format = ignore, not expecting to receive anything from the server
         // if Errors.Socket = ignore, already disconnected from the server
 
@@ -134,7 +134,7 @@ public partial class Client
         }
     }
 
-    private static int Communication(Socket socket, ref Packet received, byte idMessage, string data)
+    private static int Communication(Socket socket, ref Packet received, byte idMessage, string[] data)
     {
         try
         {
