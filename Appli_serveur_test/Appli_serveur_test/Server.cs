@@ -24,15 +24,13 @@ public class StateObject
     public Packet? Packet { get; set; }
 }
 
-public class Server
+public partial class Server
 {
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
 
     public static void StartListening()
     {
-        Console.WriteLine("Server is setting up...");
-        
         // get config from file
         var strPort = ConfigurationManager.AppSettings.Get("ServerPort");
         var port = 0;
@@ -49,6 +47,8 @@ public class Server
             Console.WriteLine("The {0} value '{1}' is not in a recognizable format.",
                 strPort.GetType().Name, strPort);
         }
+
+        Console.WriteLine("Server is setting up...");
 
         // Establish the local endpoint for the socket.
         // The DNS name of the computer
@@ -125,7 +125,6 @@ public class Server
         if (state is not null)
         {
             var handler = state.WorkSocket;
-
             if (handler is not null)
             {
                 // Read data from the client socket.
@@ -136,30 +135,52 @@ public class Server
                     Console.WriteLine(bytesRead);
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
-                    state.Packet = packetAsBytes.ByteArrayToPacket();
+
+                    try
+                    {
+                        state.Packet = packetAsBytes.ByteArrayToPacket();
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
+                                          "\n\t Read : {0} bytes" +
+                                          "\n\t => Wrong format, message ignored !", bytesRead);
+                        return;
+                    }
 
                     // There  might be more data, so store the data received so far.
                     state.Sb.Append(state.Packet is null ? "" : state.Packet.Data);
 
-                    // Check for end-of-file tag. If it is not there, read more data.
+                    // Buffer with all the data
                     var content = state.Sb.ToString();
-                    if (content.IndexOf("<EOF>", StringComparison.Ordinal) > -1)
+
+                    // Disconnection
+                    if ((IdMessage)state.Packet.IdMessage == IdMessage.Disconnection)
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
                                           "\n\t Read {0} bytes =>\t" + state.Packet +
-                                          "\n\t Data buffer =>\t" + state.Sb +
-                                          "\n\t => Every packet has been received !", bytesRead);
-                        switch (state.Packet.IdMessage)
-                        {
-                            case 1:
-                                //fonction connection test
-                                break;
-                            default:
-                                break;
-                        }
-                        // Echo the data back to the client.
-                        Send(ar);
+                                          "\n\t Data buffer =>\t\t" + state.Sb +
+                                          "\n\t => FIN !", bytesRead);
+                        state.Packet.Status = true;
+                        Send(ar, true);
                     }
+                    // Final packet of the series
+                    else if (state.Packet.Final)
+                    {
+                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
+                                          "\n\t Read {0} bytes =>\t" + state.Packet +
+                                          "\n\t Data buffer =>\t\t" + state.Sb +
+                                          "\n\t => Every packet has been received !", bytesRead);
+                        // Echo the data back to the client.
+                        Send(ar, false);
+                        state = new StateObject
+                        {
+                            WorkSocket = state.WorkSocket
+                        };
+                        handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                            ReadCallback, state);
+                    }
+                    // More packets to receive
                     else
                     {
                         Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
@@ -176,6 +197,7 @@ public class Server
                 {
                     Console.WriteLine("0 bytes to read from : " + handler.RemoteEndPoint);
                 }
+
             }
             else
             {
@@ -188,19 +210,26 @@ public class Server
             // si c'est null ?
             Console.WriteLine("state is null");
         }
+
     }
 
-    private static void Send(IAsyncResult ar)
+    private static void Send(IAsyncResult ar, bool end)
     {
         var state = (StateObject?)ar.AsyncState;
-        state.Packet.Data = "";
-        state.Packet.Status = true; //false si probleme
+        // TODO : get and put into Data what the client asked for
         var packetAsBytes = state.Packet.PacketToByteArray();
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
         var handler = state.WorkSocket;
-        handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, state);
+        if (end) // disconnection
+        {
+            handler.BeginSend(packetAsBytes, 0, size, 0, SendCallback, state);
+        }
+        else
+        {
+            handler.BeginSend(packetAsBytes, 0, size, 0, null, state);
+        }
     }
 
     private static void SendCallback(IAsyncResult ar)
