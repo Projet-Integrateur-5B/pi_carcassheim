@@ -34,8 +34,7 @@ public partial class Server
         // get config from file
         var strServerPort = ConfigurationManager.AppSettings.Get("ServerPort");
         var serverPort = 0;
-
-        var port = 0;
+        
         try
         {
             serverPort = Convert.ToInt32(strServerPort);
@@ -53,18 +52,17 @@ public partial class Server
         {
             Console.WriteLine("Server is connecting to the database...");
             var strDatabaseAddress = ConfigurationManager.AppSettings.Get("DatabaseAddress");
-            var databaseAddress = IPAddress.Parse(strDatabaseAddress);
             var strDatabasePort = ConfigurationManager.AppSettings.Get("DatabasePort");
+            var databaseAddress = IPAddress.Parse(strDatabaseAddress);
             var databasePort = Convert.ToInt32(strDatabasePort);
             var remoteEp = new IPEndPoint(databaseAddress, databasePort);
             var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             database.Connect(remoteEp);
-            Console.WriteLine("Client is connected to the database : {0}", database.RemoteEndPoint);
+            Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
         }
         catch (Exception e)
         {
-            Console.WriteLine("Exception (database) : {0}", e);
-            return;
+            Console.WriteLine(e.ToString());
         }
 
         Console.WriteLine("Server is setting up...");
@@ -74,7 +72,7 @@ public partial class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, port);
+        var localEndPoint = new IPEndPoint(ipAddress, serverPort);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
