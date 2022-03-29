@@ -107,7 +107,7 @@ public abstract class Miscellaneous : MonoBehaviour
 		return previousMenu;
 	}
 
-	public GameObject GetNextMenu()
+	public GameObject GetCurrentMenu()
 	{
 		return nextMenu;
 	}
@@ -118,11 +118,6 @@ public abstract class Miscellaneous : MonoBehaviour
 			if (child.gameObject.activeSelf)
 				return child.gameObject;
 		return null;
-	}
-
-	public GameObject GetCurrentMenu()
-	{
-		return nextMenu;
 	}
 
 	public void ChangeMenu(string close, string goTo)

@@ -26,7 +26,7 @@ public class OptionsMenu : Miscellaneous
 		_musicSlider = OCS.Find("Slider Musique").GetComponent<Slider>();
 		_pourcentSon = OCT.Find("Pourcent Son").GetComponent<Text>();
 		_pourcentMusique = OCT.Find("Pourcent Musique").GetComponent<Text>();
-		_btnMusique = OCB.Find("SwitchMusic").GetComponent<Button>();
+		_btnMusique = OCB.Find("SwitchSound").GetComponent<Button>();
 		_btnSon = OCB.Find("SwitchSound").GetComponent<Button>();
 		_soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
 		_musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
