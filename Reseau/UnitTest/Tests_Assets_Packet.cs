@@ -15,7 +15,7 @@ public class TestsAssetsPacket
     {
         this.original = new Packet(false, 0, 1, false, 0, true, 999, new string[] { "test", "deux" });
         this.originalAsString = "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
-                                "\"Final\":true,\"IdPlayer\":999,\"Data\":\"test deux\"}";
+                                "\"Final\":true,\"IdPlayer\":999,\"Data\":\"[\"test\",\"deux\"]\"}";
     }
 
     [Test]
@@ -31,7 +31,8 @@ public class TestsAssetsPacket
         Assert.AreEqual(this.original.Permission, result.Permission);
         Assert.AreEqual(this.original.Final, result.Final);
         Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
-        Assert.AreEqual(this.original.Data, result.Data);
+        Assert.AreEqual(this.original.Data[0], result.Data[0]);
+        Assert.AreEqual(this.original.Data[1], result.Data[1]);
     }
 
     [Test]
