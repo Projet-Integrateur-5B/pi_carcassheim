@@ -32,25 +32,25 @@ public partial class Server
     public class ServerParameters
     {
         public int serverPort;
-        public string databaseIP;
         public int databasePort;
+        public string DatabaseIp = new("");
     }
 
-    private static string PathToConfig = "../../../../Resources/network/config.json";
+    private const string PathToConfig = "../../../../Resources/network/config.json";
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
 
     public static void StartListening()
     {
         // get config from file
-        var fileParameters = File.ReadAllText(PathToConfig);
-        ServerParameters serverParameters = JsonConvert.DeserializeObject<ServerParameters>(fileParameters);
+        var fileParameters = File.ReadAllText(PathToConfig) ?? throw new Exception();
+        var serverParameters = JsonConvert.DeserializeObject<ServerParameters>(fileParameters) ?? throw new Exception();
 
         try
         {
             // Connecting to the database server
             Console.WriteLine("Server is connecting to the database...");
-            var databaseAddress = IPAddress.Parse(serverParameters.databaseIP);
+            var databaseAddress = IPAddress.Parse(serverParameters.DatabaseIp);
             var remoteEp = new IPEndPoint(databaseAddress, serverParameters.databasePort);
             var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             database.Connect(remoteEp);
