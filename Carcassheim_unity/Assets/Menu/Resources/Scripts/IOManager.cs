@@ -78,24 +78,28 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void Update() // A VERIFIER
 	{ //si on appuie sur une touche de deplacement
-	/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-			if (nextGo != eventSystem.currentSelectedGameObject)
-				selectionChange(); */
+/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+				selectionChange();  */
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		selectionChange(); // checkmark raycast toggle/button doit être activé 
+		selectionChange(); 
 	}
 
 	public void selectionChange()
 	{
+		// Aparté : (Les inpufield (pas leurs enfants) doivent avoir du raycast pour fonctionner donc à ne pas désactiver)
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
+		bool inputfd = nextGo.transform.parent.name == "InputField";
+		//Debug.Log(nextGo.name); 
+		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
+
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
-		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
+		if (nextGo != eventSystem.currentSelectedGameObject && (inputfd || slider || btn || nextGo.GetComponent<Toggle>()))
 		{
 			previousGo = eventSystem.currentSelectedGameObject;
 			eventSystem.SetSelectedGameObject(nextGo);
@@ -113,10 +117,13 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		_btnText.fontSize += s;
 	}
 
-	public void colorImage(GameObject go, float f)
-	{ // transparence 
+	public void colorImage(GameObject go, byte r, byte g, byte b, byte f, bool changeColor)
+	{
 		Image image = go.transform.GetChild(0).gameObject.GetComponent<Image>();
-		image.color = new Color(image.color.r, image.color.g, image.color.b, f);
+		if (changeColor == false) // transparence 
+			image.color = new Color(image.color.r, image.color.g, image.color.b, (float)f / 255);
+		else
+			image.color = new Color32(r, g, b, f); // transparence et couleur
 	}
 
 	public void tridentHover(Component c)
@@ -151,17 +158,17 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
 						break;
 					case "Unselected": // IMAGE
-						colorImage(previousGo, 1);
+						colorImage(previousGo, 0, 0, 0, 255, false);
 						break;
 					case "Text": // BOUTON
-						_previousColor = FC ? FCcolor : Color.white;
+						_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
 						textColor(_previousColor, -3, previousGo);
 						break;
 					case "Background": // TOGGLE
-						colorImage(previousGo, 1); // (à changer)
+						colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
 						break;
 					case "Handle": // SLIDER
-						colorImage(previousGo, 1); // (à changer)
+						colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
 						break;
 					default:
 						break;
@@ -169,23 +176,24 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			}
 
 			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
+			//Debug.Log("next" + nextTarget);
 			switch (nextTarget.name)
-			{ // nextGO
+			{ 	
 				case "RawImage": // GIF : A changer (mettre autre chose que zoom)
 					nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
 					break;
 				case "Unselected": // IMAGE
-					colorImage(nextGo, 0);
+					colorImage(nextGo, 0, 0, 0, 0, false);
 					break;
 				case "Text": // BOUTON
 					tridentHover(nextTarget); // TRIDENT
 					textColor(colHover, 3, nextGo);
 					break;
 				case "Background": // TOGGLE
-					colorImage(nextGo, 0.5f); // semi transparent (à changer)
+					colorImage(nextGo, 0, 0, 0, 125, false); // semi transparent (à changer)
 					break;
 				case "Handle": // SLIDER
-					colorImage(nextGo, 0.5f); // semi transparent (à changer)
+					colorImage(nextGo, 47, 79, 79, 255, true); // équivalent à #FF4500
 					break;
 				default:
 					break;

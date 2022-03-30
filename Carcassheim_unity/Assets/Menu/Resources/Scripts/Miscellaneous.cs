@@ -90,6 +90,12 @@ public abstract class Miscellaneous : MonoBehaviour
 		GameObject.Find("ShowConnection").SetActive(false);
 		tmpJouer.interactable = tmpStat.interactable = true;
 		tmpJouer.GetComponentInChildren<Text>().color = tmpStat.GetComponentInChildren<Text>().color = Color.white;
+
+		// Remonte les boutons après la connexion 
+		Transform buttons = GameObject.Find("Buttons").transform;
+		buttons.GetChild(1).transform.position = buttons.GetChild(1).transform.position + new Vector3(0, 150, 0);
+		buttons.GetChild(2).transform.position = buttons.GetChild(2).transform.position + new Vector3(0, 150, 0);
+		buttons.GetChild(3).transform.position = buttons.GetChild(3).transform.position + new Vector3(0, 150, 0);
 	}
 
 	public void SetMenuChanged(bool b)

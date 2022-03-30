@@ -12,8 +12,9 @@ public class OptionsMenu : Miscellaneous
 	float lastSoundValue = 0;
 	float lastMusicValue = 0;
 	public Toggle toggle_french, toggle_english, toggle_german;
-	private GameObject containerButtons;
+	private GameObject containerButtons, _btnSonUnselected, _btnMusicUnselected;
 	private Transform optionsMenu, OCB, OCS, OCT; // Options Container Buttons
+	private Sprite _spriteMusicON, _spriteMusicOFF, _spriteSoundON, _spriteSoundOFF, _spriteMusicUnselectedON, _spriteMusicUnselectedOFF, _spriteSoundUnselectedON, _spriteSoundUnselectedOFF;
 	// Start is called before the first frame update
 	void Start()
 	{
@@ -26,10 +27,24 @@ public class OptionsMenu : Miscellaneous
 		_musicSlider = OCS.Find("Slider Musique").GetComponent<Slider>();
 		_pourcentSon = OCT.Find("Pourcent Son").GetComponent<Text>();
 		_pourcentMusique = OCT.Find("Pourcent Musique").GetComponent<Text>();
-		_btnMusique = OCB.Find("SwitchSound").GetComponent<Button>();
+		_btnMusique = OCB.Find("SwitchMusic").GetComponent<Button>();
+		_btnMusicUnselected = _btnMusique.transform.GetChild(0).gameObject;
 		_btnSon = OCB.Find("SwitchSound").GetComponent<Button>();
+		_btnSonUnselected = _btnSon.transform.GetChild(0).gameObject;
 		_soundCtrl = GameObject.Find("SoundController").GetComponent<AudioSource>();
 		_musicCtrl = GameObject.Find("MusicController").GetComponent<AudioSource>();
+		string pathBlue = "Miscellaneous/UI/Buttons/Moss_Blue/";
+		string pathWhite = "Miscellaneous/UI/Buttons/Rock_white/";
+		_spriteMusicON = Resources.Load<Sprite>(pathBlue + "button_moss_blue13");
+		_spriteMusicOFF = Resources.Load<Sprite>(pathBlue + "button_moss_blue14");
+		_spriteSoundON = Resources.Load<Sprite>(pathBlue + "button_moss_blue30");
+		_spriteSoundOFF = Resources.Load<Sprite>(pathBlue + "button_moss_blue28");
+		_spriteMusicUnselectedON = Resources.Load<Sprite>(pathWhite + "button_white13");
+		_spriteMusicUnselectedOFF = Resources.Load<Sprite>(pathWhite + "button_white14");
+		_spriteSoundUnselectedON = Resources.Load<Sprite>(pathWhite + "button_white30");
+		_spriteSoundUnselectedOFF = Resources.Load<Sprite>(pathWhite + "button_white28");
+		// Debug.Log(_spriteMusicON.name + _spriteMusicOFF.name + _spriteSoundON.name + _spriteSoundOFF.name);
+		// Debug.Log(_spriteMusicUnselectedON.name + _spriteMusicUnselectedOFF.name + _spriteSoundUnselectedON.name + _spriteSoundUnselectedOFF.name);
 		DefaultMusicSound();
 		//Subscribe to the Slider event
 		_soundSlider.onValueChanged.AddListener(SoundSliderCallBack);
@@ -53,23 +68,28 @@ public class OptionsMenu : Miscellaneous
 
 	public void DisplayVolume(int b, float value)
 	{
-		GameObject g = _btnMusique.gameObject;
-		GameObject gs = _btnSon.gameObject;
-		bool tmpS = true; 
-		bool tmpM = true;
 		if (value > 0)
 			if (b == 0)
-				tmpS = true;
-			else 
-				tmpM = true;
+			{
+				_btnSon.GetComponent<Image>().sprite = _spriteSoundON;
+				_btnSonUnselected.GetComponent<Image>().sprite = _spriteSoundUnselectedON;
+			}
+			else
+			{
+				_btnMusique.GetComponent<Image>().sprite = _spriteMusicON;
+				_btnMusicUnselected.GetComponent<Image>().sprite = _spriteMusicUnselectedON;
+			}
 		else if (b == 0)
-				tmpS = false;
-			else 
-				tmpM = false;
-		gs.transform.Find("SonON").gameObject.SetActive(tmpS);
-		gs.transform.Find("SonOFF").gameObject.SetActive(!tmpS);
-		g.transform.Find("MusicON").gameObject.SetActive(tmpM);
-		g.transform.Find("MusicOFF").gameObject.SetActive(!tmpM);
+		{
+			_btnSon.GetComponent<Image>().sprite = _spriteSoundOFF;
+			_btnSonUnselected.GetComponent<Image>().sprite = _spriteSoundUnselectedOFF;
+		}
+		else
+		{
+			_btnMusique.GetComponent<Image>().sprite = _spriteMusicOFF;
+			_btnMusicUnselected.GetComponent<Image>().sprite = _spriteMusicUnselectedOFF;
+		}
+
 		if (b == 0)
 			Volume(_soundCtrl, _pourcentSon, _soundSlider);
 		else
@@ -78,7 +98,7 @@ public class OptionsMenu : Miscellaneous
 
 	public void DefaultMusicSound()
 	{
-		_soundSlider.maxValue = _musicSlider.maxValue = 1; 
+		_soundSlider.maxValue = _musicSlider.maxValue = 1;
 		_soundCtrl.volume = _musicCtrl.volume = _soundSlider.value = _musicSlider.value = 0.4f;
 		Volume(_soundCtrl, _pourcentSon, _soundSlider);
 		Volume(_musicCtrl, _pourcentMusique, _musicSlider);
