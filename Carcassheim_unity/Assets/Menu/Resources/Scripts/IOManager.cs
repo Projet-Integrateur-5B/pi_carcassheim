@@ -18,7 +18,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private RoomParameters _rparam;
 	private CreateRoomMenu _croom;
 	private RoomIsCreated _rcreated;
-	private GameObject currentGo;
+	private GameObject nextGo;
 	private Color _previousColor, colHover;
 	private Text _btnText;
 	static private GameObject previousGo;
@@ -26,12 +26,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private CursorMode _cursorMode = CursorMode.Auto;
 	private Vector2 _cursorHotspot = Vector2.zero;
 	private EventSystem eventSystem;
+	private bool boolSelectionChange = true;
 	void Start()
 	{
-		ColorUtility.TryParseHtmlString("#1e90ff", out colHover);
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		// ---------------------------------- PATCH : ------------------------------------
-		// à ameliorer :
 		/* 		Debug.Log("Liste des scripts : ");
 		GetScripts(); */
 		// à enlever : 
@@ -48,11 +47,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		_croom = gameObject.AddComponent(typeof(CreateRoomMenu)) as CreateRoomMenu;
 		_rcreated = gameObject.AddComponent(typeof(RoomIsCreated)) as RoomIsCreated;
 		// ---------------------------------- FIN PATCH : --------------------------------
-		//Fetch the current EventSystem. Make sure your Scene has one.
-		eventSystem = EventSystem.current;
-		// Cursor Texture :
+		//Cursor Texture :
 		_cursorTexture = Resources.Load("Miscellaneous/Cursors/BlueCursor") as Texture2D; // Texture Type = Cursor
 		Cursor.SetCursor(_cursorTexture, _cursorHotspot, _cursorMode);
+		//Fetch the current EventSystem. Make sure your Scene has one.
+		eventSystem = EventSystem.current;
+		nextGo = FirstActiveChild(GameObject.Find("Buttons"));
+		eventSystem.SetSelectedGameObject(nextGo);
+		changeHover();
 		// Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
 		foreach (Transform menu in GameObject.Find("SubMenus").transform)
 		{
@@ -64,133 +66,128 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 					});
 			if (menu.Find("Toggle Group"))
 				foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
-					if (tog.GetComponent<Toggle>()) 
+					if (tog.GetComponent<Toggle>())
 						tog.GetComponent<Toggle>().onValueChanged.AddListener(delegate
 						{
 							MethodCallT(menu.Find("Toggle Group").transform.GetChild(0).name, tog.GetComponent<Toggle>());
 						});
 		}
-
-		//selection de base lors du start : firstSelect, ce bouton sera bleu et selectionné
-		//pour l'instant ShowOptions mais à modifier
-		currentGo = FirstActiveChild(GameObject.Find("Buttons"));
-		previousGo = currentGo;
-		eventSystem.SetSelectedGameObject(currentGo);
-		_btnText = currentGo.GetComponentInChildren<Text>();
-		_previousColor = _btnText.color;
-		_btnText.color = colHover;
-		_btnText.fontSize += 3;
 	}
 
-	public void Update()
-	{
-		//si on appuie sur une touche de deplacement
-		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-			Couleur_touches();
-	}
-
-	public void ColorButtonSelected()
-	{
-		_btnText = currentGo.GetComponentInChildren<Text>();
-		_btnText.color = colHover;
-		_btnText.fontSize += 3;
-	}
-
-	public void ColorButtonDeselected()
-	{
-		_btnText = previousGo.GetComponentInChildren<Text>();
-		Color tmp; 
-		ColorUtility.TryParseHtmlString("#FFA500", out tmp);
-		if (_btnText.transform.parent.name == "CGU" || _btnText.transform.parent.name == "ForgottenPwdUser")
-			_btnText.color = tmp; 
-		else
-			_btnText.color = Color.white;
-		_btnText.fontSize -= 3;
+	public void Update() // A VERIFIER
+	{   //si on appuie sur une touche de deplacement
+/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+			if (nextGo != eventSystem.currentSelectedGameObject)
+				selectionChange(); */
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		currentGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		//si on est sur un bouton different de celui selectionne, alors on le selectionne et celui ci devient bleu
-		if (currentGo != eventSystem.currentSelectedGameObject)
-			if ((currentGo.GetComponent<Button>() && currentGo.GetComponent<Button>().interactable) || currentGo.transform.parent.gameObject.GetComponent<Toggle>())
-			{
-				if (currentGo.transform.parent.gameObject.GetComponent<Toggle>())
-					currentGo = currentGo.transform.parent.gameObject;
-				eventSystem.SetSelectedGameObject(currentGo);
-				SelectionChange();
-			}
+		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+		selectionChange(); // checkmark raycast toggle/button doit être activé 
 	}
 
-	private void SelectionChange()
+	public void selectionChange()
 	{
-		currentGo = eventSystem.currentSelectedGameObject;
-		ColorBlock cb;
-		if (!currentGo.GetComponent<InputField>())
+		// nextGo.GetComponent<Button>() est testé d'abord donc si false la parti gauche du ET non testé donc pas d'erreur
+		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
+		if (nextGo != eventSystem.currentSelectedGameObject && (btn || nextGo.GetComponent<Toggle>()))
 		{
-			if (currentGo.GetComponentInChildren<Text>())
-				ColorButtonSelected();
-			else if (currentGo.GetComponent<Image>())
-				currentGo.GetComponent<Image>().color = colHover;
-			else if (currentGo.GetComponent<Toggle>())
+			previousGo = eventSystem.currentSelectedGameObject;
+			eventSystem.SetSelectedGameObject(nextGo);
+			boolSelectionChange = true;
+		}
+		else
+			boolSelectionChange = false;
+		changeHover();
+	}
+
+	public void textColor(Color c, int s, GameObject go)
+	{
+		_btnText = go.GetComponentInChildren<Text>();
+		_btnText.color = c;
+		_btnText.fontSize += s;
+	}
+
+	public void colorImage(GameObject go, float f)
+	{ // transparence 
+		Image image = go.transform.GetChild(0).gameObject.GetComponent<Image>();
+		image.color = new Color(image.color.r, image.color.g, image.color.b, f);
+	}
+
+	public void changeHover()
+	{
+		if (boolSelectionChange == true)
+		{
+			if (previousGo != null)
 			{
-				cb = currentGo.GetComponent<Toggle>().colors;
-				cb.selectedColor = colHover;
-				currentGo.GetComponent<Toggle>().colors = cb;
+				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
+				switch (previousTarget.name)
+				{ // previousGO
+					case "RawImage": // GIF
+						// A changer (dezoom)
+						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
+						break;
+					case "Unselected": // IMAGE
+						colorImage(previousGo, 1);
+						break;
+					case "Text": // BOUTON
+						textColor(Color.white, -3, previousGo);
+						break;
+					case "Background": // TOGGLE
+						colorImage(previousGo, 1);
+						break;
+					default:
+						break;
+				}
 			}
 
-			if (previousGo != currentGo)
-			{
-				if (previousGo.GetComponentInChildren<Text>())
-					ColorButtonDeselected();
-				else if (previousGo.GetComponent<Image>())
-					previousGo.GetComponent<Image>().color = Color.white;
-				else if (previousGo.GetComponent<Toggle>())
-				{
-					cb = previousGo.GetComponent<Toggle>().colors;
-					cb.selectedColor = Color.white;
-					previousGo.GetComponent<Toggle>().colors = cb;
-				}
-
-				previousGo = currentGo;
+			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
+			switch (nextTarget.name)
+			{ // nextGO
+				case "RawImage": // GIF
+					// A changer (zoom)
+					nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
+					break;
+				case "Unselected": // IMAGE
+					colorImage(nextGo, 0);
+					break;
+				case "Text": // BOUTON
+					textColor(Color.blue, 3, nextGo);
+					break;
+				case "Background": // TOGGLE
+					colorImage(nextGo, 0.5f); // semi transparent (à changer)
+					break;
+				default:
+					break;
 			}
 		}
 	}
 
-	private void Couleur_touches()
-	{
-		if (currentGo != eventSystem.currentSelectedGameObject)
-			SelectionChange();
-	}
-
-	public void SelectionButton()
+	public void NewMenuSelectButton()
 	{
 		if (HasMenuChanged() == true)
 		{
-			string previousMenu = GetPreviousMenu().name.Substring(0, GetPreviousMenu().name.Length - 4);
+			string previousMenu = GetPreviousMenu().name.Remove(GetPreviousMenu().name.Length - 4);
 			foreach (Transform child in GameObject.Find("Buttons").transform)
 			{
-				eventSystem.SetSelectedGameObject(FirstActiveChild(GameObject.Find("Buttons")));
+				nextGo = FirstActiveChild(GameObject.Find("Buttons"));
 				if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
 				{
-					eventSystem.SetSelectedGameObject(child.gameObject);
+					nextGo = child.gameObject;
 					break;
 				}
 			}
-
 			SetMenuChanged(false);
-			SelectionChange();
+			selectionChange();
 		}
 	}
 
-	/* Broadcast message will call the passed in function for all the scripts on the game object 
-   that have that function and for all children objects that also have that function. 
-   Sendmessage only calls that function for scripts on the gameobject that have that function. */
 	public void MethodCall(string methode)
 	{
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		gameObject.SendMessage(methode, null);
-		SelectionButton();
+		NewMenuSelectButton();
 	}
 
 	public void MethodCallT(string methode, Toggle tog)
