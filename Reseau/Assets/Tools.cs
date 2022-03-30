@@ -1,9 +1,10 @@
 namespace Assets;
 
+using System.ComponentModel;
 using System.Text;
 using Newtonsoft.Json;
 
-public enum Errors : int
+public enum Errors
 {
     None = 0,
     Unknown = -1,
@@ -32,24 +33,63 @@ public enum IdMessage : byte
 public static class Tools
 {
 
-    public static byte[] PacketToByteArray(this Packet packet)
+    public static byte[] PacketToByteArray(this Packet packet, ref Errors error)
     {
-        var serialized = JsonConvert.SerializeObject(packet);
-        return Encoding.ASCII.GetBytes(serialized);
+        if (!Enum.IsDefined(typeof(Errors), error))
+        {
+            throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
+        }
+
+        try
+        {
+            var packetAsJsonString = JsonConvert.SerializeObject(packet);
+            var packetAsBytes = Encoding.ASCII.GetBytes(packetAsJsonString);
+            error = Errors.None;
+            return packetAsBytes;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            error = Errors.Format;
+            return Array.Empty<byte>();
+        }
     }
 
-    public static Packet ByteArrayToPacket(this byte[] byteArray)
+    public static Packet ByteArrayToPacket(this byte[] byteArray, ref Errors error)
     {
-        var packetAsJson = Encoding.ASCII.GetString(byteArray);
-        return JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? new Packet();
+        if (!Enum.IsDefined(typeof(Errors), error))
+        {
+            throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
+        }
+
+        try
+        {
+            var packetAsJson = Encoding.ASCII.GetString(byteArray);
+            var packet = JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? throw new ArgumentNullException(packetAsJson);
+            error = Errors.None;
+            return packet;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            error = Errors.Format;
+            return new Packet();
+        }
     }
 
-    public static List<Packet> Split(this Packet original)
+    public static List<Packet> Split(this Packet original, ref Errors error)
     {
         var packets = new List<Packet>();
 
         // within authorized range of size
-        if (original.PacketToByteArray().Length < Packet.MaxPacketSize)
+        var originalBytesLength = original.PacketToByteArray(ref error).Length;
+        if (error != Errors.None)
+        {
+            // TODO : PacketToByteArray => handle error
+            return packets; // empty
+        }
+
+        if (originalBytesLength < Packet.MaxPacketSize)
         {
             packets.Add(original);
             return packets;
@@ -59,7 +99,12 @@ public static class Tools
         var header = original; // copy the original packet
         header.Data = ""; // empty the data field (= keep the packet's header)
 
-        var headerBytes = header.PacketToByteArray(); // header to bytes
+        var headerBytes = header.PacketToByteArray(ref error); // header to bytes
+        if (error != Errors.None)
+        {
+            // TODO : PacketToByteArray => handle error
+            return packets; // empty
+        }
         var headerBytesLength = headerBytes.Length; // length
         var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength; // max length allowed
 
@@ -68,7 +113,12 @@ public static class Tools
 
         for (var i = 0; i < dataBytesTotalLength; i += headerBytesMaxLength - 1)
         {
-            var packet = headerBytes.ByteArrayToPacket();
+            var packet = headerBytes.ByteArrayToPacket(ref error);
+            if (error != Errors.None)
+            {
+                // TODO : ByteArrayToPacket => handle error
+                return new List<Packet>();
+            }
             if (i + headerBytesMaxLength - 1 > dataBytesTotalLength)
             {
                 packet.Final = true;

@@ -7,12 +7,14 @@ using NUnit.Framework;
 
 public class TestsAssetsPacket
 {
+    private Errors errorValue;
     private Packet original = new();
     private string originalAsString = new("");
 
     [SetUp]
     public void Setup()
     {
+        this.errorValue = Errors.None;
         this.original = new Packet(false, 0, 1, false, 0, true, 999, "test");
         this.originalAsString = "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
                                 "\"Final\":true,\"IdPlayer\":999,\"Data\":\"test\"}";
@@ -22,7 +24,12 @@ public class TestsAssetsPacket
     public void TestPacketByteArrayToPacketSuccess()
     {
         var resultAsBytes = Encoding.ASCII.GetBytes(this.originalAsString);
-        var result = resultAsBytes.ByteArrayToPacket();
+        var result = resultAsBytes.ByteArrayToPacket(ref this.errorValue);
+
+        if (this.errorValue != Errors.None)
+        {
+            Assert.Fail();
+        }
 
         Assert.AreEqual(this.original.Type, result.Type);
         Assert.AreEqual(this.original.IdRoom, result.IdRoom);
@@ -37,7 +44,11 @@ public class TestsAssetsPacket
     [Test]
     public void TestPacketToByteArraySuccess()
     {
-        var resultAsBytes = this.original.PacketToByteArray();
+        var resultAsBytes = this.original.PacketToByteArray(ref this.errorValue);
+        if (this.errorValue != Errors.None)
+        {
+            Assert.Fail();
+        }
         var resultAsString = Encoding.ASCII.GetString(resultAsBytes);
 
         Assert.AreEqual(this.originalAsString, resultAsString);
@@ -46,7 +57,11 @@ public class TestsAssetsPacket
     [Test]
     public void TestPacketSplitSolopacketSuccess()
     {
-        var packets = this.original.Split();
+        var packets = this.original.Split(ref this.errorValue);
+        if (this.errorValue != Errors.None)
+        {
+            Assert.Fail();
+        }
         Assert.AreEqual(this.original, packets[0]);
     }
 
@@ -71,7 +86,11 @@ public class TestsAssetsPacket
         var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
             "-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz");
 
-        var packets = packet.Split();
+        var packets = packet.Split(ref this.errorValue);
+        if (this.errorValue != Errors.None)
+        {
+            Assert.Fail();
+        }
         Assert.AreEqual(p0.Data, packets[0].Data);
         Assert.AreEqual(p1.Data, packets[1].Data);
     }

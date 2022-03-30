@@ -4,9 +4,9 @@ using System.Net.Sockets;
 using System.Security;
 using Assets;
 
-public partial class Client
+public static partial class Client
 {
-    private static int Connection(ref Socket? socket)
+    private static Errors Connection(ref Socket socket)
     {
         // TODO : trycatch lors de la récupération des données de config
         /*var port = ConfigurationManager.AppSettings.Get("ServerPort");
@@ -30,42 +30,42 @@ public partial class Client
             {
                 socket.Connect(remoteEP);
                 Console.WriteLine("Client is connected to {0}", socket.RemoteEndPoint);
-                return (int)Errors.None;
+                return Errors.None;
             }
             catch (ArgumentNullException ane)
             {
                 // Connect : remoteEP is null
                 Console.WriteLine("ArgumentNullException : {0}", ane);
-                return (int)Errors.ToBeDetermined; // Unknown ?
+                return Errors.ToBeDetermined; // Unknown ?
             }
             catch (SocketException se)
             {
                 // Connect : An error occurred when attempting to access the socket
                 Console.WriteLine("SocketException : {0}", se);
-                return (int)Errors.Socket;
+                return Errors.Socket;
             }
             catch (ObjectDisposedException ode)
             {
                 // Connect : The Socket has been closed
                 Console.WriteLine("ObjectDisposedException : {0}", ode);
-                return (int)Errors.Socket;
+                return Errors.Socket;
             }
             catch (SecurityException se)
             {
                 // Connect : A caller higher in the call stack does not have permission for the requested operation
                 Console.WriteLine("SecurityException : {0}", se);
-                return (int)Errors.ToBeDetermined; // Unknown ?
+                return Errors.ToBeDetermined; // Unknown ?
             }
             catch (InvalidOperationException se)
             {
                 // Connect : The Socket has been placed in a listening state by calling Listen(Int32).
                 Console.WriteLine("InvalidOperationException : {0}", se);
-                return (int)Errors.Socket;
+                return Errors.Socket;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Unexpected exception : {0}", e);
-                return (int)Errors.Unknown;
+                return Errors.Unknown;
             }
         }
         catch (ArgumentNullException ane)
@@ -73,37 +73,37 @@ public partial class Client
             // IPAddress.Parse : ipAddress a la valeur null
             // IPEndPoint : address a la valeur null
             Console.WriteLine("ArgumentNullException : {0}", ane);
-            return (int)Errors.ConfigFile;
+            return Errors.ConfigFile;
         }
         catch (FormatException fe)
         {
             // IPAddress.Parse : ipAddress n’est pas une adresse IP valide
             Console.WriteLine("FormatException : {0}", fe);
-            return (int)Errors.ConfigFile;
+            return Errors.ConfigFile;
         }
         catch (ArgumentOutOfRangeException aoore)
         {
             // IPEndPoint : port est inférieur à MinPort; port est supérieur à MaxPort; address est inférieur à 0 ou supérieur à 0x00000000FFFFFFFF
             Console.WriteLine("ArgumentOutOfRangeException : {0}", aoore);
-            return (int)Errors.ConfigFile;
+            return Errors.ConfigFile;
         }
         catch (SocketException se)
         {
             // Socket : La combinaison de addressFamily, socketType et protocolType crée un socket non valide
             Console.WriteLine("SocketException : {0}", se);
-            return (int)Errors.ConfigFile;
+            return Errors.ConfigFile;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.ToString());
-            return (int)Errors.Unknown;
+            return Errors.Unknown;
         }
     }
 
-    private static int Disconnection(Socket socket)
+    private static Errors Disconnection(Socket socket)
     {
         var original = new Packet();
-        Communication(socket, ref original, (byte)IdMessage.Disconnection, "");
+        socket.Communication(ref original, IdMessage.Disconnection, "");
         // if Errors.Format = ignore, not expecting to receive anything from the server
         // if Errors.Socket = ignore, already disconnected from the server
 
@@ -113,44 +113,41 @@ public partial class Client
             Console.WriteLine("Closing connection...");
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
-            return (int)Errors.None;
+            return Errors.None;
         }
         catch (SocketException se)
         {
             // Shutdown : An error occurred when attempting to access the socket
             Console.WriteLine("SocketException : {0}", se);
-            return (int)Errors.Socket;
+            return Errors.Socket;
         }
         catch (ObjectDisposedException ode)
         {
             // Shutdown : The Socket has been closed
             Console.WriteLine("ObjectDisposedException : {0}", ode);
-            return (int)Errors.None;
+            return Errors.None;
         }
         catch (Exception e)
         {
             Console.WriteLine("Unexpected exception : {0}", e);
-            return (int)Errors.Unknown;
+            return Errors.Unknown;
         }
     }
 
-    private static int Communication(Socket socket, ref Packet received, byte idMessage, string data)
+    private static Errors Communication(this Socket socket, ref Packet received, IdMessage idMessage, string data)
     {
         try
         {
             byte[]? bytes = null;
+            var error_value = Errors.None;
             var packets = new List<Packet>();
-            var original = new Packet(false, 0, idMessage, true, 999, data);
+            var original = new Packet(false, 0, (byte) idMessage, true, 999, data);
 
-            try
+            packets = original.Split(ref error_value);
+            if (error_value != Errors.None)
             {
-                packets = original.Split();
-            }
-            catch (Exception e)
-            {
-                // PacketToByteArray : issue during serialization
-                Console.WriteLine("Exception : {0}", e);
-                return (int)Errors.Data;
+                // TODO : Split => handle error
+                return Errors.Data;
             }
 
             var count_errors = 0;
@@ -159,15 +156,11 @@ public partial class Client
                 foreach (var packet in packets)
                 {
                     // Send the data through the socket.
-                    try
+                    bytes = packet.PacketToByteArray(ref error_value);
+                    if (error_value != Errors.None)
                     {
-                        bytes = packet.PacketToByteArray();
-                    }
-                    catch (Exception e)
-                    {
-                        // PacketToByteArray : issue during serialization
-                        Console.WriteLine("Exception : {0}", e);
-                        return (int)Errors.Data;
+                        // TODO : PacketToByteArray => handle error
+                        return Errors.Data;
                     }
                     var bytesSent = socket.Send(bytes);
                     Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
@@ -181,12 +174,17 @@ public partial class Client
                 try
                 {
                     Array.Copy(bytes, packetAsBytes, bytesRec);
-                    received = packetAsBytes.ByteArrayToPacket();
+                    received = packetAsBytes.ByteArrayToPacket(ref error_value);
+                    if (error_value != Errors.None)
+                    {
+                        // TODO : ByteArrayToPacket => handle error
+                        return Errors.Data;
+                    }
                     Console.WriteLine(
                         received.Status
                             ? "Read {0} bytes => \tpermission accepted \n"
                             : "Read {0} bytes => \tpermission denied \n", bytesRec);
-                    return (int)Errors.None;
+                    return Errors.None;
                 }
                 catch (Exception e)
                 {
@@ -197,7 +195,7 @@ public partial class Client
                         continue;
                     }
                     Console.WriteLine("Exception : {0}", e);
-                    return (int)Errors.Receive;
+                    return Errors.Receive;
                 }
             }
         }
@@ -205,30 +203,30 @@ public partial class Client
         {
             // Send/Receive : buffer a la valeur null
             Console.WriteLine("ArgumentNullException : {0}", ane);
-            return (int)Errors.ToBeDetermined; // Unknown ?
+            return Errors.ToBeDetermined; // Unknown ?
         }
         catch (SocketException se)
         {
             // Send/Receive : Une erreur s’est produite pendant la tentative d’accès au socket
             Console.WriteLine("SocketException : {0}", se);
-            return (int)Errors.Socket;
+            return Errors.Socket;
         }
         catch (ObjectDisposedException ode)
         {
             // Send/Receive : Socket a été fermé
             Console.WriteLine("ObjectDisposedException : {0}", ode);
-            return (int)Errors.Socket;
+            return Errors.Socket;
         }
         catch (SecurityException se)
         {
             // Receive : Un appelant de la pile des appels ne dispose pas des autorisations requises
             Console.WriteLine("SecurityException : {0}", se);
-            return (int)Errors.ToBeDetermined; // Unknown ?
+            return Errors.ToBeDetermined; // Unknown ?
         }
         catch (Exception e)
         {
             Console.WriteLine("Unexpected exception : {0}", e);
-            return (int)Errors.Unknown;
+            return Errors.Unknown;
         }
     }
 }

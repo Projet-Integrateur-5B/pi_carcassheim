@@ -121,17 +121,12 @@ public partial class Server
                     Console.WriteLine(bytesRead);
                     var packetAsBytes = new byte[bytesRead];
                     Array.Copy(state.Buffer, packetAsBytes, bytesRead);
+                    var error_value = Errors.None;
 
-                    try
+                    state.Packet = packetAsBytes.ByteArrayToPacket(ref error_value);
+                    if (error_value != Errors.None)
                     {
-                        state.Packet = packetAsBytes.ByteArrayToPacket();
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine("Reading from : " + handler.RemoteEndPoint +
-                                          "\n\t Read : {0} bytes" +
-                                          "\n\t => Wrong format, message ignored !", bytesRead);
-                        return;
+                        // TODO : ByteArrayToPacket => handle error
                     }
 
                     // There  might be more data, so store the data received so far.
@@ -237,9 +232,14 @@ public partial class Server
 
     private static void Send(IAsyncResult ar, bool end)
     {
+        var error_value = Errors.None;
         var state = (StateObject?)ar.AsyncState;
         // TODO : get and put into Data what the client asked for
-        var packetAsBytes = state.Packet.PacketToByteArray();
+        var packetAsBytes = state.Packet.PacketToByteArray(ref error_value);
+        if (error_value != Errors.None)
+        {
+            // TODO : PacketToByteArray => handle error
+        }
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
