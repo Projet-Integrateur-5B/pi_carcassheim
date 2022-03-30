@@ -15,6 +15,7 @@ public enum Errors
     Data = 5,
     ToBeDetermined = 999
 }
+
 public enum IdMessage : byte
 {
     Default = 0,
@@ -32,7 +33,6 @@ public enum IdMessage : byte
 
 public static class Tools
 {
-
     public static byte[] PacketToByteArray(this Packet packet, ref Errors error)
     {
         if (!Enum.IsDefined(typeof(Errors), error))
@@ -65,7 +65,8 @@ public static class Tools
         try
         {
             var packetAsJson = Encoding.ASCII.GetString(byteArray);
-            var packet = JsonConvert.DeserializeObject<Packet>(packetAsJson) ?? throw new ArgumentNullException(packetAsJson);
+            var packet = JsonConvert.DeserializeObject<Packet>(packetAsJson) ??
+                         throw new ArgumentNullException(packetAsJson);
             error = Errors.None;
             return packet;
         }
@@ -94,8 +95,10 @@ public static class Tools
             packets.Add(original);
             return packets;
         }
+
         var dataString = string.Join(string.Empty, original.Data);
-        var header = new Packet(original.Type, original.IdRoom, original.IdMessage, original.Final, original.IdPlayer, Array.Empty<string>());
+        var header = new Packet(original.Type, original.IdRoom, original.IdMessage, original.Final,
+            original.IdPlayer, Array.Empty<string>());
         var packetLength = original.Data.Length;
 
         var headerBytes = header.PacketToByteArray(ref error); // header to bytes
@@ -104,6 +107,7 @@ public static class Tools
             // TODO : PacketToByteArray => handle error
             return packets; // empty
         }
+
         var headerBytesLength = headerBytes.Length; // length
         var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength; // max length allowed
 
@@ -132,10 +136,7 @@ public static class Tools
 
             if (dataLength < headerBytesMaxLength)
             {
-                var list = new List<string>(packet.Data.ToList())
-                {
-                    original.Data[0]
-                };
+                var list = new List<string>(packet.Data.ToList()) { original.Data[0] };
                 packet.Data = list.ToArray();
                 packetLength--;
                 headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
@@ -151,8 +152,10 @@ public static class Tools
                     // TODO : ByteArrayToPacket => handle error
                     return new List<Packet>();
                 }
+
                 headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength;
             }
+
             if (packetLength == 0)
             {
                 packet.Final = true;
@@ -160,6 +163,7 @@ public static class Tools
                 break;
             }
         }
+
         return packets;
     }
 
@@ -170,6 +174,7 @@ public static class Tools
         {
             original.Data = original.Data.Concat(packet.Data).ToArray();
         }
+
         return original;
     }
 }

@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Assets\Assets.csproj" />
+    <ProjectReference Include="..\Assets\Assets.csproj"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0-preview.2.22152.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0-preview.2.22152.2"/>
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,8 @@
 namespace Client;
+
 using System.Net.Sockets;
 using Assets;
+
 public static partial class Client
 {
     public static int Main()
@@ -22,6 +24,14 @@ public static partial class Client
                 Console.WriteLine("Errors.Socket");
                 break;
             case Errors.ToBeDetermined:
+                break;
+            case Errors.Unknown:
+                break;
+            case Errors.Format:
+                break;
+            case Errors.Receive:
+                break;
+            case Errors.Data:
                 break;
             default:
                 // TODO : handle case : default
@@ -51,6 +61,12 @@ public static partial class Client
                 // TODO : handle case : error while receiving an answer
                 Console.WriteLine("Errors.Receive");
                 break;
+            case Errors.Unknown:
+                break;
+            case Errors.ConfigFile:
+                break;
+            case Errors.ToBeDetermined:
+                break;
             default:
                 // TODO : handle case : default
                 Console.WriteLine("Errors.Unknown");
@@ -76,11 +92,24 @@ public static partial class Client
                 // TODO : handle case : connection could not be closed
                 Console.WriteLine("Errors.Socket");
                 break;
+            case Errors.Unknown:
+                break;
+            case Errors.Format:
+                break;
+            case Errors.ConfigFile:
+                break;
+            case Errors.Receive:
+                break;
+            case Errors.Data:
+                break;
+            case Errors.ToBeDetermined:
+                break;
             default:
                 // TODO : handle case : default
                 Console.WriteLine("Errors.Unknown");
                 break;
         }
+
         return 0;
     }
 }

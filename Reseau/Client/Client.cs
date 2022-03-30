@@ -1,4 +1,5 @@
 namespace Client;
+
 using System.Net;
 using System.Net.Sockets;
 using System.Security;
@@ -134,14 +135,15 @@ public static partial class Client
         }
     }
 
-    private static Errors Communication(this Socket socket, ref Packet received, IdMessage idMessage, string[] data)
+    private static Errors Communication(this Socket socket, ref Packet received,
+        IdMessage idMessage, string[] data)
     {
         try
         {
             byte[]? bytes = null;
             var error_value = Errors.None;
             var packets = new List<Packet>();
-            var original = new Packet(false, 0, (byte) idMessage, true, 999, data);
+            var original = new Packet(false, 0, (byte)idMessage, true, 999, data);
 
             packets = original.Split(ref error_value);
             if (error_value != Errors.None)
@@ -162,6 +164,7 @@ public static partial class Client
                         // TODO : PacketToByteArray => handle error
                         return Errors.Data;
                     }
+
                     var bytesSent = socket.Send(bytes);
                     Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
                 }
@@ -180,6 +183,7 @@ public static partial class Client
                         // TODO : ByteArrayToPacket => handle error
                         return Errors.Data;
                     }
+
                     Console.WriteLine(
                         received.Status
                             ? "Read {0} bytes => \tpermission accepted \n"
@@ -194,6 +198,7 @@ public static partial class Client
                     {
                         continue;
                     }
+
                     Console.WriteLine("Exception : {0}", e);
                     return Errors.Receive;
                 }

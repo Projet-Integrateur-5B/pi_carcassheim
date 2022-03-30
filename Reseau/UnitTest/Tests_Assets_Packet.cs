@@ -15,9 +15,10 @@ public class TestsAssetsPacket
     public void Setup()
     {
         this.errorValue = Errors.None;
-        this.original = new Packet(false, 0, 1, false, 0, true, 999, new string[] { "test", "deux" });
-        this.originalAsString = "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
-                                "\"Final\":true,\"IdPlayer\":999,\"Data\":\"[\"test\",\"deux\"]\"}";
+        this.original = new Packet(false, 0, 1, false, 0, true, 999, new[] { "test", "deux" });
+        this.originalAsString =
+            "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
+            "\"Final\":true,\"IdPlayer\":999,\"Data\":\"[\"test\",\"deux\"]\"}";
     }
 
     [Test]
@@ -50,6 +51,7 @@ public class TestsAssetsPacket
         {
             Assert.Fail();
         }
+
         var resultAsString = Encoding.ASCII.GetString(resultAsBytes);
 
         Assert.AreEqual(this.originalAsString, resultAsString);
@@ -63,6 +65,7 @@ public class TestsAssetsPacket
         {
             Assert.Fail();
         }
+
         Assert.AreEqual(this.original, packets[0]);
     }
 
@@ -77,16 +80,37 @@ public class TestsAssetsPacket
         var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var packet = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer, new string[]
-        {"abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz" });
-        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer, new string[] { "abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz" });
-        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer, new string[] { "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz" });
+        var packet = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer,
+            new[]
+            {
+                "abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+            });
+        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer,
+            new[]
+            {
+                "abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+            });
+        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
+            new[]
+            {
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+            });
 
         var packets = packet.Split(ref this.errorValue);
         if (this.errorValue != Errors.None)
         {
             Assert.Fail();
         }
+
         Assert.AreEqual(p0.Data, packets[0].Data);
         Assert.AreEqual(p1.Data, packets[1].Data);
     }
@@ -94,10 +118,7 @@ public class TestsAssetsPacket
     [Test]
     public void TestPacketCatenateSolopacketSuccess()
     {
-        var packets = new List<Packet>
-        {
-            this.original
-        };
+        var packets = new List<Packet> { this.original };
         var packet = packets.Catenate();
         Assert.AreEqual(this.original, packet);
     }
@@ -113,16 +134,32 @@ public class TestsAssetsPacket
         var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var original = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer, new string[]
-        {"abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz","abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz" });
-        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer, new string[] { "abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz" });
-        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer, new string[] { "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz", "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz" });
+        var original = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer,
+            new[]
+            {
+                "abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+            });
+        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer,
+            new[]
+            {
+                "abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+            });
+        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
+            new[]
+            {
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+            });
 
-        var packets = new List<Packet>
-        {
-            p0,
-            p1
-        };
+        var packets = new List<Packet> { p0, p1 };
         var packet = packets.Catenate();
 
         Assert.AreEqual(original.Data, packet.Data);

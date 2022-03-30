@@ -194,12 +194,10 @@ public partial class Server
                                 state.Packet.Status = false;
                                 break;
                         }
+
                         // Echo the data back to the client.
                         Send(ar, false);
-                        state = new StateObject
-                        {
-                            WorkSocket = state.WorkSocket
-                        };
+                        state = new StateObject { WorkSocket = state.WorkSocket };
                         handler.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                             ReadCallback, state);
                     }
@@ -220,7 +218,6 @@ public partial class Server
                 {
                     Console.WriteLine("0 bytes to read from : " + handler.RemoteEndPoint);
                 }
-
             }
             else
             {
@@ -233,7 +230,6 @@ public partial class Server
             // si c'est null ?
             Console.WriteLine("state is null");
         }
-
     }
 
     private static void Send(IAsyncResult ar, bool end)
@@ -246,6 +242,7 @@ public partial class Server
         {
             // TODO : PacketToByteArray => handle error
         }
+
         var size = packetAsBytes.Length;
 
         // Begin sending the data to the remote device.
