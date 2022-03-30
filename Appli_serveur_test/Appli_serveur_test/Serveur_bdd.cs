@@ -11,6 +11,7 @@ public class Serveur_BDD
 	static void Main(string[] args)
 	{
 		DB bd = new DB();
+		bd.command("select * from Utilisateur;");
 		Server.StartListening();
 	}
 }

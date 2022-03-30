@@ -14,6 +14,7 @@ public class DB
         dbName = Path.GetDirectoryName(path);
         int size = dbName.Length;
         dbName = @"URI=file:" + dbName.Substring(0, size - 17) + @"\projet.db";
+        Console.WriteLine(dbName);
     }
 
     public DB(string path)
