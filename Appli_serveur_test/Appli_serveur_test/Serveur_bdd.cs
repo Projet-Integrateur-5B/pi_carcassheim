@@ -1,4 +1,6 @@
-﻿using System;
+﻿namespace Server;
+
+using System;
 
 public class Serveur_BDD
 {
