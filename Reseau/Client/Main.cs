@@ -31,6 +31,14 @@ public partial class Client
         }
         string[] test = { "pseudo", "mdp18" };
         return_value = Communication(socket, ref original, 1, test);
+        return_value = Communication(socket, ref original, 3, test);
+        return_value = Communication(socket, ref original, 4, test);
+        return_value = Communication(socket, ref original, 5, test);
+        return_value = Communication(socket, ref original, 6, test);
+        return_value = Communication(socket, ref original, 7, test);
+        return_value = Communication(socket, ref original, 8, test);
+        return_value = Communication(socket, ref original, 9, test);
+        return_value = Communication(socket, ref original, 10, test);
         switch (return_value)
         {
             case (int)Errors.None:

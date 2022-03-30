@@ -4,10 +4,11 @@ using Assets;
 
 public partial class Server
 {
-    // vérifie si les informations de connecction sont valide, si oui return true sinon false
-    public static bool Connection(Packet packet) //fonction a modifier pour la connection
+    public static bool Connection(Packet packet)
     {
-        if (packet.Data[1] == "mdp18" && packet.Data[0] == "pseudo")
+        // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
+        // if a modifié pour return true si les infos sont valide
+        if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
         {
             return true;
         }
@@ -17,8 +18,8 @@ public partial class Server
         }
     }
 
-    // deconnecte le joueur du serveur, true si deconnexion reussit , false sinon
-    public static bool Disconnection(Packet packet) // fonction pour deconnecter le joueur
+    // ne pas toucher cette fonction
+    public static bool Disconnection(Packet packet)
     {
         if (packet.IdPlayer == 999)
         {
@@ -30,10 +31,12 @@ public partial class Server
         }
     }
 
-    // vérifie si l'inscription est valide et si oui return true sinon false
-    public static bool Signup(Packet packet) //fonction a modifier pour l'inscription
+    public static bool Signup(Packet packet)
     {
-        if (packet.IdPlayer == 999)
+        // verifie si les informations d'inscription sont valide ( ne sont pas les mêmes qu'un utilisateur deja inscrit
+        // packet.Data[0] = pseudp ; packet.Data[1] = mdp ; packet.Data[2] = mail ; packet.Data[3] = date de naissance
+        // if a modifié pour return true si info valide
+        if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
         {
             return true;
         }
@@ -43,57 +46,56 @@ public partial class Server
         }
     }
 
-    // rentre les stats du joueur dans packet.Data ( string ) ou dans une nouvelle classe ( a crée et modifier alors )
-    // id du joueur présent dans packet.IdPlayer
-    // Status = true si aucune erreur, sinon false
-    public static Packet Statistics(Packet packet) //fonction a modifier pour stat d'un joueur
+    public static Packet Statistics(Packet packet)
     {
-        Array.Clear(packet.Data);
-        var retour = "joueur 1 : 23/12 ";
-        var list = new List<string>(packet.Data.ToList())
+        // id joueur dans packet.IdPlayer
+        // doit chercher les infos dans la bdd et les mettre dans packet.Data comme indiquer
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer, Array.Empty<string>());
+        var list = new List<string>(retour.Data.ToList())
         {
-            retour
+            //remplacer ici les string par les valeurs de la bdd sous forme de string
+            "XP","Niveau","Victoires","Defaites","Nbpartie"
         };
-        packet.Data = list.ToArray();
-
-        packet.Status = true;
-        return packet;
+        retour.Data = list.ToArray();
+        retour.Status = true;   // remplacer par false si erreur
+        return retour;
     }
 
-    // return la liste des rooms dispo dans un string ( ou une classe a crée )
     public static Packet RoomJoin(Packet packet)
     {
-        Array.Clear(packet.Data);
-        var retour = "r1 : 2 joueur";
-        var list = new List<string>(packet.Data.ToList())
+        // id room dans packet.IdRoom
+        // id joueur dans packet.IdPlayer
+        // ajouter le joueur a la partie dans le systeme de jeu
+        // doit chercher les infos dans la bdd e la room et les mettre dans packet.Data comme indiquer
+        var retour = RoomSettings(packet);
+        if (false)  // entrer ici si erreur
         {
-            retour
-        };
-        packet.Data = list.ToArray();
-        packet.Status = true;
-        return packet;
+            retour.Status = false;
+        }
+        return retour;
     }
 
-    // met dans Data les info de la room ( ou une classe a crée )
-    // modifie les info de la room cote server
-    // Status = true si tout c'est bien passer sinon false
     public static Packet RoomList(Packet packet)
     {
-        Array.Clear(packet.Data);
-        var retour = " room 1";
-        var list = new List<string>(packet.Data.ToList())
+        // doit chercher les infos dans la bdd pour les room dispo et les mettre dans packet.Data comme indiquer
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer, Array.Empty<string>());
+        var list = new List<string>(retour.Data.ToList());
+        for (var i = 0; i < 1; i++)  // boucle a faire pour nb room
         {
-            retour
-        };
-        packet.Data = list.ToArray();
-        packet.Status = true;
-        return packet;
+            list.Add("id room");  // id room
+            list.Add("pseudo hote");    // pseudo de l'hote de la room
+            list.Add("nb joueur present");  // nb joueur deja present
+            list.Add("nb joueur max");  // nb joueur max de la room
+        }
+        retour.Data = list.ToArray();
+        retour.Status = true;   //remplacer par false si erreur
+        return retour;
     }
 
-    // return true si room bien quitter, false si erreur
-    // modifier donnee room cote serveur
     public static bool RoomLeave(Packet packet)
     {
+        // supprimer le joueur de la prtie dans le systeme de jeu
+        // return true si bien reussit et false si joueur non retirer de la partie ( si erreur en gros)
         if (packet.IdPlayer == 999)
         {
             return true;
@@ -104,9 +106,11 @@ public partial class Server
         }
     }
 
-    // met le joueur prêt ( true si bien passer, false sinon )
     public static bool RoomReady(Packet packet)
     {
+        // met le joueur prêt dans le jeu ( true si bien passer, false sinon )
+        // id room dans packet.IdRoom
+        // id joueur dans packet.IdPlayer
         if (packet.IdPlayer == 999)
         {
             return true;
@@ -117,32 +121,29 @@ public partial class Server
         }
     }
 
-    // modifie les parametres de la room
-    // status true si parametre bien modifier, false si erreur
     public static Packet RoomSettings(Packet packet)
     {
-        Array.Clear(packet.Data);
-        var retour = " nb personne : 1";
-        var list = new List<string>(packet.Data.ToList())
+        // id room dans packet.IdRoom
+        // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer, Array.Empty<string>());
+        var list = new List<string>(retour.Data.ToList())
         {
-            retour
+            "nb joueur max","partie privé ou public","mode de la partie","nb tuile","nb pion","timer partie","timer par joueur","nb score max"   // parametre de la room a donner ici ( mettre a -1 si non remplit)
         };
-        packet.Data = list.ToArray();
-        packet.Status = true;
-        return packet;
+        for (var i = 0; i < 1; i++)  // boucle a faire pour nb joueur present
+        {
+            list.Add("pseudo joueur");    // pseudo du joueur X
+        }
+        retour.Data = list.ToArray();
+        retour.Status = true;   // remplacer par false si erreur
+        return retour;
     }
 
-    // envoye les changement de la room ( joueur join ou modification parametre ou joueur pret )
-    public static Packet RoomEdit(Packet packet)
+    public static Packet RoomStart(Packet packet)
     {
-        packet.Status = true;
-        Array.Clear(packet.Data);
-        var retour = "joueur arriver";
-        var list = new List<string>(packet.Data.ToList())
-        {
-            retour
-        };
-        packet.Data = list.ToArray();
+        // lancement de la partie
+        // id room dans packet.IdRoom
+        packet.Status = true;   // mettre sur false si erreur dans lancement
         return packet;
     }
 }

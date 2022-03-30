@@ -26,7 +26,7 @@ public enum IdMessage : byte
     RoomLeave = 7,
     RoomReady = 8,
     RoomSettings = 9,
-    RoomEdit = 10
+    RoomStart = 10
 }
 
 public static class Tools
