@@ -11,6 +11,6 @@ public class Serveur_BDD
 	static void Main(string[] args)
 	{
 		DB bd = new DB();
-		Server.Server.StartListening();
+		Server.StartListening();
 	}
 }

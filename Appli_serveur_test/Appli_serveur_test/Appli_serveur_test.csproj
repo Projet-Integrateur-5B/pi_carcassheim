@@ -15,4 +15,10 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0-preview.2.22152.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Mono.Data.Sqlite">
+      <HintPath>Mono.Data.Sqlite.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
