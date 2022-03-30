@@ -1,10 +1,10 @@
 namespace Server;
 
-using System.Configuration;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Sockets;
 using Assets;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Configuration;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -29,27 +29,58 @@ public partial class Server
     [Serializable]
     public class ServerParameters
     {
-        public int serverPort;
-        public int databasePort;
-        public string DatabaseIp = new("");
+        public int ServerPort { get; set; }
+        public int DatabasePort { get; set; }
+        public string DatabaseIp { get; set; } = new("");
     }
 
-    private const string PathToConfig = "../../../Resources/network/config.json";
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
 
+    public static ServerParameters GetConfig(ref Errors error)
+    {
+        if (!Enum.IsDefined(typeof(Errors), error))
+        {
+            throw new InvalidEnumArgumentException(nameof(error), (int)error,
+                typeof(Errors));
+        }
+
+        try
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+
+            var serverParameters = config.GetRequiredSection("Settings").Get<ServerParameters>();
+            error = Errors.None;
+            return serverParameters ?? new ServerParameters();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            error = Errors.ConfigFile;
+            return new ServerParameters();
+        }
+    }
+
     public static void StartListening()
     {
-        // get config from file
-        var fileParameters = File.ReadAllText(PathToConfig) ?? throw new Exception();
-        var serverParameters = JsonConvert.DeserializeObject<ServerParameters>(fileParameters) ?? throw new Exception();
+        var error_value = Errors.None;
 
-        /*try
+        var serverParameters = GetConfig(ref error_value);
+        if (error_value != Errors.None)
+        {
+            // TODO : GetConfig error
+            return;
+        }
+
+        try
         {
             // Connecting to the database server
             Console.WriteLine("Server is connecting to the database...");
             var databaseAddress = IPAddress.Parse(serverParameters.DatabaseIp);
-            var remoteEp = new IPEndPoint(databaseAddress, serverParameters.databasePort);
+            var remoteEp = new IPEndPoint(databaseAddress, serverParameters.DatabasePort);
             var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             database.Connect(remoteEp);
             Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
@@ -57,7 +88,7 @@ public partial class Server
         catch (Exception e)
         {
             Console.WriteLine(e.ToString());
-        }*/
+        }
 
         Console.WriteLine("Server is setting up...");
 
@@ -66,7 +97,7 @@ public partial class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, serverParameters.serverPort);
+        var localEndPoint = new IPEndPoint(ipAddress, serverParameters.ServerPort);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
