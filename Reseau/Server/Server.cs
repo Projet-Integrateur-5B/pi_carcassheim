@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Net;
 using System.Net.Sockets;
 using Assets;
+using Newtonsoft.Json;
 
 // State object for reading client data asynchronously
 public class StateObject
@@ -24,13 +25,39 @@ public class StateObject
 
 public partial class Server
 {
+
+    [Serializable]
+    public class ServerParameters
+    {
+        public int serverPort;
+        public int databasePort;
+        public string DatabaseIp = new("");
+    }
+
+    private const string PathToConfig = "../../../Resources/network/config.json";
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
 
     public static void StartListening()
     {
         // get config from file
-        var port = ConfigurationManager.AppSettings.Get("ServerPort");
+        var fileParameters = File.ReadAllText(PathToConfig) ?? throw new Exception();
+        var serverParameters = JsonConvert.DeserializeObject<ServerParameters>(fileParameters) ?? throw new Exception();
+
+        /*try
+        {
+            // Connecting to the database server
+            Console.WriteLine("Server is connecting to the database...");
+            var databaseAddress = IPAddress.Parse(serverParameters.DatabaseIp);
+            var remoteEp = new IPEndPoint(databaseAddress, serverParameters.databasePort);
+            var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            database.Connect(remoteEp);
+            Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }*/
 
         Console.WriteLine("Server is setting up...");
 
@@ -39,7 +66,7 @@ public partial class Server
         // running the listener is "host.contoso.com".
         var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
         var ipAddress = ipHostInfo.AddressList[0];
-        var localEndPoint = new IPEndPoint(ipAddress, Packet.Port);
+        var localEndPoint = new IPEndPoint(ipAddress, serverParameters.serverPort);
 
         // Create a TCP/IP socket.
         var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
