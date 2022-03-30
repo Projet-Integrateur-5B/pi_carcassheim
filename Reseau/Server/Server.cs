@@ -183,8 +183,8 @@ public partial class Server
                             case IdMessage.RoomSettings:
                                 state.Packet = RoomSettings(state.Packet);
                                 break;
-                            case IdMessage.RoomEdit:
-                                state.Packet = RoomEdit(state.Packet);
+                            case IdMessage.RoomStart:
+                                state.Packet = RoomStart(state.Packet);
                                 break;
                             case IdMessage.Disconnection: // impossible
                                 Array.Clear(state.Packet.Data);

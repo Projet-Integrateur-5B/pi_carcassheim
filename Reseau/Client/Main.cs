@@ -57,6 +57,16 @@ public static partial class Client
                 break;
         }
 
+        /*error_value = Communication(socket, ref original, IdMessage.Connection, test);
+        error_value = Communication(socket, ref original, IdMessage.Signup, test);
+        error_value = Communication(socket, ref original, IdMessage.Statistics, test);
+        error_value = Communication(socket, ref original, IdMessage.RoomList, test);
+        error_value = Communication(socket, ref original, IdMessage.RoomJoin, test);
+        error_value = Communication(socket, ref original, IdMessage.RoomLeave, test);
+        error_value = Communication(socket, ref original, IdMessage.RoomReady, test);
+        error_value = Communication(socket, ref original, IdMessage.RoomSettings, test);
+        error_value = Communication(socket, ref original, IdMessage.RoomStart, test);*/
+
         error_value = Disconnection(socket);
         switch (error_value)
         {
