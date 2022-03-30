@@ -167,14 +167,22 @@ public static class Tools
         return packets;
     }
 
-    public static Packet Catenate(this List<Packet> packets)
+    public static Packet Catenate(this List<Packet> packets, ref Errors error)
     {
         var original = packets[0];
         foreach (var packet in packets.Skip(1))
         {
-            original.Data = original.Data.Concat(packet.Data).ToArray();
+            try
+            {
+                original.Data = original.Data.Concat(packet.Data).ToArray();
+                error = Errors.None;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                error = Errors.Data;
+            }
         }
-
         return original;
     }
 }

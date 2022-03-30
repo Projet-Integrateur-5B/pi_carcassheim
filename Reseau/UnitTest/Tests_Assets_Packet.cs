@@ -18,7 +18,7 @@ public class TestsAssetsPacket
         this.original = new Packet(false, 0, 1, false, 0, true, 999, new[] { "test", "deux" });
         this.originalAsString =
             "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
-            "\"Final\":true,\"IdPlayer\":999,\"Data\":\"[\"test\",\"deux\"]\"}";
+            "\"Final\":true,\"IdPlayer\":999,\"Data\":[\"test\",\"deux\"]}";
     }
 
     [Test]
@@ -119,7 +119,11 @@ public class TestsAssetsPacket
     public void TestPacketCatenateSolopacketSuccess()
     {
         var packets = new List<Packet> { this.original };
-        var packet = packets.Catenate();
+        var packet = packets.Catenate(ref this.errorValue);
+        if (this.errorValue != Errors.None)
+        {
+            Assert.Fail();
+        }
         Assert.AreEqual(this.original, packet);
     }
 
@@ -160,8 +164,11 @@ public class TestsAssetsPacket
             });
 
         var packets = new List<Packet> { p0, p1 };
-        var packet = packets.Catenate();
-
+        var packet = packets.Catenate(ref this.errorValue);
+        if (this.errorValue != Errors.None)
+        {
+            Assert.Fail();
+        }
         Assert.AreEqual(original.Data, packet.Data);
     }
 }
