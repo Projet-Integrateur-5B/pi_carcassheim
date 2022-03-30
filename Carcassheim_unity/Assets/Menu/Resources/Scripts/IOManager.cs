@@ -18,10 +18,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private RoomParameters _rparam;
 	private CreateRoomMenu _croom;
 	private RoomIsCreated _rcreated;
-	private GameObject nextGo;
-	private Color _previousColor, colHover;
+	private Color _previousColor, FCcolor, colHover;
 	private Text _btnText;
-	static private GameObject previousGo;
+	static private GameObject previousGo, nextGo, TridentGo;
 	private Texture2D _cursorTexture;
 	private CursorMode _cursorMode = CursorMode.Auto;
 	private Vector2 _cursorHotspot = Vector2.zero;
@@ -54,6 +53,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		eventSystem = EventSystem.current;
 		nextGo = FirstActiveChild(GameObject.Find("Buttons"));
 		eventSystem.SetSelectedGameObject(nextGo);
+		ColorUtility.TryParseHtmlString("#1e90ff", out colHover);
+		ColorUtility.TryParseHtmlString("#FFA500", out FCcolor);
+		TridentGo = GameObject.Find("Other").transform.Find("Trident").gameObject;
 		changeHover();
 		// Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
 		foreach (Transform menu in GameObject.Find("SubMenus").transform)
@@ -62,21 +64,21 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 				if (btn.GetComponent<Button>())
 					btn.GetComponent<Button>().onClick.AddListener(delegate
 					{
-						MethodCall(btn.name);
+						MethodCall(btn.name, null);
 					});
 			if (menu.Find("Toggle Group"))
 				foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
 					if (tog.GetComponent<Toggle>())
 						tog.GetComponent<Toggle>().onValueChanged.AddListener(delegate
 						{
-							MethodCallT(menu.Find("Toggle Group").transform.GetChild(0).name, tog.GetComponent<Toggle>());
+							MethodCall(menu.Find("Toggle Group").transform.GetChild(0).name, tog.GetComponent<Toggle>());
 						});
 		}
 	}
 
 	public void Update() // A VERIFIER
-	{   //si on appuie sur une touche de deplacement
-/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+	{ //si on appuie sur une touche de deplacement
+	/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
 			if (nextGo != eventSystem.currentSelectedGameObject)
 				selectionChange(); */
 	}
@@ -89,9 +91,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void selectionChange()
 	{
-		// nextGo.GetComponent<Button>() est testé d'abord donc si false la parti gauche du ET non testé donc pas d'erreur
+		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
-		if (nextGo != eventSystem.currentSelectedGameObject && (btn || nextGo.GetComponent<Toggle>()))
+		bool slider = nextGo.transform.GetChild(0).name == "Handle";
+		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
+		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
 		{
 			previousGo = eventSystem.currentSelectedGameObject;
 			eventSystem.SetSelectedGameObject(nextGo);
@@ -115,27 +119,49 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		image.color = new Color(image.color.r, image.color.g, image.color.b, f);
 	}
 
+	public void tridentHover(Component c)
+	{
+		if (!(c.transform.parent.name == "ForgottenPwdUser" || c.transform.parent.name == "CGU"))
+		{
+			TridentGo.SetActive(true);
+			GameObject curBtn = c.gameObject;
+			float width = curBtn.GetComponent<RectTransform>().rect.width;
+			float height = curBtn.GetComponent<RectTransform>().rect.height;
+			GameObject TF = TridentGo.transform.Find("TridentFront").gameObject;
+			GameObject TB = TridentGo.transform.Find("TridentBack").gameObject;
+			TF.transform.position = curBtn.transform.position + new Vector3(width / 2 + 90, 0, 0);
+			TB.transform.position = curBtn.transform.position - new Vector3(width / 2 + 20, 0, 0);
+		}
+	}
+
 	public void changeHover()
 	{
 		if (boolSelectionChange == true)
 		{
+			if (TridentGo.activeSelf == true) // TRIDENT
+				TridentGo.SetActive(false);
 			if (previousGo != null)
 			{
+				//GameObject.Find("Trident").SetActive(false);
 				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
+				bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
 				switch (previousTarget.name)
 				{ // previousGO
-					case "RawImage": // GIF
-						// A changer (dezoom)
+					case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
 						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
 						break;
 					case "Unselected": // IMAGE
 						colorImage(previousGo, 1);
 						break;
 					case "Text": // BOUTON
-						textColor(Color.white, -3, previousGo);
+						_previousColor = FC ? FCcolor : Color.white;
+						textColor(_previousColor, -3, previousGo);
 						break;
 					case "Background": // TOGGLE
-						colorImage(previousGo, 1);
+						colorImage(previousGo, 1); // (à changer)
+						break;
+					case "Handle": // SLIDER
+						colorImage(previousGo, 1); // (à changer)
 						break;
 					default:
 						break;
@@ -145,17 +171,20 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
 			switch (nextTarget.name)
 			{ // nextGO
-				case "RawImage": // GIF
-					// A changer (zoom)
+				case "RawImage": // GIF : A changer (mettre autre chose que zoom)
 					nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
 					break;
 				case "Unselected": // IMAGE
 					colorImage(nextGo, 0);
 					break;
 				case "Text": // BOUTON
-					textColor(Color.blue, 3, nextGo);
+					tridentHover(nextTarget); // TRIDENT
+					textColor(colHover, 3, nextGo);
 					break;
 				case "Background": // TOGGLE
+					colorImage(nextGo, 0.5f); // semi transparent (à changer)
+					break;
+				case "Handle": // SLIDER
 					colorImage(nextGo, 0.5f); // semi transparent (à changer)
 					break;
 				default:
@@ -178,21 +207,17 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 					break;
 				}
 			}
+
 			SetMenuChanged(false);
 			selectionChange();
 		}
 	}
 
-	public void MethodCall(string methode)
-	{
-		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
-		gameObject.SendMessage(methode, null);
-		NewMenuSelectButton();
-	}
-
-	public void MethodCallT(string methode, Toggle tog)
+	public void MethodCall(string methode, Toggle tog)
 	{
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
 		gameObject.SendMessage(methode, tog);
+		if (tog == null)
+			NewMenuSelectButton();
 	}
 }
