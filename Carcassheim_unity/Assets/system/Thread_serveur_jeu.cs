@@ -21,13 +21,15 @@ public partial class Thread_serveur_jeu
 
 	private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
-	private int _nb_tuiles;
-	private int _score_max;
+	private int _nb_tuiles; // De base à 60, de 40 à infini
+	private int _score_max; // Uniquement en mode score
+	private int _nb_joueurs_max; // Nombre de joueurs max de la partie
 
 	private bool _privee;
 	private int _timer; // En secondes
 	private int _timer_max_joueur; // En secondes
 	private int _meeples; // Nombre de meeples par joueur
+
 
 
 	// Champs nécessaires pour le bon fonctionnement du programme
