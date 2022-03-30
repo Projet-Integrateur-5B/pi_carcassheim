@@ -2,17 +2,18 @@
 
 public class Packet
 {
+    private const string DataEof = "<EOF>";
     public const int MaxPacketSize = 512;
 
     public Packet()
     {
         this.Type = false;
         this.Final = true;
-        this.Data = new string("");
+        this.Data = Array.Empty<string>();
     }
 
     public Packet(bool type, ulong idRoom, byte idMessage,
-        bool status, byte permission, bool final, ulong idPlayer, string data)
+        bool status, byte permission, bool final, ulong idPlayer, string[] data)
     {
         this.Type = type;
         this.IdRoom = idRoom;
@@ -26,7 +27,7 @@ public class Packet
 
     // type == false (client -> server)
     public Packet(bool type, ulong idRoom, byte idMessage, bool final,
-        ulong idPlayer, string data)
+        ulong idPlayer, string[] data)
     {
         this.Type = type;
         this.IdRoom = idRoom;
@@ -38,7 +39,7 @@ public class Packet
 
     // type == true (server -> client)
     public Packet(bool type, bool status, byte permission, bool final, ulong idPlayer,
-        string data)
+        string[] data)
     {
         this.Type = type;
         this.Status = status;
@@ -61,7 +62,7 @@ public class Packet
     // common to both
     public bool Final { get; set; }
     public ulong IdPlayer { get; set; }
-    public string Data { get; set; } // à définir
+    public string[] Data { get; set; } // à définir
 
     public override string ToString() => "Type:" + this.Type + "; "
                                          + "IdRoom:" + this.IdRoom + "; "
