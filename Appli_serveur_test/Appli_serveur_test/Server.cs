@@ -46,21 +46,6 @@ public partial class Server
         var fileParameters = File.ReadAllText(PathToConfig) ?? throw new Exception();
         var serverParameters = JsonConvert.DeserializeObject<ServerParameters>(fileParameters) ?? throw new Exception();
 
-        try
-        {
-            // Connecting to the database server
-            Console.WriteLine("Server is connecting to the database...");
-            var databaseAddress = IPAddress.Parse(serverParameters.DatabaseIp);
-            var remoteEp = new IPEndPoint(databaseAddress, serverParameters.databasePort);
-            var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            database.Connect(remoteEp);
-            Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());
-        }
-
         Console.WriteLine("Server is setting up...");
 
         // Establish the local endpoint for the socket.
