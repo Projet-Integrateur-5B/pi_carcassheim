@@ -94,10 +94,9 @@ public static class Tools
             packets.Add(original);
             return packets;
         }
-
-        var dataString = original.Data;
-        var header = original; // copy the original packet
-        header.Data = ""; // empty the data field (= keep the packet's header)
+        var dataString = string.Join(string.Empty, original.Data);
+        var header = new Packet(original.Type, original.IdRoom, original.IdMessage, original.Final, original.IdPlayer, Array.Empty<string>());
+        var packetLength = original.Data.Length;
 
         var headerBytes = header.PacketToByteArray(ref error); // header to bytes
         if (error != Errors.None)
@@ -111,29 +110,55 @@ public static class Tools
         var dataBytes = Encoding.ASCII.GetBytes(dataString);
         var dataBytesTotalLength = dataBytes.Length;
 
-        for (var i = 0; i < dataBytesTotalLength; i += headerBytesMaxLength - 1)
+        var packet = headerBytes.ByteArrayToPacket(ref error);
+        if (error != Errors.None)
         {
-            var packet = headerBytes.ByteArrayToPacket(ref error);
-            if (error != Errors.None)
+            // TODO : ByteArrayToPacket => handle error
+            return new List<Packet>();
+        }
+
+        int dataLength;
+        while (true)
+        {
+            try
             {
-                // TODO : ByteArrayToPacket => handle error
-                return new List<Packet>();
+                dataLength = Encoding.ASCII.GetBytes(original.Data[0]).Length;
             }
-            if (i + headerBytesMaxLength - 1 > dataBytesTotalLength)
+            catch (Exception e)
             {
-                packet.Final = true;
-                packet.Data = dataString[i..dataBytesTotalLength];
-                Console.WriteLine(dataString[i..dataBytesTotalLength]);
-                // dataString.Substring(i, dataBytesTotalLength - i);
+                Console.WriteLine(e);
+                throw;
+            }
+
+            if (dataLength < headerBytesMaxLength)
+            {
+                var list = new List<string>(packet.Data.ToList())
+                {
+                    original.Data[0]
+                };
+                packet.Data = list.ToArray();
+                packetLength--;
+                headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
+                original.Data = original.Data.Where((source, index) => index != 0).ToArray();
             }
             else
             {
                 packet.Final = false;
-                packet.Data = dataString.Substring(i, headerBytesMaxLength - 1);
-                Console.WriteLine(dataString.Substring(i, headerBytesMaxLength - 1));
-                // dataString.Substring(i, headerBytesMaxLength - 1);
+                packets.Add(packet);
+                packet = headerBytes.ByteArrayToPacket(ref error);
+                if (error != Errors.None)
+                {
+                    // TODO : ByteArrayToPacket => handle error
+                    return new List<Packet>();
+                }
+                headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength;
             }
-            packets.Add(packet);
+            if (packetLength == 0)
+            {
+                packet.Final = true;
+                packets.Add(packet);
+                break;
+            }
         }
         return packets;
     }
@@ -143,7 +168,7 @@ public static class Tools
         var original = packets[0];
         foreach (var packet in packets.Skip(1))
         {
-            original.Data += packet.Data;
+            original.Data = original.Data.Concat(packet.Data).ToArray();
         }
         return original;
     }

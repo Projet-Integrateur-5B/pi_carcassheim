@@ -29,7 +29,8 @@ public static partial class Client
                 break;
         }
 
-        error_value = socket.Communication(ref original, IdMessage.Default, "petit test");
+        string[] test = { "pseudo", "mdp18" };
+        error_value = socket.Communication(ref original, IdMessage.Default, test);
         switch (error_value)
         {
             case Errors.None:
