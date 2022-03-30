@@ -143,7 +143,7 @@ public static partial class Server
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
-                var state = new StateObject { Sockets = sockets, Error = Errors.Data};
+                var state = new StateObject { Sockets = sockets, Error = Errors.Data };
                 sockets.Listener.BeginAccept(AcceptCallback, state);
 
                 // Wait until a connection is made before continuing.
@@ -168,7 +168,7 @@ public static partial class Server
         if (state is not null)
         {
             var listener = state.Sockets.Listener.EndAccept(ar);
-                Console.WriteLine("Connection with client is established : " + listener.RemoteEndPoint);
+            Console.WriteLine("Connection with client is established : " + listener.RemoteEndPoint);
 
             // Create the state object.
             listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
