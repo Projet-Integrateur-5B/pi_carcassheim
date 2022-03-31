@@ -76,7 +76,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 	}
 
-	public void Update() // A VERIFIER
+	public void Update() 
 	{ //si on appuie sur une touche de deplacement
 		previousGo = nextGo;
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
@@ -89,34 +89,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		{
 			Debug.Log("Left Mouse Button");
 			nextGo = eventSystem.currentSelectedGameObject;
-			//a simplifier
-			if (previousGo != null)
-			{
-				//GameObject.Find("Trident").SetActive(false);
-				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
-				bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
-				switch (previousTarget.name)
-				{ // previousGO
-					case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
-						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
-						break;
-					case "Unselected": // IMAGE
-						colorImage(previousGo, 0, 0, 0, 255, false);
-						break;
-					case "Text": // BOUTON
-						_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
-						textColor(_previousColor, -3, previousGo);
-						break;
-					case "Background": // TOGGLE
-						colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
-						break;
-					case "Handle": // SLIDER
-						colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
-						break;
-					default:
-						break;
-				}
-			}
+			resetHoverPreviousGo();
 		}
 	}
 
@@ -135,12 +108,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
-		bool inputfd = nextGo.transform.parent.name == "InputField";
+		//bool inputfd = nextGo.transform.parent.name == "InputField";
 		//Debug.Log(nextGo.name); 
 		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
 
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
-		if (nextGo != eventSystem.currentSelectedGameObject && (inputfd || slider || btn || nextGo.GetComponent<Toggle>()))
+		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
 		{
 			previousGo = eventSystem.currentSelectedGameObject;
 			eventSystem.SetSelectedGameObject(nextGo);
@@ -182,13 +155,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 	}
 
-	public void changeHover()
-	{
-		if (boolSelectionChange == true)
-		{
-			if (TridentGo.activeSelf == true) // TRIDENT
-				TridentGo.SetActive(false);
-			if (previousGo != null)
+	public void resetHoverPreviousGo() {
+		if (previousGo != null)
 			{
 				//GameObject.Find("Trident").SetActive(false);
 				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
@@ -215,6 +183,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 						break;
 				}
 			}
+	}
+	public void changeHover()
+	{
+		if (boolSelectionChange == true)
+		{
+			if (TridentGo.activeSelf == true) // TRIDENT
+				TridentGo.SetActive(false);
+			resetHoverPreviousGo(); 
 
 			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
 			//Debug.Log("next" + nextTarget);
