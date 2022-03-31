@@ -91,6 +91,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			nextGo = eventSystem.currentSelectedGameObject;
 			resetHoverPreviousGo();
 		}
+
+		// IDEE : desactiver souris quand écriture dans inputfield, et inversement si bouger souris desactiver ecriture inputfield
+		if(Cursor.lockState != CursorLockMode.Locked && Input.GetMouseButtonDown(0)){
+			Debug.Log("debug");
+		}
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
