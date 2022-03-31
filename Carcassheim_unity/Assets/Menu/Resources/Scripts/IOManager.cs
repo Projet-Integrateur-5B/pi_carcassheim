@@ -78,8 +78,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void Update() // A VERIFIER
 	{ //si on appuie sur une touche de deplacement
-/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-				selectionChange();  */
+		previousGo = nextGo;
+		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+		{
+			nextGo = eventSystem.currentSelectedGameObject;
+			changeHover();
+		}
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
