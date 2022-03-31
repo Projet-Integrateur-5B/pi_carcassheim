@@ -84,6 +84,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			nextGo = eventSystem.currentSelectedGameObject;
 			changeHover();
 		}
+
+		if (Input.GetMouseButtonDown(0)) {
+        	Debug.Log("Left Mouse Button");
+        } else if (Input.GetMouseButtonDown(1)) {
+        	Debug.Log("Right Mouse Button");
+        } if (Input.GetMouseButtonDown(2)) {
+        	Debug.Log("Middle Mouse Button");
+        }
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
@@ -94,7 +102,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void selectionChange()
 	{
-		// Aparté : (Les inpufield (pas leurs enfants) doivent avoir du raycast pour fonctionner donc à ne pas désactiver)
+		// Aparté : (Les inpufield : le "Text" doit avoir du raycast pour fonctionner donc à ne pas désactiver)
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
