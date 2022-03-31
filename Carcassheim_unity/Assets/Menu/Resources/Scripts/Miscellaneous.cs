@@ -26,7 +26,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	}
 
 	// PATCH : 
-	public void GetScripts()
+	/*public void GetScripts()
 	{
 		var scripts = Resources.LoadAll<MonoScript>("Scripts");
 		int len = scripts.Length;
@@ -35,7 +35,7 @@ public abstract class Miscellaneous : MonoBehaviour
 			// GetClass method returns the type of the script
 			Debug.Log("Script : " + script.GetClass());
 		}
-	}
+	}*/
 
 	public void HidePopUpOptions()
 	{

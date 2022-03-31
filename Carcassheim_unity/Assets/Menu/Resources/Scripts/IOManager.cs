@@ -85,19 +85,48 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			changeHover();
 		}
 
-		if (Input.GetMouseButtonDown(0)) {
-        	Debug.Log("Left Mouse Button");
-        } else if (Input.GetMouseButtonDown(1)) {
-        	Debug.Log("Right Mouse Button");
-        } if (Input.GetMouseButtonDown(2)) {
-        	Debug.Log("Middle Mouse Button");
-        }
+		if (Input.GetMouseButtonDown(0))
+		{
+			Debug.Log("Left Mouse Button");
+			nextGo = eventSystem.currentSelectedGameObject;
+			//a simplifier
+			if (previousGo != null)
+			{
+				//GameObject.Find("Trident").SetActive(false);
+				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
+				bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
+				switch (previousTarget.name)
+				{ // previousGO
+					case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
+						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
+						break;
+					case "Unselected": // IMAGE
+						colorImage(previousGo, 0, 0, 0, 255, false);
+						break;
+					case "Text": // BOUTON
+						_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
+						textColor(_previousColor, -3, previousGo);
+						break;
+					case "Background": // TOGGLE
+						colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
+						break;
+					case "Handle": // SLIDER
+						colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
+						break;
+					default:
+						break;
+				}
+			}
+		}
 	}
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		selectionChange(); 
+		if (!eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<InputField>())
+		{
+			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			selectionChange();
+		}
 	}
 
 	public void selectionChange()
