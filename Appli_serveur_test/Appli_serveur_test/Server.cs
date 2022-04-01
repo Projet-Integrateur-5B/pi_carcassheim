@@ -59,7 +59,7 @@ public static partial class Server
         try
         {
             IConfiguration config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("config.json")
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -210,7 +210,7 @@ public static partial class Server
                 state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
 
                 // Disconnection
-                if ((IdMessage)state.Packet.IdMessage == IdMessage.Disconnection)
+                if (state.Packet.IdMessage == IdMessage.Disconnection)
                 {
                     Console.WriteLine("Reading from : " + sockets.Listener.RemoteEndPoint +
                                       "\n\t Read {0} bytes =>\t" + state.Packet +
@@ -310,7 +310,7 @@ public static partial class Server
         }
 
         packet.Status = true;
-        packet.IdMessage = (byte)IdMessage.Disconnection;
+        packet.IdMessage = IdMessage.Disconnection;
         Array.Clear(packet.Data);
 
         bytes = packet.PacketToByteArray(ref error_value);

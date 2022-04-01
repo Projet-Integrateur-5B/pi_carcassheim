@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ClassLibrary\ClassLibrary.csproj" />
-    <Content Include="../Resources/network/appsettings.json">
+    <Content Include="../Resources/network/config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
