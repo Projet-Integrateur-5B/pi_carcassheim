@@ -14,7 +14,6 @@ public static partial class Client
         /* TextAsset contents = Resources.Load<TextAsset>("network/config");
         ServerParameters serverParameters = JsonConvert.DeserializeObject<ServerParameters>(contents.ToString());*/
 
-
         try
         {
             Console.WriteLine("Client is setting up...");
@@ -158,55 +157,48 @@ public static partial class Client
                 return Errors.Data;
             }
 
-            var count_errors = 0;
+            foreach (var packet in packets)
+            {
+                // Send the data through the socket.
+                bytes = packet.PacketToByteArray(ref error_value);
+                if (error_value != Errors.None)
+                {
+                    // TODO : PacketToByteArray => handle error
+                    return Errors.Data;
+                }
+
+                var bytesSent = socket.Send(bytes);
+                Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
+            }
+
+            // Receive the response from the remote device.
+            bytes = new byte[Packet.MaxPacketSize];
+            var bytesRec = 0;
+            var packetAsBytes = new byte[bytesRec];
+            var part_answer = new Packet();
+
             while (true)
             {
-                foreach (var packet in packets)
-                {
-                    // Send the data through the socket.
-                    bytes = packet.PacketToByteArray(ref error_value);
-                    if (error_value != Errors.None)
-                    {
-                        // TODO : PacketToByteArray => handle error
-                        return Errors.Data;
-                    }
+                bytesRec = socket.Receive(bytes);
+                packetAsBytes = new byte[bytesRec];
 
-                    var bytesSent = socket.Send(bytes);
-                    Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
+                Array.Copy(bytes, packetAsBytes, bytesRec);
+                part_answer = packetAsBytes.ByteArrayToPacket(ref error_value);
+                if (error_value != Errors.None)
+                {
+                    // TODO : ByteArrayToPacket => handle error
+                    return Errors.Data;
                 }
 
-                // Receive the response from the remote device.
-                bytes = new byte[Packet.MaxPacketSize];
-                var bytesRec = socket.Receive(bytes);
-                var packetAsBytes = new byte[bytesRec];
+                Console.WriteLine(
+                    part_answer.Status
+                        ? "Read {0} bytes => \tpermission accepted \n"
+                        : "Read {0} bytes => \tpermission denied \n", bytesRec);
 
-                try
+                received.Data = received.Data.Concat(part_answer.Data).ToArray();
+                if (received.Final)
                 {
-                    Array.Copy(bytes, packetAsBytes, bytesRec);
-                    received = packetAsBytes.ByteArrayToPacket(ref error_value);
-                    if (error_value != Errors.None)
-                    {
-                        // TODO : ByteArrayToPacket => handle error
-                        return Errors.Data;
-                    }
-
-                    Console.WriteLine(
-                        received.Status
-                            ? "Read {0} bytes => \tpermission accepted \n"
-                            : "Read {0} bytes => \tpermission denied \n", bytesRec);
                     return Errors.None;
-                }
-                catch (Exception e)
-                {
-                    // besoin de tester 3x ? return en premiere instance ?
-                    count_errors++;
-                    if (count_errors != 3)
-                    {
-                        continue;
-                    }
-
-                    Console.WriteLine("Exception : {0}", e);
-                    return Errors.Receive;
                 }
             }
         }

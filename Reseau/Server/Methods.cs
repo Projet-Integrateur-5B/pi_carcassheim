@@ -4,6 +4,62 @@ using Assets;
 
 public partial class Server
 {
+    public static Packet GetFromDatabase(IAsyncResult ar)
+    {
+        var packet = new Packet();
+
+        var state = (StateObject?)ar.AsyncState;
+        if (state is null)
+        {
+            // TODO : state is null
+            return packet;
+        }
+
+        // TODO : get what the client asked from the database or whatever
+        switch ((IdMessage)state.Packet.IdMessage)
+        {
+            case IdMessage.Connection:
+                packet.Status = Connection(packet);
+                Array.Clear(packet.Data);
+                break;
+            case IdMessage.Signup:
+                packet.Status = Signup(packet);
+                Array.Clear(packet.Data);
+                break;
+            case IdMessage.Statistics:
+                packet = Statistics(packet);
+                break;
+            case IdMessage.RoomList:
+                packet = RoomList(packet);
+                break;
+            case IdMessage.RoomJoin:
+                packet = RoomJoin(packet);
+                break;
+            case IdMessage.RoomLeave:
+                packet.Status = RoomLeave(packet);
+                Array.Clear(packet.Data);
+                break;
+            case IdMessage.RoomReady:
+                packet.Status = RoomReady(packet);
+                Array.Clear(packet.Data);
+                break;
+            case IdMessage.RoomSettings:
+                packet = RoomSettings(packet);
+                break;
+            case IdMessage.RoomStart:
+                packet = RoomStart(packet);
+                break;
+            case IdMessage.Disconnection: // impossible
+                Array.Clear(packet.Data);
+                break;
+            case IdMessage.Default:
+            default:
+                packet.Status = false;
+                break;
+        }
+        return packet;
+    }
+
     public static bool Connection(Packet packet)
     {
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
