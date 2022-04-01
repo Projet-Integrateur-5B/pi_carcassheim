@@ -71,5 +71,5 @@ public class Packet
                                          + "Permission:" + this.Permission + "; "
                                          + "Final:" + this.Final + ";"
                                          + "IdPlayer:" + this.IdPlayer + "; "
-                                         + "Data:" + this.Data + ";";
+                                         + "Data:" + string.Join(" ", this.Data) + ";";
 }
