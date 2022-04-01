@@ -5,6 +5,7 @@ using System.Linq;
 using System.ComponentModel;
 using System.Text;
 using Newtonsoft.Json;
+using UnityEngine;
 
 public enum Errors
 {
@@ -51,7 +52,7 @@ public static class Tools
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Debug.Log(e);
             error = Errors.Format;
             return Array.Empty<byte>();
         }
@@ -74,7 +75,7 @@ public static class Tools
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Debug.Log(e);
             error = Errors.Format;
             return new Packet();
         }
@@ -132,7 +133,7 @@ public static class Tools
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Debug.Log(e);
                 throw;
             }
 
@@ -181,7 +182,7 @@ public static class Tools
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Debug.Log(e);
                 error = Errors.Data;
             }
         }

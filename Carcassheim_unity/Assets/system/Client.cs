@@ -3,28 +3,38 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Security;
+using Newtonsoft.Json;
 using UnityEngine;
 
-
-public static partial class Client
+public static class Client
 {
+    [Serializable]
+    public class Parameters
+    {
+        public int ServerPort { get; set; }
+        public string ServerIP { get; set; } = "";
+    }
+
     public static Errors Connection(ref Socket socket)
     {
         // TODO : trycatch lors de la récupération des données de config
-        /*var port = ConfigurationManager.AppSettings.Get("ServerPort");
-        var ip = ConfigurationManager.AppSettings.Get("ServerIP");*/
+        // Version : Unity
+        TextAsset contents = Resources.Load<TextAsset>("network/config");
+        Parameters parameters = JsonConvert.DeserializeObject<Parameters>(contents.ToString());
 
         try
         {
             Debug.Log(string.Format("Client is setting up..."));
 
             // Establish the remote endpoint for the socket.
-            var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            // Version : Unity
+            IPAddress ipAddress = IPAddress.Parse(parameters.ServerIP);
+            var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);
+            // Version : Local
+            /*var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            var ipAddress = ipHostInfo.AddressList[0];
+            var remoteEP = new IPEndPoint(ipAddress, 10000);*/
 
-            // /!\ VERSION TEMPORAIRE (BARBARE)
-            var ipAddress = IPAddress.Parse("185.155.93.105");
-            var remoteEP = new IPEndPoint(ipAddress, 19000);
-            // /!\
 
             // Create a TCP/IP  socket.
             socket = new Socket(ipAddress.AddressFamily,

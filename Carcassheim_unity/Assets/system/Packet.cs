@@ -1,8 +1,8 @@
 using System;
+
 public class Packet
 {
     public const int MaxPacketSize = 512;
-    public const int Port = 19000;
 
     public Packet()
     {
@@ -70,5 +70,5 @@ public class Packet
                                          + "Permission:" + this.Permission + "; "
                                          + "Final:" + this.Final + ";"
                                          + "IdPlayer:" + this.IdPlayer + "; "
-                                         + "Data:" + this.Data + ";";
+                                         + "Data:" + string.Join(" ", this.Data) + ";";
 }
