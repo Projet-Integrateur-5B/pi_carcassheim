@@ -10,18 +10,23 @@ public static partial class Client
     private static Errors Connection(ref Socket socket)
     {
         // TODO : trycatch lors de la récupération des données de config
-        /*var port = ConfigurationManager.AppSettings.Get("ServerPort");
-        var ip = ConfigurationManager.AppSettings.Get("ServerIP");*/
+        // Version : Unity
+        /* TextAsset contents = Resources.Load<TextAsset>("network/config");
+        ServerParameters serverParameters = JsonConvert.DeserializeObject<ServerParameters>(contents.ToString());*/
+
 
         try
         {
             Console.WriteLine("Client is setting up...");
 
             // Establish the remote endpoint for the socket.
+            // Version : Unity
+            /*IPAddress ipAddress = IPAddress.Parse(serverParameters.serverIP);
+            var remoteEP = new IPEndPoint(ipAddress, serverParameters.serverPort);*/
+            // Version : Local
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            // var remoteEP = new IPEndPoint(ipAddress, Packet.Port); // main version
-            var remoteEP = new IPEndPoint(ipAddress, 10000); // local version
+            var remoteEP = new IPEndPoint(ipAddress, 10000);
 
             // Create a TCP/IP  socket.
             socket = new Socket(ipAddress.AddressFamily,

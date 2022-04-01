@@ -3,7 +3,6 @@ namespace Assets;
 public class Packet
 {
     public const int MaxPacketSize = 512;
-    public const int Port = 19000;
 
     public Packet()
     {
