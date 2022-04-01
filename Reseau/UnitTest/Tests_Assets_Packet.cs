@@ -15,9 +15,9 @@ public class TestsAssetsPacket
     public void Setup()
     {
         this.errorValue = Errors.None;
-        this.original = new Packet(false, 0, 1, false, 0, true, 999, new[] { "test", "deux" });
+        this.original = new Packet(false, 0, IdMessage.Default, false, 0, true, 999, new[] { "test", "deux" });
         this.originalAsString =
-            "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":1,\"Status\":false,\"Permission\":0," +
+            "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":0,\"Status\":false,\"Permission\":0," +
             "\"Final\":true,\"IdPlayer\":999,\"Data\":[\"test\",\"deux\"]}";
     }
 

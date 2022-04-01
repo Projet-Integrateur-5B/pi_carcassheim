@@ -7,12 +7,20 @@ using Assets;
 
 public static partial class Client
 {
+
+    [Serializable]
+    public class Parameters
+    {
+        public int ServerPort { get; set; }
+        public string ServerIP { get; set; } = "";
+    }
+
     private static Errors Connection(ref Socket socket)
     {
         // TODO : trycatch lors de la récupération des données de config
         // Version : Unity
-        /* TextAsset contents = Resources.Load<TextAsset>("network/config");
-        ServerParameters serverParameters = JsonConvert.DeserializeObject<ServerParameters>(contents.ToString());*/
+        /*TextAsset contents = Resources.Load<TextAsset>("network/config");
+        Parameters parameters = JsonConvert.DeserializeObject<Parameters>(contents.ToString());*/
 
         try
         {
@@ -20,12 +28,13 @@ public static partial class Client
 
             // Establish the remote endpoint for the socket.
             // Version : Unity
-            /*IPAddress ipAddress = IPAddress.Parse(serverParameters.serverIP);
-            var remoteEP = new IPEndPoint(ipAddress, serverParameters.serverPort);*/
+            /*IPAddress ipAddress = IPAddress.Parse(parameters.ServerIP);
+            var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);*/
             // Version : Local
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
             var remoteEP = new IPEndPoint(ipAddress, 10000);
+
 
             // Create a TCP/IP  socket.
             socket = new Socket(ipAddress.AddressFamily,
@@ -148,7 +157,7 @@ public static partial class Client
             byte[]? bytes = null;
             var error_value = Errors.None;
             var packets = new List<Packet>();
-            var original = new Packet(false, 0, (byte)idMessage, true, 999, data);
+            var original = new Packet(false, 0, idMessage, true, 999, data);
 
             packets = original.Split(ref error_value);
             if (error_value != Errors.None)

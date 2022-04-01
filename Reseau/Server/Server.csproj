@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Assets\Assets.csproj" />
-    <Content Include="appsettings.json">
+    <Content Include="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
