@@ -29,6 +29,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private EventSystem eventSystem;
 	private bool boolSelectionChange = true;
 	private bool cooldown = false;
+
+	private InputField IF = null;
 	void Start()
 	{
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
@@ -90,14 +92,28 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 
 		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
-		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false )
+		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
 		{
 			lockMouse(false);
 			nextGo = eventSystem.currentSelectedGameObject;
 			// EVITE SPAM CLIC
-			Invoke("ResetCooldown",5.0f);
+			Invoke("ResetCooldown", 5.0f);
 			cooldown = true;
 		}
+
+		/* --------------------- PATCH INPUTFIELD --------------------- */
+		// il faut mieux gérer l'inputfield pour la saisie (entree et escape)
+		if (IF!=null) 
+			if(IF.isFocused)
+				{
+					previousGo = nextGo;
+					nextGo = eventSystem.currentSelectedGameObject;
+					changeHover();
+					lockMouse(true);
+					if(Input.GetKey(KeyCode.Return)) // touche enter
+						lockMouse(false); 
+				}
+		/* ------------------ FIN PATCH INPUTFIELD -------------------- */
 	}
 
 	private void lockMouse(bool b)
@@ -106,10 +122,21 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		Cursor.visible = !b;
 	}
 
-  void ResetCooldown(){ // EVITE SPAM CLIC
-     cooldown = false;
- }
+	private void ResetCooldown()
+	{ // EVITE SPAM CLIC
+		cooldown = false;
+	}
 
+	public void OnPointerEnter(PointerEventData eventData)
+	{	
+		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
+		if (!IF)
+		{	
+			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			selectionChange();
+		}
+
+	}
 
 	/* 	void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
     {
@@ -119,14 +146,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 				break;
 				}
     } */
-	public void OnPointerEnter(PointerEventData eventData)
-	{
-		if (!eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<InputField>())
-		{
-			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-			selectionChange();
-		}
-	}
 
 	public void selectionChange()
 	{
@@ -134,8 +153,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
-		//bool inputfd = nextGo.transform.parent.name == "InputField";
-		//Debug.Log(nextGo.name); 
+/* 		bool inputfd = nextGo.transform.parent.name == "InputField";
+		Debug.Log(inputfd);  */
 		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
 		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
