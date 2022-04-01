@@ -85,25 +85,26 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	{
 		if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)) // résout probleme souris/clavier avec GetKey 
 		{
-			lockMouse(true);
+			/* lockMouse(true); */
 			previousGo = nextGo;
 			nextGo = eventSystem.currentSelectedGameObject;
 			changeHover();
 		}
 
 		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
-		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
-		{
-			lockMouse(false);
-			nextGo = eventSystem.currentSelectedGameObject;
+/* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
+		{ */
+			/* lockMouse(false); */
+/* 			nextGo = eventSystem.currentSelectedGameObject;
+			resetHoverPreviousGo(); */
 			// EVITE SPAM CLIC
-			Invoke("ResetCooldown", 5.0f);
-			cooldown = true;
-		}
+/* 			Invoke("ResetCooldown", 5.0f);
+			cooldown = true; */
+		/* } */
 
 		/* --------------------- PATCH INPUTFIELD --------------------- */
 		// il faut mieux gérer l'inputfield pour la saisie (entree et escape)
-		if (IF!=null) 
+/* 		if (IF!=null) 
 			if(IF.isFocused)
 				{
 					previousGo = nextGo;
@@ -112,7 +113,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 					lockMouse(true);
 					if(Input.GetKey(KeyCode.Return)) // touche enter
 						lockMouse(false); 
-				}
+				} */
 		/* ------------------ FIN PATCH INPUTFIELD -------------------- */
 	}
 
