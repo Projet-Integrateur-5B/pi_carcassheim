@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
+using System.Collections.Generic;
+using System.Collections;
 
 public class IOManager : Miscellaneous, IPointerEnterHandler
 {
@@ -76,28 +78,40 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 	}
 
-	public void Update() 
-	{ //si on appuie sur une touche de deplacement
-		previousGo = nextGo;
-		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
+	public void Update()
+	{
+		if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
 		{
+			// Debug.Log(KeyCode);
+			lockMouse(true);
+			previousGo = nextGo;
 			nextGo = eventSystem.currentSelectedGameObject;
 			changeHover();
 		}
 
-		if (Input.GetMouseButtonDown(0))
+		// ESCAPE fera pas disparaitre souris si on reutilise clavier car escape permet de sortir de la zone de jeu dans unity
+		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Escape)) && Cursor.lockState == CursorLockMode.Locked /* && !Input.anyKeyDown */)
 		{
-			Debug.Log("Left Mouse Button");
+			// Debug.Log("Left Mouse Button"); // A LAISSER
+			lockMouse(false);
 			nextGo = eventSystem.currentSelectedGameObject;
-			resetHoverPreviousGo();
-		}
-
-		// IDEE : desactiver souris quand écriture dans inputfield, et inversement si bouger souris desactiver ecriture inputfield
-		if(Cursor.lockState != CursorLockMode.Locked && Input.GetMouseButtonDown(0)){
-			Debug.Log("debug");
 		}
 	}
 
+	private void lockMouse(bool b)
+	{
+		Cursor.lockState = b ? CursorLockMode.Locked : CursorLockMode.None;
+		Cursor.visible = !b;
+	}
+
+	/* 	void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
+    {
+		if(Input.anyKeyDown &&  Event.current.isKey)
+				switch(Event.current.keyCode.ToString()){
+				case "UpArrow" : case "DownArrow" : case "LeftArrow" : case "RightArrow" :
+				break;
+				}
+    } */
 	public void OnPointerEnter(PointerEventData eventData)
 	{
 		if (!eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject.GetComponent<InputField>())
@@ -116,7 +130,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		//bool inputfd = nextGo.transform.parent.name == "InputField";
 		//Debug.Log(nextGo.name); 
 		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
-
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
 		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
 		{
@@ -160,47 +173,48 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 	}
 
-	public void resetHoverPreviousGo() {
+	public void resetHoverPreviousGo()
+	{
 		if (previousGo != null)
-			{
-				//GameObject.Find("Trident").SetActive(false);
-				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
-				bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
-				switch (previousTarget.name)
-				{ // previousGO
-					case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
-						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
-						break;
-					case "Unselected": // IMAGE
-						colorImage(previousGo, 0, 0, 0, 255, false);
-						break;
-					case "Text": // BOUTON
-						_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
-						textColor(_previousColor, -3, previousGo);
-						break;
-					case "Background": // TOGGLE
-						colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
-						break;
-					case "Handle": // SLIDER
-						colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
-						break;
-					default:
-						break;
-				}
+		{
+			//GameObject.Find("Trident").SetActive(false);
+			Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
+			bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
+			switch (previousTarget.name)
+			{ // previousGO
+				case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
+					previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
+					break;
+				case "Unselected": // IMAGE
+					colorImage(previousGo, 0, 0, 0, 255, false);
+					break;
+				case "Text": // BOUTON
+					_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
+					textColor(_previousColor, -3, previousGo);
+					break;
+				case "Background": // TOGGLE
+					colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
+					break;
+				case "Handle": // SLIDER
+					colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
+					break;
+				default:
+					break;
 			}
+		}
 	}
+
 	public void changeHover()
 	{
 		if (boolSelectionChange == true)
 		{
 			if (TridentGo.activeSelf == true) // TRIDENT
 				TridentGo.SetActive(false);
-			resetHoverPreviousGo(); 
-
+			resetHoverPreviousGo();
 			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
 			//Debug.Log("next" + nextTarget);
 			switch (nextTarget.name)
-			{ 	
+			{
 				case "RawImage": // GIF : A changer (mettre autre chose que zoom)
 					nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
 					break;
