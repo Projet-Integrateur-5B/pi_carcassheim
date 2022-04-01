@@ -1,9 +1,9 @@
 using UnityEngine.InputSystem;
-using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using UnityEngine;
 using System.Collections;
 
 public class IOManager : Miscellaneous, IPointerEnterHandler
@@ -28,6 +28,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private Vector2 _cursorHotspot = Vector2.zero;
 	private EventSystem eventSystem;
 	private bool boolSelectionChange = true;
+	private bool cooldown = false;
 	void Start()
 	{
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
@@ -80,21 +81,22 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void Update()
 	{
-		if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
+		if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)) // résout probleme souris/clavier avec GetKey 
 		{
-			// Debug.Log(KeyCode);
 			lockMouse(true);
 			previousGo = nextGo;
 			nextGo = eventSystem.currentSelectedGameObject;
 			changeHover();
 		}
 
-		// ESCAPE fera pas disparaitre souris si on reutilise clavier car escape permet de sortir de la zone de jeu dans unity
-		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Escape)) && Cursor.lockState == CursorLockMode.Locked /* && !Input.anyKeyDown */)
+		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
+		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false )
 		{
-			// Debug.Log("Left Mouse Button"); // A LAISSER
 			lockMouse(false);
 			nextGo = eventSystem.currentSelectedGameObject;
+			// EVITE SPAM CLIC
+			Invoke("ResetCooldown",5.0f);
+			cooldown = true;
 		}
 	}
 
@@ -103,6 +105,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		Cursor.lockState = b ? CursorLockMode.Locked : CursorLockMode.None;
 		Cursor.visible = !b;
 	}
+
+  void ResetCooldown(){ // EVITE SPAM CLIC
+     cooldown = false;
+ }
+
 
 	/* 	void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
     {
