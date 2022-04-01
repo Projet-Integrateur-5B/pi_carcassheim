@@ -2,7 +2,6 @@
 
 public class Packet
 {
-    private const string DataEof = "<EOF>";
     public const int MaxPacketSize = 512;
 
     public Packet()
@@ -71,5 +70,5 @@ public class Packet
                                          + "Permission:" + this.Permission + "; "
                                          + "Final:" + this.Final + ";"
                                          + "IdPlayer:" + this.IdPlayer + "; "
-                                         + "Data:" + this.Data + ";";
+                                         + "Data:" + string.Join(" ", this.Data) + ";";
 }

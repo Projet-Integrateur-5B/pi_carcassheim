@@ -106,7 +106,6 @@ namespace system
 
 
                 int typeMsg = 0; // (Dépend du RESEAU) Dépendra du type : création de partie, connexion à la partie, etc
-                int portPartie = 0; // (Dépend du RESEAU) Port de la partie en question
                 int id_joueur_client = 0; // (Dépend du RESEAU)
 
                 switch (typeMsg)
@@ -144,7 +143,7 @@ namespace system
                         break;
 
                     case 2: // Connexion à une partie
-                        
+
                         break;
 
                     case 3: // Pose d'une tuile
