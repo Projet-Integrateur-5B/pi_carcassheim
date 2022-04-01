@@ -167,11 +167,12 @@ public static partial class Server
         var state = (StateObject?)ar.AsyncState;
         if (state is not null)
         {
-            var listener = state.Sockets.Listener.EndAccept(ar);
-            Console.WriteLine("Connection with client is established : " + listener.RemoteEndPoint);
+            state.Sockets.Listener = state.Sockets.Listener.EndAccept(ar);
+            Console.WriteLine(state.Sockets.Listener.Connected);
+            Console.WriteLine("Connection with client is established : " + state.Sockets.Listener.RemoteEndPoint);
 
             // Create the state object.
-            listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+            state.Sockets.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
         }
         else

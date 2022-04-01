@@ -20,7 +20,8 @@ public static partial class Client
             // Establish the remote endpoint for the socket.
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, Packet.Port);
+            // var remoteEP = new IPEndPoint(ipAddress, Packet.Port); // main version
+            var remoteEP = new IPEndPoint(ipAddress, 10000); // local version
 
             // Create a TCP/IP  socket.
             socket = new Socket(ipAddress.AddressFamily,
