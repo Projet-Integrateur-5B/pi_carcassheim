@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Security;
@@ -157,7 +158,7 @@ public static class Client
             byte[]? bytes = null;
             var error_value = Errors.None;
             var packets = new List<Packet>();
-            var original = new Packet(false, 0, (byte)idMessage, true, 999, data);
+            var original = new Packet(false, 0, idMessage, true, 999, data);
 
             packets = original.Split(ref error_value);
             if (error_value != Errors.None)
@@ -165,59 +166,53 @@ public static class Client
                 // TODO : Split => handle error
                 return Errors.Data;
             }
+            
+            foreach (var packet in packets)
+            {
+                // Send the data through the socket.
+                bytes = packet.PacketToByteArray(ref error_value);
+                if (error_value != Errors.None)
+                {
+                    // TODO : PacketToByteArray => handle error
+                    return Errors.Data;
+                }
 
-            var count_errors = 0;
+                var bytesSent = socket.Send(bytes);
+                Debug.Log(string.Format("Sent {0} bytes =>\t" + packet, bytesSent));
+            }
+
+            // Receive the response from the remote device.
+            bytes = new byte[Packet.MaxPacketSize];
+            var bytesRec = 0;
+            var packetAsBytes = new byte[bytesRec];
+            var part_answer = new Packet();
+
             while (true)
             {
-                foreach (var packet in packets)
-                {
-                    // Send the data through the socket.
-                    bytes = packet.PacketToByteArray(ref error_value);
-                    if (error_value != Errors.None)
-                    {
-                        // TODO : PacketToByteArray => handle error
-                        return Errors.Data;
-                    }
+                bytesRec = socket.Receive(bytes);
+                packetAsBytes = new byte[bytesRec];
 
-                    var bytesSent = socket.Send(bytes);
-                    Debug.Log(string.Format("Sent {0} bytes =>\t" + packet, bytesSent));
+                Array.Copy(bytes, packetAsBytes, bytesRec);
+                part_answer = packetAsBytes.ByteArrayToPacket(ref error_value);
+                if (error_value != Errors.None)
+                {
+                    // TODO : ByteArrayToPacket => handle error
+                    return Errors.Data;
                 }
 
-                // Receive the response from the remote device.
-                bytes = new byte[Packet.MaxPacketSize];
-                var bytesRec = socket.Receive(bytes);
-                var packetAsBytes = new byte[bytesRec];
+                Debug.Log(string.Format(
+                    part_answer.Status
+                        ? "Read {0} bytes => \tpermission accepted \n"
+                        : "Read {0} bytes => \tpermission denied \n", bytesRec));
 
-                try
+                received.Data = received.Data.Concat(part_answer.Data).ToArray();
+                if (received.Final)
                 {
-                    Array.Copy(bytes, packetAsBytes, bytesRec);
-                    received = packetAsBytes.ByteArrayToPacket(ref error_value);
-                    if (error_value != Errors.None)
-                    {
-                        // TODO : ByteArrayToPacket => handle error
-                        return Errors.Data;
-                    }
-
-                    Debug.Log(string.Format(
-                        received.Status
-                            ? "Read {0} bytes => \tpermission accepted \n"
-                            : "Read {0} bytes => \tpermission denied \n", bytesRec));
                     return Errors.None;
-                }
-                catch (Exception e)
-                {
-                    // besoin de tester 3x ? return en premiere instance ?
-                    count_errors++;
-                    if (count_errors != 3)
-                    {
-                        continue;
-                    }
-
-                    Debug.Log(string.Format("Exception : {0}", e));
-                    return Errors.Receive;
                 }
             }
         }
+
         catch (ArgumentNullException ane)
         {
             // Send/Receive : buffer a la valeur null

@@ -11,7 +11,7 @@ public class Packet
         this.Data = Array.Empty<string>();
     }
 
-    public Packet(bool type, ulong idRoom, byte idMessage,
+    public Packet(bool type, ulong idRoom, IdMessage idMessage,
         bool status, byte permission, bool final, ulong idPlayer, string[] data)
     {
         this.Type = type;
@@ -25,7 +25,7 @@ public class Packet
     }
 
     // type == false (client -> server)
-    public Packet(bool type, ulong idRoom, byte idMessage, bool final,
+    public Packet(bool type, ulong idRoom, IdMessage idMessage, bool final,
         ulong idPlayer, string[] data)
     {
         this.Type = type;
@@ -52,7 +52,7 @@ public class Packet
 
     // type == false (client -> server)
     public ulong IdRoom { get; set; } // default : 0 -> not destined to a room
-    public byte IdMessage { get; set; } // à définir
+    public IdMessage IdMessage { get; set; } // à définir
 
     // type == true (server -> client)
     public bool Status { get; set; } // 0 : error ; 1 : success
