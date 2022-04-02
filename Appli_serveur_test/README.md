@@ -71,6 +71,12 @@ sudo systemctl status Appli_serveur_test
 sudo journalctl -u Appli_serveur_test
 ```
 
+Pour vider le journal :
+```
+sudo journalctl --rotate
+sudo journalctl --vacuum-time=1s
+```
+
 Après avoir apporté des modifications dans le code (depuis le bon répertoire!!!):
 ```
 sudo systemctl stop Appli_serveur_test
