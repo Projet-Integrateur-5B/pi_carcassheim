@@ -180,6 +180,12 @@ public static class Client
                 var bytesSent = socket.Send(bytes);
                 Debug.Log(string.Format("Sent {0} bytes =>\t" + packet, bytesSent));
             }
+            
+            // check if an answer is needed
+            if (idMessage == IdMessage.Disconnection)
+            {
+                return Errors.None;
+            }
 
             // Receive the response from the remote device.
             bytes = new byte[Packet.MaxPacketSize];
@@ -200,14 +206,13 @@ public static class Client
                     return Errors.Data;
                 }
 
-                Debug.Log(string.Format(
-                    part_answer.Status
-                        ? "Read {0} bytes => \tpermission accepted \n"
-                        : "Read {0} bytes => \tpermission denied \n", bytesRec));
+                Debug.Log(string.Format("Read {0} bytes => \t" + part_answer + "\n\t\t\tPermission = " +
+                                        part_answer.Status, bytesRec));
 
                 received.Data = received.Data.Concat(part_answer.Data).ToArray();
                 if (received.Final)
                 {
+                    Debug.Log(string.Format("Received = " + received));
                     return Errors.None;
                 }
             }
