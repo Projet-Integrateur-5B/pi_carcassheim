@@ -136,31 +136,30 @@ public static class Tools
 
             if (dataLength < headerBytesMaxLength - 3)
             {
-                var list = new List<string>(packet.Data.ToList()) { original.Data[0] };
-                packet.Data = list.ToArray();
+                packet.Data = new List<string>(packet.Data.ToList()) { original.Data[0] }.ToArray();
                 packetLength--;
                 headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
                 original.Data = original.Data.Where((source, index) => index != 0).ToArray();
             }
             else
             {
-                var chaine = original.Data[0][..(headerBytesMaxLength - 9)];
-                // original.Data[0].Substring(0, headerBytesMaxLength - 9);
-                var list = new List<string>(packet.Data.ToList()) { "<FS>" + chaine };
-                packet.Data = list.ToArray();
-                original.Data[0] = original.Data[0][(headerBytesMaxLength - 9)..];
-                // original.Data[0].Substring(headerBytesMaxLength - 9);
+                var chaine = original.Data[0][..(headerBytesMaxLength - 5)];
+                // original.Data[0].Substring(0, headerBytesMaxLength - 5);
+                packet.Data = new List<string>(packet.Data.ToList()) { chaine }.ToArray();
+                original.Data[0] = original.Data[0][(headerBytesMaxLength - 5)..];
+                // original.Data[0].Substring(headerBytesMaxLength - 5);
 
                 packet.Final = false;
                 packets.Add(packet);
                 packet = headerBytes.ByteArrayToPacket(ref error);
+                packet.Data = new List<string>(packet.Data.ToList()) { "" }.ToArray();
                 if (error != Errors.None)
                 {
                     // TODO : ByteArrayToPacket => handle error
                     return new List<Packet>();
                 }
 
-                headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength;
+                headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength - 4;
             }
 
             if (packetLength == 0)

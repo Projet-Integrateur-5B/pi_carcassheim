@@ -215,11 +215,11 @@ public static partial class Server
                 state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
                 if (tailletab > 0)
                 {
-                    var fusion = state.Tableau[tailletab - 1][..4];
-                    if (fusion == "<FS>")
+                    if (state.Tableau[tailletab] == "")
                     {
-                        state.Tableau[tailletab - 1] = state.Tableau[tailletab - 1][4..] +
-                                                       state.Tableau[tailletab];
+                        state.Tableau = state.Tableau.Where((source, index) => index != tailletab)
+                            .ToArray();
+                        state.Tableau[tailletab - 1] += state.Tableau[tailletab];
                         state.Tableau = state.Tableau.Where((source, index) => index != tailletab)
                             .ToArray();
                     }
