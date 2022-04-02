@@ -8,9 +8,10 @@ using Microsoft.Extensions.Configuration;
 
 public static partial class Server
 {
-    // Thread signal.
-    private static ManualResetEvent AllDone { get; } = new(false);
+    private static ManualResetEvent AllDone { get; } = new(false); // thread signal
     private static Parameters Settings { get; set; } = new();
+
+    private const int Timeout = 1800000; // 30 minutes
 
     public static void GetConfig(ref Errors error)
     {
@@ -169,8 +170,15 @@ public static partial class Server
             Console.WriteLine("Connection with client is established : " +
                               state.Listener.RemoteEndPoint);
 
+            state.ReceiveDone = new ManualResetEvent(false);
+            state.ReceiveDone.Reset();
             state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
+            if (!state.ReceiveDone.WaitOne(Timeout))
+            {
+                state.Listener.EndReceive(ar);
+                state.Listener.Close();
+            }
         }
         else
         {
@@ -186,6 +194,7 @@ public static partial class Server
         var state = (StateObject?)ar.AsyncState;
         if (state is not null)
         {
+            state.ReceiveDone.Set();
             var listener = state.Listener;
             // Read data from the client socket.
             var bytesRead = listener.EndReceive(ar);
@@ -238,17 +247,31 @@ public static partial class Server
                     SendBackToClient(ar, packet);
 
                     // Start listening again
-                    state = new StateObject { Listener = listener };
+                    state.ReceiveDone = new ManualResetEvent(false);
+                    state.ReceiveDone.Reset();
+                    state = new StateObject { Listener = listener, ReceiveDone = state.ReceiveDone };
                     listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                         ReadCallback, state);
+                    if (!state.ReceiveDone.WaitOne(Timeout))
+                    {
+                        state.Listener.EndReceive(ar);
+                        state.Listener.Close();
+                    }
                 }
                 // More packets to receive
                 else
                 {
                     Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...",
                         bytesRead);
+                    state.ReceiveDone = new ManualResetEvent(false);
+                    state.ReceiveDone.Reset();
                     listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                         ReadCallback, state);
+                    if (!state.ReceiveDone.WaitOne(Timeout))
+                    {
+                        state.Listener.EndReceive(ar);
+                        state.Listener.Close();
+                    }
                 }
             }
             else
@@ -359,5 +382,7 @@ public static partial class Server
         public string[] Tableau { get; set; } = Array.Empty<string>();
 
         public Errors Error { get; set; } = Errors.None;
+
+        public ManualResetEvent ReceiveDone { get; set; } = new ManualResetEvent(false);
     }
 }
