@@ -17,15 +17,6 @@ public static partial class Server
         public string DatabaseIp { get; set; } = new("");
     }
 
-    public class Sockets
-    {
-        public Socket Listener { get; set; } = new Socket(AddressFamily.InterNetwork,
-            SocketType.Stream, ProtocolType.Tcp);
-
-        public Socket Database { get; set; } = new Socket(AddressFamily.InterNetwork,
-            SocketType.Stream, ProtocolType.Tcp);
-    }
-
     // State object for reading client data asynchronously
     public class StateObject
     {
@@ -35,8 +26,11 @@ public static partial class Server
         // Receive buffer.
         public byte[] Buffer { get; } = new byte[BufferSize];
 
-        // Socket.
-        public Sockets Sockets { get; set; } = new Sockets();
+        public Socket Listener { get; set; } = new Socket(AddressFamily.InterNetwork,
+            SocketType.Stream, ProtocolType.Tcp);
+
+        public Socket Database { get; set; } = new Socket(AddressFamily.InterNetwork,
+            SocketType.Stream, ProtocolType.Tcp);
 
         public Packet? Packet { get; set; }
 
@@ -59,7 +53,7 @@ public static partial class Server
         try
         {
             IConfiguration config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("config.json")
                 .AddEnvironmentVariables()
                 .Build();
 
@@ -75,30 +69,30 @@ public static partial class Server
         }
     }
 
-    public static Sockets GetSockets(ref Errors error)
+    public static StateObject GetSockets(ref Errors error)
     {
         if (!Enum.IsDefined(typeof(Errors), error))
         {
             throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
         }
 
-        var sockets = new Sockets();
+        var state = new StateObject();
         try
         {
             var parameters = GetConfig(ref error);
             if (error != Errors.None)
             {
                 // TODO : GetConfig error
-                return sockets;
+                return state;
             }
 
             // Connecting to the database server
             /*Console.WriteLine("Server is connecting to the database...");
             var databaseAddress = IPAddress.Parse(parameters.DatabaseIp);
             var remoteEp = new IPEndPoint(databaseAddress, parameters.DatabasePort);
-            sockets.Database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            sockets.Database.Connect(remoteEp);
-            Console.WriteLine("Server is connected to the database : {0}", sockets.Database.RemoteEndPoint);*/
+            state.Database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            state.Database.Connect(remoteEp);
+            Console.WriteLine("Server is connected to the database : {0}", state.Database.RemoteEndPoint);*/
 
             // Establish the local endpoint for the socket.
             Console.WriteLine("Server is preparing to listen...");
@@ -107,10 +101,10 @@ public static partial class Server
             var localEndPoint = new IPEndPoint(ipAddress, parameters.ServerPort);
 
             // Create a TCP/IP socket and Bind to the local endpoint and listen for incoming connections.
-            sockets.Listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            sockets.Listener.Bind(localEndPoint);
-            sockets.Listener.Listen(100);
-            Console.WriteLine("Server is listening : " + sockets.Listener.LocalEndPoint);
+            state.Listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            state.Listener.Bind(localEndPoint);
+            state.Listener.Listen(100);
+            Console.WriteLine("Server is listening : " + state.Listener.LocalEndPoint);
 
             error = Errors.None;
         }
@@ -119,7 +113,7 @@ public static partial class Server
             Console.WriteLine(e.ToString());
             error = Errors.Socket;
         }
-        return sockets;
+        return state;
     }
 
     public static void StartListening()
@@ -127,7 +121,7 @@ public static partial class Server
         var error_value = Errors.None;
 
         Console.WriteLine("Server is setting up...");
-        var sockets = GetSockets(ref error_value);
+        var state = GetSockets(ref error_value);
         if (error_value != Errors.None)
         {
             // TODO : GetSockets error
@@ -143,8 +137,8 @@ public static partial class Server
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
-                var state = new StateObject { Sockets = sockets, Error = Errors.Data };
-                sockets.Listener.BeginAccept(AcceptCallback, state);
+                var new_state = new StateObject { Listener = state.Listener, Database = state.Database, Error = Errors.None };
+                new_state.Listener.BeginAccept(AcceptCallback, new_state);
 
                 // Wait until a connection is made before continuing.
                 AllDone.WaitOne();
@@ -167,11 +161,9 @@ public static partial class Server
         var state = (StateObject?)ar.AsyncState;
         if (state is not null)
         {
-            state.Sockets.Listener = state.Sockets.Listener.EndAccept(ar);
-            Console.WriteLine("Connection with client is established : " + state.Sockets.Listener.RemoteEndPoint);
-
-            // Create the state object.
-            state.Sockets.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+            state.Listener = state.Listener.EndAccept(ar);
+            Console.WriteLine("Connection with client is established : " + state.Listener.RemoteEndPoint);
+            state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
         }
         else
@@ -188,9 +180,9 @@ public static partial class Server
         var state = (StateObject?)ar.AsyncState;
         if (state is not null)
         {
-            var sockets = state.Sockets;
+            var listener = state.Listener;
             // Read data from the client socket.
-            var bytesRead = sockets.Listener.EndReceive(ar);
+            var bytesRead = listener.EndReceive(ar);
 
             if (bytesRead > 0)
             {
@@ -207,49 +199,42 @@ public static partial class Server
                 // There  might be more data, so store the data received so far.
                 state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
 
+                var debug = "Reading from : " + listener.RemoteEndPoint +
+                               "\n\t Read {0} bytes =>\t" + state.Packet +
+                               "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau);
+
                 // Disconnection
                 if (state.Packet.IdMessage == IdMessage.Disconnection)
                 {
-                    Console.WriteLine("Reading from : " + sockets.Listener.RemoteEndPoint +
-                                      "\n\t Read {0} bytes =>\t" + state.Packet +
-                                      "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau) +
-                                      "\n\t => FIN !", bytesRead);
+                    Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
                     DisconnectFromClient(ar, state.Packet);
                 }
                 // Final packet of the series
                 else if (state.Packet.Final)
                 {
-                    state.Packet.Data = state.Tableau;
-                    Console.WriteLine("Reading from : " + sockets.Listener.RemoteEndPoint +
-                                      "\n\t Read {0} bytes =>\t" + state.Packet +
-                                      "\n\t Data buffer =>\t\t" + string.Join(" ", state.Packet.Data) +
-                                      "\n\t => Every packet has been received !", bytesRead);
+                    Console.WriteLine(debug + "\n\t => Every packet has been received !", bytesRead);
 
-                    // get answer data from database and answer the client
+                    // Get answer data from database and answer the client
+                    state.Packet.Data = state.Tableau;
                     var packet = GetFromDatabase(ar);
                     SendBackToClient(ar, packet);
 
                     // Start listening again
-                    state = new StateObject { Sockets = state.Sockets };
-                    sockets.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                    state = new StateObject { Listener = listener };
+                    listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                         ReadCallback, state);
                 }
                 // More packets to receive
                 else
                 {
-                    Console.WriteLine("Reading from : " + sockets.Listener.RemoteEndPoint +
-                                      "\n\t Read {0} bytes =>\t" + state.Packet +
-                                      "\n\t Data buffer =>\t" + string.Join(" ", state.Tableau) +
-                                      "\n\t => Waiting for the rest to be send...", bytesRead);
-
-                    // Not all data received. Get more.
-                    sockets.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                    Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...", bytesRead);
+                    listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                         ReadCallback, state);
                 }
             }
             else
             {
-                Console.WriteLine("0 bytes to read from : " + sockets.Listener.RemoteEndPoint);
+                Console.WriteLine("0 bytes to read from : " + listener.RemoteEndPoint);
             }
         }
         else
@@ -289,9 +274,9 @@ public static partial class Server
             }
 
             var size = bytes.Length;
-            Console.WriteLine("Sending back : " + state.Sockets.Listener.RemoteEndPoint +
-                              "\n\t Sent {0} bytes =>\t" + original, size);
-            state.Sockets.Listener.BeginSend(bytes, 0, size, 0, null, state);
+            Console.WriteLine("Sending back : " + state.Listener.RemoteEndPoint +
+                              "\n\t Sent {0} bytes =>\t" + packet, size);
+            state.Listener.BeginSend(bytes, 0, size, 0, null, state);
         }
     }
 
@@ -317,19 +302,20 @@ public static partial class Server
             // TODO : PacketToByteArray => handle error
             // return Errors.Data;
         }
+
         var size = bytes.Length;
-        state.Sockets.Listener.BeginSend(bytes, 0, size, 0, null, state);
+        state.Listener.BeginSend(bytes, 0, size, 0, null, state);
 
         // Ending the connection.
-        var sockets = state.Sockets;
-        var bytesSent = sockets.Listener.EndSend(ar);
+        var listener = state.Listener;
+        var bytesSent = listener.EndSend(ar);
 
-        Console.WriteLine("Sending back : " + sockets.Listener.RemoteEndPoint +
-                          "\n\t Sent {0} bytes =>\t" + state.Packet +
+        Console.WriteLine("Sending back : " + listener.RemoteEndPoint +
+                          "\n\t Sent {0} bytes =>\t" + packet +
                           "\n\t => Closing connection...", bytesSent);
 
-        sockets.Listener.Shutdown(SocketShutdown.Both);
-        sockets.Listener.Close();
+        listener.Shutdown(SocketShutdown.Both);
+        listener.Close();
     }
 
     public static int Main()
