@@ -130,7 +130,7 @@ public static partial class Server
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
-                var new_state = new StateObject {Listener = listener, Error = Errors.None};
+                var new_state = new StateObject { Listener = listener, Error = Errors.None };
                 new_state.Listener.BeginAccept(AcceptCallback, new_state);
 
                 // Wait until a connection is made before continuing.
@@ -204,7 +204,7 @@ public static partial class Server
                 // Read data from the client socket.
                 bytesRead = listener.EndReceive(ar);
             }
-            catch (Exception e) // timeout
+            catch (Exception) // timeout
             {
                 Console.WriteLine("Connection with the client has timed out");
                 return;
