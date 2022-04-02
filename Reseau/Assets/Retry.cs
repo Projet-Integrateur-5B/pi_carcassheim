@@ -6,10 +6,10 @@ public static class Retry
         Action action,
         TimeSpan retryInterval,
         int maxAttemptCount = 3)
-        => Do<object>(() =>
+        => Do(() =>
         {
             action();
-            return null;
+            return new object();
         }, retryInterval, maxAttemptCount);
 
     public static T Do<T>(Func<T> action, TimeSpan retryInterval, int maxAttemptCount = 3)
