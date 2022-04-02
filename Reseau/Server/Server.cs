@@ -101,31 +101,15 @@ public static partial class Server
         return listener;
     }
 
-    public static Socket GetDatabaseSocket(ref Errors error)
+    public static Socket GetDatabaseSocket()
     {
-        if (!Enum.IsDefined(typeof(Errors), error))
-        {
-            throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
-        }
-
-        var database = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        try
-        {
-            // Connecting to the database server
-            Console.WriteLine("Server is connecting to the database...");
-            var databaseAddress = IPAddress.Parse(Settings.DatabaseIp);
-            var remoteEp = new IPEndPoint(databaseAddress, Settings.DatabasePort);
-            database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            // database.Connect(remoteEp);
-            Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
-
-            error = Errors.None;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());
-            error = Errors.Socket;
-        }
+        // Connecting to the database server
+        Console.WriteLine("Server is connecting to the database...");
+        var databaseAddress = IPAddress.Parse(Settings.DatabaseIp);
+        var remoteEp = new IPEndPoint(databaseAddress, Settings.DatabasePort);
+        var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        // database.Connect(remoteEp);
+        Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
         return database;
     }
 
@@ -197,17 +181,19 @@ public static partial class Server
         var state = (StateObject?)ar.AsyncState;
         if (state is not null)
         {
-            state.Listener = state.Listener.EndAccept(ar);
-            Console.WriteLine("Connection with client is established : " + state.Listener.RemoteEndPoint);
-
             // Connecting the thread to the database
-            var error_value = Errors.None;
-            state.Database = GetDatabaseSocket(ref error_value);
-            if (error_value != Errors.None)
+            try
             {
-                // TODO : GetDatabaseSocket error
+                state.Database = Retry.Do(GetDatabaseSocket, TimeSpan.FromSeconds(0));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
                 return;
             }
+
+            state.Listener = state.Listener.EndAccept(ar);
+            Console.WriteLine("Connection with client is established : " + state.Listener.RemoteEndPoint);
 
             state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);

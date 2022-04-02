@@ -44,6 +44,7 @@ public static partial class Client
             try
             {
                 socket.Connect(remoteEP);
+                socket.ReceiveTimeout = 15000;
                 Console.WriteLine("Client is connected to {0}", socket.RemoteEndPoint);
                 return Errors.None;
             }
