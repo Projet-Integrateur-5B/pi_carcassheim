@@ -16,6 +16,7 @@ public partial class Server
         }
 
         // TODO : get what the client asked from the database or whatever
+
         switch (state.Packet.IdMessage)
         {
             case IdMessage.Connection:
