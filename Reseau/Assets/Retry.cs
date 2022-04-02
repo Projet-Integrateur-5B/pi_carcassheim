@@ -2,11 +2,15 @@ namespace Assets;
 
 public static class Retry
 {
-    public static void Do(Action action, TimeSpan retryInterval, int maxAttemptCount = 3) => Do<object>(() =>
-                                                                                           {
-                                                                                               action();
-                                                                                               return null;
-                                                                                           }, retryInterval, maxAttemptCount);
+    public static void Do(
+        Action action,
+        TimeSpan retryInterval,
+        int maxAttemptCount = 3)
+        => Do<object>(() =>
+        {
+            action();
+            return null;
+        }, retryInterval, maxAttemptCount);
 
     public static T Do<T>(Func<T> action, TimeSpan retryInterval, int maxAttemptCount = 3)
     {
@@ -20,6 +24,7 @@ public static class Retry
                 {
                     Thread.Sleep(retryInterval);
                 }
+
                 return action();
             }
             catch (Exception ex)
@@ -27,6 +32,7 @@ public static class Retry
                 exceptions.Add(ex);
             }
         }
+
         throw new AggregateException(exceptions);
     }
 }

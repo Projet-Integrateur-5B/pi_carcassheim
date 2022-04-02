@@ -58,6 +58,7 @@ public partial class Server
                 packet.Status = false;
                 break;
         }
+
         return packet;
     }
 

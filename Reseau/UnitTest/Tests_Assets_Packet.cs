@@ -15,7 +15,8 @@ public class TestsAssetsPacket
     public void Setup()
     {
         this.errorValue = Errors.None;
-        this.original = new Packet(false, 0, IdMessage.Default, false, 0, true, 999, new[] { "test", "deux" });
+        this.original = new Packet(false, 0, IdMessage.Default, false, 0, true, 999,
+            new[] { "test", "deux" });
         this.originalAsString =
             "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":0,\"Status\":false,\"Permission\":0," +
             "\"Final\":true,\"IdPlayer\":999,\"Data\":[\"test\",\"deux\"]}";
@@ -125,6 +126,7 @@ public class TestsAssetsPacket
         {
             Assert.Fail();
         }
+
         Assert.AreEqual(this.original, packet);
     }
 
@@ -170,6 +172,7 @@ public class TestsAssetsPacket
         {
             Assert.Fail();
         }
+
         Assert.AreEqual(original.Data, packet.Data);
     }
 }

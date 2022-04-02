@@ -8,40 +8,9 @@ using Microsoft.Extensions.Configuration;
 
 public static partial class Server
 {
-
-    [Serializable]
-    public class Parameters
-    {
-        public int ServerPort { get; set; }
-        public int DatabasePort { get; set; }
-        public string DatabaseIp { get; set; } = new("");
-    }
-
-    // State object for reading client data asynchronously
-    public class StateObject
-    {
-        // Size of receive buffer.
-        public const int BufferSize = Packet.MaxPacketSize;
-
-        // Receive buffer.
-        public byte[] Buffer { get; } = new byte[BufferSize];
-
-        public Socket Listener { get; set; } = new Socket(AddressFamily.InterNetwork,
-            SocketType.Stream, ProtocolType.Tcp);
-
-        public Socket Database { get; set; } = new Socket(AddressFamily.InterNetwork,
-            SocketType.Stream, ProtocolType.Tcp);
-
-        public Packet? Packet { get; set; }
-
-        public string[] Tableau { get; set; } = Array.Empty<string>();
-
-        public Errors Error { get; set; } = Errors.None;
-    }
-
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-    private static Parameters Settings { get; set; } = new Parameters();
+    private static Parameters Settings { get; set; } = new();
 
     public static void GetConfig(ref Errors error)
     {
@@ -98,6 +67,7 @@ public static partial class Server
             Console.WriteLine(e.ToString());
             error = Errors.Socket;
         }
+
         return listener;
     }
 
@@ -107,7 +77,8 @@ public static partial class Server
         Console.WriteLine("Server is connecting to the database...");
         var databaseAddress = IPAddress.Parse(Settings.DatabaseIp);
         var remoteEp = new IPEndPoint(databaseAddress, Settings.DatabasePort);
-        var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+        var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream,
+            ProtocolType.Tcp);
         // database.Connect(remoteEp);
         Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
         return database;
@@ -141,6 +112,7 @@ public static partial class Server
             // TODO : GetConfig error
             return;
         }
+
         var listener = GetListenerSocket(ref error_value);
         if (error_value != Errors.None)
         {
@@ -168,6 +140,7 @@ public static partial class Server
         {
             Console.WriteLine(e.ToString());
         }
+
         Console.WriteLine("Server is closed");
     }
 
@@ -193,7 +166,8 @@ public static partial class Server
             }
 
             state.Listener = state.Listener.EndAccept(ar);
-            Console.WriteLine("Connection with client is established : " + state.Listener.RemoteEndPoint);
+            Console.WriteLine("Connection with client is established : " +
+                              state.Listener.RemoteEndPoint);
 
             state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
@@ -235,14 +209,16 @@ public static partial class Server
                     var fusion = state.Tableau[tailletab - 1][..4];
                     if (fusion == "<FS>")
                     {
-                        state.Tableau[tailletab - 1] = state.Tableau[tailletab - 1][4..] + state.Tableau[tailletab];
-                        state.Tableau = state.Tableau.Where((source, index) => index != tailletab).ToArray();
+                        state.Tableau[tailletab - 1] = state.Tableau[tailletab - 1][4..] +
+                                                       state.Tableau[tailletab];
+                        state.Tableau = state.Tableau.Where((source, index) => index != tailletab)
+                            .ToArray();
                     }
                 }
 
                 var debug = "Reading from : " + listener.RemoteEndPoint +
-                               "\n\t Read {0} bytes =>\t" + state.Packet +
-                               "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau);
+                            "\n\t Read {0} bytes =>\t" + state.Packet +
+                            "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau);
 
                 // Disconnection
                 if (state.Packet.IdMessage == IdMessage.Disconnection)
@@ -253,7 +229,8 @@ public static partial class Server
                 // Final packet of the series
                 else if (state.Packet.Final)
                 {
-                    Console.WriteLine(debug + "\n\t => Every packet has been received !", bytesRead);
+                    Console.WriteLine(debug + "\n\t => Every packet has been received !",
+                        bytesRead);
 
                     // Get answer data from database and answer the client
                     state.Packet.Data = state.Tableau;
@@ -268,7 +245,8 @@ public static partial class Server
                 // More packets to receive
                 else
                 {
-                    Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...", bytesRead);
+                    Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...",
+                        bytesRead);
                     listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                         ReadCallback, state);
                 }
@@ -351,5 +329,35 @@ public static partial class Server
     {
         StartListening();
         return 0;
+    }
+
+    [Serializable]
+    public class Parameters
+    {
+        public int ServerPort { get; set; }
+        public int DatabasePort { get; set; }
+        public string DatabaseIp { get; set; } = new("");
+    }
+
+    // State object for reading client data asynchronously
+    public class StateObject
+    {
+        // Size of receive buffer.
+        public const int BufferSize = Packet.MaxPacketSize;
+
+        // Receive buffer.
+        public byte[] Buffer { get; } = new byte[BufferSize];
+
+        public Socket Listener { get; set; } = new(AddressFamily.InterNetwork,
+            SocketType.Stream, ProtocolType.Tcp);
+
+        public Socket Database { get; set; } = new(AddressFamily.InterNetwork,
+            SocketType.Stream, ProtocolType.Tcp);
+
+        public Packet? Packet { get; set; }
+
+        public string[] Tableau { get; set; } = Array.Empty<string>();
+
+        public Errors Error { get; set; } = Errors.None;
     }
 }

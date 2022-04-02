@@ -7,14 +7,6 @@ using Assets;
 
 public static partial class Client
 {
-
-    [Serializable]
-    public class Parameters
-    {
-        public int ServerPort { get; set; }
-        public string ServerIP { get; set; } = "";
-    }
-
     private static Errors Connection(ref Socket socket)
     {
         // TODO : trycatch lors de la récupération des données de config
@@ -246,5 +238,12 @@ public static partial class Client
             Console.WriteLine("Unexpected exception : {0}", e);
             return Errors.Unknown;
         }
+    }
+
+    [Serializable]
+    public class Parameters
+    {
+        public int ServerPort { get; set; }
+        public string ServerIP { get; set; } = "";
     }
 }
