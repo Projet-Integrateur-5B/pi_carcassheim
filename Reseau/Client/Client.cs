@@ -199,14 +199,13 @@ public static partial class Client
                     return Errors.Data;
                 }
 
-                Console.WriteLine(
-                    part_answer.Status
-                        ? "Read {0} bytes => \tpermission accepted \n"
-                        : "Read {0} bytes => \tpermission denied \n", bytesRec);
+                Console.WriteLine("Read {0} bytes => \t" + part_answer + "\n\t\t\tPermission = " +
+                                  part_answer.Status, bytesRec);
 
                 received.Data = received.Data.Concat(part_answer.Data).ToArray();
-                if (received.Final)
+                if (part_answer.Final)
                 {
+                    Console.WriteLine("Received = " + received);
                     return Errors.None;
                 }
             }
