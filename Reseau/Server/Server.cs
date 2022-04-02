@@ -41,9 +41,11 @@ public static partial class Server
 
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
+    private static Parameters Settings { get; set; }= new Parameters();
 
-    public static Parameters GetConfig(ref Errors error)
+    public static void GetConfig(ref Errors error)
     {
+        Settings = new Parameters();
         if (!Enum.IsDefined(typeof(Errors), error))
         {
             throw new InvalidEnumArgumentException(nameof(error), (int)error,
@@ -57,54 +59,37 @@ public static partial class Server
                 .AddEnvironmentVariables()
                 .Build();
 
-            var serverParameters = config.GetRequiredSection("Settings").Get<Parameters>();
+            Settings = config.GetRequiredSection("Settings").Get<Parameters>() ?? new Parameters();
             error = Errors.None;
-            return serverParameters ?? new Parameters();
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             error = Errors.ConfigFile;
-            return new Parameters();
         }
     }
 
-    public static StateObject GetSockets(ref Errors error)
+    public static Socket GetListenerSocket(ref Errors error)
     {
         if (!Enum.IsDefined(typeof(Errors), error))
         {
             throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
         }
 
-        var state = new StateObject();
+        var listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         try
         {
-            var parameters = GetConfig(ref error);
-            if (error != Errors.None)
-            {
-                // TODO : GetConfig error
-                return state;
-            }
-
-            // Connecting to the database server
-            /*Console.WriteLine("Server is connecting to the database...");
-            var databaseAddress = IPAddress.Parse(parameters.DatabaseIp);
-            var remoteEp = new IPEndPoint(databaseAddress, parameters.DatabasePort);
-            state.Database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            state.Database.Connect(remoteEp);
-            Console.WriteLine("Server is connected to the database : {0}", state.Database.RemoteEndPoint);*/
-
             // Establish the local endpoint for the socket.
             Console.WriteLine("Server is preparing to listen...");
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var localEndPoint = new IPEndPoint(ipAddress, parameters.ServerPort);
+            var localEndPoint = new IPEndPoint(ipAddress, Settings.ServerPort);
 
             // Create a TCP/IP socket and Bind to the local endpoint and listen for incoming connections.
-            state.Listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            state.Listener.Bind(localEndPoint);
-            state.Listener.Listen(100);
-            Console.WriteLine("Server is listening : " + state.Listener.LocalEndPoint);
+            listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            listener.Bind(localEndPoint);
+            listener.Listen(100);
+            Console.WriteLine("Server is listening : " + listener.LocalEndPoint);
 
             error = Errors.None;
         }
@@ -113,7 +98,51 @@ public static partial class Server
             Console.WriteLine(e.ToString());
             error = Errors.Socket;
         }
-        return state;
+        return listener;
+    }
+
+    public static Socket GetDatabaseSocket(ref Errors error)
+    {
+        if (!Enum.IsDefined(typeof(Errors), error))
+        {
+            throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
+        }
+
+        var database = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        try
+        {
+            // Connecting to the database server
+            Console.WriteLine("Server is connecting to the database...");
+            var databaseAddress = IPAddress.Parse(Settings.DatabaseIp);
+            var remoteEp = new IPEndPoint(databaseAddress, Settings.DatabasePort);
+            database = new Socket(databaseAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            // database.Connect(remoteEp);
+            Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
+
+            error = Errors.None;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            error = Errors.Socket;
+        }
+        return database;
+    }
+
+    public static void DisconnectFromDatabase(IAsyncResult ar)
+    {
+        var state = (StateObject?)ar.AsyncState;
+        if (state is null)
+        {
+            // TODO : state is null
+            return;
+        }
+
+        var database = state.Database;
+        Console.WriteLine(database.RemoteEndPoint + "\t => Closing database connection...");
+
+        /*database.Shutdown(SocketShutdown.Both);
+        database.Close();*/
     }
 
     public static void StartListening()
@@ -121,7 +150,14 @@ public static partial class Server
         var error_value = Errors.None;
 
         Console.WriteLine("Server is setting up...");
-        var state = GetSockets(ref error_value);
+
+        GetConfig(ref error_value);
+        if (error_value != Errors.None)
+        {
+            // TODO : GetConfig error
+            return;
+        }
+        var listener = GetListenerSocket(ref error_value);
         if (error_value != Errors.None)
         {
             // TODO : GetSockets error
@@ -137,7 +173,7 @@ public static partial class Server
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
-                var new_state = new StateObject { Listener = state.Listener, Database = state.Database, Error = Errors.None };
+                var new_state = new StateObject { Listener = listener, Error = Errors.None };
                 new_state.Listener.BeginAccept(AcceptCallback, new_state);
 
                 // Wait until a connection is made before continuing.
@@ -163,6 +199,16 @@ public static partial class Server
         {
             state.Listener = state.Listener.EndAccept(ar);
             Console.WriteLine("Connection with client is established : " + state.Listener.RemoteEndPoint);
+
+            // Connecting the thread to the database
+            var error_value = Errors.None;
+            state.Database = GetDatabaseSocket(ref error_value);
+            if (error_value != Errors.None)
+            {
+                // TODO : GetDatabaseSocket error
+                return;
+            }
+
             state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
         }
@@ -306,13 +352,21 @@ public static partial class Server
         var size = bytes.Length;
         state.Listener.BeginSend(bytes, 0, size, 0, null, state);
 
-        // Ending the connection.
+        // Ending database connection
+        DisconnectFromDatabase(ar);
+        if (error_value != Errors.None)
+        {
+            // TODO : DisconnectFromDatabase => handle error
+            // return Errors.Data;
+        }
+
+        // Ending client connection
         var listener = state.Listener;
         var bytesSent = listener.EndSend(ar);
 
         Console.WriteLine("Sending back : " + listener.RemoteEndPoint +
                           "\n\t Sent {0} bytes =>\t" + packet +
-                          "\n\t => Closing connection...", bytesSent);
+                          "\n\t => Closing client connection...", bytesSent);
 
         listener.Shutdown(SocketShutdown.Both);
         listener.Close();
