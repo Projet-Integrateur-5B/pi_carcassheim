@@ -242,8 +242,17 @@ public static partial class Server
                     // TODO : ByteArrayToPacket => handle error
                 }
 
-                // There  might be more data, so store the data received so far.
+                var tailletab = state.Tableau.Length;
                 state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
+                if (tailletab > 0)
+                {
+                    var fusion = state.Tableau[tailletab - 1][..4];
+                    if (fusion == "<FS>")
+                    {
+                        state.Tableau[tailletab - 1] = state.Tableau[tailletab - 1][4..] + state.Tableau[tailletab];
+                        state.Tableau = state.Tableau.Where((source, index) => index != tailletab).ToArray();
+                    }
+                }
 
                 var debug = "Reading from : " + listener.RemoteEndPoint +
                                "\n\t Read {0} bytes =>\t" + state.Packet +
