@@ -129,7 +129,7 @@ public static partial class Server
         return database;
     }
 
-    public static void DisconnectFromDatabase(IAsyncResult ar)
+    public static void DisconnectFromDatabase(IAsyncResult ar, ref Errors error)
     {
         var state = (StateObject?)ar.AsyncState;
         if (state is null)
@@ -138,11 +138,11 @@ public static partial class Server
             return;
         }
 
-        var database = state.Database;
-        Console.WriteLine(database.RemoteEndPoint + "\t => Closing database connection...");
-
-        /*database.Shutdown(SocketShutdown.Both);
-        database.Close();*/
+        Console.WriteLine(state.Database.RemoteEndPoint + "\t => Closing database connection...");
+        /*state.Database.EndSend(ar);
+        state.Database.Shutdown(SocketShutdown.Both);
+        state.Database.Close();*/
+        error = Errors.None;
     }
 
     public static void StartListening()
@@ -253,7 +253,7 @@ public static partial class Server
                 if (state.Packet.IdMessage == IdMessage.Disconnection)
                 {
                     Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
-                    DisconnectFromClient(ar, state.Packet);
+                    DisconnectFromClient(ar);
                 }
                 // Final packet of the series
                 else if (state.Packet.Final)
@@ -326,9 +326,8 @@ public static partial class Server
         }
     }
 
-    private static void DisconnectFromClient(IAsyncResult ar, Packet packet)
+    private static void DisconnectFromClient(IAsyncResult ar)
     {
-        byte[]? bytes = null;
         var error_value = Errors.None;
 
         var state = (StateObject?)ar.AsyncState;
@@ -338,22 +337,8 @@ public static partial class Server
             return;
         }
 
-        packet.Status = true;
-        packet.IdMessage = IdMessage.Disconnection;
-        Array.Clear(packet.Data);
-
-        bytes = packet.PacketToByteArray(ref error_value);
-        if (error_value != Errors.None)
-        {
-            // TODO : PacketToByteArray => handle error
-            // return Errors.Data;
-        }
-
-        var size = bytes.Length;
-        state.Listener.BeginSend(bytes, 0, size, 0, null, state);
-
         // Ending database connection
-        DisconnectFromDatabase(ar);
+        DisconnectFromDatabase(ar, ref error_value);
         if (error_value != Errors.None)
         {
             // TODO : DisconnectFromDatabase => handle error
@@ -361,15 +346,10 @@ public static partial class Server
         }
 
         // Ending client connection
-        var listener = state.Listener;
-        var bytesSent = listener.EndSend(ar);
-
-        Console.WriteLine("Sending back : " + listener.RemoteEndPoint +
-                          "\n\t Sent {0} bytes =>\t" + packet +
-                          "\n\t => Closing client connection...", bytesSent);
-
-        listener.Shutdown(SocketShutdown.Both);
-        listener.Close();
+        Console.WriteLine(state.Listener.RemoteEndPoint + "\t => Closing client connection...");
+        state.Listener.EndSend(ar);
+        state.Listener.Shutdown(SocketShutdown.Both);
+        state.Listener.Close();
     }
 
     public static int Main()

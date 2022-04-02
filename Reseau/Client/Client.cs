@@ -180,6 +180,12 @@ public static partial class Client
                 Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
             }
 
+            // check if an answer is needed
+            if (idMessage == IdMessage.Disconnection)
+            {
+                return Errors.None;
+            }
+
             // Receive the response from the remote device.
             bytes = new byte[Packet.MaxPacketSize];
             var bytesRec = 0;
