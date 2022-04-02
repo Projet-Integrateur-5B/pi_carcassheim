@@ -41,7 +41,7 @@ public static partial class Server
 
     // Thread signal.
     private static ManualResetEvent AllDone { get; } = new(false);
-    private static Parameters Settings { get; set; }= new Parameters();
+    private static Parameters Settings { get; set; } = new Parameters();
 
     public static void GetConfig(ref Errors error)
     {
