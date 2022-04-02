@@ -211,16 +211,16 @@ public static partial class Server
                     // TODO : ByteArrayToPacket => handle error
                 }
 
-                var tailletab = state.Tableau.Length;
+                var dataLength = state.Tableau.Length;
                 state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
-                if (tailletab > 0)
+                if (dataLength > 0)
                 {
-                    if (state.Tableau[tailletab] == "")
+                    if (state.Tableau[dataLength] == "")
                     {
-                        state.Tableau = state.Tableau.Where((source, index) => index != tailletab)
+                        state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
                             .ToArray();
-                        state.Tableau[tailletab - 1] += state.Tableau[tailletab];
-                        state.Tableau = state.Tableau.Where((source, index) => index != tailletab)
+                        state.Tableau[dataLength - 1] += state.Tableau[dataLength];
+                        state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
                             .ToArray();
                     }
                 }

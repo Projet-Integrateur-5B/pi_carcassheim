@@ -40,7 +40,7 @@ public static partial class Client
         }
 
         string[] test = { "pseudo", "mdp18" };
-        error_value = socket.Communication(ref original, IdMessage.Default, test);
+        error_value = socket.Communication(ref original, IdMessage.Connection, test);
         switch (error_value)
         {
             case Errors.None:
