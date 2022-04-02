@@ -144,10 +144,12 @@ public static class Tools
             }
             else
             {
-                var chaine = original.Data[0][..(headerBytesMaxLength - 9)];
+                var chaine = original.Data[0].Substring(0, headerBytesMaxLength - 9);
+                // original.Data[0].Substring(0, headerBytesMaxLength - 9);
                 var list = new List<string>(packet.Data.ToList()) { "<FS>" + chaine };
                 packet.Data = list.ToArray();
-                original.Data[0] = original.Data[0][(headerBytesMaxLength - 9)..];
+                original.Data[0] = original.Data[0].Substring(headerBytesMaxLength - 9);
+                // original.Data[0].Substring(headerBytesMaxLength - 9);
 
                 packet.Final = false;
                 packets.Add(packet);
