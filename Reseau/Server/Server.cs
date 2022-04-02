@@ -11,7 +11,7 @@ public static partial class Server
     private static ManualResetEvent AllDone { get; } = new(false); // thread signal
     private static Parameters Settings { get; set; } = new();
 
-    private const int Timeout = 1800000; // 30 minutes
+    private const int Timeout = 1000; // 30 minutes = 1800000
 
     public static void GetConfig(ref Errors error)
     {
@@ -130,7 +130,7 @@ public static partial class Server
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
-                var new_state = new StateObject { Listener = listener, Error = Errors.None };
+                var new_state = new StateObject {Listener = listener, Error = Errors.None};
                 new_state.Listener.BeginAccept(AcceptCallback, new_state);
 
                 // Wait until a connection is made before continuing.
@@ -177,6 +177,7 @@ public static partial class Server
             if (!state.ReceiveDone.WaitOne(Timeout))
             {
                 state.Listener.EndReceive(ar);
+                state.Listener.Shutdown(SocketShutdown.Both);
                 state.Listener.Close();
             }
         }
@@ -196,8 +197,18 @@ public static partial class Server
         {
             state.ReceiveDone.Set();
             var listener = state.Listener;
-            // Read data from the client socket.
-            var bytesRead = listener.EndReceive(ar);
+
+            var bytesRead = 0;
+            try
+            {
+                // Read data from the client socket.
+                bytesRead = listener.EndReceive(ar);
+            }
+            catch (Exception e) // timeout
+            {
+                Console.WriteLine("Connection with the client has timed out");
+                return;
+            }
 
             if (bytesRead > 0)
             {
@@ -255,6 +266,7 @@ public static partial class Server
                     if (!state.ReceiveDone.WaitOne(Timeout))
                     {
                         state.Listener.EndReceive(ar);
+                        state.Listener.Shutdown(SocketShutdown.Both);
                         state.Listener.Close();
                     }
                 }
@@ -270,6 +282,7 @@ public static partial class Server
                     if (!state.ReceiveDone.WaitOne(Timeout))
                     {
                         state.Listener.EndReceive(ar);
+                        state.Listener.Shutdown(SocketShutdown.Both);
                         state.Listener.Close();
                     }
                 }
