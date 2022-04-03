@@ -79,10 +79,9 @@ public class Table : MonoBehaviour
 
         balise1 = balise1_model.position;
         balise2 = balise2_model.position;
+        tile_zone.transform.localPosition = balise1_model.localPosition;
+        meeple_zone.transform.localPosition = balise1_model.localPosition;
         unselected_angle = Quaternion.AngleAxis(90, balise2 - balise1);
-
-        Destroy(balise1_model.gameObject);
-        Destroy(balise2_model.gameObject);
     }
 
     // Update is called once per frame
@@ -118,7 +117,7 @@ public class Table : MonoBehaviour
             tile.transform.parent = tile_zone.transform;
             tile.model.layer = DisplaySystem.TableLayer;
             tile.pivotPoint.rotation = unselected_angle;
-            tile.transform.position = tile_origin + tile_step * act_tile_count;
+            tile.transform.localPosition = tile_origin + tile_step * act_tile_count;
 
             if (perma_tile)
             {
@@ -140,10 +139,10 @@ public class Table : MonoBehaviour
         planned_tile_count = hand_size;
 
         tile_step = (balise2 - balise1) / hand_size;
-        tile_origin = balise1 + tile_step / 2f;
+        tile_origin = tile_step / 2f;
 
         meeple_step = (balise2 - balise1) / meeples.Count;
-        meeple_origin = balise1 + meeple_step / 2f;
+        meeple_origin = meeple_step / 2f;
 
         cleanHand();
 
@@ -151,11 +150,11 @@ public class Table : MonoBehaviour
         foreach (Meeple mpl in meeples)
         {
             MeepleColliderStat mps = Instantiate<MeepleColliderStat>(meeple_collider_model, meeple_zone.transform);
-            mps.transform.position = meeple_origin + meeple_step * i;
+            mps.transform.localPosition = meeple_origin + meeple_step * i;
             mps.Index = i;
 
             mpl.transform.parent = meeple_zone.transform;
-            mpl.transform.position = mps.transform.position;
+            mpl.transform.localPosition = mps.transform.localPosition;
             mpl.model.layer = DisplaySystem.TableLayer;
             mpl.pivotPoint.rotation = unselected_angle;
 
