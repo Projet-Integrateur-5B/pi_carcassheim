@@ -29,6 +29,11 @@ public partial class Thread_serveur_jeu
 
 	// Champs nécessaires pour le bon fonctionnement du programme
 
+	// A RAJOUTER : tableau d'étape du tour actuel -> placement tuile, placement pion, pour savoir si ces deux derniers ont 
+	// été validés (et sont donc légaux).
+	// -> On enregistre le placement de la tuile et du pion, une fois vérifié, quelque part. On ne met à jour la structure de donnée
+	// qu'à la validation du tour.
+
 
 
 	// Constructeur

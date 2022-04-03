@@ -84,8 +84,8 @@ public class Thread_communication
         if(debug != 1) // TEMPORAIRE - A retirer plus tard    // A REMPLACER - Par boucle de réception
         {
             // Types de messages qui peuvent être reçus:
-            //      • Création de partie
-            //      • Arrivée dans la partie
+            //      • Création de partie  (Message provenant du Serveur_main, donc via modification de variable dans le thread)
+            //      • Arrivée dans la partie (Message provenant du Serveur_main, ^ )
             //      • Pose de tuile
             //      • Pose de pion
             //      • ? Fin de tour ?
@@ -95,6 +95,8 @@ public class Thread_communication
             //      • Réaction à triche
             //      • Réaction à afk
             //      • Kick (afk ou triche)
+
+            // Chaque message reçu est transmis au thread_serveur_jeu concerné
 
 
             int typeMsg = 0; // (Dépend du RESEAU) Dépendra du type : création de partie, connexion à la partie, etc
