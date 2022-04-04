@@ -137,9 +137,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		selectionChange();
+		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
+		if (!IF)
+		{
+			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			selectionChange();
+		}
 	}
+
 
 	/* 	void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
 {
