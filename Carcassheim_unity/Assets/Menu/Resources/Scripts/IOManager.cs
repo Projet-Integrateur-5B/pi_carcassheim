@@ -26,6 +26,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private Vector2 _cursorHotspot = Vector2.zero;
 	private EventSystem eventSystem;
 	private bool boolSelectionChange = true;
+	private bool cooldown = false;
+	private InputField IF = null;
+
 	void Start()
 	{
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
@@ -64,36 +67,103 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 				if (btn.GetComponent<Button>())
 					btn.GetComponent<Button>().onClick.AddListener(delegate
 					{
-						MethodCall(btn.name, null);
+						MethodCall(btn.name, null, null);
 					});
 			if (menu.Find("Toggle Group"))
 				foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
 					if (tog.GetComponent<Toggle>())
 						tog.GetComponent<Toggle>().onValueChanged.AddListener(delegate
 						{
-							MethodCall(menu.Find("Toggle Group").transform.GetChild(0).name, tog.GetComponent<Toggle>());
+							MethodCall(menu.Find("Toggle Group").transform.GetChild(0).name, tog.GetComponent<Toggle>(), null);
+						});
+			if (menu.Find("InputField"))
+				foreach (Transform inp in menu.Find("InputField").transform.GetChild(0).transform)
+					if (inp.GetComponent<InputField>())
+						inp.GetComponent<InputField>().onEndEdit.AddListener(delegate
+						{
+							MethodCall(menu.Find("InputField").transform.GetChild(0).name, null, inp.GetComponent<InputField>());
 						});
 		}
 	}
 
-	public void Update() // A VERIFIER
-	{ //si on appuie sur une touche de deplacement
-	/* 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
-			if (nextGo != eventSystem.currentSelectedGameObject)
-				selectionChange(); */
+	public void Update()
+	{
+		if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)) // résout probleme souris/clavier avec GetKey 
+		{
+			/* lockMouse(true); */
+			previousGo = nextGo;
+			nextGo = eventSystem.currentSelectedGameObject;
+			changeHover();
+		}
+
+		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
+		/* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
+				{ */
+		/* lockMouse(false); */
+		/* 			nextGo = eventSystem.currentSelectedGameObject;
+					resetHoverPreviousGo(); */
+		// EVITE SPAM CLIC
+		/* 			Invoke("ResetCooldown", 5.0f);
+					cooldown = true; */
+		/* } */
+
+		/* --------------------- PATCH INPUTFIELD --------------------- */
+		// il faut mieux gérer l'inputfield pour la saisie (entree et escape)
+		/* 		if (IF!=null) 
+					if(IF.isFocused)
+						{
+							previousGo = nextGo;
+							nextGo = eventSystem.currentSelectedGameObject;
+							changeHover();
+							lockMouse(true);
+							if(Input.GetKey(KeyCode.Return)) // touche enter
+								lockMouse(false); 
+						} */
+		/* ------------------ FIN PATCH INPUTFIELD -------------------- */
 	}
+
+	private void lockMouse(bool b)
+	{
+		Cursor.lockState = b ? CursorLockMode.Locked : CursorLockMode.None;
+		Cursor.visible = !b;
+	}
+
+	private void ResetCooldown()
+	{ // EVITE SPAM CLIC
+		cooldown = false;
+	}
+
+
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		selectionChange(); // checkmark raycast toggle/button doit être activé 
+		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
+		if (!IF)
+		{
+			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			selectionChange();
+		}
 	}
+
+
+	/* 	void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
+{
+	if(Input.anyKeyDown &&  Event.current.isKey)
+			switch(Event.current.keyCode.ToString()){
+			case "UpArrow" : case "DownArrow" : case "LeftArrow" : case "RightArrow" :
+			break;
+			}
+} */
 
 	public void selectionChange()
 	{
+		// Aparté : (Les inpufield : le "Text" doit avoir du raycast pour fonctionner donc à ne pas désactiver)
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
+		/* 		bool inputfd = nextGo.transform.parent.name == "InputField";
+				Debug.Log(inputfd);  */
+		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
 		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
 		{
@@ -113,10 +183,13 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		_btnText.fontSize += s;
 	}
 
-	public void colorImage(GameObject go, float f)
-	{ // transparence 
+	public void colorImage(GameObject go, byte r, byte g, byte b, byte f, bool changeColor)
+	{
 		Image image = go.transform.GetChild(0).gameObject.GetComponent<Image>();
-		image.color = new Color(image.color.r, image.color.g, image.color.b, f);
+		if (changeColor == false) // transparence 
+			image.color = new Color(image.color.r, image.color.g, image.color.b, (float)f / 255);
+		else
+			image.color = new Color32(r, g, b, f); // transparence et couleur
 	}
 
 	public void tridentHover(Component c)
@@ -134,58 +207,63 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 	}
 
+	public void resetHoverPreviousGo()
+	{
+		if (previousGo != null)
+		{
+			//GameObject.Find("Trident").SetActive(false);
+			Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
+			bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
+			switch (previousTarget.name)
+			{ // previousGO
+				case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
+					previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
+					break;
+				case "Unselected": // IMAGE
+					colorImage(previousGo, 0, 0, 0, 255, false);
+					break;
+				case "Text": // BOUTON
+					_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
+					textColor(_previousColor, -3, previousGo);
+					break;
+				case "Background": // TOGGLE
+					colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
+					break;
+				case "Handle": // SLIDER
+					colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
+					break;
+				default:
+					break;
+			}
+		}
+	}
+
 	public void changeHover()
 	{
 		if (boolSelectionChange == true)
 		{
 			if (TridentGo.activeSelf == true) // TRIDENT
 				TridentGo.SetActive(false);
-			if (previousGo != null)
-			{
-				//GameObject.Find("Trident").SetActive(false);
-				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
-				bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
-				switch (previousTarget.name)
-				{ // previousGO
-					case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
-						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
-						break;
-					case "Unselected": // IMAGE
-						colorImage(previousGo, 1);
-						break;
-					case "Text": // BOUTON
-						_previousColor = FC ? FCcolor : Color.white;
-						textColor(_previousColor, -3, previousGo);
-						break;
-					case "Background": // TOGGLE
-						colorImage(previousGo, 1); // (à changer)
-						break;
-					case "Handle": // SLIDER
-						colorImage(previousGo, 1); // (à changer)
-						break;
-					default:
-						break;
-				}
-			}
-
+			resetHoverPreviousGo();
 			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
+			//Debug.Log("next" + nextTarget);
 			switch (nextTarget.name)
-			{ // nextGO
+			{
 				case "RawImage": // GIF : A changer (mettre autre chose que zoom)
 					nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
 					break;
 				case "Unselected": // IMAGE
-					colorImage(nextGo, 0);
+					colorImage(nextGo, 0, 0, 0, 0, false);
 					break;
 				case "Text": // BOUTON
 					tridentHover(nextTarget); // TRIDENT
 					textColor(colHover, 3, nextGo);
 					break;
 				case "Background": // TOGGLE
-					colorImage(nextGo, 0.5f); // semi transparent (à changer)
+					colorImage(nextGo, 0, 0, 0, 125, false); // semi transparent (à changer)
 					break;
 				case "Handle": // SLIDER
-					colorImage(nextGo, 0.5f); // semi transparent (à changer)
+					colorImage(nextGo, 47, 79, 79, 255, true); // équivalent à #FF4500
 					break;
 				default:
 					break;
@@ -213,11 +291,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		}
 	}
 
-	public void MethodCall(string methode, Toggle tog)
+
+	public void MethodCall(string methode, Toggle tog, InputField inp)
 	{
 		GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
-		gameObject.SendMessage(methode, tog);
-		if (tog == null)
+		if (inp == null)
+			gameObject.SendMessage(methode, tog);
+		else gameObject.SendMessage(methode, inp);
+		if (tog == null || inp == null)
 			NewMenuSelectButton();
 	}
 }

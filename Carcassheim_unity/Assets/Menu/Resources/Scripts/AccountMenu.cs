@@ -10,7 +10,7 @@ public class AccountMenu : Miscellaneous
 	{
 		// INITIALISATION
 		accMenu = GameObject.Find("SubMenus").transform.Find("AccountMenu").transform;
-		AMCI = accMenu.Find("InputField").transform;
+		AMCI = accMenu.Find("InputField").transform.Find("InputFieldEndEdit").transform;
 		AMCI.Find("InputField Day CA").GetComponent<InputField>().characterLimit = 2;
 		AMCI.Find("InputField Month CA").GetComponent<InputField>().characterLimit = 2;
 		AMCI.Find("InputField Year CA").GetComponent<InputField>().characterLimit = 4;
