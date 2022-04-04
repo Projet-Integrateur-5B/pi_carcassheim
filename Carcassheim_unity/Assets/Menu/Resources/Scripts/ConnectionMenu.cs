@@ -8,7 +8,7 @@ public class ConnectionMenu : Miscellaneous
 	void Start()
 	{
 		coMenu = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform;
-		CMCI = coMenu.Find("InputField").transform;
+		CMCI = coMenu.Find("InputField").transform.Find("InputFieldEndEdit").transform;
 		loginCM = CMCI.GetChild(0).GetComponent<InputField>();
 		passwordCM = CMCI.GetChild(1).GetComponent<InputField>();
 		passwordCM.inputType = InputField.InputType.Password; // Hide password by default
@@ -55,6 +55,11 @@ public class ConnectionMenu : Miscellaneous
 		tmpText.text = "Connectez vous";
 		HidePopUpOptions();
 		ChangeMenu("ConnectionMenu", "AccountMenu");
+	}
+
+	public void InputFieldEndEdit(InputField inp)
+	{
+		Debug.Log("Input submitted" + " : " + inp.text);
 	}
 
 	public void Connect()
