@@ -13,6 +13,7 @@ public class PlayerRepre
 
 
     public int Id { get => _id; private set => _id = value; }
+    public string Name { get => _name; private set => _name = value; }
     public uint Score
     {
         get => _score;
@@ -36,6 +37,7 @@ public class PlayerRepre
     private int _id;
     private uint _score;
     private uint _nb_meeple;
+    private string _name;
 
 
     public PlayerRepre()
@@ -47,9 +49,10 @@ public class PlayerRepre
         _score = 0;
     }
 
-    public PlayerRepre(int id, Color col)
+    public PlayerRepre(string name, int id, Color col)
     {
         Id = id;
+        Name = name;
         color = col;
         _score = 0;
         _nb_meeple = 0;

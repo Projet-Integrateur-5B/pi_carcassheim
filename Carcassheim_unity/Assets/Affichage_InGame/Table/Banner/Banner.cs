@@ -13,6 +13,14 @@ public class Banner : MonoBehaviour
     [SerializeField] private TMP_Text nbPointsTMP;
     [SerializeField] private DisplaySystem master;
 
+
+    [SerializeField] private RectTransform separator_location;
+
+
+    [SerializeField] private BannerWinCondition win_condition_time;
+    [SerializeField] private BannerWinCondition win_condition_tile;
+    [SerializeField] private BannerWinCondition win_condition_point;
+
     private PlayerRepre _player = null;
     int _nb_player = 0;
     // Start is called before the first frame update
@@ -108,4 +116,22 @@ public class Banner : MonoBehaviour
         timerTourTMP.text = timerTour.ToString();
     }
 
+    public void setWinCondition(WinCondition win, List<int> param)
+    {
+        BannerWinCondition win_cond;
+        switch (win)
+        {
+            case WinCondition.WinByTime:
+                win_cond = Instantiate<BannerWinCondition>(win_condition_time, transform);
+                break;
+            case WinCondition.WinByPoint:
+                win_cond = Instantiate<BannerWinCondition>(win_condition_point, transform);
+                break;
+            default:
+                win_cond = Instantiate<BannerWinCondition>(win_condition_tile, transform);
+                break;
+        }
+        win_cond.setWinParameters(param);
+        separator_location.anchoredPosition = win_cond.separator_position;
+    }
 }

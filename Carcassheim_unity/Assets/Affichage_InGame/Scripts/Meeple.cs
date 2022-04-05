@@ -17,6 +17,7 @@ public class Meeple : MonoBehaviour
     // * LOOK *************************************************
     public Transform pivotPoint;
     public GameObject model;
+    public Renderer color;
 
     public MeepleType meeple_type { get; set; } = MeepleType.DefaultMeeple; //TODO set should be private
 

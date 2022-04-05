@@ -5,8 +5,8 @@ using UnityEngine;
 public class CameraManager : MonoBehaviour
 {
     Camera mainCamera;
-    Vector3 mainCameraPosition = new Vector3(1,8,-10);
-    Quaternion mainCameraRotation = Quaternion.Euler(40,0,0);
+    Vector3 mainCameraPosition = new Vector3(1, 8, -10);
+    Quaternion mainCameraRotation = Quaternion.Euler(40, 0, 0);
     public float defaultFOV = 60;
     public float minFOV = 5;
     public float zoomMultiplier = 5;
@@ -38,7 +38,7 @@ public class CameraManager : MonoBehaviour
             leftAndRightMotion(2.5f);
         if (Input.GetKey(KeyCode.LeftArrow))
             leftAndRightMotion(-2.5f);
-        
+
         if (Input.mouseScrollDelta.y > 0 || Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.Equals))// || getDoubleClick())
         {
             if (mainCamera.fieldOfView > minFOV)
@@ -53,13 +53,15 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    void cameraClickAndDrag() {
-        if (Input.GetMouseButtonDown(0)) {
+    void cameraClickAndDrag()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
             dragOrigin = Input.mousePosition;
         }
 
         if (!Input.GetMouseButton(0)) return;
-        Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition-dragOrigin);
+        Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
         mainCameraPosition.x -= pos.x * dragSpeed;
         mainCameraPosition.z -= pos.y * dragSpeed;
 

@@ -17,7 +17,7 @@ public class Tuile : MonoBehaviour
 
     public int Id
     {
-        set { _id = value; _id_repre.text = value.ToString(); }
+        set { _id = value; _id_repre.text = value.ToString(); if (value < 0) _id_repre.gameObject.SetActive(false); }
         get { return _id; }
     }
 
@@ -26,7 +26,6 @@ public class Tuile : MonoBehaviour
 
     void Start()
     {
-        _id_repre.gameObject.SetActive(true);
     }
 
     private void Update()

@@ -132,14 +132,15 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
+        PlayerRepre player_act;
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
+                player_act = players_mapping[system_back.getNextPlayer()];
                 if (old_state != DisplaySystemState.noState)
-                    player_list.nextPlayer(players_mapping[system_back.getNextPlayer()]);
+                    player_list.nextPlayer(player_act);
                 table.Focus = (my_player.Id == player_list.getActPlayer().Id);
-                turnBegin();
-                // TODO gestion of next player + player list
+                turnBegin(player_act);
                 break;
         }
     }
@@ -221,14 +222,19 @@ public class DisplaySystem : MonoBehaviour
 
     public void gameBegin()
     {
+        WinCondition win = WinCondition.WinByTime;
+        List<int> param = new List<int>();
+        system_back.askWinCondition(ref win, param);
+
         table.setTileNumber(system_back.tile_number);
         List<int> player_ids = new List<int>();
-        system_back.askPlayerOrder(player_ids);
+        List<string> player_names = new List<string>();
+        system_back.askPlayers(player_ids, player_names);
 
         int L = player_ids.Count;
         for (int i = 0; i < L; i++)
         {
-            PlayerRepre pl = new PlayerRepre(player_ids[i], players_color[i]);
+            PlayerRepre pl = new PlayerRepre(player_names[i], player_ids[i], players_color[i]);
             players_mapping.Add(pl.Id, pl);
             player_list.addPlayer(pl);
         }
@@ -239,9 +245,12 @@ public class DisplaySystem : MonoBehaviour
         banner.setPlayerNumber(L);
         my_player = players_mapping[system_back.getMyPlayer()];
         banner.setPlayer(my_player);
+
+        banner.setWinCondition(win, param);
+
     }
 
-    public void turnBegin()
+    public void turnBegin(PlayerRepre player_act)
     {
         List<MeepleType> meeples_type = new List<MeepleType>();
         List<int> meeples_number = new List<int>();
@@ -260,6 +269,7 @@ public class DisplaySystem : MonoBehaviour
         {
             // TODO should instantiate dependnat on the type
             Meeple mp = Instantiate<Meeple>(meeple_model);
+            mp.color.material.color = player_act.color;
             mp.meeple_type = meeples_type[i];
             meeples_hand.Add(mp);
             meeple_distrib[meeples_type[i]] = meeples_number[i];
@@ -272,6 +282,8 @@ public class DisplaySystem : MonoBehaviour
         {
             // TODO should instatntiate in function of id
             Tuile tl = Instantiate<Tuile>(tuile_model);
+            Renderer red = tl.model.GetComponent<Renderer>();
+            red.material.color = player_act.color;
             tl.Id = tile_ids[i];
             tiles_drawned.Enqueue(tl);
             lifespan_tiles_drawned.Enqueue(tile_perma[i]);
