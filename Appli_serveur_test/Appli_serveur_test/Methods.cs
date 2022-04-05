@@ -65,8 +65,7 @@ public partial class Server
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
 
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
-            Array.Empty<string>());
+        var retour = new Packet();
 
 
         if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
