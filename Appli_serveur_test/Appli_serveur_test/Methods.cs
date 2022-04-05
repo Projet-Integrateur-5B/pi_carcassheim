@@ -20,8 +20,7 @@ public partial class Server
         switch (state.Packet.IdMessage)
         {
             case IdMessage.Connection:
-                packet.Status = Connection(packet);
-                Array.Clear(packet.Data);
+                packet = Connection(packet);
                 break;
             case IdMessage.Signup:
                 packet.Status = Signup(packet);
@@ -61,16 +60,31 @@ public partial class Server
         return packet;
     }
 
-    public static bool Connection(Packet packet)
+    public static Packet Connection(Packet packet)
     {
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
+
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            Array.Empty<string>());
+
+
         if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
         {
-            return true;
+            retour.Status = true;
+        }
+        else if(packet.Data[0] != "pseudo")
+        {
+            retour.Status = false;
+            retour.Data[0] = "login";
+        }
+        else if (packet.Data[1] != "mdp18")
+        {
+            retour.Status = false;
+            retour.Data[0] = "password";
         }
 
-        return false;
+        return retour;
     }
 
     // ne pas toucher cette fonction
