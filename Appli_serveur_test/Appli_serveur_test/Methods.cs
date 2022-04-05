@@ -20,34 +20,34 @@ public partial class Server
         switch (state.Packet.IdMessage)
         {
             case IdMessage.Connection:
-                packet = Connection(packet);
+                packet = Connection(state.Packet);
                 break;
             case IdMessage.Signup:
-                packet.Status = Signup(packet);
+                packet.Status = Signup(state.Packet);
                 Array.Clear(packet.Data);
                 break;
             case IdMessage.Statistics:
-                packet = Statistics(packet);
+                packet = Statistics(state.Packet);
                 break;
             case IdMessage.RoomList:
-                packet = RoomList(packet);
+                packet = RoomList(state.Packet);
                 break;
             case IdMessage.RoomJoin:
-                packet = RoomJoin(packet);
+                packet = RoomJoin(state.Packet);
                 break;
             case IdMessage.RoomLeave:
-                packet.Status = RoomLeave(packet);
+                packet.Status = RoomLeave(state.Packet);
                 Array.Clear(packet.Data);
                 break;
             case IdMessage.RoomReady:
-                packet.Status = RoomReady(packet);
+                packet.Status = RoomReady(state.Packet);
                 Array.Clear(packet.Data);
                 break;
             case IdMessage.RoomSettings:
-                packet = RoomSettings(packet);
+                packet = RoomSettings(state.Packet);
                 break;
             case IdMessage.RoomStart:
-                packet = RoomStart(packet);
+                packet = RoomStart(state.Packet);
                 break;
             case IdMessage.Disconnection: // impossible
                 Array.Clear(packet.Data);
