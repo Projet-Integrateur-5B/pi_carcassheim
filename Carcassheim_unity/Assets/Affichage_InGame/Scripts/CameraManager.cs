@@ -4,17 +4,24 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    [SerializeField] Plateau board;
     Camera mainCamera;
     Vector3 mainCameraPosition;
     Quaternion mainCameraRotation;
     public float dragSpeed = .5f;
     Vector3 dragOrigin;
+    [SerializeField] private Table table;
+
     // Start is called before the first frame update
     void Start()
     {
         mainCamera = Camera.main;
         mainCameraPosition = mainCamera.transform.position;
         mainCameraRotation = mainCamera.transform.rotation;
+    }
+
+    private void OnEnable() {
+        
     }
 
     // Update is called once per frame
@@ -48,8 +55,21 @@ public class CameraManager : MonoBehaviour
 
     void cameraClickAndDrag() {
         // Check if mouse is on the table
+        // Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        // RaycastHit hit;
+
+        // if (Physics.Raycast(ray, out hit))
+        // {
+        //     if (hit.collider.name == "TileCollider")
+        //     {  
+        //         Debug.Log(hit.collider.name);
+        //         return;
+        //     }
+        // }
+
+
         // exit in this case
-        
+
         if (Input.GetMouseButtonDown(0)) {
             dragOrigin = Input.mousePosition;
         }
@@ -59,6 +79,10 @@ public class CameraManager : MonoBehaviour
         mainCameraPosition.x -= pos.x * dragSpeed;
         mainCameraPosition.z -= pos.y * dragSpeed;
 
+        if ((mainCamera.transform.position.z <= 0 && mainCameraPosition.z < 0)
+            || (mainCamera.transform.position.z >= 0.90f && mainCameraPosition.z > 0)) {
+            return;
+        }
         mainCamera.transform.position = mainCameraPosition;
     }
 
