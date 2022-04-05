@@ -9,6 +9,7 @@ public class PlayerIcon : MonoBehaviour
     [SerializeField] private Image player_color;
     [SerializeField] private TMP_Text player_score;
     [SerializeField] private TMP_Text player_meeple;
+    [SerializeField] private TMP_Text player_name;
     public PlayerRepre Player { get => _player; private set => setPlayer(value); }
     private PlayerRepre _player;
 
@@ -29,6 +30,9 @@ public class PlayerIcon : MonoBehaviour
         player.OnMeepleUpdate += meepleUpdated;
         player.OnScoreUpdate += scoreUpdated;
         player_color.color = player.color;
+        player_name.text = player.Name;
+        player_meeple.text = player.NbMeeple.ToString();
+        player_score.text = player.Score.ToString();
     }
 
     public void OnDestroy()

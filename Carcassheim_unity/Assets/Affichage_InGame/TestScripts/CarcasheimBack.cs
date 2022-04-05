@@ -2,15 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+public enum WinCondition
+{
+    WinByTime,
+    WinByPoint,
+    WinByTile
+};
 public class CarcasheimBack : MonoBehaviour
 {
 
     public int tile_number;
 
     public List<int> players;
+    public List<string> players_names;
     public int player_index;
+    public bool first = true;
 
     // Start is called before the first frame update
+    string randomStrong(int nb_char)
+    {
+        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        var stringChars = new char[nb_char];
+
+        for (int i = 0; i < stringChars.Length; i++)
+        {
+            stringChars[i] = chars[Random.Range(0, nb_char - 1)];
+        }
+
+        return new string(stringChars);
+    }
+
     void Start()
     {
         tile_number = Random.Range(29, 119);
@@ -23,7 +45,10 @@ public class CarcasheimBack : MonoBehaviour
                 id = Random.Range(0, 500);
             } while (players.Contains(id));
             players.Add(id);
+            players_names.Add(randomStrong(Random.Range(8, 20)));
         }
+        foreach (string name in players_names)
+            Debug.Log(name);
     }
 
     // Update is called once per frame
@@ -67,6 +92,12 @@ public class CarcasheimBack : MonoBehaviour
         return true_total;
     }
 
+    public void askPlayers(List<int> player_ids, List<string> players_name)
+    {
+        player_ids.AddRange(players);
+        players_name.AddRange(players_names);
+    }
+
     public void askPlayerOrder(List<int> player_ids)
     {
         player_ids.AddRange(players);
@@ -74,8 +105,16 @@ public class CarcasheimBack : MonoBehaviour
 
     public int getNextPlayer()
     {
-        player_index = (player_index + 1) % players.Count;
-        return players[player_index];
+        if (!first)
+        {
+            player_index = (player_index + 1) % players.Count;
+            return players[player_index];
+        }
+        else
+        {
+            first = false;
+            return players[player_index];
+        }
     }
 
     public int getMyPlayer()
@@ -89,6 +128,27 @@ public class CarcasheimBack : MonoBehaviour
         sec = 0;
     }
 
+
+    public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
+    {
+        var r = Random.Range(0, 2);
+        switch (r)
+        {
+            case 0:
+                win_cond = WinCondition.WinByPoint;
+                parameters.Add(Random.Range(100, 1000));
+                break;
+            case 1:
+                win_cond = WinCondition.WinByTime;
+                parameters.Add(Random.Range(0, 10));
+                parameters.Add(Random.Range(30, 50));
+                break;
+            case 2:
+                win_cond = WinCondition.WinByTile;
+                parameters.Add(Random.Range(20, 500));
+                break;
+        }
+    }
 
 
 }

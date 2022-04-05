@@ -383,7 +383,7 @@ GameObject:
   - component: {fileID: 8449869370616528946}
   - component: {fileID: 5795810135641972890}
   m_Layer: 0
-  m_Name: Text (TMP)
+  m_Name: name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -634,6 +634,7 @@ MonoBehaviour:
   player_color: {fileID: 3996547853298618396}
   player_score: {fileID: 1130318176463735631}
   player_meeple: {fileID: 687285983904543363}
+  player_name: {fileID: 5795810135641972890}
 --- !u!1 &3996547854131014849
 GameObject:
   m_ObjectHideFlags: 0

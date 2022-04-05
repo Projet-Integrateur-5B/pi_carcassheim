@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pivotPoint: {fileID: 8279807921869812281}
   model: {fileID: 55029656637128621}
+  color: {fileID: 2000580503930412664}
 --- !u!1 &3090529365766695915
 GameObject:
   m_ObjectHideFlags: 0
@@ -158,5 +159,10 @@ GameObject:
 --- !u!4 &831003753347278103 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 290030fe29853a1438ec7e302daf8017, type: 3}
+  m_PrefabInstance: {fileID: 865510263476617980}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &2000580503930412664 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 290030fe29853a1438ec7e302daf8017, type: 3}
   m_PrefabInstance: {fileID: 865510263476617980}
   m_PrefabAsset: {fileID: 0}

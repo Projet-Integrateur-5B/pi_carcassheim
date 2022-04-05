@@ -41,7 +41,7 @@ public class CameraManager : MonoBehaviour
             leftAndRightMotion(2.5f);
         if (Input.GetKey(KeyCode.LeftArrow))
             leftAndRightMotion(-2.5f);
-        
+
         if (Input.mouseScrollDelta.y > 0 || Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.Equals))// || getDoubleClick())
         {
             upAndDownMotion(-2.5f);
@@ -53,6 +53,7 @@ public class CameraManager : MonoBehaviour
         }
     }
 
+<<<<<<< HEAD
     void cameraClickAndDrag() {
         // Check if mouse is on the table
         // Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
@@ -71,11 +72,17 @@ public class CameraManager : MonoBehaviour
         // exit in this case
 
         if (Input.GetMouseButtonDown(0)) {
+=======
+    void cameraClickAndDrag()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+>>>>>>> 97c98758d11e5acab07530da02fbd79c29a3bad0
             dragOrigin = Input.mousePosition;
         }
 
         if (!Input.GetMouseButton(0)) return;
-        Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition-dragOrigin);
+        Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
         mainCameraPosition.x -= pos.x * dragSpeed;
         mainCameraPosition.z -= pos.y * dragSpeed;
 
