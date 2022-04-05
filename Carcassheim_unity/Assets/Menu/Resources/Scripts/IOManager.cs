@@ -29,6 +29,16 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private bool cooldown = false;
 	private InputField IF = null;
 
+	// MOBILE : 
+
+	public Vector2 startPos;
+    public Vector2 direction;
+	private Touch touch;
+
+    public Text m_Text = null;
+    string message = null;
+	PointerEventData m_PointerEventData;
+
 	void Start()
 	{
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
@@ -96,6 +106,62 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			changeHover();
 		}
 
+		
+		// Debug.LogFormat ("Application.platform: {0}", Application.platform.ToString ());
+		bool tempTOremoveATtheEND = Application.platform == RuntimePlatform.WindowsEditor;
+		// MOBILE : 
+		if (tempTOremoveATtheEND || Application.platform == RuntimePlatform.Android /* || Application.platform == RuntimePlatform.IPhonePlayer */)
+		{
+			//Update the Text on the screen depending on current TouchPhase, and the current direction vector
+			//Debug.Log("Touch : " + message + "in direction" + direction);
+			// Track a single touch as a direction control.
+			 if (Input.touchCount > 0)
+			{
+				touch = Input.GetTouch(0);
+
+				// Handle finger movements based on TouchPhase
+				switch (touch.phase)
+				{
+					//When a touch has first been detected, change the message and record the starting position
+					case UnityEngine.TouchPhase.Began:
+						// Record initial touch position.
+						startPos = touch.position;
+						message = "Begun ";
+						break;
+
+					//Determine if the touch is a moving touch
+					case UnityEngine.TouchPhase.Moved:
+						// Determine direction by comparing the current touch position with the initial one
+						direction = touch.position - startPos;
+						message = "Moving ";
+						break;
+
+					case UnityEngine.TouchPhase.Ended:
+						// Report that the touch has ended when it ends
+						message = "Ending ";
+						break;
+				}
+
+				//Set up the new Pointer Event
+            	m_PointerEventData = new PointerEventData(eventSystem);
+            	//Set the Pointer Event Position to that of the game object
+           		//transform.position = touch.position;
+				m_PointerEventData.position = touch.position;
+				//Debug.Log(m_PointerEventData.position);
+				OnPointerEnter(m_PointerEventData); 
+			}
+
+/* 		 if ((Input.touchCount > 0) && (Input.GetTouch (0).phase == UnityEngine.TouchPhase.Began)) {
+              Ray raycast = Camera.main.ScreenPointToRay (Input.GetTouch (0).position);
+              RaycastHit raycastHit;
+			  Debug.Log(raycast);
+              if (Physics.Raycast (raycast, out raycastHit)) 
+                  Debug.Log ("Something Hit " + raycastHit.collider.name);
+			
+		} */
+		
+		}
+
 		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
 		/* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
 				{ */
@@ -128,21 +194,19 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		Cursor.visible = !b;
 	}
 
-	private void ResetCooldown()
-	{ // EVITE SPAM CLIC
-		cooldown = false;
-	}
-
-
+	private void ResetCooldown() => cooldown = false; // EVITE SPAM CLIC
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
+		Debug.Log(eventData.pointerCurrentRaycast);
+		// A DECOMMENTER quand pointerCurrentRaycast fonctionne 
+		
+/* 		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
 		if (!IF)
 		{
 			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 			selectionChange();
-		}
+		} */
 	}
 
 
@@ -202,8 +266,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			float height = curBtn.GetComponent<RectTransform>().rect.height;
 			GameObject TF = TridentGo.transform.Find("TridentFront").gameObject;
 			GameObject TB = TridentGo.transform.Find("TridentBack").gameObject;
-			TF.transform.position = curBtn.transform.position + new Vector3(width / 2 + 90, 0, 0);
-			TB.transform.position = curBtn.transform.position - new Vector3(width / 2 + 20, 0, 0);
+			TF.transform.position = curBtn.transform.position + new Vector3((int)(width / 2.7)/* 2 + 90 */, 0, 0);
+			TB.transform.position = curBtn.transform.position - new Vector3((int)(width / 3.4) /* 2 + 20 */, 0, 0);
 		}
 	}
 
