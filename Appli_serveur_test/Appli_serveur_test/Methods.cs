@@ -75,12 +75,12 @@ public partial class Server
         else if(packet.Data[0] != "pseudo")
         {
             retour.Status = false;
-            retour.Data[0] = "login";
+            retour.Data = new string[] { "login" };
         }
         else if (packet.Data[1] != "mdp18")
         {
             retour.Status = false;
-            retour.Data[0] = "password";
+            retour.Data = new string[] { "password" };
         }
 
         return retour;
