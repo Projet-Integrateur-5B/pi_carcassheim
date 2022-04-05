@@ -47,6 +47,9 @@ public class CameraManager : MonoBehaviour
     }
 
     void cameraClickAndDrag() {
+        // Check if mouse is on the table
+        // exit in this case
+        
         if (Input.GetMouseButtonDown(0)) {
             dragOrigin = Input.mousePosition;
         }
