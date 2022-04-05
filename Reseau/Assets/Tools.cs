@@ -28,7 +28,15 @@ public enum IdMessage : byte
     RoomLeave = 7,
     RoomReady = 8,
     RoomSettings = 9,
-    RoomStart = 10
+    RoomStart = 10,
+    TuileDraw = 11,
+    TuilePlacement = 12,
+    PionPlacement = 13,
+    CancelPlacement = 14,
+    TourValidation = 15,
+    TimerExpiration = 16,
+    LeaveGame = 17,
+    EndGame = 18
 }
 
 public static class Tools

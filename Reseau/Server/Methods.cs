@@ -46,6 +46,30 @@ public partial class Server
             case IdMessage.RoomStart:
                 packet = RoomStart(state.Packet);
                 break;
+            case IdMessage.TuileDraw:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.TuilePlacement:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.PionPlacement:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.CancelPlacement:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.TourValidation:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.TimerExpiration:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.LeaveGame:
+                packet = Statistics(state.Packet);
+                break;
+            case IdMessage.EndGame:
+                packet = Statistics(state.Packet);
+                break;
             case IdMessage.Disconnection: // impossible
                 break;
             case IdMessage.Default:
@@ -124,7 +148,12 @@ public partial class Server
         {
             retour.Status = false;
         }
+        var list = new List<string>(retour.Data.ToList())
+        {
+            "10001" // nouveau port
+        };
 
+        retour.Data = list.ToArray();
         return retour;
     }
 
@@ -189,7 +218,7 @@ public partial class Server
             "timer par joueur",
             "nb score max" // parametre de la room a donner ici ( mettre a -1 si non remplit)
         };
-        for (var i = 0; i < 1; i++) // boucle a faire pour nb joueur present
+        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
         {
             list.Add("pseudo joueur"); // pseudo du joueur X
         }
@@ -203,7 +232,137 @@ public partial class Server
     {
         // lancement de la partie
         // id room dans packet.IdRoom
-        packet.Status = true; // mettre sur false si erreur dans lancement
-        return packet;
+        // start le timer general
+        // retourne l'ordre des joueurs et l'ordre des tuiles
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            Array.Empty<string>());
+        var list = new List<string>(retour.Data.ToList());
+        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present dans l'ordre de tirage
+        {
+            list.Add("pseudo joueur"); // pseudo du joueur X
+        }
+
+        retour.Data = list.ToArray();
+        retour.Status = true; // remplacer par false si erreur
+        return retour;
+    }
+
+    public static Packet TuileDraw(Packet packet)
+    {
+        // tirage de 3 tuiles pour le joueur
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            Array.Empty<string>());
+        var list = new List<string>(retour.Data.ToList())
+        {
+            "numero tuile",
+            "numero tuile",
+            "numero tuile"
+        };
+
+        retour.Data = list.ToArray();
+        retour.Status = true; // remplacer par false si erreur
+        return retour;
+    }
+
+    public static Packet TuilePlacement(Packet packet)
+    {
+        // test si la tuile est bien a un emplacement valide
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            Array.Empty<string>())
+        {
+            Status = true, // remplacer par false si erreur
+            Permission = 1 // 1 si tuile accepter sinon 0
+        };
+        return retour;
+    }
+
+    public static Packet PionPlacement(Packet packet)
+    {
+        // test si le pion est bien a un emplacement valide
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            Array.Empty<string>())
+        {
+            Status = true, // remplacer par false si erreur
+            Permission = 1 // 1 si pion accepter sinon 0
+        };
+        return retour;
+    }
+
+    public static Packet CancelPlacement(Packet packet)
+    {
+        // annule le placement de la tuile
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            packet.Data)
+        {
+            Status = true // remplacer par false si erreur dans l'annulation
+        };
+        return retour;
+    }
+
+    public static Packet TourValidation(Packet packet)
+    {
+        // valide le tour
+        // calculer les points du tour avec les zone qui viennent de se fermé
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            packet.Data)
+        {
+            Status = true // remplacer par false si erreur dans la validation
+        };
+        var list = new List<string>(retour.Data.ToList())// a faire seulement si une zone se ferme ( d'apres ce que j'ai compris )
+        {
+            "position X", // position pion où la zone a été fermé
+            "position Y"
+        };
+        retour.Data = list.ToArray();
+        return retour;
+    }
+
+    public static Packet TimerExpiration(Packet packet)
+    {
+        // timer du joueur expirer, on passe au prochaine joueur
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            packet.Data)
+        {
+            Status = true
+        };
+        return retour;
+    }
+
+    public static Packet LeaveGame(Packet packet)
+    {
+        // joueur quitte la partie ( le supprimer de la partie du coup ? )
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            packet.Data)
+        {
+            Status = true
+        };
+        var list = new List<string>(retour.Data.ToList())
+        {
+            "pseudo", // pseudo ou ID du joueur qui a leave la game
+        };
+        retour.Data = list.ToArray();
+        return retour;
+    }
+
+    public static Packet EndGame(Packet packet)
+    {
+        // partie finit, on choisis un emplacement X Y où sera afficher les scores
+        // donner les score des joueurs ( peut importe l'ordre )
+        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+            Array.Empty<string>());
+        var list = new List<string>(retour.Data.ToList())
+        {
+            "position X", // position afficher X
+            "position Y" // position afficher Y
+        };
+        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
+        {
+            list.Add("pseudo joueur"); // pseudo du joueur X
+            list.Add("score"); // score du joueur X
+        }
+
+        retour.Data = list.ToArray();
+        retour.Status = true; // remplacer par false si erreur
+        return retour;
     }
 }

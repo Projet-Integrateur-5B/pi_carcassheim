@@ -7,7 +7,7 @@ using Assets;
 
 public static partial class Client
 {
-    private static Errors Connection(ref Socket socket)
+    private static Errors Connection(ref Socket socket, int port)
     {
         // TODO : trycatch lors de la récupération des données de config
         // Version : Unity
@@ -25,7 +25,7 @@ public static partial class Client
             // Version : Local
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var remoteEP = new IPEndPoint(ipAddress, 10000);
+            var remoteEP = new IPEndPoint(ipAddress, port);
 
 
             // Create a TCP/IP  socket.

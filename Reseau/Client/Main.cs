@@ -5,12 +5,12 @@ using Assets;
 
 public static partial class Client
 {
-    public static int Main()
+    public static int StartConnection(int port)
     {
         Socket? socket = null;
         var original = new Packet();
 
-        var error_value = Connection(ref socket);
+        var error_value = Connection(ref socket, port);
         switch (error_value)
         {
             case Errors.None:
@@ -40,7 +40,17 @@ public static partial class Client
         }
 
         string[] test = { "pseudo", "mdp18" };
-        error_value = socket.Communication(ref original, IdMessage.Connection, test);
+        error_value = socket.Communication(ref original, IdMessage.RoomJoin, test);
+        Console.WriteLine("\n {0} \n", original.Data[12]);
+        try
+        {
+            port = int.Parse(original.Data[12]);
+        }
+        catch (FormatException e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
         switch (error_value)
         {
             case Errors.None:
@@ -110,6 +120,20 @@ public static partial class Client
                 break;
         }
 
+        return port;
+    }
+
+    public static int Main()
+    {
+        var port = 10000;
+        int newPort;
+        newPort = StartConnection(port);
+        if (newPort != port)
+        {
+            port = newPort;
+            StartConnection(port);
+        }
         return 0;
     }
+
 }
