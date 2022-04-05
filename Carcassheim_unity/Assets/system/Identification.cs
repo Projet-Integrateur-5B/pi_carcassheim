@@ -9,8 +9,8 @@ public class Identification : MonoBehaviour
     
     void Start()
     {
-        string login = "salutmonpote";
-        string mdp = "642aacc8647593ad87912c7304fdc944f69b287201d3978d605671ed78c463c4";
+        string login = "pseudo";
+        string mdp = "mdp18";
 
         // Etablissement de la communication réseau
         Socket? socket = null;
@@ -36,6 +36,8 @@ public class Identification : MonoBehaviour
                 Debug.Log("Errors.Unknown");
                 break;
         }
+
+        // Tentative d'identification 
 
         string[] data_to_send = { login, mdp };
         error_value = socket.Communication(ref server_answer, IdMessage.Connection, data_to_send);
@@ -63,6 +65,25 @@ public class Identification : MonoBehaviour
                 // TODO : handle case : default
                 Debug.Log("Errors.Unknown");
                 break;
+        }
+
+        if (server_answer.Status == true) // Identification réussie
+        {
+            Debug.Log("Réussite de l'identification !");
+        }
+        else // Identification échouée
+        {
+            if(server_answer.Data[0] == "login")
+            {
+                Debug.Log("Echec de l'identification: login inconnu");
+            }
+            else if(server_answer.Data[0] == "password")
+            {
+                Debug.Log("Echec de l'identification: password erroné");
+            }
+
+
+
         }
 
         error_value = Client.Disconnection(socket);

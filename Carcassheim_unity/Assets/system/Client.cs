@@ -209,8 +209,17 @@ public static class Client
                 Debug.Log(string.Format("Read {0} bytes => \t" + part_answer + "\n\t\t\tPermission = " +
                                         part_answer.Status, bytesRec));
 
+                // Getting the flags of the last part
+                received.Type = part_answer.Type;
+                received.IdRoom = part_answer.IdRoom;
+                received.IdMessage = part_answer.IdMessage;
+                received.Status = part_answer.Status;
+                received.Permission = part_answer.Permission;
+                received.Final = part_answer.Final;
+                received.IdPlayer = part_answer.IdPlayer;
+
                 received.Data = received.Data.Concat(part_answer.Data).ToArray();
-                if (received.Final)
+                if (part_answer.Final)
                 {
                     Debug.Log(string.Format("Received = " + received));
                     return Errors.None;
