@@ -1497,7 +1497,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75e453abc62b70befb2b2391798d8951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  board: {fileID: 0}
   dragSpeed: 0.5
+  table: {fileID: 362091632}
 --- !u!1 &1019639301
 GameObject:
   m_ObjectHideFlags: 0
