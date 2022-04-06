@@ -1,4 +1,5 @@
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -32,14 +33,130 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	// MOBILE : 
 
 	public Vector2 startPos;
-    public Vector2 direction;
+	public Vector2 direction;
 	private Touch touch;
 
-    public Text m_Text = null;
-    string message = null;
+	public Text m_Text = null;
+	string message = null;
 	PointerEventData m_PointerEventData;
 
-	void Start()
+
+
+
+	public bool showDebugGUI = false;
+
+	Touchscreen touchScreen;
+	TouchState primaryTouchState = default;
+	TouchState[] touchStates = new TouchState[10];
+
+	private void OnEnable()
+	{
+		touchScreen = InputSystem.AddDevice<Touchscreen>("Injected TouchScreen");
+		InputSystem.onBeforeUpdate += Inject;
+	}
+
+	private void OnDisable()
+	{
+		InputSystem.onBeforeUpdate -= Inject;
+		if (touchScreen != null)
+			InputSystem.RemoveDevice(touchScreen);
+	}
+
+	unsafe private void Inject()
+	{
+		//InputState.currentTime
+		for (int i = 0; i < 10; i++)
+		{
+			Touch t = default;
+
+			if (i < Input.touchCount)
+			{
+				t = Input.GetTouch(i);
+				var ts = touchStates[t.fingerId];
+				ts.position = t.position;
+				ts.delta = t.deltaPosition;
+				ts.pressure = t.pressure;
+				ts.touchId = t.fingerId;
+				ts.radius = Vector2.one * t.radius;
+
+				//Tap Count is done inside TouchScreen controldevice implementation with new InputSystem and is kinda funky.
+				//Typically this is exposed as an Accessibility Setting on the end device itself (ie: the iPhone settings menus)
+
+				//IMPORTANT NOTE:  If you want TapCount to actually function, you need to use the latest  Input System Preview Package (1.1.0+)
+				//OR!  If you continue to use 1.0.2 (verified stable) Modify InputState.cs
+				//WRONG        public static double currentTime => InputRuntime.s_Instance.currentTime + InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
+				//RIGHT        public static double currentTime => InputRuntime.s_Instance.currentTime - InputRuntime.s_CurrentTimeOffsetToRealtimeSinceStartup;
+				//                                                                                      ^ zigged when supposed to zag
+
+				switch (t.phase)
+				{
+					case UnityEngine.TouchPhase.Began:
+						ts.startPosition = t.position;
+						ts.startTime = InputState.currentTime;
+						ts.phase = UnityEngine.InputSystem.TouchPhase.Began;
+						break;
+					case UnityEngine.TouchPhase.Moved:
+						ts.phase = UnityEngine.InputSystem.TouchPhase.Moved;
+						break;
+					case UnityEngine.TouchPhase.Stationary:
+						ts.phase = UnityEngine.InputSystem.TouchPhase.Stationary;
+						break;
+					case UnityEngine.TouchPhase.Ended:
+						ts.phase = UnityEngine.InputSystem.TouchPhase.Ended;
+						break;
+					case UnityEngine.TouchPhase.Canceled:
+						ts.phase = UnityEngine.InputSystem.TouchPhase.Canceled;
+						break;
+				}
+
+				touchStates[t.fingerId] = ts;
+			}
+		}
+
+		foreach (var ts in touchStates)
+		{
+			if (ts.phase != UnityEngine.InputSystem.TouchPhase.None)
+				InputSystem.QueueStateEvent(touchScreen, ts);
+		}
+
+		for (int i = 0; i < touchStates.Length; i++)
+		{
+			if (touchStates[i].phase == UnityEngine.InputSystem.TouchPhase.Ended)
+			{
+				touchStates[i].phase = UnityEngine.InputSystem.TouchPhase.None;
+				InputSystem.QueueStateEvent(touchScreen, touchStates[i]);
+			}
+		}
+	}
+
+	private void OnGUI()
+	{
+		if (!showDebugGUI)
+			return;
+
+		foreach (var t in Input.touches)
+		{
+			var pos = new Rect(t.position, Vector2.one * 300);
+			pos.y = Screen.height - pos.y;
+			GUI.Label(pos, $"OG\t{t.fingerId}\t{t.phase}\t{t.tapCount}");
+		}
+
+		foreach (var touchControl in touchScreen.touches)
+		{
+			var touchState = touchControl.ReadValue();
+			if (touchState.phase == UnityEngine.InputSystem.TouchPhase.None)
+				continue;
+
+			var pos = new Rect(touchState.position, Vector2.one * 300);
+			pos.y = Screen.height - pos.y - 20;
+			GUI.Label(pos, $"IS\t{touchState.touchId}\t{touchState.phase}\t{touchState.tapCount}\t{touchState.isPrimaryTouch}");
+			GUILayout.Label(touchState.touchId.ToString() + "  " + touchState.phase + "  " + touchState.isTap);
+		}
+	}
+
+
+
+void Start()
 	{
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		// ---------------------------------- PATCH : ------------------------------------
@@ -106,7 +223,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			changeHover();
 		}
 
-		
+
 		// Debug.LogFormat ("Application.platform: {0}", Application.platform.ToString ());
 		bool tempTOremoveATtheEND = Application.platform == RuntimePlatform.WindowsEditor;
 		// MOBILE : 
@@ -115,7 +232,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 			//Update the Text on the screen depending on current TouchPhase, and the current direction vector
 			//Debug.Log("Touch : " + message + "in direction" + direction);
 			// Track a single touch as a direction control.
-			 if (Input.touchCount > 0)
+			if (Input.touchCount > 0)
 			{
 				touch = Input.GetTouch(0);
 
@@ -143,23 +260,23 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 				}
 
 				//Set up the new Pointer Event
-            	m_PointerEventData = new PointerEventData(eventSystem);
-            	//Set the Pointer Event Position to that of the game object
-           		//transform.position = touch.position;
+				m_PointerEventData = new PointerEventData(eventSystem);
+				//Set the Pointer Event Position to that of the game object
+				//transform.position = touch.position;
 				m_PointerEventData.position = touch.position;
 				//Debug.Log(m_PointerEventData.position);
-				OnPointerEnter(m_PointerEventData); 
+				OnPointerEnter(m_PointerEventData);
 			}
 
-/* 		 if ((Input.touchCount > 0) && (Input.GetTouch (0).phase == UnityEngine.TouchPhase.Began)) {
-              Ray raycast = Camera.main.ScreenPointToRay (Input.GetTouch (0).position);
-              RaycastHit raycastHit;
-			  Debug.Log(raycast);
-              if (Physics.Raycast (raycast, out raycastHit)) 
-                  Debug.Log ("Something Hit " + raycastHit.collider.name);
-			
-		} */
-		
+			/* 		 if ((Input.touchCount > 0) && (Input.GetTouch (0).phase == UnityEngine.TouchPhase.Began)) {
+						  Ray raycast = Camera.main.ScreenPointToRay (Input.GetTouch (0).position);
+						  RaycastHit raycastHit;
+						  Debug.Log(raycast);
+						  if (Physics.Raycast (raycast, out raycastHit)) 
+							  Debug.Log ("Something Hit " + raycastHit.collider.name);
+
+					} */
+
 		}
 
 		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
@@ -186,6 +303,55 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 								lockMouse(false); 
 						} */
 		/* ------------------ FIN PATCH INPUTFIELD -------------------- */
+
+			// Handle native touch events
+			foreach (Touch touch in Input.touches)
+			{
+				HandleTouch(touch.fingerId, Camera.main.ScreenToWorldPoint(touch.position), touch.phase);
+			}
+
+			// Simulate touch events from mouse events
+			if (Input.touchCount == 0)
+			{
+				if (Input.GetMouseButtonDown(0))
+				{
+					HandleTouch(10, Camera.main.ScreenToWorldPoint(Input.mousePosition), UnityEngine.TouchPhase.Began);
+				}
+				if (Input.GetMouseButton(0))
+				{
+					HandleTouch(10, Camera.main.ScreenToWorldPoint(Input.mousePosition), UnityEngine.TouchPhase.Moved);
+				}
+				if (Input.GetMouseButtonUp(0))
+				{
+					HandleTouch(10, Camera.main.ScreenToWorldPoint(Input.mousePosition), UnityEngine.TouchPhase.Ended);
+				}
+			}
+		if (Input.touchCount > 0 && Input.GetTouch(0).phase == UnityEngine.TouchPhase.Began)
+		{
+			if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
+			{
+				Debug.Log("tchoin");
+			}
+		}
+
+	}
+
+	private void HandleTouch(int touchFingerId, Vector3 touchPosition, UnityEngine.TouchPhase touchPhase)
+	{
+		switch (touchPhase)
+		{
+			case UnityEngine.TouchPhase.Began:
+				Debug.Log("click");
+				break;
+			case UnityEngine.TouchPhase.Moved:
+				Debug.Log("dep");
+				break;
+			case UnityEngine.TouchPhase.Ended:
+				Debug.Log("release");
+				break;
+		}
+
+
 	}
 
 	private void lockMouse(bool b)
@@ -200,13 +366,13 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	{
 		Debug.Log(eventData.pointerCurrentRaycast);
 		// A DECOMMENTER quand pointerCurrentRaycast fonctionne 
-		
-/* 		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
+
+		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
 		if (!IF)
 		{
 			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
 			selectionChange();
-		} */
+		} 
 	}
 
 
@@ -225,8 +391,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
-		/* 		bool inputfd = nextGo.transform.parent.name == "InputField";
-				Debug.Log(inputfd);  */
+		bool inputfd = nextGo.transform.parent.name == "InputField";
+		Debug.Log(inputfd);  
 		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
 		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
