@@ -32,17 +32,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	// MOBILE : 
 
-	public Vector2 startPos;
-	public Vector2 direction;
-	private Touch touch;
-
-	public Text m_Text = null;
-	string message = null;
-	PointerEventData m_PointerEventData;
-
-
-
-
 	public bool showDebugGUI = false;
 
 	Touchscreen touchScreen;
@@ -250,19 +239,16 @@ void Start()
 
 	}
 
-	private void lockMouse(bool b)
+	/*private void lockMouse(bool b)
 	{
 		Cursor.lockState = b ? CursorLockMode.Locked : CursorLockMode.None;
 		Cursor.visible = !b;
 	}
 
-	private void ResetCooldown() => cooldown = false; // EVITE SPAM CLIC
+	private void ResetCooldown() => cooldown = false; // EVITE SPAM CLIC*/
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		Debug.Log(eventData.pointerCurrentRaycast);
-		// A DECOMMENTER quand pointerCurrentRaycast fonctionne 
-
 		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
 		if (!IF)
 		{
@@ -298,7 +284,9 @@ void Start()
 		}
 		else
 			boolSelectionChange = false;
+#if !(UNITY_IOS || UNITY_ANDROID)
 		changeHover();
+#endif
 	}
 
 	public void textColor(Color c, int s, GameObject go)
@@ -334,66 +322,70 @@ void Start()
 
 	public void resetHoverPreviousGo()
 	{
+#if !(UNITY_IOS || UNITY_ANDROID)
 		if (previousGo != null)
-		{
-			//GameObject.Find("Trident").SetActive(false);
-			Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
-			bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
-			switch (previousTarget.name)
-			{ // previousGO
-				case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
-					previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
-					break;
-				case "Unselected": // IMAGE
-					colorImage(previousGo, 0, 0, 0, 255, false);
-					break;
-				case "Text": // BOUTON
-					_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
-					textColor(_previousColor, -3, previousGo);
-					break;
-				case "Background": // TOGGLE
-					colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
-					break;
-				case "Handle": // SLIDER
-					colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
-					break;
-				default:
-					break;
+			{
+				//GameObject.Find("Trident").SetActive(false);
+				Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
+				bool FC = previousTarget.transform.parent.name == "ForgottenPwdUser" || previousTarget.transform.parent.name == "CGU";
+				switch (previousTarget.name)
+				{ // previousGO
+					case "RawImage": // GIF : A changer (mettre autre chose que dezoom)
+						previousGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(50, 50);
+						break;
+					case "Unselected": // IMAGE
+						colorImage(previousGo, 0, 0, 0, 255, false);
+						break;
+					case "Text": // BOUTON
+						_previousColor = FC ? FCcolor : new Color(1, 1, 1, 1); // COULEUR PAR DEFAUT (RESET COLOR)
+						textColor(_previousColor, -3, previousGo);
+						break;
+					case "Background": // TOGGLE
+						colorImage(previousGo, 0, 0, 0, 255, false); // (à changer)
+						break;
+					case "Handle": // SLIDER
+						colorImage(previousGo, 255, 255, 255, 255, true); // COULEUR PAR DEFAUT (RESET COLOR)
+						break;
+					default:
+						break;
+				}
 			}
-		}
+#endif
 	}
 
 	public void changeHover()
 	{
+#if !(UNITY_IOS || UNITY_ANDROID)
 		if (boolSelectionChange == true)
-		{
-			if (TridentGo.activeSelf == true) // TRIDENT
-				TridentGo.SetActive(false);
-			resetHoverPreviousGo();
-			Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
-			//Debug.Log("next" + nextTarget);
-			switch (nextTarget.name)
 			{
-				case "RawImage": // GIF : A changer (mettre autre chose que zoom)
-					nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
-					break;
-				case "Unselected": // IMAGE
-					colorImage(nextGo, 0, 0, 0, 0, false);
-					break;
-				case "Text": // BOUTON
-					tridentHover(nextTarget); // TRIDENT
-					textColor(colHover, 3, nextGo);
-					break;
-				case "Background": // TOGGLE
-					colorImage(nextGo, 0, 0, 0, 125, false); // semi transparent (à changer)
-					break;
-				case "Handle": // SLIDER
-					colorImage(nextGo, 47, 79, 79, 255, true); // équivalent à #FF4500
-					break;
-				default:
-					break;
+				if (TridentGo.activeSelf == true) // TRIDENT
+					TridentGo.SetActive(false);
+				resetHoverPreviousGo();
+				Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
+			
+				switch (nextTarget.name)
+				{
+					case "RawImage": // GIF : A changer (mettre autre chose que zoom)
+						nextGo.GetComponentInChildren<RawImage>().rectTransform.sizeDelta = new Vector2(70, 70);
+						break;
+					case "Unselected": // IMAGE
+						colorImage(nextGo, 0, 0, 0, 0, false);
+						break;
+					case "Text": // BOUTON
+						tridentHover(nextTarget); // TRIDENT
+						textColor(colHover, 3, nextGo);
+						break;
+					case "Background": // TOGGLE
+						colorImage(nextGo, 0, 0, 0, 125, false); // semi transparent (à changer)
+						break;
+					case "Handle": // SLIDER
+						colorImage(nextGo, 47, 79, 79, 255, true); // équivalent à #FF4500
+						break;
+					default:
+						break;
+				}
 			}
-		}
+#endif
 	}
 
 	public void NewMenuSelectButton()
@@ -410,7 +402,6 @@ void Start()
 					break;
 				}
 			}
-
 			SetMenuChanged(false);
 			selectionChange();
 		}
