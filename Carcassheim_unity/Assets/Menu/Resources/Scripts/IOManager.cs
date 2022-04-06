@@ -223,62 +223,6 @@ void Start()
 			changeHover();
 		}
 
-
-		// Debug.LogFormat ("Application.platform: {0}", Application.platform.ToString ());
-		bool tempTOremoveATtheEND = Application.platform == RuntimePlatform.WindowsEditor;
-		// MOBILE : 
-		if (tempTOremoveATtheEND || Application.platform == RuntimePlatform.Android /* || Application.platform == RuntimePlatform.IPhonePlayer */)
-		{
-			//Update the Text on the screen depending on current TouchPhase, and the current direction vector
-			//Debug.Log("Touch : " + message + "in direction" + direction);
-			// Track a single touch as a direction control.
-			if (Input.touchCount > 0)
-			{
-				touch = Input.GetTouch(0);
-
-				// Handle finger movements based on TouchPhase
-				switch (touch.phase)
-				{
-					//When a touch has first been detected, change the message and record the starting position
-					case UnityEngine.TouchPhase.Began:
-						// Record initial touch position.
-						startPos = touch.position;
-						message = "Begun ";
-						break;
-
-					//Determine if the touch is a moving touch
-					case UnityEngine.TouchPhase.Moved:
-						// Determine direction by comparing the current touch position with the initial one
-						direction = touch.position - startPos;
-						message = "Moving ";
-						break;
-
-					case UnityEngine.TouchPhase.Ended:
-						// Report that the touch has ended when it ends
-						message = "Ending ";
-						break;
-				}
-
-				//Set up the new Pointer Event
-				m_PointerEventData = new PointerEventData(eventSystem);
-				//Set the Pointer Event Position to that of the game object
-				//transform.position = touch.position;
-				m_PointerEventData.position = touch.position;
-				//Debug.Log(m_PointerEventData.position);
-				OnPointerEnter(m_PointerEventData);
-			}
-
-			/* 		 if ((Input.touchCount > 0) && (Input.GetTouch (0).phase == UnityEngine.TouchPhase.Began)) {
-						  Ray raycast = Camera.main.ScreenPointToRay (Input.GetTouch (0).position);
-						  RaycastHit raycastHit;
-						  Debug.Log(raycast);
-						  if (Physics.Raycast (raycast, out raycastHit)) 
-							  Debug.Log ("Something Hit " + raycastHit.collider.name);
-
-					} */
-
-		}
-
 		// Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
 		/* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
 				{ */
@@ -303,54 +247,6 @@ void Start()
 								lockMouse(false); 
 						} */
 		/* ------------------ FIN PATCH INPUTFIELD -------------------- */
-
-			// Handle native touch events
-			foreach (Touch touch in Input.touches)
-			{
-				HandleTouch(touch.fingerId, Camera.main.ScreenToWorldPoint(touch.position), touch.phase);
-			}
-
-			// Simulate touch events from mouse events
-			if (Input.touchCount == 0)
-			{
-				if (Input.GetMouseButtonDown(0))
-				{
-					HandleTouch(10, Camera.main.ScreenToWorldPoint(Input.mousePosition), UnityEngine.TouchPhase.Began);
-				}
-				if (Input.GetMouseButton(0))
-				{
-					HandleTouch(10, Camera.main.ScreenToWorldPoint(Input.mousePosition), UnityEngine.TouchPhase.Moved);
-				}
-				if (Input.GetMouseButtonUp(0))
-				{
-					HandleTouch(10, Camera.main.ScreenToWorldPoint(Input.mousePosition), UnityEngine.TouchPhase.Ended);
-				}
-			}
-		if (Input.touchCount > 0 && Input.GetTouch(0).phase == UnityEngine.TouchPhase.Began)
-		{
-			if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId))
-			{
-				Debug.Log("tchoin");
-			}
-		}
-
-	}
-
-	private void HandleTouch(int touchFingerId, Vector3 touchPosition, UnityEngine.TouchPhase touchPhase)
-	{
-		switch (touchPhase)
-		{
-			case UnityEngine.TouchPhase.Began:
-				Debug.Log("click");
-				break;
-			case UnityEngine.TouchPhase.Moved:
-				Debug.Log("dep");
-				break;
-			case UnityEngine.TouchPhase.Ended:
-				Debug.Log("release");
-				break;
-		}
-
 
 	}
 
@@ -392,7 +288,6 @@ void Start()
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
 		bool inputfd = nextGo.transform.parent.name == "InputField";
-		Debug.Log(inputfd);  
 		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
 		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
