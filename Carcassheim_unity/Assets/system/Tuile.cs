@@ -7,6 +7,7 @@ public partial class Tuile
     private readonly int _nombreSlot;
     private readonly int[][] _lienSlotPosition;
     private readonly int _id;
+    public bool Riviere { get; }
     public int Id => _id;
     public Slot[] Slots => _slots;
     public int[][] LienSlotPosition => _lienSlotPosition;
