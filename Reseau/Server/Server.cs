@@ -222,23 +222,23 @@ public static partial class Server
                     // TODO : ByteArrayToPacket => handle error
                 }
 
-                var dataLength = state.Tableau.Length;
-                state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
+                var dataLength = state.LastPacket.Length;
+                state.LastPacket = state.LastPacket.Concat(state.Packet.Data).ToArray();
                 if (dataLength > 0)
                 {
-                    if (state.Tableau[dataLength] == "")
+                    if (state.LastPacket[dataLength] == "")
                     {
-                        state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
+                        state.LastPacket = state.LastPacket.Where((source, index) => index != dataLength)
                             .ToArray();
-                        state.Tableau[dataLength - 1] += state.Tableau[dataLength];
-                        state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
+                        state.LastPacket[dataLength - 1] += state.LastPacket[dataLength];
+                        state.LastPacket = state.LastPacket.Where((source, index) => index != dataLength)
                             .ToArray();
                     }
                 }
 
                 var debug = "Reading from : " + listener.RemoteEndPoint +
                             "\n\t Read {0} bytes =>\t" + state.Packet +
-                            "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau);
+                            "\n\t Data buffer =>\t\t" + string.Join(" ", state.LastPacket);
 
                 // Disconnection
                 if (state.Packet.IdMessage == IdMessage.Disconnection)
@@ -253,7 +253,7 @@ public static partial class Server
                         bytesRead);
 
                     // Get answer data from database and answer the client
-                    state.Packet.Data = state.Tableau;
+                    state.Packet.Data = state.LastPacket;
                     var packet = GetFromDatabase(ar);
                     SendBackToClient(ar, packet);
 
@@ -392,7 +392,7 @@ public static partial class Server
 
         public Packet? Packet { get; set; }
 
-        public string[] Tableau { get; set; } = Array.Empty<string>();
+        public string[] LastPacket { get; set; } = Array.Empty<string>();
 
         public Errors Error { get; set; } = Errors.None;
 
