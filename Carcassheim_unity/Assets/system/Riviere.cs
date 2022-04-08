@@ -72,11 +72,9 @@ namespace Assets.system
                 _plateau.PoserTuile(current, x, y, rot);
                 lastDirection = 1 - current.LienSlotPosition[slotR][1 - randI] / 3;
             }
-
-            // TODO poser derniere riviere
         }
 
-        private int SlotRiviere(Tuile tuile)
+        private static int SlotRiviere(Tuile tuile)
         {
             for (int i = 0; i < tuile.Slots.Length; i++)
             {
@@ -87,7 +85,7 @@ namespace Assets.system
             return -1;
         }
 
-        private int DirectionRiviereExtreme(Tuile tuile)
+        private static int DirectionRiviereExtreme(Tuile tuile)
         {
             int slot = SlotRiviere(tuile);
             if (tuile.LienSlotPosition[slot].Length != 1)
