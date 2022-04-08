@@ -183,15 +183,38 @@ public static partial class Server
         Console.WriteLine("Connection with client is established : " +
                           state.Listener.RemoteEndPoint);
 
+        // Start listening.
+        StartReading(ar, state.Listener, false);
+    }
+
+    /// <summary>
+    /// Start receiving from a client but with a timeout.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
+    /// <param name="listener"><see cref="Socket"/> on which the <see cref="Server"/> must be listening.</param>
+    /// <param name="updateState">Indicate if <see cref="StateObject"/> should be reset or not.</param>
+    public static void StartReading(IAsyncResult ar, Socket listener, bool updateState)
+    {
+        var state = (StateObject?)ar.AsyncState;
+        if (state is null) // Checking for errors.
+        {
+            // Setting the error value.
+            // TODO : state is null
+            return;
+        }
+
+        if (updateState)
+        {
+            state = new StateObject { Listener = listener, ReceiveDone = state.ReceiveDone };
+        }
+
         state.ReceiveDone = new ManualResetEvent(false);
         state.ReceiveDone.Reset();
-        state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+        listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
             ReadCallback, state);
         if (!state.ReceiveDone.WaitOne(Settings.Timeout))
         {
-            state.Listener.EndReceive(ar);
-            state.Listener.Shutdown(SocketShutdown.Both);
-            state.Listener.Close();
+            DisconnectFromClient(ar);
         }
     }
 
@@ -288,34 +311,16 @@ public static partial class Server
             // Send answer to the client.
             SendBackToClient(ar, packet);
 
-            // Start listening again
-            state.ReceiveDone = new ManualResetEvent(false);
-            state.ReceiveDone.Reset();
-            state = new StateObject { Listener = listener, ReceiveDone = state.ReceiveDone };
-            listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                ReadCallback, state);
-            if (!state.ReceiveDone.WaitOne(Settings.Timeout))
-            {
-                state.Listener.EndReceive(ar);
-                state.Listener.Shutdown(SocketShutdown.Both);
-                state.Listener.Close();
-            }
+            // Start listening again.
+            StartReading(ar, listener, true);
         }
         // More packets to receive in this series.
         else
         {
             Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...",
                 bytesRead);
-            state.ReceiveDone = new ManualResetEvent(false);
-            state.ReceiveDone.Reset();
-            listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                ReadCallback, state);
-            if (!state.ReceiveDone.WaitOne(Settings.Timeout))
-            {
-                state.Listener.EndReceive(ar);
-                state.Listener.Shutdown(SocketShutdown.Both);
-                state.Listener.Close();
-            }
+            // Keep listening.
+            StartReading(ar, listener, false);
         }
     }
 

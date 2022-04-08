@@ -42,14 +42,7 @@ public static partial class Client
                 break;
         }
 
-        string[] test = {
-            "abcdefghijklmnopqrstuvwxyz",
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
-            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
-        };
+        string[] test = { "pseudo", "mdp18" };
         error_value = socket.Communication(ref original, Tools.IdMessage.RoomJoin, test);
         /*Console.WriteLine("\n {0} \n", original.Data[12]);
         try
