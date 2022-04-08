@@ -282,6 +282,7 @@ public class Plateau
         {
             if (ZoneAppartientAutreJoueur(tuile, i, idJoueur, parcourues))
                 resultat.Add(i);
+            parcourues.Clear();
         }
 
         return resultat.ToArray();
