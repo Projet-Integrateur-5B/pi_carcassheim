@@ -272,23 +272,23 @@ public static partial class Server
             return;
         }
 
-        var dataLength = state.Tableau.Length;
-        state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
+        var dataLength = state.Data.Length;
+        state.Data = state.Data.Concat(state.Packet.Data).ToArray();
         if (dataLength > 0)
         {
-            if (state.Tableau[dataLength] == "")
+            if (state.Data[dataLength] == "")
             {
-                state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
+                state.Data = state.Data.Where((source, index) => index != dataLength)
                     .ToArray();
-                state.Tableau[dataLength - 1] += state.Tableau[dataLength];
-                state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
+                state.Data[dataLength - 1] += state.Data[dataLength];
+                state.Data = state.Data.Where((source, index) => index != dataLength)
                     .ToArray();
             }
         }
 
         var debug = "Reading from : " + listener.RemoteEndPoint +
                     "\n\t Read {0} bytes =>\t" + state.Packet +
-                    "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau);
+                    "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
 
         // The client asked for a disconnection.
         if (state.Packet.IdMessage == Tools.IdMessage.Disconnection)
@@ -302,7 +302,7 @@ public static partial class Server
             Console.WriteLine(debug + "\n\t => Every packet has been received !",
                 bytesRead);
 
-            state.Packet.Data = state.Tableau;
+            state.Packet.Data = state.Data;
 
             // TODO: check if packet.IdMessage requires an answer for the client
 
@@ -447,7 +447,7 @@ public static partial class Server
         public Socket Listener { get; set; } = new(AddressFamily.InterNetwork,
             SocketType.Stream, ProtocolType.Tcp);
 
-        public string[] Tableau { get; set; } = Array.Empty<string>();
+        public string[] Data { get; set; } = Array.Empty<string>();
 
         /// <summary>
         ///     Stores an asynchronous <see cref="Tools.Errors" /> value.
