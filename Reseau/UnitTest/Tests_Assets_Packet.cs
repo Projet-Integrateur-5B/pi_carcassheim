@@ -15,7 +15,7 @@ public class TestsAssetsPacket
     public void Setup()
     {
         this.errorValue = Tools.Errors.None;
-        this.original = new Packet(false, 0, Tools.IdMessage.Default, false, 0, true, 999,
+        this.original = new Packet(false, Tools.IdMessage.Default, false, true, 999,
             new[] { "test", "deux" });
         this.originalAsString =
             "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":0,\"Status\":false,\"Permission\":0," +
@@ -35,10 +35,8 @@ public class TestsAssetsPacket
         }
 
         Assert.AreEqual(this.original.Type, result.Type);
-        Assert.AreEqual(this.original.IdRoom, result.IdRoom);
         Assert.AreEqual(this.original.IdMessage, result.IdMessage);
         Assert.AreEqual(this.original.Status, result.Status);
-        Assert.AreEqual(this.original.Permission, result.Permission);
         Assert.AreEqual(this.original.Final, result.Final);
         Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
         Assert.AreEqual(this.original.Data[0], result.Data[0]);
@@ -78,14 +76,12 @@ public class TestsAssetsPacket
     public void TestPacketSplitMultiPacketsSuccess()
     {
         var type = this.original.Type;
-        var idRoom = this.original.IdRoom;
         var idMessage = this.original.IdMessage;
         var status = this.original.Status;
-        var permission = this.original.Permission;
         var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var packet = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer,
+        var packet = new Packet(type, idMessage, status, final, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -95,7 +91,7 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
-        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer,
+        var p0 = new Packet(type, idMessage, status, false, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -104,7 +100,7 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmn"
             });
-        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
+        var p1 = new Packet(type, idMessage, status, true, idPlayer,
             new[]
             {
                 "", "opqrstuvwxyz",
@@ -140,14 +136,12 @@ public class TestsAssetsPacket
     public void TestPacketConcatenateMultiPacketSuccess()
     {
         var type = this.original.Type;
-        var idRoom = this.original.IdRoom;
         var idMessage = this.original.IdMessage;
         var status = this.original.Status;
-        var permission = this.original.Permission;
         var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var original = new Packet(type, idRoom, idMessage, status, permission, final, idPlayer,
+        var original = new Packet(type, idMessage, status, final, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -157,7 +151,7 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
-        var p0 = new Packet(type, idRoom, idMessage, status, permission, false, idPlayer,
+        var p0 = new Packet(type, idMessage, status, false, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -165,7 +159,7 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
-        var p1 = new Packet(type, idRoom, idMessage, status, permission, true, idPlayer,
+        var p1 = new Packet(type, idMessage, status, true, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",

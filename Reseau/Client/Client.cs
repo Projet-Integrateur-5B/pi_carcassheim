@@ -150,7 +150,7 @@ public static partial class Client
             byte[]? bytes = null;
             var error_value = Tools.Errors.None;
             var packets = new List<Packet>();
-            var original = new Packet(false, 0, idMessage, true, 999, data);
+            var original = new Packet(false, idMessage, true, 999, data);
 
             packets = original.Split(ref error_value);
             if (error_value != Tools.Errors.None)

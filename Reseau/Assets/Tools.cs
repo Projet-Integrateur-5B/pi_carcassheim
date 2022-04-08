@@ -170,8 +170,7 @@ public static class Tools
         var packetLength = original.Data.Length;
 
         // Copying the rest : common header for each packet of the list.
-        var header = new Packet(original.Type, original.IdRoom, original.IdMessage, original.Status,
-            original.Permission, false, original.IdPlayer, Array.Empty<string>());
+        var header = new Packet(original.Type, original.IdMessage, original.Status, false, original.IdPlayer, Array.Empty<string>());
 
         // Serializing the header.
         var headerBytes = header.PacketToByteArray(ref error);

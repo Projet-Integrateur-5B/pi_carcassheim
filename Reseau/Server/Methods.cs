@@ -133,7 +133,7 @@ public partial class Server
     {
         // id joueur dans packet.IdPlayer
         // doit chercher les infos dans la bdd et les mettre dans packet.Data comme indiquer
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList())
         {
@@ -173,7 +173,7 @@ public partial class Server
     public static Packet RoomList(Packet packet)
     {
         // doit chercher les infos dans la bdd pour les room dispo et les mettre dans packet.Data comme indiquer
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList());
         for (var i = 0; i < 1; i++) // boucle a faire pour nb room
@@ -218,7 +218,7 @@ public partial class Server
     {
         // id room dans packet.IdRoom
         // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList())
         {
@@ -247,7 +247,7 @@ public partial class Server
         // id room dans packet.IdRoom
         // start le timer general
         // retourne l'ordre des joueurs et l'ordre des tuiles
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList());
         for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present dans l'ordre de tirage
@@ -263,7 +263,7 @@ public partial class Server
     public static Packet TuileDraw(Packet packet)
     {
         // tirage de 3 tuiles pour le joueur
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList())
         {
@@ -278,11 +278,11 @@ public partial class Server
     public static Packet TuilePlacement(Packet packet)
     {
         // test si la tuile est bien a un emplacement valide
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>())
         {
             Status = true, // remplacer par false si erreur
-            Permission = 1 // 1 si tuile accepter sinon 0
+            //Permission = 1 // 1 si tuile accepter sinon 0
         };
         return retour;
     }
@@ -290,11 +290,11 @@ public partial class Server
     public static Packet PionPlacement(Packet packet)
     {
         // test si le pion est bien a un emplacement valide
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>())
         {
             Status = true, // remplacer par false si erreur
-            Permission = 1 // 1 si pion accepter sinon 0
+            //Permission = 1 // 1 si pion accepter sinon 0
         };
         return retour;
     }
@@ -302,7 +302,7 @@ public partial class Server
     public static Packet CancelPlacement(Packet packet)
     {
         // annule le placement de la tuile
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
         {
             Status = true // remplacer par false si erreur dans l'annulation
@@ -314,7 +314,7 @@ public partial class Server
     {
         // valide le tour
         // calculer les points du tour avec les zone qui viennent de se fermé
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
         {
             Status = true // remplacer par false si erreur dans la validation
@@ -333,7 +333,7 @@ public partial class Server
     public static Packet TimerExpiration(Packet packet)
     {
         // timer du joueur expirer, on passe au prochaine joueur
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
         { Status = true };
         return retour;
@@ -342,7 +342,7 @@ public partial class Server
     public static Packet LeaveGame(Packet packet)
     {
         // joueur quitte la partie ( le supprimer de la partie du coup ? )
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
         { Status = true };
         var list = new List<string>(retour.Data.ToList())
@@ -357,7 +357,7 @@ public partial class Server
     {
         // partie finit, on choisis un emplacement X Y où sera afficher les scores
         // donner les score des joueurs ( peut importe l'ordre )
-        var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
+        var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList())
         {

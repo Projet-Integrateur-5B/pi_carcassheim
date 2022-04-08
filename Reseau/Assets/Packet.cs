@@ -29,14 +29,12 @@ public class Packet
     /// <param name="final">One of the <see cref="Packet" /> values.</param>
     /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
     /// <param name="data">One of the <see cref="Packet" /> values.</param>
-    public Packet(bool type, ulong idRoom, Tools.IdMessage idMessage,
-        bool status, byte permission, bool final, ulong idPlayer, string[] data)
+    public Packet(bool type, Tools.IdMessage idMessage,
+        bool status, bool final, ulong idPlayer, string[] data)
     {
         this.Type = type;
-        this.IdRoom = idRoom;
         this.IdMessage = idMessage;
         this.Status = status;
-        this.Permission = permission;
         this.Final = final;
         this.IdPlayer = idPlayer;
         this.Data = data;
@@ -51,11 +49,10 @@ public class Packet
     /// <param name="final">One of the <see cref="Packet" /> values.</param>
     /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
     /// <param name="data">One of the <see cref="Packet" /> values.</param>
-    public Packet(bool type, ulong idRoom, Tools.IdMessage idMessage, bool final,
+    public Packet(bool type, Tools.IdMessage idMessage, bool final,
         ulong idPlayer, string[] data)
     {
         this.Type = type;
-        this.IdRoom = idRoom;
         this.IdMessage = idMessage;
         this.Final = final;
         this.IdPlayer = idPlayer;
@@ -71,20 +68,17 @@ public class Packet
     /// <param name="final">One of the <see cref="Packet" /> values.</param>
     /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
     /// <param name="data">One of the <see cref="Packet" /> values.</param>
-    public Packet(bool type, bool status, byte permission, bool final, ulong idPlayer,
+    public Packet(bool type, bool status, bool final, ulong idPlayer,
         string[] data)
     {
         this.Type = type;
         this.Status = status;
-        this.Permission = permission;
         this.Final = final;
         this.IdPlayer = idPlayer;
         this.Data = data;
     }
 
-    public ulong IdRoom { get; set; }
     public bool Status { get; set; } // 0 : error ; 1 : success
-    public byte Permission { get; set; } // 0 : unused/error ; 1 : permission ; 2 : confirmation
 
     /// <summary>
     ///     Indicates wether the instance object <see cref="Packet" /> is coming from a client or from the
@@ -131,10 +125,8 @@ public class Packet
     /// <param name="this">The packet object to which the method is being applied.</param>
     /// <returns>The string representation of the value of this instance under the JSON format.</returns>
     public override string ToString() => "Type:" + this.Type + "; "
-                                         + "IdRoom:" + this.IdRoom + "; "
                                          + "IdMessage:" + this.IdMessage + "; "
                                          + "Status:" + this.Status + "; "
-                                         + "Permission:" + this.Permission + "; "
                                          + "Final:" + this.Final + ";"
                                          + "IdPlayer:" + this.IdPlayer + "; "
                                          + "Data:" + string.Join(" ", this.Data) + ";";
