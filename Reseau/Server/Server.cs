@@ -6,50 +6,84 @@ using System.Net.Sockets;
 using Assets;
 using Microsoft.Extensions.Configuration;
 
+/// <summary>
+///     Represents an async server.
+/// </summary>
 public static partial class Server
 {
-    private static ManualResetEvent AllDone { get; } = new(false); // thread signal
-    private static Parameters Settings { get; set; } = new();
+    /// <summary>
+    ///     Thread signal used to have each connected client on a different thread in <see cref="Server" />
+    ///     .
+    /// </summary>
+    private static ManualResetEvent AllDone { get; } = new(false);
 
-    private const int Timeout = 1000; // 30 minutes = 1800000
+    /// <summary>
+    ///     Stores the <see cref="ServerParameters" />.
+    /// </summary>
+    private static ServerParameters Settings { get; set; } = new();
 
-    public static void GetConfig(ref Errors error)
+    /// <summary>
+    ///     Stores the config file of the <see cref="Server" /> into <see cref="Settings" />.
+    /// </summary>
+    /// <param name="error">Stores the <see cref="Tools.Errors" /> value.</param>
+    /// <exception cref="InvalidEnumArgumentException"></exception>
+    public static void GetConfig(ref Tools.Errors error)
     {
-        Settings = new Parameters();
-        if (!Enum.IsDefined(typeof(Errors), error))
+        Settings = new ServerParameters(); // default
+
+        // Check if enum "Errors" do exist.
+        if (!Enum.IsDefined(typeof(Tools.Errors), error))
         {
             throw new InvalidEnumArgumentException(nameof(error), (int)error,
-                typeof(Errors));
+                typeof(Tools.Errors));
         }
 
+        // Catch : config file could not be imported nor serialized into ServerParameters.
         try
         {
+            // Import the config file.
             IConfiguration config = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
                 .AddEnvironmentVariables()
                 .Build();
 
-            Settings = config.GetRequiredSection("Settings").Get<Parameters>() ?? new Parameters();
-            error = Errors.None;
+            // Config into ServerParameters.
+            Settings = config.GetRequiredSection("Settings").Get<ServerParameters>() ??
+                       new ServerParameters();
+
+            // No error has occured.
+            error = Tools.Errors.None;
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            error = Errors.ConfigFile;
+            // Setting the error value.
+            error = Tools.Errors.ConfigFile;
         }
     }
 
-    public static Socket GetListenerSocket(ref Errors error)
+    /// <summary>
+    ///     Setup a listening socket for the <see cref="Server" /> from <see cref="Settings" />.
+    /// </summary>
+    /// <param name="error">Stores the <see cref="Tools.Errors" /> value.</param>
+    /// <returns>The listening socket.</returns>
+    /// <exception cref="InvalidEnumArgumentException"></exception>
+    public static Socket GetListenerSocket(ref Tools.Errors error)
     {
-        if (!Enum.IsDefined(typeof(Errors), error))
+        // Check if enum "Errors" do exist.
+        if (!Enum.IsDefined(typeof(Tools.Errors), error))
         {
-            throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
+            throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Tools.Errors));
         }
 
+        // Initialize a default socket.
         var listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+        // Catch : socket could not be created nor put into listening state.
         try
         {
             // Establish the local endpoint for the socket.
+            // IpAddress is local and Port is coming from the config file.
             Console.WriteLine("Server is preparing to listen...");
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
@@ -61,76 +95,56 @@ public static partial class Server
             listener.Listen(100);
             Console.WriteLine("Server is listening : " + listener.LocalEndPoint);
 
-            error = Errors.None;
+            // No error has occured.
+            error = Tools.Errors.None;
         }
         catch (Exception e)
         {
             Console.WriteLine(e.ToString());
-            error = Errors.Socket;
+            // Setting the error value.
+            error = Tools.Errors.Socket;
         }
 
         return listener;
     }
 
-    public static Socket GetDatabaseSocket()
-    {
-        // Connecting to the database server
-        Console.WriteLine("Server is connecting to the database...");
-        var databaseAddress = IPAddress.Parse(Settings.DatabaseIp);
-        var remoteEp = new IPEndPoint(databaseAddress, Settings.DatabasePort);
-        var database = new Socket(databaseAddress.AddressFamily, SocketType.Stream,
-            ProtocolType.Tcp);
-        // database.Connect(remoteEp);
-        Console.WriteLine("Server is connected to the database : {0}", database.RemoteEndPoint);
-        return database;
-    }
-
-    public static void DisconnectFromDatabase(IAsyncResult ar, ref Errors error)
-    {
-        var state = (StateObject?)ar.AsyncState;
-        if (state is null)
-        {
-            // TODO : state is null
-            return;
-        }
-
-        Console.WriteLine(state.Database.RemoteEndPoint + "\t => Closing database connection...");
-        /*state.Database.EndSend(ar);
-        state.Database.Shutdown(SocketShutdown.Both);
-        state.Database.Close();*/
-        error = Errors.None;
-    }
-
+    /// <summary>
+    ///     Main server method which accepts incoming connections and starts an asynchronous communication.
+    /// </summary>
     public static void StartListening()
     {
-        var error_value = Errors.None;
-
+        var error_value = Tools.Errors.None;
         Console.WriteLine("Server is setting up...");
 
+        // Getting the server settings from the config file.
         GetConfig(ref error_value);
-        if (error_value != Errors.None)
+        if (error_value != Tools.Errors.None) // Checking for errors.
         {
+            // Setting the error value.
             // TODO : GetConfig error
             return;
         }
 
+        // Getting the listening socket from the server settings.
         var listener = GetListenerSocket(ref error_value);
-        if (error_value != Errors.None)
+        if (error_value != Tools.Errors.None) // Checking for errors.
         {
+            // Setting the error value.
             // TODO : GetSockets error
             return;
         }
 
+        // Catch : Something went wrong during an asynchronous communication.
         try
         {
-            while (true)
+            while (true) // Receives incoming asynchronous connections indefinitely.
             {
                 // Set the event to nonsignaled state.
                 AllDone.Reset();
 
                 // Start an asynchronous socket to listen for connections.
                 Console.WriteLine("Waiting for a connection...");
-                var new_state = new StateObject { Listener = listener, Error = Errors.None };
+                var new_state = new StateObject { Listener = listener, Error = Tools.Errors.None };
                 new_state.Listener.BeginAccept(AcceptCallback, new_state);
 
                 // Wait until a connection is made before continuing.
@@ -145,6 +159,10 @@ public static partial class Server
         Console.WriteLine("Server is closed");
     }
 
+    /// <summary>
+    ///     Asynchronous operation to accept an incoming connection attempt.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
     public static void AcceptCallback(IAsyncResult ar)
     {
         Console.WriteLine("New connection is being established...");
@@ -153,208 +171,219 @@ public static partial class Server
         AllDone.Set();
 
         var state = (StateObject?)ar.AsyncState;
-        if (state is not null)
+        if (state is null) // Checking for errors.
         {
-            // Connecting the thread to the database
-            try
-            {
-                state.Database = Retry.Do(GetDatabaseSocket, TimeSpan.FromSeconds(0));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return;
-            }
+            // Setting the error value.
+            // TODO : state is null
+            return;
+        }
 
-            state.Listener = state.Listener.EndAccept(ar);
-            Console.WriteLine("Connection with client is established : " +
-                              state.Listener.RemoteEndPoint);
+        // Accepts an asynchronous connection with a client.
+        state.Listener = state.Listener.EndAccept(ar);
+        Console.WriteLine("Connection with client is established : " +
+                          state.Listener.RemoteEndPoint);
 
+        state.ReceiveDone = new ManualResetEvent(false);
+        state.ReceiveDone.Reset();
+        state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+            ReadCallback, state);
+        if (!state.ReceiveDone.WaitOne(Settings.Timeout))
+        {
+            state.Listener.EndReceive(ar);
+            state.Listener.Shutdown(SocketShutdown.Both);
+            state.Listener.Close();
+        }
+    }
+
+    /// <summary>
+    ///     Begins to asynchronously receive data from <see cref="StateObject.Listener" /> in
+    ///     <see cref="Server" />.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
+    public static void ReadCallback(IAsyncResult ar)
+    {
+        // Retrieve the state object from the asynchronous state object.
+        var state = (StateObject?)ar.AsyncState;
+        if (state is null) // Checking for errors.
+        {
+            // Setting the error value.
+            // TODO : state is null
+            return;
+        }
+
+        // Signal the async state thread to continue.
+        state.ReceiveDone.Set();
+
+        var listener = state.Listener;
+        var bytesRead = 0;
+
+        // Trying read data from the client socket.
+        // Catch : the socket has timed out.
+        try
+        {
+            bytesRead = listener.EndReceive(ar);
+        }
+        catch (Exception)
+        {
+            Console.WriteLine("Connection with the client has timed out");
+            return;
+        }
+
+        // Nothing to read here.
+        if (bytesRead <= 0)
+        {
+            return;
+        }
+
+        // Get the last received bytes.
+        var packetAsBytes = new byte[bytesRead];
+        Array.Copy(state.Buffer, packetAsBytes, bytesRead);
+        var error_value = Tools.Errors.None;
+
+        // Deserialize the byte array
+        state.Packet = packetAsBytes.ByteArrayToPacket(ref error_value);
+        if (error_value != Tools.Errors.None) // Checking for errors.
+        {
+            // Setting the error value.
+            // TODO : ByteArrayToPacket => handle error
+            return;
+        }
+
+        var dataLength = state.Tableau.Length;
+        state.Tableau = state.Tableau.Concat(state.Packet.Data).ToArray();
+        if (dataLength > 0)
+        {
+            if (state.Tableau[dataLength] == "")
+            {
+                state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
+                    .ToArray();
+                state.Tableau[dataLength - 1] += state.Tableau[dataLength];
+                state.Tableau = state.Tableau.Where((source, index) => index != dataLength)
+                    .ToArray();
+            }
+        }
+
+        var debug = "Reading from : " + listener.RemoteEndPoint +
+                    "\n\t Read {0} bytes =>\t" + state.Packet +
+                    "\n\t Data buffer =>\t\t" + string.Join(" ", state.Tableau);
+
+        // The client asked for a disconnection.
+        if (state.Packet.IdMessage == Tools.IdMessage.Disconnection)
+        {
+            Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
+            DisconnectFromClient(ar);
+        }
+        // Final packet of the series has been received.
+        else if (state.Packet.Final)
+        {
+            Console.WriteLine(debug + "\n\t => Every packet has been received !",
+                bytesRead);
+
+            state.Packet.Data = state.Tableau;
+
+            // TODO: check if packet.IdMessage requires an answer for the client
+
+            // Get required data from the database.
+            var packet = GetFromDatabase(ar);
+            // Send answer to the client.
+            SendBackToClient(ar, packet);
+
+            // Start listening again
             state.ReceiveDone = new ManualResetEvent(false);
             state.ReceiveDone.Reset();
-            state.Listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+            state = new StateObject { Listener = listener, ReceiveDone = state.ReceiveDone };
+            listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
                 ReadCallback, state);
-            if (!state.ReceiveDone.WaitOne(Timeout))
+            if (!state.ReceiveDone.WaitOne(Settings.Timeout))
             {
                 state.Listener.EndReceive(ar);
                 state.Listener.Shutdown(SocketShutdown.Both);
                 state.Listener.Close();
             }
         }
+        // More packets to receive in this series.
         else
         {
-            // si c'est null ??
-            Console.WriteLine("Connection with client failed !");
+            Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...",
+                bytesRead);
+            state.ReceiveDone = new ManualResetEvent(false);
+            state.ReceiveDone.Reset();
+            listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
+                ReadCallback, state);
+            if (!state.ReceiveDone.WaitOne(Settings.Timeout))
+            {
+                state.Listener.EndReceive(ar);
+                state.Listener.Shutdown(SocketShutdown.Both);
+                state.Listener.Close();
+            }
         }
     }
 
-    public static void ReadCallback(IAsyncResult ar)
-    {
-        // Retrieve the state object and the handler socket
-        // from the asynchronous state object.
-        var state = (StateObject?)ar.AsyncState;
-        if (state is not null)
-        {
-            state.ReceiveDone.Set();
-            var listener = state.Listener;
-
-            var bytesRead = 0;
-            try
-            {
-                // Read data from the client socket.
-                bytesRead = listener.EndReceive(ar);
-            }
-            catch (Exception) // timeout
-            {
-                Console.WriteLine("Connection with the client has timed out");
-                return;
-            }
-
-            if (bytesRead > 0)
-            {
-                var packetAsBytes = new byte[bytesRead];
-                Array.Copy(state.Buffer, packetAsBytes, bytesRead);
-                var error_value = Errors.None;
-
-                state.Packet = packetAsBytes.ByteArrayToPacket(ref error_value);
-                if (error_value != Errors.None)
-                {
-                    // TODO : ByteArrayToPacket => handle error
-                }
-
-                var dataLength = state.LastPacket.Length;
-                state.LastPacket = state.LastPacket.Concat(state.Packet.Data).ToArray();
-                if (dataLength > 0)
-                {
-                    if (state.LastPacket[dataLength] == "")
-                    {
-                        state.LastPacket = state.LastPacket.Where((source, index) => index != dataLength)
-                            .ToArray();
-                        state.LastPacket[dataLength - 1] += state.LastPacket[dataLength];
-                        state.LastPacket = state.LastPacket.Where((source, index) => index != dataLength)
-                            .ToArray();
-                    }
-                }
-
-                var debug = "Reading from : " + listener.RemoteEndPoint +
-                            "\n\t Read {0} bytes =>\t" + state.Packet +
-                            "\n\t Data buffer =>\t\t" + string.Join(" ", state.LastPacket);
-
-                // Disconnection
-                if (state.Packet.IdMessage == IdMessage.Disconnection)
-                {
-                    Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
-                    DisconnectFromClient(ar);
-                }
-                // Final packet of the series
-                else if (state.Packet.Final)
-                {
-                    Console.WriteLine(debug + "\n\t => Every packet has been received !",
-                        bytesRead);
-
-                    // Get answer data from database and answer the client
-                    state.Packet.Data = state.LastPacket;
-                    var packet = GetFromDatabase(ar);
-                    SendBackToClient(ar, packet);
-
-                    // Start listening again
-                    state.ReceiveDone = new ManualResetEvent(false);
-                    state.ReceiveDone.Reset();
-                    state = new StateObject { Listener = listener, ReceiveDone = state.ReceiveDone };
-                    listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                        ReadCallback, state);
-                    if (!state.ReceiveDone.WaitOne(Timeout))
-                    {
-                        state.Listener.EndReceive(ar);
-                        state.Listener.Shutdown(SocketShutdown.Both);
-                        state.Listener.Close();
-                    }
-                }
-                // More packets to receive
-                else
-                {
-                    Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...",
-                        bytesRead);
-                    state.ReceiveDone = new ManualResetEvent(false);
-                    state.ReceiveDone.Reset();
-                    listener.BeginReceive(state.Buffer, 0, StateObject.BufferSize, 0,
-                        ReadCallback, state);
-                    if (!state.ReceiveDone.WaitOne(Timeout))
-                    {
-                        state.Listener.EndReceive(ar);
-                        state.Listener.Shutdown(SocketShutdown.Both);
-                        state.Listener.Close();
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("0 bytes to read from : " + listener.RemoteEndPoint);
-            }
-        }
-        else
-        {
-            // si c'est null ?
-            Console.WriteLine("state is null");
-        }
-    }
-
+    /// <summary>
+    ///     Sends data asynchronously to <see cref="StateObject.Listener" /> in <see cref="Server" />.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
+    /// <param name="original">Instance of <see cref="Packet" /> to send.</param>
     private static void SendBackToClient(IAsyncResult ar, Packet original)
     {
         byte[]? bytes = null;
-        var error_value = Errors.None;
+        var error_value = Tools.Errors.None; // Default error value.
 
+        // Retrieve the state object from the asynchronous state object.
         var state = (StateObject?)ar.AsyncState;
-        if (state is null)
+        if (state is null) // Checking for errors.
         {
+            // Setting the error value.
             // TODO : state is null
             return;
         }
 
+        // Original packet may be to big to be send directly : splitting it into smaller ones.
         var packets = original.Split(ref error_value);
-        if (error_value != Errors.None)
+        if (error_value != Tools.Errors.None) // Checking for errors.
         {
+            // Setting the error value.
             // TODO : Split => handle error
-            // return Errors.Data;
+            return;
         }
 
+        // Sending split packets.
         foreach (var packet in packets)
         {
-            // Send the data through the socket.
+            // Serialize the packet.
             bytes = packet.PacketToByteArray(ref error_value);
-            if (error_value != Errors.None)
+            if (error_value != Tools.Errors.None) // Checking for errors.
             {
+                // Setting the error value.
                 // TODO : PacketToByteArray => handle error
-                // return Errors.Data;
+                return;
             }
 
             var size = bytes.Length;
             Console.WriteLine("Sending back : " + state.Listener.RemoteEndPoint +
                               "\n\t Sent {0} bytes =>\t" + packet, size);
+            // Send the packet through the socket.
             state.Listener.BeginSend(bytes, 0, size, 0, null, state);
         }
     }
 
+    /// <summary>
+    ///     Ends asynchronous connection with a client in <see cref="Server" />.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
     private static void DisconnectFromClient(IAsyncResult ar)
     {
-        var error_value = Errors.None;
 
+        // Retrieve the state object from the asynchronous state object.
         var state = (StateObject?)ar.AsyncState;
-        if (state is null)
+        if (state is null) // Checking for errors.
         {
+            // Setting the error value.
             // TODO : state is null
             return;
         }
 
-        // Ending database connection
-        DisconnectFromDatabase(ar, ref error_value);
-        if (error_value != Errors.None)
-        {
-            // TODO : DisconnectFromDatabase => handle error
-            // return Errors.Data;
-        }
-
-        // Ending client connection
+        // Ending client connection.
         Console.WriteLine(state.Listener.RemoteEndPoint + "\t => Closing client connection...");
         state.Listener.EndSend(ar);
         state.Listener.Shutdown(SocketShutdown.Both);
@@ -367,35 +396,62 @@ public static partial class Server
         return 0;
     }
 
+    /// <summary>
+    ///     Object used to store the parameters of the <see cref="Server" />.
+    /// </summary>
     [Serializable]
-    public class Parameters
+    public class ServerParameters
     {
+        /// <summary>
+        ///     The local port on which the server is running.
+        /// </summary>
         public int ServerPort { get; set; }
-        public int DatabasePort { get; set; }
-        public string DatabaseIp { get; set; } = new("");
+
+        /// <summary>
+        ///     Time left (without any communication) to a async listening socket until timeout.
+        /// </summary>
+        public int Timeout { get; set; }
     }
 
-    // State object for reading client data asynchronously
+    /// <summary>
+    ///     State object for storing useful data asynchronously in <see cref="Server" />.
+    /// </summary>
     public class StateObject
     {
-        // Size of receive buffer.
+        /// <summary>
+        ///     Received data size related to <see cref="Packet" /> in <see cref="StateObject" />.
+        /// </summary>
         public const int BufferSize = Packet.MaxPacketSize;
 
-        // Receive buffer.
+        /// <summary>
+        ///     Stores the data from <see cref="Listener" /> of size <see cref="BufferSize" /> in
+        ///     <see cref="StateObject" />.
+        /// </summary>
         public byte[] Buffer { get; } = new byte[BufferSize];
 
+        /// <summary>
+        ///     Stores everything from <see cref="Listener" /> in the <see cref="Packet" /> format in
+        ///     <see cref="StateObject" />.
+        /// </summary>
+        public Packet? Packet { get; set; }
+
+        /// <summary>
+        ///     Represents the listening socket used asynchronously for each client in
+        ///     <see cref="StateObject" />.
+        /// </summary>
         public Socket Listener { get; set; } = new(AddressFamily.InterNetwork,
             SocketType.Stream, ProtocolType.Tcp);
 
-        public Socket Database { get; set; } = new(AddressFamily.InterNetwork,
-            SocketType.Stream, ProtocolType.Tcp);
+        public string[] Tableau { get; set; } = Array.Empty<string>();
 
-        public Packet? Packet { get; set; }
+        /// <summary>
+        ///     Stores an asynchronous <see cref="Tools.Errors" /> value.
+        /// </summary>
+        public Tools.Errors Error { get; set; } = Tools.Errors.None;
 
-        public string[] LastPacket { get; set; } = Array.Empty<string>();
-
-        public Errors Error { get; set; } = Errors.None;
-
-        public ManualResetEvent ReceiveDone { get; set; } = new ManualResetEvent(false);
+        /// <summary>
+        ///     Used to check if <see cref="Listener" /> has timed out in <see cref="StateObject" />.
+        /// </summary>
+        public ManualResetEvent ReceiveDone { get; set; } = new(false);
     }
 }

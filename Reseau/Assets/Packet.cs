@@ -1,9 +1,18 @@
 namespace Assets;
 
+/// <summary>
+///     Object used when data is sent or received through the sockets between client and server.
+/// </summary>
 public class Packet
 {
+    /// <summary>
+    ///     The length of a serialized instance of <see cref="Packet" /> can take up to this exact value.
+    /// </summary>
     public const int MaxPacketSize = 512;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Packet" /> class as default.
+    /// </summary>
     public Packet()
     {
         this.Type = false;
@@ -11,7 +20,16 @@ public class Packet
         this.Data = Array.Empty<string>();
     }
 
-    public Packet(bool type, ulong idRoom, IdMessage idMessage,
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Packet" /> class with all set values.
+    /// </summary>
+    /// <param name="type">One of the <see cref="Packet" /> values.</param>
+    /// <param name="idMessage">One of the <see cref="Packet" /> values.</param>
+    /// <param name="error">One of the <see cref="Packet" /> values.</param>
+    /// <param name="final">One of the <see cref="Packet" /> values.</param>
+    /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
+    /// <param name="data">One of the <see cref="Packet" /> values.</param>
+    public Packet(bool type, ulong idRoom, Tools.IdMessage idMessage,
         bool status, byte permission, bool final, ulong idPlayer, string[] data)
     {
         this.Type = type;
@@ -24,8 +42,16 @@ public class Packet
         this.Data = data;
     }
 
-    // type == false (client -> server)
-    public Packet(bool type, ulong idRoom, IdMessage idMessage, bool final,
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Packet" /> class used to communicate from client
+    ///     to server.
+    /// </summary>
+    /// <param name="type">One of the <see cref="Packet" /> values.</param>
+    /// <param name="idMessage">One of the <see cref="Packet" /> values.</param>
+    /// <param name="final">One of the <see cref="Packet" /> values.</param>
+    /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
+    /// <param name="data">One of the <see cref="Packet" /> values.</param>
+    public Packet(bool type, ulong idRoom, Tools.IdMessage idMessage, bool final,
         ulong idPlayer, string[] data)
     {
         this.Type = type;
@@ -36,7 +62,15 @@ public class Packet
         this.Data = data;
     }
 
-    // type == true (server -> client)
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Packet" /> class used to communicate from server
+    ///     to client.
+    /// </summary>
+    /// <param name="type">One of the <see cref="Packet" /> values.</param>
+    /// <param name="error">One of the <see cref="Packet" /> values.</param>
+    /// <param name="final">One of the <see cref="Packet" /> values.</param>
+    /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
+    /// <param name="data">One of the <see cref="Packet" /> values.</param>
     public Packet(bool type, bool status, byte permission, bool final, ulong idPlayer,
         string[] data)
     {
@@ -48,21 +82,54 @@ public class Packet
         this.Data = data;
     }
 
-    public bool Type { get; set; } // false (client -> server) - true (server -> client)
-
-    // type == false (client -> server)
-    public ulong IdRoom { get; set; } // default : 0 -> not destined to a room
-    public IdMessage IdMessage { get; set; } // à définir
-
-    // type == true (server -> client)
+    public ulong IdRoom { get; set; }
     public bool Status { get; set; } // 0 : error ; 1 : success
     public byte Permission { get; set; } // 0 : unused/error ; 1 : permission ; 2 : confirmation
 
-    // common to both
-    public bool Final { get; set; }
-    public ulong IdPlayer { get; set; }
-    public string[] Data { get; set; } // à définir
+    /// <summary>
+    ///     Indicates wether the instance object <see cref="Packet" /> is coming from a client or from the
+    ///     server.
+    /// </summary>
+    /// <value>False - from client.</value>
+    /// <value>True - from server.</value>
+    /// <remarks>Default value is false.</remarks>
+    public bool Type { get; set; }
 
+    /// <summary>
+    ///     <see cref="Tools.IdMessage" /> indicates the ID for a specific instance object of
+    ///     <see cref="Packet" />.
+    /// </summary>
+    /// <value>Default is "Default" = 0.</value>
+    public Tools.IdMessage IdMessage { get; set; }
+
+    /// <summary>
+    /// <see cref="Tools.Errors"/> indicates the error for a specific instance object of <see cref="Packet"/>.
+    /// </summary>
+    /// <value>Default is "None" = 0.</value>
+    // public Tools.Errors Error { get; set; }
+
+    /// <summary>
+    ///     Indicates whether the instance object <see cref="Packet" /> is the final one of a list.
+    /// </summary>
+    /// <value>Default is true.</value>
+    public bool Final { get; set; }
+
+    /// <summary>
+    ///     The user's ID within the instance object <see cref="Packet" />.
+    /// </summary>
+    public ulong IdPlayer { get; set; }
+
+    /// <summary>
+    ///     The data within the instance object <see cref="Packet" />.
+    /// </summary>
+    /// <value>Default is empty.</value>
+    public string[] Data { get; set; }
+
+    /// <summary>
+    ///     Converts the values of this instance to its equivalent string representation.
+    /// </summary>
+    /// <param name="this">The packet object to which the method is being applied.</param>
+    /// <returns>The string representation of the value of this instance under the JSON format.</returns>
     public override string ToString() => "Type:" + this.Type + "; "
                                          + "IdRoom:" + this.IdRoom + "; "
                                          + "IdMessage:" + this.IdMessage + "; "

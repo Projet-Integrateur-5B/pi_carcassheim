@@ -2,82 +2,94 @@ namespace Server;
 
 using Assets;
 
+/// <summary>
+///     Represents an async server.
+/// </summary>
 public partial class Server
 {
+    /// <summary>
+    ///     Analyzes the client request and executes it.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
+    /// <returns>Instance of <see cref="Packet" /> containing the response from the <see cref="Server" />.</returns>
     public static Packet GetFromDatabase(IAsyncResult ar)
     {
+        // Initialize the packet to default.
         var packet = new Packet();
 
         var state = (StateObject?)ar.AsyncState;
-        if (state is null)
+        if (state?.Packet is null) // Checking for errors.
         {
+            // Setting the error value.
             // TODO : state is null
             return packet;
         }
 
         // TODO : get what the client asked from the database or whatever
+        packet.IdPlayer = state.Packet.IdPlayer;
 
+        // Check IdMessage : different action
         switch (state.Packet.IdMessage)
         {
-            case IdMessage.Connection:
+            case Tools.IdMessage.Connection:
                 packet.Status = Connection(state.Packet);
                 break;
-            case IdMessage.Signup:
+            case Tools.IdMessage.Signup:
                 packet.Status = Signup(state.Packet);
                 break;
-            case IdMessage.Statistics:
+            case Tools.IdMessage.Statistics:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.RoomList:
+            case Tools.IdMessage.RoomList:
                 packet = RoomList(state.Packet);
                 break;
-            case IdMessage.RoomJoin:
+            case Tools.IdMessage.RoomJoin:
                 packet = RoomJoin(state.Packet);
                 break;
-            case IdMessage.RoomLeave:
+            case Tools.IdMessage.RoomLeave:
                 packet.Status = RoomLeave(state.Packet);
                 break;
-            case IdMessage.RoomReady:
+            case Tools.IdMessage.RoomReady:
                 packet.Status = RoomReady(state.Packet);
                 break;
-            case IdMessage.RoomSettings:
+            case Tools.IdMessage.RoomSettings:
                 packet = RoomSettings(state.Packet);
                 break;
-            case IdMessage.RoomStart:
+            case Tools.IdMessage.RoomStart:
                 packet = RoomStart(state.Packet);
                 break;
-            case IdMessage.TuileDraw:
+            case Tools.IdMessage.TuileDraw:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.TuilePlacement:
+            case Tools.IdMessage.TuilePlacement:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.PionPlacement:
+            case Tools.IdMessage.PionPlacement:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.CancelPlacement:
+            case Tools.IdMessage.CancelPlacement:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.TourValidation:
+            case Tools.IdMessage.TourValidation:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.TimerExpiration:
+            case Tools.IdMessage.TimerExpiration:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.LeaveGame:
+            case Tools.IdMessage.LeaveGame:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.EndGame:
+            case Tools.IdMessage.EndGame:
                 packet = Statistics(state.Packet);
                 break;
-            case IdMessage.Disconnection: // impossible
+            case Tools.IdMessage.Disconnection: // impossible
                 break;
-            case IdMessage.Default:
+            case Tools.IdMessage.Default:
             default:
                 packet.Status = false;
                 break;
         }
-        packet.IdPlayer = state.Packet.IdPlayer;
+
         return packet;
     }
 
@@ -148,6 +160,7 @@ public partial class Server
         {
             retour.Status = false;
         }
+
         var list = new List<string>(retour.Data.ToList())
         {
             "10000" // nouveau port
@@ -254,9 +267,7 @@ public partial class Server
             Array.Empty<string>());
         var list = new List<string>(retour.Data.ToList())
         {
-            "numero tuile",
-            "numero tuile",
-            "numero tuile"
+            "numero tuile", "numero tuile", "numero tuile"
         };
 
         retour.Data = list.ToArray();
@@ -308,11 +319,13 @@ public partial class Server
         {
             Status = true // remplacer par false si erreur dans la validation
         };
-        var list = new List<string>(retour.Data.ToList())// a faire seulement si une zone se ferme ( d'apres ce que j'ai compris )
-        {
-            "position X", // position pion où la zone a été fermé
-            "position Y"
-        };
+        var list =
+            new List<string>(retour.Data
+                    .ToList()) // a faire seulement si une zone se ferme ( d'apres ce que j'ai compris )
+                {
+                    "position X", // position pion où la zone a été fermé
+                    "position Y"
+                };
         retour.Data = list.ToArray();
         return retour;
     }
@@ -322,9 +335,7 @@ public partial class Server
         // timer du joueur expirer, on passe au prochaine joueur
         var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
-        {
-            Status = true
-        };
+        { Status = true };
         return retour;
     }
 
@@ -333,12 +344,10 @@ public partial class Server
         // joueur quitte la partie ( le supprimer de la partie du coup ? )
         var retour = new Packet(packet.Type, packet.IdRoom, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
-        {
-            Status = true
-        };
+        { Status = true };
         var list = new List<string>(retour.Data.ToList())
         {
-            "pseudo", // pseudo ou ID du joueur qui a leave la game
+            "pseudo" // pseudo ou ID du joueur qui a leave la game
         };
         retour.Data = list.ToArray();
         return retour;

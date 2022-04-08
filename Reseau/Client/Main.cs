@@ -1,5 +1,6 @@
 namespace Client;
 
+using System.Globalization;
 using System.Net.Sockets;
 using Assets;
 
@@ -13,25 +14,25 @@ public static partial class Client
         var error_value = Connection(ref socket, port);
         switch (error_value)
         {
-            case Errors.None:
+            case Tools.Errors.None:
                 break;
-            case Errors.ConfigFile:
+            case Tools.Errors.ConfigFile:
                 // TODO : handle case : config file is bad or issue while extracting the data
                 Console.WriteLine("Errors.ConfigFile");
                 break;
-            case Errors.Socket:
+            case Tools.Errors.Socket:
                 // TODO : handle case : connection could not be established
                 Console.WriteLine("Errors.Socket");
                 break;
-            case Errors.ToBeDetermined:
+            case Tools.Errors.ToBeDetermined:
                 break;
-            case Errors.Unknown:
+            case Tools.Errors.Unknown:
                 break;
-            case Errors.Format:
+            case Tools.Errors.Format:
                 break;
-            case Errors.Receive:
+            case Tools.Errors.Receive:
                 break;
-            case Errors.Data:
+            case Tools.Errors.Data:
                 break;
             default:
                 // TODO : handle case : default
@@ -40,11 +41,11 @@ public static partial class Client
         }
 
         string[] test = { "pseudo", "mdp18" };
-        error_value = socket.Communication(ref original, IdMessage.RoomJoin, test);
+        error_value = socket.Communication(ref original, Tools.IdMessage.RoomJoin, test);
         Console.WriteLine("\n {0} \n", original.Data[12]);
         try
         {
-            port = int.Parse(original.Data[12]);
+            port = int.Parse(original.Data[12], new CultureInfo("en-us"));
         }
         catch (FormatException e)
         {
@@ -53,29 +54,29 @@ public static partial class Client
 
         switch (error_value)
         {
-            case Errors.None:
+            case Tools.Errors.None:
                 break;
-            case Errors.Format: // == Errors.Receive ?
+            case Tools.Errors.Format: // == Errors.Receive ?
                 // TODO : handle case : wrong format
                 Console.WriteLine("Errors.Format");
                 break;
-            case Errors.Socket:
+            case Tools.Errors.Socket:
                 // TODO : handle case : connection error
                 Console.WriteLine("Errors.Socket");
                 break;
-            case Errors.Data:
+            case Tools.Errors.Data:
                 // TODO : handle case : error while getting the packet ready
                 Console.WriteLine("Errors.Data");
                 break;
-            case Errors.Receive:
+            case Tools.Errors.Receive:
                 // TODO : handle case : error while receiving an answer
                 Console.WriteLine("Errors.Receive");
                 break;
-            case Errors.Unknown:
+            case Tools.Errors.Unknown:
                 break;
-            case Errors.ConfigFile:
+            case Tools.Errors.ConfigFile:
                 break;
-            case Errors.ToBeDetermined:
+            case Tools.Errors.ToBeDetermined:
                 break;
             default:
                 // TODO : handle case : default
@@ -96,23 +97,23 @@ public static partial class Client
         error_value = Disconnection(socket);
         switch (error_value)
         {
-            case Errors.None:
+            case Tools.Errors.None:
                 break;
-            case Errors.Socket:
+            case Tools.Errors.Socket:
                 // TODO : handle case : connection could not be closed
                 Console.WriteLine("Errors.Socket");
                 break;
-            case Errors.Unknown:
+            case Tools.Errors.Unknown:
                 break;
-            case Errors.Format:
+            case Tools.Errors.Format:
                 break;
-            case Errors.ConfigFile:
+            case Tools.Errors.ConfigFile:
                 break;
-            case Errors.Receive:
+            case Tools.Errors.Receive:
                 break;
-            case Errors.Data:
+            case Tools.Errors.Data:
                 break;
-            case Errors.ToBeDetermined:
+            case Tools.Errors.ToBeDetermined:
                 break;
             default:
                 // TODO : handle case : default
@@ -133,7 +134,7 @@ public static partial class Client
             port = newPort;
             StartConnection(port);
         }
+
         return 0;
     }
-
 }
