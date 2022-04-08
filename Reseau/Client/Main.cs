@@ -1,6 +1,4 @@
 namespace Client;
-
-using System.Globalization;
 using System.Net.Sockets;
 using Assets;
 
@@ -33,6 +31,10 @@ public static partial class Client
             case Tools.Errors.Receive:
                 break;
             case Tools.Errors.Data:
+                break;
+            case Tools.Errors.Permission:
+                break;
+            case Tools.Errors.Success:
                 break;
             default:
                 // TODO : handle case : default
@@ -85,6 +87,10 @@ public static partial class Client
                 break;
             case Tools.Errors.ToBeDetermined:
                 break;
+            case Tools.Errors.Permission:
+                break;
+            case Tools.Errors.Success:
+                break;
             default:
                 // TODO : handle case : default
                 Console.WriteLine("Errors.Unknown");
@@ -121,6 +127,10 @@ public static partial class Client
             case Tools.Errors.Data:
                 break;
             case Tools.Errors.ToBeDetermined:
+                break;
+            case Tools.Errors.Permission:
+                break;
+            case Tools.Errors.Success:
                 break;
             default:
                 // TODO : handle case : default
