@@ -95,7 +95,7 @@ public partial class Thread_serveur_jeu
 
 		//Initialisation du plateau + poser 1ere tuile
 		Plateau p = new Plateau();
-		p.Poser1ereTuile(0);//a changer, la tuile va être aléatoirement décidée (contenant riviere!)
+		p.GenererRiviere();//a changer, la tuile va être aléatoirement décidée (contenant riviere!)
 		
 		//Génération des tuiles:
 		List<int> listeTuiles = null;
