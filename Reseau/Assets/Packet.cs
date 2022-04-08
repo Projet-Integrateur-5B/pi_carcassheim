@@ -30,11 +30,11 @@ public class Packet
     /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
     /// <param name="data">One of the <see cref="Packet" /> values.</param>
     public Packet(bool type, Tools.IdMessage idMessage,
-        bool status, bool final, ulong idPlayer, string[] data)
+        Tools.Errors error, bool final, ulong idPlayer, string[] data)
     {
         this.Type = type;
         this.IdMessage = idMessage;
-        this.Status = status;
+        this.Error = error;
         this.Final = final;
         this.IdPlayer = idPlayer;
         this.Data = data;
@@ -68,17 +68,15 @@ public class Packet
     /// <param name="final">One of the <see cref="Packet" /> values.</param>
     /// <param name="idPlayer">One of the <see cref="Packet" /> values.</param>
     /// <param name="data">One of the <see cref="Packet" /> values.</param>
-    public Packet(bool type, bool status, bool final, ulong idPlayer,
+    public Packet(bool type, Tools.Errors error, bool final, ulong idPlayer,
         string[] data)
     {
         this.Type = type;
-        this.Status = status;
+        this.Error = error;
         this.Final = final;
         this.IdPlayer = idPlayer;
         this.Data = data;
     }
-
-    public bool Status { get; set; } // 0 : error ; 1 : success
 
     /// <summary>
     ///     Indicates wether the instance object <see cref="Packet" /> is coming from a client or from the
@@ -100,7 +98,7 @@ public class Packet
     /// <see cref="Tools.Errors"/> indicates the error for a specific instance object of <see cref="Packet"/>.
     /// </summary>
     /// <value>Default is "None" = 0.</value>
-    // public Tools.Errors Error { get; set; }
+    public Tools.Errors Error { get; set; }
 
     /// <summary>
     ///     Indicates whether the instance object <see cref="Packet" /> is the final one of a list.
@@ -126,7 +124,7 @@ public class Packet
     /// <returns>The string representation of the value of this instance under the JSON format.</returns>
     public override string ToString() => "Type:" + this.Type + "; "
                                          + "IdMessage:" + this.IdMessage + "; "
-                                         + "Status:" + this.Status + "; "
+                                         + "Error:" + this.Error + "; "
                                          + "Final:" + this.Final + ";"
                                          + "IdPlayer:" + this.IdPlayer + "; "
                                          + "Data:" + string.Join(" ", this.Data) + ";";

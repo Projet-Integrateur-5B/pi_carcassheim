@@ -29,6 +29,7 @@ public partial class Server
         packet.IdPlayer = state.Packet.IdPlayer;
 
         // Check IdMessage : different action
+        /*
         switch (state.Packet.IdMessage)
         {
             case Tools.IdMessage.Connection:
@@ -89,11 +90,11 @@ public partial class Server
                 packet.Status = false;
                 break;
         }
-
+*/
         return packet;
     }
 
-    public static bool Connection(Packet packet)
+    /*public static bool Connection(Packet packet)
     {
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
@@ -373,5 +374,5 @@ public partial class Server
         retour.Data = list.ToArray();
         retour.Status = true; // remplacer par false si erreur
         return retour;
-    }
+    }*/
 }

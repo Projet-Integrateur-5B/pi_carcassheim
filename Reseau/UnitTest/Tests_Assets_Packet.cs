@@ -15,10 +15,10 @@ public class TestsAssetsPacket
     public void Setup()
     {
         this.errorValue = Tools.Errors.None;
-        this.original = new Packet(false, Tools.IdMessage.Default, false, true, 999,
+        this.original = new Packet(false, Tools.IdMessage.Default, Tools.Errors.None, true, 999,
             new[] { "test", "deux" });
         this.originalAsString =
-            "{\"Type\":false,\"IdRoom\":0,\"IdMessage\":0,\"Status\":false,\"Permission\":0," +
+            "{\"Type\":false,\"IdMessage\":0,\"Error\":0," +
             "\"Final\":true,\"IdPlayer\":999,\"Data\":[\"test\",\"deux\"]}";
     }
 
@@ -36,7 +36,7 @@ public class TestsAssetsPacket
 
         Assert.AreEqual(this.original.Type, result.Type);
         Assert.AreEqual(this.original.IdMessage, result.IdMessage);
-        Assert.AreEqual(this.original.Status, result.Status);
+        Assert.AreEqual(this.original.Error, result.Error);
         Assert.AreEqual(this.original.Final, result.Final);
         Assert.AreEqual(this.original.IdPlayer, result.IdPlayer);
         Assert.AreEqual(this.original.Data[0], result.Data[0]);
@@ -77,11 +77,11 @@ public class TestsAssetsPacket
     {
         var type = this.original.Type;
         var idMessage = this.original.IdMessage;
-        var status = this.original.Status;
+        var error = this.original.Error;
         var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var packet = new Packet(type, idMessage, status, final, idPlayer,
+        var packet = new Packet(type, idMessage, error, final, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -91,20 +91,21 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
-        var p0 = new Packet(type, idMessage, status, false, idPlayer,
+        var p0 = new Packet(type, idMessage, error, false, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
-                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmn"
+                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+                "abcdefghijklmno"
             });
-        var p1 = new Packet(type, idMessage, status, true, idPlayer,
+        var p1 = new Packet(type, idMessage, error, true, idPlayer,
             new[]
             {
-                "", "opqrstuvwxyz",
-                "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+                "",
+                "pqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
 
         var packets = packet.Split(ref this.errorValue);
@@ -137,11 +138,11 @@ public class TestsAssetsPacket
     {
         var type = this.original.Type;
         var idMessage = this.original.IdMessage;
-        var status = this.original.Status;
+        var error = this.original.Error;
         var final = this.original.Final;
         var idPlayer = this.original.IdPlayer;
 
-        var original = new Packet(type, idMessage, status, final, idPlayer,
+        var original = new Packet(type, idMessage, error, final, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -151,7 +152,7 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
-        var p0 = new Packet(type, idMessage, status, false, idPlayer,
+        var p0 = new Packet(type, idMessage, error, false, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz",
@@ -159,7 +160,7 @@ public class TestsAssetsPacket
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
             });
-        var p1 = new Packet(type, idMessage, status, true, idPlayer,
+        var p1 = new Packet(type, idMessage, error, true, idPlayer,
             new[]
             {
                 "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",

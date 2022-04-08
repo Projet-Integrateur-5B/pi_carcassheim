@@ -199,7 +199,7 @@ public static partial class Client
                 }
 
                 Console.WriteLine("Read {0} bytes => \t" + part_answer + "\n\t\t\tPermission = " +
-                                  part_answer.Status, bytesRec);
+                                  part_answer.Error, bytesRec);
 
                 received.Data = received.Data.Concat(part_answer.Data).ToArray();
                 if (part_answer.Final)

@@ -21,6 +21,8 @@ public static class Tools
         ConfigFile = 3,
         Receive = 4,
         Data = 5,
+        Permission = 6,
+        Success = 7,
         ToBeDetermined = 999
     }
 
@@ -170,7 +172,7 @@ public static class Tools
         var packetLength = original.Data.Length;
 
         // Copying the rest : common header for each packet of the list.
-        var header = new Packet(original.Type, original.IdMessage, original.Status, false, original.IdPlayer, Array.Empty<string>());
+        var header = new Packet(original.Type, original.IdMessage, original.Error, false, original.IdPlayer, Array.Empty<string>());
 
         // Serializing the header.
         var headerBytes = header.PacketToByteArray(ref error);

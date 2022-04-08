@@ -40,9 +40,16 @@ public static partial class Client
                 break;
         }
 
-        string[] test = { "pseudo", "mdp18" };
+        string[] test = {
+            "abcdefghijklmnopqrstuvwxyz",
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz",
+            "abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz-abcdefghijklmnopqrstuvwxyz"
+        };
         error_value = socket.Communication(ref original, Tools.IdMessage.RoomJoin, test);
-        Console.WriteLine("\n {0} \n", original.Data[12]);
+        /*Console.WriteLine("\n {0} \n", original.Data[12]);
         try
         {
             port = int.Parse(original.Data[12], new CultureInfo("en-us"));
@@ -50,7 +57,7 @@ public static partial class Client
         catch (FormatException e)
         {
             Console.WriteLine(e.Message);
-        }
+        }*/
 
         switch (error_value)
         {
