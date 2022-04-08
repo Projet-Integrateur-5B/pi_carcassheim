@@ -17,6 +17,7 @@ public class Plateau
     public Plateau()
     {
         _tuiles = new List<Tuile>();
+        CompteurPoints.Init(this);
     }
 
     static Plateau()
