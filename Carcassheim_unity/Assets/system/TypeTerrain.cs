@@ -5,5 +5,6 @@ public enum TypeTerrain
     Pre,
     Abbaye,
     Auberge,
-    Cathedrale
+    Cathedrale,
+    Riviere
 }

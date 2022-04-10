@@ -101,37 +101,62 @@ public class Thread_communication
             int portPartie = 0; // (Dépend du RESEAU) Port de la partie en question
             int id_joueur_client = 0; // (Dépend du RESEAU)
 
-            if (typeMsg == 1)    // Création de partie
+            switch (typeMsg)
             {
-                int id_nouv_partie = -1;
+                case 1 :  // Création de partie
 
-                lock (this.Get_lock_nb_parties_gerees())
-                {
-                    if (_nb_parties_gerees < 5)
+                    int id_nouv_partie = -1;
+
+                    lock (this.Get_lock_nb_parties_gerees())
                     {
-                        id_nouv_partie = 1; // TEMPORAIRE     //  BDD - Fonction de récupération d'ID libre
+                        if (_nb_parties_gerees < 5)
+                        {
+                            id_nouv_partie = 1; // TEMPORAIRE     //  BDD - Fonction de récupération d'ID libre
 
-                        this.Add_partie_geree(id_nouv_partie);
+                            this.Add_partie_geree(id_nouv_partie);
+                        }
                     }
-                }
 
-                if (id_nouv_partie != -1) // Si la partie a pu être crée
-                {
-                    Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, id_joueur_client);
-                    Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
+                    if (id_nouv_partie != -1) // Si la partie a pu être crée
+                    {
+                        Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, id_joueur_client);
+                        Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
 
-                    _lst_serveur_jeu.Add(thread_serveur_jeu);
+                        _lst_serveur_jeu.Add(thread_serveur_jeu);
 
-                    nouv_thread.Start();
+                        nouv_thread.Start();
 
-                    // A FAIRE - Rajouter ce joueur dans la partie
-                }
-                else
-                {
-                    // RESEAU - Fonction qui indique au client que la partie n'a pas pu être créée 
-                }
-                
+                        // A FAIRE - Rajouter ce joueur dans la partie
+                    }
+                    else
+                    {
+                        // RESEAU - Fonction qui indique au client que la partie n'a pas pu être créée 
+                    }
+
+                    break;
+
+                case 2: // Connexion à une partie
+
+                    break;
+
+                case 3: // Pose d'une tuile
+
+                    break;
+
+                case 4: // Pose d'un pion
+
+                    break;
+
+                case 5: // Fin de tour
+
+                    break;
+
+                default:
+
+                    break;
+
             }
+
 
 
         }

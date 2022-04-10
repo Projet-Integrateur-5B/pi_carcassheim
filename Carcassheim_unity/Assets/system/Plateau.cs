@@ -17,6 +17,7 @@ public class Plateau
     public Plateau()
     {
         _tuiles = new List<Tuile>();
+        CompteurPoints.Init(this);
     }
 
     static Plateau()
@@ -44,14 +45,17 @@ public class Plateau
         return _tuiles.ToArray();
     }*/
 
-    public void Poser1ereTuile(int idTuile)
+    public void GenererRiviere()
     {
-        Poser1ereTuile(Tuile.DicoTuiles[idTuile]);
-    }
+        List<Tuile> riviere = new List<Tuile>();
 
-    public void Poser1ereTuile(Tuile tuile)
-    {
-        PoserTuile(tuile, 0, 0, 0);
+        foreach (var item in Tuile.DicoTuiles.Values)
+        {
+            if (item.Riviere)
+                riviere.Add(item);
+        }
+
+        Riviere.Init(this, riviere.ToArray());
     }
 
     public void PoserTuile(Tuile tuile, Position pos)
@@ -279,6 +283,7 @@ public class Plateau
         {
             if (ZoneAppartientAutreJoueur(tuile, i, idJoueur, parcourues))
                 resultat.Add(i);
+            parcourues.Clear();
         }
 
         return resultat.ToArray();
