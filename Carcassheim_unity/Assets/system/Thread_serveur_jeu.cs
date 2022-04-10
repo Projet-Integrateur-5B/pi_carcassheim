@@ -91,9 +91,9 @@ public partial class Thread_serveur_jeu
 		String file = "Assets/system/infos.xml";
 		LireXml l = new LireXml(file);
 
-		//Initialisation du plateau + poser 1ere tuile
+		//Initialisation du plateau + poser tuiles de riviere
 		Plateau p = new Plateau();
-		p.Poser1ereTuile(0);//a changer, la tuile va être aléatoirement décidée (contenant riviere!)
+		p.Poser1ereTuile(0);//a changer, la rivière va être aléatoirement géneré 
 		
 		//Génération des tuiles:
 		List<int> listeTuiles = null;
@@ -111,24 +111,26 @@ public partial class Thread_serveur_jeu
 			choisirTuile = true;
 			//<-- Res tour du joueur x:
 			//..
-			while (tour) {
-                //Phase tirage de 3 tuiles:
-                while (choisirTuile)
-                {
+			while (tour)
+			{
+				//Phase tirage de 3 tuiles:
+				while (choisirTuile)
+				{
 					//Tirage de 3 tuiles de la fin du tableau
 					troisTuiles = tirageTroisTuiles(listeTuiles);
-					//ecoute client FCT RES
-						//if client repond avec confirmation que l'une des tuile est posable
-							//listeTuiles = suppTuileChoisie(idTuileChoisie);
-							//bool = false
-						//else continue
+					//Res(troisTuiles)<-
+					//ecoute client FCT RES->
+					//if client repond avec confirmation que l'une des tuile est posable
+					//listeTuiles = suppTuileChoisie(idTuileChoisie);
+					//bool = false
+					//else continue
 				}
 				timerNonExpire = true;
 				//Timer:
 				//..
 
 				//Phase actions
-				//While(actions)
+				//While(timerNonExpire)///!!
 				//Attendre une action:
 				//while(timerNonExpirer)
 				//Action recue:
@@ -138,7 +140,6 @@ public partial class Thread_serveur_jeu
 				//verfication position pion en slot
 				//verification position abbé
 				//si demande de validation:
-				//verificationFinal:
 				//si triche:
 				//j._tricheJoueur++;
 				//if(j._tricheJoueur==2)
@@ -155,8 +156,6 @@ public partial class Thread_serveur_jeu
 				//passage du tour:
 
 			}
-
-
 		}
 		// A FAIRE - Fin/retour de la fonction pour libérer l'objet associé dans le thread_com à la fin de la partie et donc de ce thread
 		//return 0;	//cas ou' tout s'est bien passé et la partie est finie
@@ -192,12 +191,14 @@ public partial class Thread_serveur_jeu
 
 	public void avertissement(int id_joueur) 
 	{
-	
+		//FCT Res <-Client
 	}
 
 	public void disconnectJoueur(int id_joueur)
 	{
-
+		_dico_joueur_score.Remove(id_joueur);
+		_nbJoueur--;
+		// FCT Res <-Client
 	}
 
 
