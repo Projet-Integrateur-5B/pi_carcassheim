@@ -1,6 +1,7 @@
 ///  ( proba * 60 ) Puis mélanger  
 using System;
 using System.Xml;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 class LireXml : MonoBehaviour
@@ -53,8 +54,8 @@ class LireXml : MonoBehaviour
                                 reader.ReadToFollowing("idSl");
                                 idSl = Int32.Parse(reader.ReadString());//id du slot
 
-                                reader.ReadToFollowing("nbPositions");
-                                nbPos = Int32.Parse(reader.ReadString());
+                                //reader.ReadToFollowing("postionsSlot");
+                                //nbPos = Int32.Parse(reader.ReadString());
 
                                 //Récupérer le tableau des positions internes (slot[])
                                 reader.ReadToFollowing("postionsSlot");
@@ -64,6 +65,7 @@ class LireXml : MonoBehaviour
                                 {
                                    if (sub == "N" || sub == "NNO" || sub == "NNE" || sub == "NEE" || sub == "E" || sub == "SEE" || sub == "S" || sub == "SSO" || sub == "SOO" || sub == "O" || sub == "NOO")
                                     {
+                                        //Debug.Log(sub);
                                         tab.Add(Tuile.PointsCardPos[sub]);
                                     }
                                 }
@@ -81,13 +83,98 @@ class LireXml : MonoBehaviour
                 //reader.ReadEndElement();
             }
         }
+       
     }
-   /*
+    public static void CreateXMLFile(string xml, string filePath)//sert au test unitaire de la méthode LireXml
+    {
+
+
+        //Decalre a new XMLDocument object
+        XmlDocument doc = new XmlDocument();
+
+        //xml declaration is recommended, but not mandatory
+        XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+
+        //create the root element
+        XmlElement root = doc.DocumentElement;
+        doc.InsertBefore(xmlDeclaration, root);
+
+        //string.Empty makes cleaner code
+        XmlElement element1 = doc.CreateElement(string.Empty, "carcasheim", string.Empty);
+        doc.AppendChild(element1);
+
+        //terrain
+        XmlElement element2 = doc.CreateElement(string.Empty, "terrain", string.Empty);
+
+
+        XmlElement element3 = doc.CreateElement(string.Empty, "idTe", string.Empty);
+
+        XmlText text1 = doc.CreateTextNode("5");
+
+        element1.AppendChild(element2);
+        element2.AppendChild(element3);
+        element3.AppendChild(text1);
+
+
+        XmlElement element4 = doc.CreateElement(string.Empty, "nomTe", string.Empty);
+        XmlText text2 = doc.CreateTextNode("Chemin");
+        element4.AppendChild(text2);
+        element2.AppendChild(element4);
+
+        //Tuile
+        XmlElement element5 = doc.CreateElement(string.Empty, "Tuile", string.Empty);
+
+
+        XmlElement element6 = doc.CreateElement(string.Empty, "idTu", string.Empty);
+
+        XmlText text3 = doc.CreateTextNode("2");
+
+        element1.AppendChild(element5);
+        element5.AppendChild(element6);
+        element6.AppendChild(text3);
+
+
+        XmlElement element7 = doc.CreateElement(string.Empty, "nbSlots", string.Empty);
+        XmlText text4 = doc.CreateTextNode("1");
+        element7.AppendChild(text4);
+        element5.AppendChild(element7);
+
+
+        //slots
+        XmlElement element8 = doc.CreateElement(string.Empty, "slot", string.Empty);
+
+
+        XmlElement element9 = doc.CreateElement(string.Empty, "idsl", string.Empty);
+
+        XmlText text5 = doc.CreateTextNode("0");
+
+        element5.AppendChild(element8);
+        element8.AppendChild(element9);
+        element9.AppendChild(text5);
+
+
+        XmlElement element10 = doc.CreateElement(string.Empty, "positionsSlot", string.Empty);
+        XmlText text6 = doc.CreateTextNode("NEE,N.");
+        element10.AppendChild(text6);
+        element8.AppendChild(element10);
+
+        XmlElement element11 = doc.CreateElement(string.Empty, "terrain", string.Empty);
+        XmlText text7 = doc.CreateTextNode("5");
+        element11.AppendChild(text7);
+        element8.AppendChild(element11);
+
+        doc.Save(Directory.GetCurrentDirectory() + "//Assets" + "//system" + "//document.xml");
+    
+}
+    /*
     void Start()
     {
         String file = "Assets/system/infos.xml";
         LireXml l = new LireXml(file);
+        String f1 = "testing";
+        String f2 = "allGood";
+        CreateXMLFile(f1, f2);
     }
-   */
+    */
 }
 
