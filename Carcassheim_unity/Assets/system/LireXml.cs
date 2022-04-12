@@ -38,9 +38,9 @@ public class LireXml
                             idTe = int.Parse(reader.ReadString());
                             reader.ReadToFollowing("nomTe"); //depend de l'écriture dans le fichier xml
                             nomTe = reader.ReadString();
-                            Debug.Log("Terrain : ");
-                            Debug.Log(idTe);
-                            Debug.Log(nomTe);
+                            //Debug.Log("Terrain : ");
+                            //Debug.Log(idTe);
+                            //Debug.Log(nomTe);
 
                             break;
 
@@ -81,7 +81,6 @@ public class LireXml
                             break;
                     }
                 }
-                //reader.ReadEndElement();
             }
         }
         return ;

@@ -13,8 +13,7 @@ namespace Tests
 {
     public class LireXmlUintyTest
     {
-        
-        // A Test behaves as an ordinary method
+
         [Test]
         public void TuilesReadedEqualGeneratedTuiles()
         {
@@ -24,11 +23,12 @@ namespace Tests
             LireXml.CreateXMLFile();
             LireXml.ReadXml();
             int expectedKeyDicoTuile = 2;
-            int actualKeyDicoTuile =Tuile.DicoTuiles.ElementAt(0).Key;
+            int actualKeyDicoTuile = Tuile.DicoTuiles.ElementAt(0).Key;
             Debug.Log(actualKeyDicoTuile);
             Assert.AreEqual(expectedKeyDicoTuile, actualKeyDicoTuile);
 
             File.Delete(file);
+
 
         }
 
