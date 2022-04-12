@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
+using System;
+
 
 namespace Tests
 {
@@ -26,10 +28,20 @@ namespace Tests
         };
             actualResult = Thread_serveur_jeu.tuile_a_tirer(id, x, map);
             int expectedResult = 4;
-            Debug.Log(actualResult);
-            Debug.Log(expectedResult);
+            //Debug.Log(actualResult);
+            //Debug.Log(expectedResult);
             Assert.AreEqual(actualResult, expectedResult);
 
+        }
+        [Test]
+        public void Random_sort_tuilesTest()
+        {
+            int nbTuile = 60, minimumResult = 1;
+            List<int> list = null;
+            list = new List<int>();
+            list =Thread_serveur_jeu.Random_sort_tuiles(nbTuile);
+            int actualNbOfElement = list.Count;
+            Assert.GreaterOrEqual(actualNbOfElement,minimumResult);
         }
 
 
