@@ -4,15 +4,19 @@ using System.Xml;
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
-class LireXml : MonoBehaviour
+public class LireXml 
 {
-
-
+    public static String _file;
     public LireXml(string file)
     {
+         _file = file;
+    }
+    public static void ReadXml()
+    {
         int idTu = 0, idTe = 0, idSl = 0, i = 0, j = 0, nbPos = 0;
-        List<Slot> slot = new List<Slot>(); 
-       
+        List<Slot> slot = new List<Slot>();
+        Dictionary<int, Tuile> resultat = Tuile.DicoTuiles;
+
         int[][] lien = new int[12][];
         for (int n = 0; n < 12; n++)
         {
@@ -21,7 +25,7 @@ class LireXml : MonoBehaviour
         List<int> tab = new List<int>();
         string nomTe = "", tmp = "";
 
-        using (XmlReader reader = XmlReader.Create(@file))
+        using (XmlReader reader = XmlReader.Create(@_file))
         {
             while (reader.Read())
             {
@@ -54,11 +58,8 @@ class LireXml : MonoBehaviour
                                 reader.ReadToFollowing("idSl");
                                 idSl = Int32.Parse(reader.ReadString());//id du slot
 
-                                //reader.ReadToFollowing("postionsSlot");
-                                //nbPos = Int32.Parse(reader.ReadString());
-
                                 //Récupérer le tableau des positions internes (slot[])
-                                reader.ReadToFollowing("postionsSlot");
+                                reader.ReadToFollowing("positionsSlot");
                                 tmp = reader.ReadString();
                                 string[] subs = tmp.Split(',', '.','\0');
                                 foreach (string sub in subs)
@@ -83,16 +84,23 @@ class LireXml : MonoBehaviour
                 //reader.ReadEndElement();
             }
         }
-       
+        return ;
     }
-    public static void CreateXMLFile(string xml, string filePath)//sert au test unitaire de la méthode LireXml
+    public static void afficheDicoTuiles()
+    {
+        foreach(var element in Tuile.DicoTuiles)
+        {
+            Debug.Log(element.Key);
+        }
+    } 
+    public static void CreateXMLFile()//sert au test unitaire de la méthode LireXml
     {
 
 
         //Decalre a new XMLDocument object
         XmlDocument doc = new XmlDocument();
 
-        //xml declaration is recommended, but not mandatory
+        //xml declaration 
         XmlDeclaration xmlDeclaration = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
 
         //create the root element
@@ -122,7 +130,7 @@ class LireXml : MonoBehaviour
         element2.AppendChild(element4);
 
         //Tuile
-        XmlElement element5 = doc.CreateElement(string.Empty, "Tuile", string.Empty);
+        XmlElement element5 = doc.CreateElement(string.Empty, "tuile", string.Empty);
 
 
         XmlElement element6 = doc.CreateElement(string.Empty, "idTu", string.Empty);
@@ -144,7 +152,7 @@ class LireXml : MonoBehaviour
         XmlElement element8 = doc.CreateElement(string.Empty, "slot", string.Empty);
 
 
-        XmlElement element9 = doc.CreateElement(string.Empty, "idsl", string.Empty);
+        XmlElement element9 = doc.CreateElement(string.Empty, "idSl", string.Empty);
 
         XmlText text5 = doc.CreateTextNode("0");
 
@@ -163,18 +171,19 @@ class LireXml : MonoBehaviour
         element11.AppendChild(text7);
         element8.AppendChild(element11);
 
-        doc.Save(Directory.GetCurrentDirectory() + "//Assets" + "//system" + "//document.xml");
+        doc.Save(Directory.GetCurrentDirectory() +"//"+ _file);
     
 }
-    /*
+   /* 
     void Start()
     {
+        CreateXMLFile();
         String file = "Assets/system/infos.xml";
         LireXml l = new LireXml(file);
-        String f1 = "testing";
-        String f2 = "allGood";
-        CreateXMLFile(f1, f2);
+        afficheDicoTuiles();
+        File.Delete(file);
+
     }
-    */
+   */
 }
 

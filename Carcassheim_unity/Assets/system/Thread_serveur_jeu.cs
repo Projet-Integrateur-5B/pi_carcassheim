@@ -89,7 +89,7 @@ public partial class Thread_serveur_jeu
 		int idTuile = 0; 
 		//Lecture du fichier xml / Récupération des infos des tuiles et des terrains / Création des objets
 		String file = "Assets/system/infos.xml";
-		LireXml l = new LireXml(file);
+		//LireXml l = new LireXml(file);
 
 		//Initialisation du plateau + poser tuiles de riviere
 		Plateau p = new Plateau();
