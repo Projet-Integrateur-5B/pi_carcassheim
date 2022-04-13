@@ -20,22 +20,17 @@ namespace Assets.system
             instance = new CompteurPoints(plateau);
         }
 
-        public static int Compter(int idJoueur)
-        {
-            return instance.Points(idJoueur);
-        }
-
         public static int CompterZoneFerme(int idTuile, int idSlot, int idJoueur = -1)
         {
             Tuile tuile = idTuile;
             if (tuile.NombreSlot <= idSlot)
                 throw new ArgumentException("idSlot trop grand");
 
-            idJoueur = tuile.Slots[idSlot];
+            idJoueur = tuile.Slots[idSlot].IdJoueur;
 
             List<Tuile> parcourue = new List<Tuile> { tuile };
             int result = 0;
-            PointZone(tuile, idSlot, parcourue, ref result);
+            instance.PointsZone(tuile, idSlot, parcourue, ref result);
 
             return 0;
         }
@@ -74,6 +69,39 @@ namespace Assets.system
         }
 
 
+        private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, int idSlot,
+            out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
+        {
+            emplacementVide = false;
+
+            int[] positionsInternes = tuile.LienSlotPosition[idSlot];
+            List<int> positionsInternesProchainesTuilesTemp = new List<int>();
+            List<Tuile> resultat = new List<Tuile>();
+            int x = tuile.X, y = tuile.Y;
+
+            int direction;
+            foreach (int position in positionsInternes)
+            {
+                //direction = (position + (3 * tuile.Rotation)) / 3;
+                direction = (position / 3 + tuile.Rotation) % 3;
+
+                Tuile elem = _plateau.GetTuile(x + Plateau.PositionAdjacentes[direction, 0],
+                                      y + Plateau.PositionAdjacentes[direction, 1]);
+
+                if (elem == null)
+                    emplacementVide = true;
+
+                else if (!resultat.Contains(elem))
+                {
+                    resultat.Add(elem);
+                    positionsInternesProchainesTuilesTemp.Add(
+                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 3);
+                }
+            }
+            positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();
+
+            return resultat.ToArray();
+        }
 
         /*
         public int[] EmplacementPionPossible(Tuile tuile, int idJoueur)
