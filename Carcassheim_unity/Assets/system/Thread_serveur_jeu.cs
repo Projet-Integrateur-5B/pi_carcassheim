@@ -89,7 +89,7 @@ public partial class Thread_serveur_jeu
 		int idTuile = 0; 
 		//Lecture du fichier xml / Récupération des infos des tuiles et des terrains / Création des objets
 		String file = "Assets/system/infos.xml";
-		LireXml l = new LireXml(file);
+		//LireXml l = new LireXml(file);
 
 		//Initialisation du plateau + poser tuiles de riviere
 		Plateau p = new Plateau();
@@ -160,31 +160,20 @@ public partial class Thread_serveur_jeu
 		// A FAIRE - Fin/retour de la fonction pour libérer l'objet associé dans le thread_com à la fin de la partie et donc de ce thread
 		//return 0;	//cas ou' tout s'est bien passé et la partie est finie
     }
-    public void comptageDesPoints(int[] idSlots)
-    {
-	//Règles d'évaluation:
-		// route : 1 point par tuile
-		// ville : Chaque tuile dans une ville complétée rapporte 2 points.
-			// De plus, chaque blason dans une ville complétée rapporte
-			// 2 points de plus.
-		// abbaye : Une abbaye est complétée lorsqu’elle est complètement entourée de tuiles.
-			// Lors de l’évaluation, une abbaye complétée rapporte 1 point par tuile la
-			// complétant(incluant celle de l’abbaye).
-
-	}
 
 
 	public static List<int> tirageTroisTuiles(List<int> tuiles)
 	{
 		List<int> list = new List<int>();
-		for (int i = tuiles.Count-1;i>= tuiles.Count-4;i++)
+		for (int i = tuiles.Count - 3 ;i< tuiles.Count; i++)
 			list.Add(tuiles[i]);
 		return list;
 	}
 	public static List<int> suppTuileChoisie(List<int> tuiles, int idTuile)
 	{
-		for (int i = tuiles.Count - 1; i>0 && tuiles[i] != idTuile; i++)
-			tuiles.Remove(tuiles[i]);
+		int i = 0;
+		for (i = tuiles.Count - 1; i >= 0 && tuiles[i] != idTuile; i--) ;
+		tuiles.Remove(tuiles[i]);
 
 		return tuiles;
 	}
