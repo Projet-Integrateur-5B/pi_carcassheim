@@ -23,6 +23,7 @@ public static class Tools
         Data = 5,
         Permission = 6,
         Success = 7,
+        Database = 8,
         ToBeDetermined = 999
     }
 
