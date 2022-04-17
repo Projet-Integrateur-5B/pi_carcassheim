@@ -111,7 +111,7 @@ public static partial class Client
     private static Tools.Errors Disconnection(Socket socket)
     {
         var original = new Packet();
-        socket.Communication(ref original, Tools.IdMessage.Disconnection, Array.Empty<string>());
+        socket.Communication(ref original, Tools.IdMessage.Logout, Array.Empty<string>());
         // if Errors.Format = ignore, not expecting to receive anything from the server
         // if Errors.Socket = ignore, already disconnected from the server
 
@@ -174,7 +174,7 @@ public static partial class Client
             }
 
             // check if an answer is needed
-            if (idMessage == Tools.IdMessage.Disconnection)
+            if (idMessage == Tools.IdMessage.Logout)
             {
                 return Tools.Errors.None;
             }
@@ -198,13 +198,12 @@ public static partial class Client
                     return Tools.Errors.Data;
                 }
 
-                Console.WriteLine("Read {0} bytes => \t" + part_answer + "\n\t\t\tPermission = " +
-                                  part_answer.Error, bytesRec);
+                Console.WriteLine("Read {0} bytes => \t" + part_answer, bytesRec);
 
                 received.Data = received.Data.Concat(part_answer.Data).ToArray();
                 if (part_answer.Final)
                 {
-                    Console.WriteLine("Received = " + received);
+                    Console.WriteLine("Received = " + received + "\n\tError = " + part_answer.Error);
                     return Tools.Errors.None;
                 }
             }

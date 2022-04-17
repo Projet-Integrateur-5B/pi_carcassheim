@@ -29,14 +29,14 @@ public partial class Server
         packet.IdPlayer = state.Packet.IdPlayer;
 
         // Check IdMessage : different action
-        /*
+
         switch (state.Packet.IdMessage)
         {
-            case Tools.IdMessage.Connection:
-                packet.Status = Connection(state.Packet);
+            case Tools.IdMessage.Login:
+                packet.Error = Connection(state.Packet);
                 break;
             case Tools.IdMessage.Signup:
-                packet.Status = Signup(state.Packet);
+                packet.Error = Signup(state.Packet);
                 break;
             case Tools.IdMessage.Statistics:
                 packet = Statistics(state.Packet);
@@ -48,10 +48,10 @@ public partial class Server
                 packet = RoomJoin(state.Packet);
                 break;
             case Tools.IdMessage.RoomLeave:
-                packet.Status = RoomLeave(state.Packet);
+                packet.Error = RoomLeave(state.Packet);
                 break;
             case Tools.IdMessage.RoomReady:
-                packet.Status = RoomReady(state.Packet);
+                packet.Error = RoomReady(state.Packet);
                 break;
             case Tools.IdMessage.RoomSettings:
                 packet = RoomSettings(state.Packet);
@@ -68,9 +68,9 @@ public partial class Server
             case Tools.IdMessage.PionPlacement:
                 packet = Statistics(state.Packet);
                 break;
-            case Tools.IdMessage.CancelPlacement:
+            /*case Tools.IdMessage.CancelPlacement:
                 packet = Statistics(state.Packet);
-                break;
+                break;*/
             case Tools.IdMessage.TourValidation:
                 packet = Statistics(state.Packet);
                 break;
@@ -83,51 +83,61 @@ public partial class Server
             case Tools.IdMessage.EndGame:
                 packet = Statistics(state.Packet);
                 break;
-            case Tools.IdMessage.Disconnection: // impossible
+            case Tools.IdMessage.Logout: // impossible
+                break;
+            case Tools.IdMessage.RoomCreate:
+                break;
+            case Tools.IdMessage.CancelTuilePlacement:
+                break;
+            case Tools.IdMessage.CancelPionPlacement:
+                break;
+            case Tools.IdMessage.WarningCheat:
+                break;
+            case Tools.IdMessage.KickFromGame:
                 break;
             case Tools.IdMessage.Default:
             default:
-                packet.Status = false;
+                packet.Error = Tools.Errors.Unknown;
                 break;
         }
-*/
+
         return packet;
     }
 
-    /*public static bool Connection(Packet packet)
+    public static Tools.Errors Connection(Packet packet)
     {
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
         if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
         {
-            return true;
+            return Tools.Errors.None;
         }
 
-        return false;
+        return Tools.Errors.Unknown;
     }
 
     // ne pas toucher cette fonction
-    public static bool Disconnection(Packet packet)
+    public static Tools.Errors Disconnection(Packet packet)
     {
         if (packet.IdPlayer == 999)
         {
-            return true;
+            return Tools.Errors.None;
         }
 
-        return false;
+        return Tools.Errors.Unknown;
     }
 
-    public static bool Signup(Packet packet)
+    public static Tools.Errors Signup(Packet packet)
     {
         // verifie si les informations d'inscription sont valide ( ne sont pas les mêmes qu'un utilisateur deja inscrit
         // packet.Data[0] = pseudp ; packet.Data[1] = mdp ; packet.Data[2] = mail ; packet.Data[3] = date de naissance
         // if a modifié pour return true si info valide
         if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
         {
-            return true;
+            return Tools.Errors.None;
         }
 
-        return false;
+        return Tools.Errors.Unknown;
     }
 
     public static Packet Statistics(Packet packet)
@@ -146,7 +156,7 @@ public partial class Server
             "Nbpartie"
         };
         retour.Data = list.ToArray();
-        retour.Status = true; // remplacer par false si erreur
+        retour.Error = Tools.Errors.None; // remplacer par "false" si erreur
         return retour;
     }
 
@@ -159,7 +169,7 @@ public partial class Server
         var retour = RoomSettings(packet);
         if (false) // entrer ici si erreur
         {
-            retour.Status = false;
+            retour.Error = Tools.Errors.Unknown; // remplacer par le bon code erreur
         }
 
         var list = new List<string>(retour.Data.ToList())
@@ -186,33 +196,33 @@ public partial class Server
         }
 
         retour.Data = list.ToArray();
-        retour.Status = true; //remplacer par false si erreur
+        retour.Error = Tools.Errors.None; //remplacer par "false" si erreur
         return retour;
     }
 
-    public static bool RoomLeave(Packet packet)
+    public static Tools.Errors RoomLeave(Packet packet)
     {
         // supprimer le joueur de la prtie dans le systeme de jeu
         // return true si bien reussit et false si joueur non retirer de la partie ( si erreur en gros)
         if (packet.IdPlayer == 999)
         {
-            return true;
+            return Tools.Errors.None;
         }
 
-        return false;
+        return Tools.Errors.Unknown;
     }
 
-    public static bool RoomReady(Packet packet)
+    public static Tools.Errors RoomReady(Packet packet)
     {
         // met le joueur prêt dans le jeu ( true si bien passer, false sinon )
         // id room dans packet.IdRoom
         // id joueur dans packet.IdPlayer
         if (packet.IdPlayer == 999)
         {
-            return true;
+            return Tools.Errors.None;
         }
 
-        return false;
+        return Tools.Errors.Unknown;
     }
 
     public static Packet RoomSettings(Packet packet)
@@ -238,7 +248,7 @@ public partial class Server
         }
 
         retour.Data = list.ToArray();
-        retour.Status = true; // remplacer par false si erreur
+        retour.Error = Tools.Errors.None; // remplacer par "false" si erreur
         return retour;
     }
 
@@ -257,7 +267,7 @@ public partial class Server
         }
 
         retour.Data = list.ToArray();
-        retour.Status = true; // remplacer par false si erreur
+        retour.Error = Tools.Errors.None; // remplacer par "false" si erreur
         return retour;
     }
 
@@ -272,7 +282,7 @@ public partial class Server
         };
 
         retour.Data = list.ToArray();
-        retour.Status = true; // remplacer par false si erreur
+        retour.Error = Tools.Errors.None; // remplacer par "false" si erreur
         return retour;
     }
 
@@ -282,7 +292,7 @@ public partial class Server
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>())
         {
-            Status = true, // remplacer par false si erreur
+            Error = Tools.Errors.None, // remplacer par "false" si erreur
             //Permission = 1 // 1 si tuile accepter sinon 0
         };
         return retour;
@@ -294,7 +304,7 @@ public partial class Server
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>())
         {
-            Status = true, // remplacer par false si erreur
+            Error = Tools.Errors.None, // remplacer par "false" si erreur
             //Permission = 1 // 1 si pion accepter sinon 0
         };
         return retour;
@@ -306,7 +316,7 @@ public partial class Server
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
         {
-            Status = true // remplacer par false si erreur dans l'annulation
+            Error = Tools.Errors.None, // remplacer par "false" si erreur dans l'annulation
         };
         return retour;
     }
@@ -318,7 +328,7 @@ public partial class Server
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
         {
-            Status = true // remplacer par false si erreur dans la validation
+            Error = Tools.Errors.None, // remplacer par "false" si erreur dans la validation
         };
         var list =
             new List<string>(retour.Data
@@ -336,7 +346,7 @@ public partial class Server
         // timer du joueur expirer, on passe au prochaine joueur
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
-        { Status = true };
+        { Error = Tools.Errors.None };
         return retour;
     }
 
@@ -345,7 +355,7 @@ public partial class Server
         // joueur quitte la partie ( le supprimer de la partie du coup ? )
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             packet.Data)
-        { Status = true };
+        { Error = Tools.Errors.None };
         var list = new List<string>(retour.Data.ToList())
         {
             "pseudo" // pseudo ou ID du joueur qui a leave la game
@@ -372,7 +382,7 @@ public partial class Server
         }
 
         retour.Data = list.ToArray();
-        retour.Status = true; // remplacer par false si erreur
+        retour.Error = Tools.Errors.None; // remplacer par "false" si erreur
         return retour;
-    }*/
+    }
 }
