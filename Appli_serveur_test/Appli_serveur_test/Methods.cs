@@ -108,12 +108,8 @@ public partial class Server
     {
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
-        if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
-        {
-            return Tools.Errors.None;
-        }
-
-        return Tools.Errors.Unknown;
+        Database db = new Database();
+        return db.Identification(packet.Data[0], packet.Data[1]) ? Tools.Errors.Success : Tools.Errors.Database;
     }
 
     // ne pas toucher cette fonction
@@ -132,12 +128,19 @@ public partial class Server
         // verifie si les informations d'inscription sont valide ( ne sont pas les mêmes qu'un utilisateur deja inscrit
         // packet.Data[0] = pseudp ; packet.Data[1] = mdp ; packet.Data[2] = mail ; packet.Data[3] = date de naissance
         // if a modifié pour return true si info valide
-        if (packet.Data[0] == "pseudo" && packet.Data[1] == "mdp18")
+        Database db = new Database();
+        try
         {
-            return Tools.Errors.None;
+            db.Adduser(packet.Data[0], packet.Data[1], packet.Data[2], "", 0, 1, 0, 0, 0, packet.Data[3]);
+            return Tools.Errors.Success;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERREUR: Signup : " + ex);
+            return Tools.Errors.Database;
         }
 
-        return Tools.Errors.Unknown;
+        
     }
 
     public static Packet Statistics(Packet packet)
