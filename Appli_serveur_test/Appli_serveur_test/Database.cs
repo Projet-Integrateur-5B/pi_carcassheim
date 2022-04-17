@@ -9,7 +9,7 @@ public class Database
     
     public Database()
     {
-        connString = "Host=192.168.100.118;Username=ubuntu;Password=PI_Carcassheim;Database=projet.db";
+        connString = "Host=192.168.100.118;Port=10000;Username=ubuntu;Password=PI_Carcassheim;Database=projet.db";
     }
 
     public NpgsqlConnection Connect()
