@@ -1,7 +1,6 @@
-﻿{
+{
   "Settings": {
-    "serverPort": 10000,
-    "databaseIP": "192.168.100.118",
-    "databasePort": 10000
+    "ServerPort": 10000,
+    "Timeout": 1800000
   }
 }
