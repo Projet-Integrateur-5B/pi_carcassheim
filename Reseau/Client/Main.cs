@@ -43,16 +43,18 @@ public static partial class Client
         }
 
         string[] test = { "pseudo", "mdp18" };
-        error_value = socket.Communication(ref original, Tools.IdMessage.RoomJoin, test);
-        /*Console.WriteLine("\n {0} \n", original.Data[12]);
+        error_value = socket.Communication(ref original, Tools.IdMessage.Login, test);
         try
         {
-            port = int.Parse(original.Data[12], new CultureInfo("en-us"));
+            if (original.IdMessage is Tools.IdMessage.RoomJoin or Tools.IdMessage.RoomCreate)
+            {
+                port = int.Parse(original.Data[0]);
+            }
         }
         catch (FormatException e)
         {
             Console.WriteLine(e.Message);
-        }*/
+        }
 
         switch (error_value)
         {
@@ -134,7 +136,7 @@ public static partial class Client
         return port;
     }
 
-    /*public static int Main()
+    public static int Main()
     {
         var port = 10000;
         int newPort;
@@ -146,5 +148,5 @@ public static partial class Client
         }
 
         return 0;
-    }*/
+    }
 }
