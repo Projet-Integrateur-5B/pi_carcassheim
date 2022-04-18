@@ -134,7 +134,7 @@ public static partial class Client
         return port;
     }
 
-    public static int Main()
+    /*public static int Main()
     {
         var port = 10000;
         int newPort;
@@ -146,5 +146,5 @@ public static partial class Client
         }
 
         return 0;
-    }
+    }*/
 }
