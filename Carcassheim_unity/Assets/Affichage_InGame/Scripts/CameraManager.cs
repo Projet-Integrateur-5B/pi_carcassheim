@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
+    [SerializeField] Plateau board;
     Camera mainCamera;
-    Vector3 mainCameraPosition = new Vector3(1, 8, -10);
-    Quaternion mainCameraRotation = Quaternion.Euler(40, 0, 0);
-    public float defaultFOV = 60;
-    public float minFOV = 5;
-    public float zoomMultiplier = 5;
-    public float zoomDuration = 2;
+    Vector3 mainCameraPosition;
+    Quaternion mainCameraRotation;
     public float dragSpeed = .5f;
     Vector3 dragOrigin;
+    [SerializeField] private Table table;
+
     // Start is called before the first frame update
     void Start()
     {
         mainCamera = Camera.main;
-        mainCamera.transform.position = mainCameraPosition;
-        mainCamera.transform.rotation = mainCameraRotation;
+        mainCameraPosition = mainCamera.transform.position;
+        mainCameraRotation = mainCamera.transform.rotation;
+    }
+
+    private void OnEnable() {
+        
     }
 
     // Update is called once per frame
@@ -41,22 +44,40 @@ public class CameraManager : MonoBehaviour
 
         if (Input.mouseScrollDelta.y > 0 || Input.GetKey(KeyCode.Plus) || Input.GetKey(KeyCode.Equals))// || getDoubleClick())
         {
-            if (mainCamera.fieldOfView > minFOV)
-                smoothZoom(mainCamera.fieldOfView - 2.5f);
-
+            upAndDownMotion(-2.5f);
         }
 
         if (Input.mouseScrollDelta.y < 0 || Input.GetKey(KeyCode.Minus) || Input.GetKey(KeyCode.Alpha6))
         {
-            if (mainCamera.fieldOfView < defaultFOV)
-                smoothZoom(mainCamera.fieldOfView + 2.5f);
+            upAndDownMotion(2.5f);
         }
     }
 
+<<<<<<< HEAD
+    void cameraClickAndDrag() {
+        // Check if mouse is on the table
+        // Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+        // RaycastHit hit;
+
+        // if (Physics.Raycast(ray, out hit))
+        // {
+        //     if (hit.collider.name == "TileCollider")
+        //     {  
+        //         Debug.Log(hit.collider.name);
+        //         return;
+        //     }
+        // }
+
+
+        // exit in this case
+
+        if (Input.GetMouseButtonDown(0)) {
+=======
     void cameraClickAndDrag()
     {
         if (Input.GetMouseButtonDown(0))
         {
+>>>>>>> 97c98758d11e5acab07530da02fbd79c29a3bad0
             dragOrigin = Input.mousePosition;
         }
 
@@ -65,24 +86,34 @@ public class CameraManager : MonoBehaviour
         mainCameraPosition.x -= pos.x * dragSpeed;
         mainCameraPosition.z -= pos.y * dragSpeed;
 
+        if ((mainCamera.transform.position.z <= 0 && mainCameraPosition.z < 0)
+            || (mainCamera.transform.position.z >= 0.90f && mainCameraPosition.z > 0)) {
+            return;
+        }
         mainCamera.transform.position = mainCameraPosition;
     }
 
     void upAndDownMotion(float target)
     {
+        if (mainCamera.transform.position.z <= 0 && target < 0) {
+            mainCameraPosition.z = 0;
+            mainCamera.transform.position = mainCameraPosition;
+            return;
+        }
+        if (mainCamera.transform.position.z >= 0.90f && target > 0) {
+            return;
+        }
         mainCameraPosition.z += target * Time.deltaTime;
         mainCamera.transform.position = mainCameraPosition;
     }
 
     void leftAndRightMotion(float target)
     {
+        if ((mainCamera.transform.position.x <= -1 && target < 0)
+            || (mainCamera.transform.position.x >= 1 && target > 0))
+            return;
         mainCameraPosition.x += target * Time.deltaTime;
         mainCamera.transform.position = mainCameraPosition;
     }
 
-    void smoothZoom(float target)
-    {
-        float angle = Mathf.Abs((defaultFOV / zoomMultiplier) - defaultFOV);
-        mainCamera.fieldOfView = Mathf.MoveTowards(mainCamera.fieldOfView, target, angle / zoomDuration * Time.deltaTime);
-    }
 }
