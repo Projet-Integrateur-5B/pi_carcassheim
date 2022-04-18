@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.System;
 
 public class ConnectionMenu : Miscellaneous
 {
@@ -64,9 +65,14 @@ public class ConnectionMenu : Miscellaneous
 
 	public void Connect()
 	{
+		/*
 		bool a = string.Equals(RemoveLastSpace(loginCM.text), "");
 		bool b = string.Equals(passwordCM.text, "");
-		SetState(a && b);
+		*/
+		string[] values = new[] { RemoveLastSpace(loginCM.text), RemoveLastSpace(passwordCM.text) };
+		bool res = Communication.Instance.CommunicationWithoutResult(Tools.IdMessage.Login, values);
+
+		SetState(res);
 		GameObject tmpGO = GameObject.Find("Instructions");
 		Text tmpText = tmpGO.GetComponent<Text>();
 		if (GetState() == true)
