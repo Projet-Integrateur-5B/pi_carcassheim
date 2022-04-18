@@ -109,7 +109,15 @@ public partial class Server
         // verifié ici si packet.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packet.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
         Database db = new Database();
-        return db.Identification(packet.Data[0], packet.Data[1]) ? Tools.Errors.Success : Tools.Errors.Database;
+        try
+        {
+            return db.Identification(packet.Data[0], packet.Data[1]) ? Tools.Errors.Success : Tools.Errors.Database;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERREUR: Connection : " + ex);
+            return Tools.Errors.Database;
+        }
     }
 
     // ne pas toucher cette fonction
@@ -149,17 +157,20 @@ public partial class Server
         // doit chercher les infos dans la bdd et les mettre dans packet.Data comme indiquer
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
-        var list = new List<string>(retour.Data.ToList())
+        
+        Database db = new Database();
+        try
         {
-            //remplacer ici les string par les valeurs de la bdd sous forme de string
-            "XP",
-            "Niveau",
-            "Victoires",
-            "Defaites",
-            "Nbpartie"
-        };
-        retour.Data = list.ToArray();
-        retour.Error = Tools.Errors.None; // remplacer par "false" si erreur
+            retour.Data = db.GetStatistique(packet.IdPlayer);
+            retour.Error = Tools.Errors.Success;
+        }
+        catch (Exception ex)
+        {
+            retour.Data = Array.Empty<string>();
+            retour.Error = Tools.Errors.Database;
+            Console.WriteLine("ERREUR: Statistics : " + ex);
+        }
+        
         return retour;
     }
 
@@ -189,17 +200,35 @@ public partial class Server
         // doit chercher les infos dans la bdd pour les room dispo et les mettre dans packet.Data comme indiquer
         var retour = new Packet(packet.Type, packet.IdMessage, true, packet.IdPlayer,
             Array.Empty<string>());
-        var list = new List<string>(retour.Data.ToList());
-        for (var i = 0; i < 1; i++) // boucle a faire pour nb room
+        
+        string[] res_db = Array.Empty<string>();
+        Database db = new Database();
+        try
         {
-            list.Add("id room"); // id room
-            list.Add("pseudo hote"); // pseudo de l'hote de la room
+            res_db = db.GetRoomList();
+            retour.Error = Tools.Errors.Success;
+        }
+        catch (Exception ex)
+        {
+            retour.Data = Array.Empty<string>();
+            retour.Error = Tools.Errors.Database;
+            Console.WriteLine("ERREUR: Statistics : " + ex);
+        }
+        
+        var list = new List<string>(retour.Data.ToList());
+        int taille = res_db.Length;
+        
+        for (var i = 0; i < taille; i+=3) // boucle a faire pour nb room
+        {
+            list.Add(res_db[i]); // id room
+            list.Add(res_db[i+1]); // pseudo de l'hote de la room
+            //TODO
             list.Add("nb joueur present"); // nb joueur deja present
-            list.Add("nb joueur max"); // nb joueur max de la room
+            list.Add(res_db[i+2]); // nb joueur max de la room
         }
 
         retour.Data = list.ToArray();
-        retour.Error = Tools.Errors.None; //remplacer par "false" si erreur
+         
         return retour;
     }
 

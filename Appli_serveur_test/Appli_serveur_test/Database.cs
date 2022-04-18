@@ -88,28 +88,28 @@ public class Database
         return (string[])res.ToArray(typeof(string));
     }
     
-    public void IncrementeNbParties(int idu)
+    public void IncrementeNbParties(ulong idu)
     {
         string commande = "update Utilisateur set NbParties =  NbParties + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
     
-    public void IncrementeVictoires(int idu)
+    public void IncrementeVictoires(ulong idu)
     {
         string commande = "update Utilisateur set Victoires =  Victoires + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
     
-    public void IncrementeDefaites(int idu)
+    public void IncrementeDefaites(ulong idu)
     {
         string commande = "update Utilisateur set Defaites =  Defaites + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
     
-    public int GetXp(int idu)
+    public int GetXp(ulong idu)
     {
         string commande = "select XP from Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -119,7 +119,7 @@ public class Database
         return XP;
     }
     
-    public void AddXp(int idu, int xp)
+    public void AddXp(ulong idu, int xp)
     {
         int CurExp = GetXp(idu);
         int lvl = (CurExp + xp) / 100;
@@ -152,7 +152,7 @@ public class Database
         return 0;
     }
     
-    public string GetPseudo(int idu)
+    public string GetPseudo(ulong idu)
     {
         string commande = "select Pseudo from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -167,7 +167,7 @@ public class Database
         return "";
     }
     
-    public string GetPhoto(int idu)
+    public string GetPhoto(ulong idu)
     {
         string commande = "select Photo from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -182,7 +182,7 @@ public class Database
         return "";
     }
     
-    public int GetNbVictoires(int idu)
+    public int GetNbVictoires(ulong idu)
     {
         string commande = "select Victoires from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -197,7 +197,7 @@ public class Database
         return 0;
     }
     
-    public int GetNiveau(int idu)
+    public int GetNiveau(ulong idu)
     {
         string commande = "select Niveau from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -212,7 +212,7 @@ public class Database
         return 0;
     }
     
-    public int GetNbefaites(int idu)
+    public int GetNbefaites(ulong idu)
     {
         string commande = "select Defaites from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -227,7 +227,7 @@ public class Database
         return 0;
     }
     
-    public int GetNbParties(int idu)
+    public int GetNbParties(ulong idu)
     {
         string commande = "select NbParties from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -316,7 +316,7 @@ public class Database
         ExecuteCommandeModification(commande,parametres);
     }
     
-    void RemplirTuiles(Dictionary<int, int> dico)
+    void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
         string commande = "SELECT T.IDT,M.Proba FROM Tuile T,Modele M where T.IDM = M.IDM;";
         string[] parametres = Array.Empty<string>();
@@ -329,7 +329,7 @@ public class Database
         {
             try
             {
-                dico.Add(Convert.ToInt32(res.Result[i]), Convert.ToInt32(res.Result[i + 1]));
+                dico.Add(Convert.ToUInt64(res.Result[i]), Convert.ToUInt64(res.Result[i + 1]));
             }
             catch (Exception ex)
             {
@@ -337,5 +337,29 @@ public class Database
             }
         }
         
+    }
+    
+    public string[] GetStatistique(ulong idu)
+    {
+        string commande = "select XP,Niveau,Victoires,Defaites,Nbparties, from Utilisateur where IDU = @pIDU;";
+        string[] parametres = new[] {"pIDU", idu.ToString()};
+        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+        
+        if (res.Result.Length == 0)
+            return Array.Empty<string>();
+        
+        return res.Result.ToArray();
+    }
+    
+    public string[] GetRoomList()
+    {
+        string commande = "select IDP,Moderateur,NbMaxJ from Partie where Prive = 0;";
+        string[] parametres = Array.Empty<string>();
+        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+        
+        if (res.Result.Length == 0)
+            return Array.Empty<string>();
+        
+        return res.Result.ToArray();
     }
 }
