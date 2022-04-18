@@ -9,7 +9,7 @@ public class Database
     
     public Database()
     {
-        connString = "Host=192.168.100.118;Port=10000;Username=ubuntu;Password=PI_Carcassheim;Database=projet.db";
+        connString = "Host=192.168.100.119;Port=5432;Username=pro;Password=PI_Carcassheim;Database=carcassheim";
     }
 
     public NpgsqlConnection Connect()
@@ -39,7 +39,7 @@ public class Database
             {
                 cmd.Parameters.AddWithValue(parametres[i], parametres[i+1]);
             }
-
+		cmd.Prepare();
             try
             {
                 await cmd.ExecuteNonQueryAsync();
@@ -84,7 +84,7 @@ public class Database
         }
 
         connection.Close();
-        return (string[])res.ToArray();
+        return (string[])res.ToArray(typeof(string));
     }
     
     public void IncrementeNbParties(int idu)
@@ -256,11 +256,11 @@ public class Database
     
     public bool Identification(string login, string mdp)
     {
-        string commande = "SELECT MDP FROM Utilisateur WHERE Pseudo = @(pLOGIN);";
-        string[] parametres = new[] {"pLOGIN", login};
+        string commande = "SELECT MDP FROM Utilisateur WHERE Pseudo = @LOGIN;";
+        string[] parametres = new[] {"LOGIN", login};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
 
-        if (res.Result[0] == "")
+        if (res.Result.Length == 0)
             return false;
 
         if (String.Equals(res.Result[0], mdp))
