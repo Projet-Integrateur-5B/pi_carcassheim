@@ -196,7 +196,7 @@ public class Serveur_main : MonoBehaviour
                 break;
         }
 
-        string[] test = { "test", "aucuneidee" };
+        string[] test = { "test", "aucuneidee"};
         error_value = socket.Communication(ref original, Tools.IdMessage.Login, test);
         /*Console.WriteLine("\n {0} \n", original.Data[12]);
         try
