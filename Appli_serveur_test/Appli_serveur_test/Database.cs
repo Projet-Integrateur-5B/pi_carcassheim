@@ -39,7 +39,7 @@ public class Database
             {
                 cmd.Parameters.AddWithValue(parametres[i], parametres[i+1]);
             }
-		cmd.Prepare();
+		    cmd.Prepare();
             try
             {
                 await cmd.ExecuteNonQueryAsync();
@@ -66,6 +66,7 @@ public class Database
             {
                 cmd.Parameters.AddWithValue(parametres[i], parametres[i+1]);
             }
+            cmd.Prepare();
             
             await using (var reader = await cmd.ExecuteReaderAsync())
             {
@@ -89,28 +90,28 @@ public class Database
     
     public void IncrementeNbParties(int idu)
     {
-        string commande = "update Utilisateur set NbParties =  NbParties + 1 where IDU = (@pIDU);";
+        string commande = "update Utilisateur set NbParties =  NbParties + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
     
     public void IncrementeVictoires(int idu)
     {
-        string commande = "update Utilisateur set Victoires =  Victoires + 1 where IDU = (@pIDU);";
+        string commande = "update Utilisateur set Victoires =  Victoires + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
     
     public void IncrementeDefaites(int idu)
     {
-        string commande = "update Utilisateur set Defaites =  Defaites + 1 where IDU = (@pIDU);";
+        string commande = "update Utilisateur set Defaites =  Defaites + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
     
     public int GetXp(int idu)
     {
-        string commande = "select XP from Utilisateur where IDU =  (@pIDU);";
+        string commande = "select XP from Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         int XP = Convert.ToInt32(res.Result[0]);
@@ -123,7 +124,7 @@ public class Database
         int CurExp = GetXp(idu);
         int lvl = (CurExp + xp) / 100;
         CurExp = (CurExp + xp) % 100;
-        string commande = "update Utilisateur set XP =  Defaites + 1 where IDU = (@pIDU);";
+        string commande = "update Utilisateur set XP =  Defaites + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pCUREXP",CurExp.ToString(),"pLVL",lvl.ToString(), idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
@@ -153,7 +154,7 @@ public class Database
     
     public string GetPseudo(int idu)
     {
-        string commande = "select Pseudo from table Utilisateur where IDU = (@pIDU);";
+        string commande = "select Pseudo from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
@@ -168,7 +169,7 @@ public class Database
     
     public string GetPhoto(int idu)
     {
-        string commande = "select Photo from table Utilisateur where IDU = (@pIDU);";
+        string commande = "select Photo from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
@@ -183,7 +184,7 @@ public class Database
     
     public int GetNbVictoires(int idu)
     {
-        string commande = "select Victoires from table Utilisateur where IDU = (@pIDU);";
+        string commande = "select Victoires from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
@@ -198,7 +199,7 @@ public class Database
     
     public int GetNiveau(int idu)
     {
-        string commande = "select Niveau from table Utilisateur where IDU = (@pIDU);";
+        string commande = "select Niveau from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
@@ -213,7 +214,7 @@ public class Database
     
     public int GetNbefaites(int idu)
     {
-        string commande = "select Defaites from table Utilisateur where IDU = (@pIDU);";
+        string commande = "select Defaites from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
@@ -228,7 +229,7 @@ public class Database
     
     public int GetNbParties(int idu)
     {
-        string commande = "select NbParties from table Utilisateur where IDU = (@pIDU);";
+        string commande = "select NbParties from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
@@ -243,7 +244,7 @@ public class Database
     
     public void Drop(string tableName)
     {
-        string commande = "DROP Table @(pTABLENAME);";
+        string commande = "DROP Table @pTABLENAME;";
         string[] parametres = new[] {"pTABLENAME", tableName};
         ExecuteCommandeModification(commande,parametres);
     }
@@ -256,8 +257,8 @@ public class Database
     
     public bool Identification(string login, string mdp)
     {
-        string commande = "SELECT MDP FROM Utilisateur WHERE Pseudo = @LOGIN;";
-        string[] parametres = new[] {"LOGIN", login};
+        string commande = "SELECT MDP FROM Utilisateur WHERE Pseudo = @pLOGIN;";
+        string[] parametres = new[] {"pLOGIN", login};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         if (res.Result.Length == 0)
@@ -274,7 +275,7 @@ public class Database
 
         if (age >= 13)
         {
-            string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,Photo,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@(pPSEUDO),@(pMDP),@(pMAIL),@(pPHOTO),@(pXP),@(pNIVEAU),@(pVICTOIRES),@(pDEFAITES),@(pNBPARTIES),@(pDATENAISS));";
+            string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,Photo,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@pPSEUDO,@pMDP,@pMAIL,@pPHOTO,@pXP,@pNIVEAU,@pVICTOIRES,@pDEFAITES,@pNBPARTIES,@pDATENAISS;";
             string[] parametres = new[] {"pPSEUDO", Pseudo,"pMDP", MDP,"pMAIL", Mail,"pPHOTO", Photo,"pXP", Xp.ToString(),"pNIVEAU", Niveau.ToString(),"pVICTOIRES", Victoires.ToString(),"pDEFAITES", Defaites.ToString(),"pNBPARTIES", Nbparties.ToString(),"pDATENAISS", DateNaiss};
             ExecuteCommandeModification(commande,parametres);
         }
@@ -286,7 +287,7 @@ public class Database
     
     public void AddExtension(string Nom)
     {
-        string commande = "INSERT INTO Extension (Nom) VALUES( @(pNOM));";
+        string commande = "INSERT INTO Extension (Nom) VALUES( @pNOM);";
         string[] parametres = new[] {"pNOM", Nom};
         ExecuteCommandeModification(commande,parametres);
     }
@@ -294,7 +295,7 @@ public class Database
     // fonction d'ajout de modèle
     public void AddModele(int Proba, string Nom, int IDE)
     {
-        string commande = "INSERT INTO Extension (Proba,Nom,IDE) VALUES( @(pPROBA), @(pNOM), @(pIDE));";
+        string commande = "INSERT INTO Extension (Proba,Nom,IDE) VALUES( @pPROBA, @pNOM, @pIDE);";
         string[] parametres = new[] {"pPROBA",Proba.ToString(),"pNOM", Nom,"pIDE",IDE.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
@@ -302,7 +303,7 @@ public class Database
     // focntion d'ajout de la tuile  
     public void AddTuile(int IDM, string Image)
     {
-        string commande = "INSERT INTO Tuile (IDM,Image) VALUES(@(pIDM), @(pIMAGE));";
+        string commande = "INSERT INTO Tuile (IDM,Image) VALUES(@pIDM, @pIMAGE);";
         string[] parametres = new[] {"pIDM",IDM.ToString(),"pIMAGE", Image};
         ExecuteCommandeModification(commande,parametres);
     }
@@ -310,7 +311,7 @@ public class Database
     // focntion d'ajout de la partie 
     public void AddPartie(int Moderateur, string Statut, int NbMaxJ, string Prive, int Timer, int TMaxJ, int Meeples)
     {
-        string commande = "INSERT INTO Partie (Moderateur,Statut,NbMaxJ,Prive,Timer,TMaxJ,Meeples) VALUES(@(pMODERATEUR), @(pSTATUT), @(pNBMAXJ), @(pPRIVE), @(pTIMER), @(pTMAXJ), @(pMEEPLES));";
+        string commande = "INSERT INTO Partie (Moderateur,Statut,NbMaxJ,Prive,Timer,TMaxJ,Meeples) VALUES(@pMODERATEUR, @pSTATUT, @pNBMAXJ, @pPRIVE, @pTIMER, @pTMAXJ, @pMEEPLES);";
         string[] parametres = new[] {"pMODERATEUR",Moderateur.ToString(),"pSTATUT", Statut,"pNBMAXJ",NbMaxJ.ToString(),"pPRIVE",Prive,"pTIMER",Timer.ToString(),"pTMAXJ",TMaxJ.ToString(),"pMEEPLES",Meeples.ToString()};
         ExecuteCommandeModification(commande,parametres);
     }
