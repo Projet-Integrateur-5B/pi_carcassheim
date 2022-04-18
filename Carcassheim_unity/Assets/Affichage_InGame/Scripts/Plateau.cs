@@ -17,4 +17,29 @@ public class Plateau : MonoBehaviour
     {
 
     }
+
+    public Tuile getTileAt(Position pos)
+    {
+        return null;
+    }
+
+    public void setTilePossibilities(PlayerRepre player, Tuile tile)
+    {
+
+    }
+
+    public void displayTilePossibilities()
+    {
+
+    }
+
+    public void displayMeeplePossiblities()
+    {
+
+    }
+
+    public void finalizeTurn()
+    {
+
+    }
 }
