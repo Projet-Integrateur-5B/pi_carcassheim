@@ -196,8 +196,8 @@ public class Serveur_main : MonoBehaviour
                 break;
         }
 
-        string[] test = { "test", "aucuneidee"};
-        error_value = socket.Communication(ref original, Tools.IdMessage.Login, test);
+        string[] test = { "test", "aucuneidee", "supermail@gmail.com", "1990/12/24"};
+        error_value = socket.Communication(ref original, Tools.IdMessage.Signup, test);
         /*Console.WriteLine("\n {0} \n", original.Data[12]);
         try
         {

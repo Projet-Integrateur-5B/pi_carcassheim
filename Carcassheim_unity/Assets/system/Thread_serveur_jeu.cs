@@ -14,7 +14,7 @@ public partial class Thread_serveur_jeu
 	private Dictionary<int, int> _dico_joueur_score; // Contient les ID's de chaque joueur
 	private int _id_moderateur; // Identifiant du joueur modérateur
 
-	private string _statut_partie;
+	private bool _statut_partie; // false -> en cours de création, true -> lancée
 
 	private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
@@ -46,7 +46,7 @@ public partial class Thread_serveur_jeu
 		_dico_joueur_score.Add(id_joueur_createur,0);
 		_id_moderateur = id_joueur_createur;
 
-		_statut_partie = "ACCUEIL";
+		_statut_partie = false;
 
 		// Initialisation des valeurs par défaut
 		_mode = 0;
