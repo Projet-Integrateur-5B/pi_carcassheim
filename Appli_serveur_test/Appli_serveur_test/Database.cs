@@ -353,7 +353,7 @@ public class Database
     
     public string[] GetRoomList()
     {
-        string commande = "select IDP,Moderateur,NbMaxJ from Partie where Prive = 0;";
+        string commande = "select IDP,Moderateur,NbMaxJ from Partie where Prive = 0 and Status = 0;";
         string[] parametres = Array.Empty<string>();
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
