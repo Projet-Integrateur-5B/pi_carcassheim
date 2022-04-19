@@ -33,6 +33,7 @@ public static class Tools
     /// </summary>
     public enum IdMessage : byte
     {
+
         Default = 0,
         Login = 1,
         Logout = 2,
@@ -43,19 +44,21 @@ public static class Tools
         RoomJoin = 7,
         RoomLeave = 8,
         RoomReady = 9,
-        RoomSettings = 10,
-        RoomStart = 11,
-        TuileDraw = 12,
-        TuilePlacement = 13,
-        PionPlacement = 14,
-        CancelTuilePlacement = 15,
-        CancelPionPlacement = 16,
-        TourValidation = 17,
-        TimerExpiration = 18,
-        WarningCheat = 19,
-        KickFromGame = 20,
-        LeaveGame = 21,
-        EndGame = 22
+        RoomSettingsGet = 10,
+        RoomSettingsSet = 11,
+        RoomStart = 12,
+        TuileDraw = 13,
+        TuilePlacement = 14,
+        PionPlacement = 15,
+        CancelTuilePlacement = 16,
+        CancelPionPlacement = 17,
+        TourValidation = 18,
+        TimerExpiration = 19,
+        WarningCheat = 20,
+        KickFromGame = 21,
+        LeaveGame = 22,
+        EndGame = 23
+
     }
 
     /// <summary>
