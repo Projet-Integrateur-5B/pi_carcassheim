@@ -57,8 +57,11 @@ public partial class Server
             case Tools.IdMessage.RoomReady:
                 packet.Error = RoomReady(state.Packet);
                 break;
-            case Tools.IdMessage.RoomSettings:
-                packet.Data = RoomSettings(state.Packet);
+            case Tools.IdMessage.RoomSettingsGet:
+                packet.Data = RoomSettingsGet(state.Packet);
+                break;
+            case Tools.IdMessage.RoomSettingsSet:
+                packet.Data = RoomSettingsSet(state.Packet);
                 break;
             case Tools.IdMessage.RoomStart:
                 RoomStart(state.Packet, ref packet);
@@ -191,7 +194,7 @@ public partial class Server
                 "10001" // nouveau port
             };
             packet.Data = list.ToArray();
-            packet.Data = packet.Data.Concat(RoomSettings(packetReceived)).ToArray();
+            packet.Data = packet.Data.Concat(RoomSettingsGet(packetReceived)).ToArray();
             packet.Error = Tools.Errors.Success;
         }
     }
@@ -251,11 +254,41 @@ public partial class Server
     }
 
     /// <summary>
-    ///     parametre d'une room
+    ///     recup parametre d'une room
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static string[] RoomSettings(Packet packetReceived)
+    public static string[] RoomSettingsGet(Packet packetReceived)
     {
+        // id room dans packetReceived.IdRoom
+        // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
+        var retour = new Packet();
+        var list = new List<string>(retour.Data.ToList())
+        {
+            "nb joueur max",
+            "partie privé ou public",
+            "mode de la partie",
+            "nb tuile",
+            "nb pion",
+            "timer partie",
+            "timer par joueur",
+            "nb score max" // parametre de la room a donner ici ( mettre a -1 si non remplit)
+        };
+        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
+        {
+            list.Add("pseudo joueur"); // pseudo du joueur X
+        }
+
+        retour.Data = list.ToArray();
+        return retour.Data;
+    }
+
+    /// <summary>
+    ///     modif parametre d'une room
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    public static string[] RoomSettingsSet(Packet packetReceived)
+    {
+        // info a modif dans packetReceived.Data
         // id room dans packetReceived.IdRoom
         // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
         var retour = new Packet();
