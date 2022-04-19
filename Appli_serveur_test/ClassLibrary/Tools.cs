@@ -23,7 +23,6 @@ public static class Tools
         Data = 5,
         Permission = 6,
         Success = 7,
-        Database = 8,
         ToBeDetermined = 999
     }
 
@@ -42,19 +41,20 @@ public static class Tools
         RoomJoin = 7,
         RoomLeave = 8,
         RoomReady = 9,
-        RoomSettings = 10,
-        RoomStart = 11,
-        TuileDraw = 12,
-        TuilePlacement = 13,
-        PionPlacement = 14,
-        CancelTuilePlacement = 15,
-        CancelPionPlacement = 16,
-        TourValidation = 17,
-        TimerExpiration = 18,
-        WarningCheat = 19,
-        KickFromGame = 20,
-        LeaveGame = 21,
-        EndGame = 22
+        RoomSettingsGet = 10,
+        RoomSettingsSet = 11,
+        RoomStart = 12,
+        TuileDraw = 13,
+        TuilePlacement = 14,
+        PionPlacement = 15,
+        CancelTuilePlacement = 16,
+        CancelPionPlacement = 17,
+        TourValidation = 18,
+        TimerExpiration = 19,
+        WarningCheat = 20,
+        KickFromGame = 21,
+        LeaveGame = 22,
+        EndGame = 23
     }
 
     /// <summary>
@@ -211,6 +211,7 @@ public static class Tools
         {
             try
             {
+                // get the data length
                 dataLength = Encoding.ASCII.GetBytes(original.Data[0]).Length;
             }
             catch (Exception e)
@@ -219,23 +220,36 @@ public static class Tools
                 throw;
             }
 
+            // ajout d'un string dans le packet si il y a assez de place
             if (dataLength < headerBytesMaxLength - 3)
             {
+                // ajoute la data dans le packet
                 packet.Data = new List<string>(packet.Data.ToList()) { original.Data[0] }.ToArray();
+                // réduit le nombre de string qu'il reste à ajouter
                 packetLength--;
+                // réduit la place disponible dans le reste du packet
                 headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
+                // supprime de original la data mis dans le packet
                 original.Data = original.Data.Where((source, index) => index != 0).ToArray();
             }
             else
             {
+                // récupère ce qu'on peut encore rajouter dans le reste du packet
                 var chaine = original.Data[0][..(headerBytesMaxLength - 5)];
                 // original.Data[0].Substring(0, headerBytesMaxLength - 5);
+
+                // ajoute la chaine récupèrer
                 packet.Data = new List<string>(packet.Data.ToList()) { chaine }.ToArray();
+
+                //supprimer dans original la chaine ajouter
                 original.Data[0] = original.Data[0][(headerBytesMaxLength - 5)..];
                 // original.Data[0].Substring(headerBytesMaxLength - 5);
 
+                //packet non final
                 packet.Final = false;
+                //ajout du packet
                 packets.Add(packet);
+                //reinitialisation du packet pour le prochain ajout
                 packet = headerBytes.ByteArrayToPacket(ref error);
                 packet.Data = new List<string>(packet.Data.ToList()) { "" }.ToArray();
                 if (error != Errors.None)
@@ -243,13 +257,15 @@ public static class Tools
                     // TODO : ByteArrayToPacket => handle error
                     return new List<Packet>();
                 }
-
+                // reinitialisation de la place dispo dans le prochain packet
                 headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength - 4;
             }
 
             if (packetLength == 0)
             {
+                // dernier packet
                 packet.Final = true;
+                // ajout du dernier pacekt
                 packets.Add(packet);
                 break;
             }
