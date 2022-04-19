@@ -275,7 +275,7 @@ public class Database
 
         if (age >= 13)
         {
-            string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,Photo,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@pPSEUDO,@pMDP,@pMAIL,@pPHOTO,@pXP,@pNIVEAU,@pVICTOIRES,@pDEFAITES,@pNBPARTIES,@pDATENAISS;";
+            string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,Photo,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@pPSEUDO,@pMDP,@pMAIL,@pPHOTO,@pXP,@pNIVEAU,@pVICTOIRES,@pDEFAITES,@pNBPARTIES,@pDATENAISS);";
             string[] parametres = new[] {"pPSEUDO", Pseudo,"pMDP", MDP,"pMAIL", Mail,"pPHOTO", Photo,"pXP", Xp.ToString(),"pNIVEAU", Niveau.ToString(),"pVICTOIRES", Victoires.ToString(),"pDEFAITES", Defaites.ToString(),"pNBPARTIES", Nbparties.ToString(),"pDATENAISS", DateNaiss};
             ExecuteCommandeModification(commande,parametres);
         }
