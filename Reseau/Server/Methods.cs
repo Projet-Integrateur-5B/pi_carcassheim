@@ -156,6 +156,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void Statistics(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // id joueur dans packetReceived.IdPlayer
         // doit chercher les infos dans la bdd et les mettre dans packet.Data comme indiquer
 
@@ -206,6 +207,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void RoomList(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // doit chercher les infos dans la bdd pour les room dispo et les mettre dans packet.Data comme indiquer
         var list = new List<string>(packet.Data.ToList());
         for (var i = 0; i < 1; i++) // boucle a faire pour nb room
@@ -259,6 +261,7 @@ public partial class Server
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     public static string[] RoomSettingsGet(Packet packetReceived)
     {
+        _ = packetReceived;
         // id room dans packetReceived.IdRoom
         // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
         var retour = new Packet();
@@ -288,6 +291,7 @@ public partial class Server
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     public static string[] RoomSettingsSet(Packet packetReceived)
     {
+        _ = packetReceived;
         // info a modif dans packetReceived.Data
         // id room dans packetReceived.IdRoom
         // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
@@ -319,6 +323,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void RoomStart(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // lancement de la partie
         // id room dans packetreceived.IdRoom
         // start le timer general
@@ -340,6 +345,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void TuileDraw(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // tirage de 3 tuiles pour le joueur
         var list = new List<string>(packet.Data.ToList())
         {
@@ -354,17 +360,23 @@ public partial class Server
     ///     placement d'une tuile
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static Tools.Errors TuilePlacement(Packet packetReceived) =>
+    public static Tools.Errors TuilePlacement(Packet packetReceived)
+    {
+        _ = packetReceived;
         // test si la tuile est bien a un emplacement valide
-        Tools.Errors.Unknown; // remplacer par Permission si validation du joueur sinon par Success
+        return Tools.Errors.Unknown; // remplacer par Permission si validation du joueur sinon par Success
+    }
 
     /// <summary>
     ///     placement d'un pion
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static Tools.Errors PionPlacement(Packet packetReceived) =>
-        // test si le pion est bien a un emplacement valide
-        Tools.Errors.Unknown; // remplacer par Permission si validation du joueur sinon par Success
+    public static Tools.Errors PionPlacement(Packet packetReceived)
+    {
+        _ = packetReceived;
+        // test si la Pion est bien a un emplacement valide
+        return Tools.Errors.Unknown; // remplacer par Permission si validation du joueur sinon par Success
+    }
 
     /// <summary>
     ///     validation d'un tour
@@ -373,6 +385,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void TourValidation(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // valide le tour
         // calculer les points du tour avec les zone qui viennent de se fermé
         var list = new List<string>(packet.Data.ToList()) // a faire seulement si une zone se ferme ( d'apres ce que j'ai compris )
@@ -402,6 +415,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void LeaveGame(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // joueur quitte la partie ( le supprimer de la partie du coup ? )
         var list = new List<string>(packet.Data.ToList())
         {
@@ -418,6 +432,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void EndGame(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // partie finit, on choisis un emplacement X Y de tuile où sera afficher les scores
         // donner les score des joueurs ( peut importe l'ordre )
         var list = new List<string>(packet.Data.ToList())
@@ -439,7 +454,11 @@ public partial class Server
     ///     deconnection d'un joueur
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static Tools.Errors Logout(Packet packetReceived) => Tools.Errors.None;
+    public static Tools.Errors Logout(Packet packetReceived)
+    {
+        _ = packetReceived;
+        return Tools.Errors.None;
+    }
 
     /// <summary>
     ///     creation d'une room
@@ -448,6 +467,7 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void RoomCreate(Packet packetReceived, ref Packet packet)
     {
+        _ = packetReceived;
         // creation d'une nouvelle room par un joueur
         var list = new List<string>(packet.Data.ToList())
         {
@@ -472,9 +492,12 @@ public partial class Server
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void CancelPionPlacement(Packet packetReceived, ref Packet packet) =>
+    public static void CancelPionPlacement(Packet packetReceived, ref Packet packet)
+    {
+        _ = packetReceived;
         // cancel le placement du pion qui avais été validé par le joueur
         packet.Error = Tools.Errors.None; // remplacer par Permission si aucune erreur sinon par Unknown
+    }
 
     /// <summary>
     ///     warning envoyer quand suspision de triche
