@@ -57,6 +57,35 @@ public static class Tools
         EndGame = 23
     }
 
+    public enum PlayerStatus
+    {
+        Default = 0,
+        Success = 1,
+        Kicked = 2,
+        Full = 3,
+        Found = 4,
+        NotFound = -1
+    }
+
+    public enum Timer 
+    {
+        Minute = 60,
+        DemiHeure = 1800,
+        Heure = 3600,
+    }
+
+    public enum Meeple
+    {
+        Quatre = 4,
+        Huit = 8,
+        Dix = 10
+    }
+
+    public enum Mode
+    {
+        Default = 0
+    }
+
     /// <summary>
     ///     Converts an instance of <see cref="Packet" /> to a byte array (serialized).
     /// </summary>

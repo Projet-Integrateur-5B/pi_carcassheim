@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ClassLibrary;
 
 namespace system
 {
@@ -13,20 +14,24 @@ namespace system
 
         private readonly int _id_partie;
 
-        private Dictionary<int, int> _dico_joueur_score; // Contient les ID's de chaque joueur
-        private int _id_moderateur; // Identifiant du joueur modérateur
+        /* Attributs en lien avec le Dictionary Player */
+        private Dictionary<long, Player> _dico_joueur; // Contient les ID's de chaque joueur
+        private Semaphore _s_dico_joueur;
+        private uint _nombre_joueur;
+        private uint _nombre_joeur_max;
+        private long _id_moderateur; // Identifiant du joueur modérateur
 
         private string _statut_partie;
 
-        private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
+        private Tools.Mode _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
         private int _nb_tuiles;
         private int _score_max;
 
         private bool _privee;
-        private int _timer; // En secondes
-        private int _timer_max_joueur; // En secondes
-        private int _meeples; // Nombre de meeples par joueur
+        private Tools.Timer _timer; // En secondes
+        private Tools.Timer _timer_max_joueur; // En secondes
+        private Tools.Meeple _meeples; // Nombre de meeples par joueur
 
 
         // Champs nécessaires pour le bon fonctionnement du programme
@@ -38,24 +43,145 @@ namespace system
         {
             _id_partie = id_partie;
 
-            _dico_joueur_score = new Dictionary<int, int>();
-
-            _dico_joueur_score.Add(id_joueur_createur, 0);
+            /* Zone  du Dictionary Score */
+            _dico_joueur = new Dictionary<long, Player>();
+            _s_dico_joueur = new Semaphore(1, 1);
+            _nombre_joueur = 1;
+            _nombre_joeur_max = 8;
+            _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur));
             _id_moderateur = id_joueur_createur;
 
             _statut_partie = "ACCUEIL";
 
             // Initialisation des valeurs par défaut
-            _mode = 0;
+            _mode = Tools.Mode.Default;
             _nb_tuiles = 60;
             _score_max = -1;
             _privee = true; // Une partie est par défaut privée
-            _timer = 3600; // Une heure par défaut
-            _timer_max_joueur = 40;
-            _meeples = 8;
+            _timer = Tools.Timer.Heure; // Une heure par défaut
+            _timer_max_joueur = Tools.Timer.Minute;
+            _meeples = Tools.Meeple.Huit;
         }
 
         // Méthodes
+
+        public Tools.PlayerStatus AddJoueur(long id_joueur)
+        {
+            _s_dico_joueur.WaitOne();
+            if (_nombre_joueur >= _nombre_joeur_max)
+            {
+                _s_dico_joueur.Release();
+                return Tools.PlayerStatus.Full;
+            }
+
+            if (_dico_joueur.ContainsKey(id_joueur))
+            {
+                _s_dico_joueur.Release();
+                return Tools.PlayerStatus.Found;
+            }
+
+            _dico_joueur.Add(id_joueur, new Player(id_joueur));
+            _nombre_joueur++;
+            _s_dico_joueur.Release();
+
+            return Tools.PlayerStatus.Success;
+        }
+
+        public Tools.PlayerStatus RemoveJoueur(long id_joueur)
+        {
+
+            _s_dico_joueur.WaitOne();
+            bool res = _dico_joueur.Remove(id_joueur);
+            if (res)
+            {
+                _nombre_joueur--;
+                if(id_joueur == _id_moderateur)
+                {
+                    if(_dico_joueur.Count != 1)
+                    {
+                        _id_moderateur = _dico_joueur.First().Key;
+                    }
+                    else
+                    {/* Il n'y a plus personne dans la room */
+                        Close();
+                    }
+                }
+                    
+                _s_dico_joueur.Release();
+                
+                return Tools.PlayerStatus.Success;
+            }
+                
+            _s_dico_joueur.Release();
+            return Tools.PlayerStatus.NotFound;
+        }
+
+
+        public Tools.PlayerStatus SetPlayerTriche(long id_joueur)
+        {
+            _s_dico_joueur.WaitOne();
+            if (!_dico_joueur.ContainsKey(id_joueur))
+            {
+                _s_dico_joueur.Release();
+                return Tools.PlayerStatus.NotFound;
+            }
+
+            Player player = _dico_joueur[id_joueur];
+            player._s_player.WaitOne();
+            player._triche++;
+            if(player._triche == (uint)Tools.PlayerStatus.Kicked)
+            {
+                player._s_player.Release();
+                _s_dico_joueur.Release();
+                RemoveJoueur(id_joueur);
+                return Tools.PlayerStatus.Kicked;
+            }
+            player._s_player.Release();
+            _s_dico_joueur.Release();
+
+            return Tools.PlayerStatus.Success;
+        }
+
+        public Tools.PlayerStatus SetPlayerStatus(long id_joueur)
+        {
+            _s_dico_joueur.WaitOne();
+            if (!_dico_joueur.ContainsKey(id_joueur))
+            {
+                _s_dico_joueur.Release();
+                return Tools.PlayerStatus.NotFound;
+            }
+
+            Player player = _dico_joueur[id_joueur];
+            player._s_player.WaitOne();
+            player._is_ready = !player._is_ready;
+            player._s_player.Release();
+            _s_dico_joueur.Release();
+
+            return Tools.PlayerStatus.Success;
+        }
+
+        public Tools.PlayerStatus SetPlayerPoint(long id_joueur,uint score)
+        {
+            _s_dico_joueur.WaitOne();
+            if (!_dico_joueur.ContainsKey(id_joueur))
+            {
+                _s_dico_joueur.Release();
+                return Tools.PlayerStatus.NotFound;
+            }
+
+            Player player = _dico_joueur[id_joueur];
+            player._s_player.WaitOne();
+            player._score += score;
+            player._s_player.Release();
+            _s_dico_joueur.Release();
+
+            return Tools.PlayerStatus.Success;
+        }
+
+        public void Close()
+        {
+            //TODO
+        }
 
         public void Lancement_thread_serveur_jeu()
         {
