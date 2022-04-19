@@ -19,28 +19,47 @@ public class Communication_ingame : MonoBehaviour
     private int _nb_tuiles;
     private int _score_max;
 
+    private int _nb_joueur_max;
     private bool _privee;
     private int _timer; // En secondes
     private int _timer_max_joueur; // En secondes
     private int _meeples; // Nombre de meeples par joueur
 
 
-    // Start is called before the first frame update
-    void Start()
+    private Tools.Errors ReceiveRoomSettings(Socket socket)
     {
-        // ======================
-        // ==== DANS LE MENU ====
-        // ======================
+        var packet = new Packet();
 
-        // Boucle d'écoute du serveur
-
+        string[] nothing = new string[0];
+        var result = socket.Communication(ref packet, Tools.IdMessage.RoomSettingsGet, nothing);
         // === Première com : demande les settings de la room ===
 
-        // Etablissement de la communication réseau avec le thread com (synchrone)
-        Socket? socket = null;
-        var original = new Packet();
+        string[] dataReceived = packet.Data;
+        _nb_joueur_max = int.Parse(dataReceived[0]);
 
-        var error_value = Client.Connection(ref socket, 19000);
+        switch (dataReceived[1])
+        {
+            case "true":
+                _privee = true;
+                break;
+            case "false":
+                _privee = false;
+                break;
+            default:
+                break;
+        }
+
+        _mode = int.Parse(dataReceived[2]);
+        _nb_tuiles = int.Parse(dataReceived[3]);
+        _meeples = int.Parse(dataReceived[4]);
+        _timer = int.Parse(dataReceived[5]);
+        _timer_max_joueur = int.Parse(dataReceived[6]);
+
+        return result;
+    }
+
+    private void CheckErrorSocketConnect(Tools.Errors error_value)
+    {
         switch (error_value)
         {
             case Tools.Errors.None:
@@ -72,10 +91,10 @@ public class Communication_ingame : MonoBehaviour
                 Debug.Log(string.Format("Errors.Unknown"));
                 break;
         }
+    }
 
-        string[] data = { };
-        error_value = socket.Communication(ref original, Tools.IdMessage.RoomSettings, data);
-
+    private void CheckErrorSocketRS(Tools.Errors error_value)
+    {
         switch (error_value)
         {
             case Tools.Errors.None:
@@ -111,13 +130,33 @@ public class Communication_ingame : MonoBehaviour
                 Debug.Log(string.Format("Errors.Unknown"));
                 break;
         }
+    }
 
-        
+    // Start is called before the first frame update
+    void Start()
+    {
+        // ======================
+        // ==== DANS LE MENU ====
+        // ======================
+
+        // Boucle d'écoute du serveur
+        Socket? socket = null;
+
+        // Etablissement de la communication réseau avec le thread com (synchrone)
+
+        var errorValue = Client.Connection(ref socket, 19000);
+        CheckErrorSocketConnect(errorValue);
+
+
+        errorValue = ReceiveRoomSettings(socket);
+
+        CheckErrorSocketRS(errorValue);
 
         // A FAIRE - Mise à jour des paramètres de la partie
 
 
         int idClient = -1;
+
 
 
         while (!_statut_partie) // Boucle tant que la partie n'est pas lancée
@@ -131,7 +170,7 @@ public class Communication_ingame : MonoBehaviour
 
                 /*
                 string[] data = { };
-                error_value = socket.Communication(ref original, Tools.IdMessage.SetRoomSettings, data);
+                errorValue = socket.Communication(ref original, Tools.IdMessage.SetRoomSettings, data);
                 */
 
                 // OU réception du serveur : quelqu'un a rejoint la game
@@ -149,8 +188,8 @@ public class Communication_ingame : MonoBehaviour
 
 
         // Déconnexion du socket
-        error_value = Client.Disconnection(socket);
-        switch (error_value)
+        errorValue = Client.Disconnection(socket);
+        switch (errorValue)
         {
             case Tools.Errors.None:
                 break;
