@@ -270,15 +270,14 @@ public class Database
         return false;
     }
     
-    public void Adduser(string Pseudo, string MDP, string Mail, byte[] Photo, int Xp, int Niveau, int Victoires, int Defaites, int Nbparties, string DateNaiss)
+    public void Adduser(string Pseudo, string MDP, string Mail, int Xp, int Niveau, int Victoires, int Defaites, int Nbparties, string DateNaiss)
     {
         int age = GetAge(DateNaiss);
 
         if (age >= 13)
         {
-            string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,Photo,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@pPSEUDO,@pMDP,@pMAIL,@pPHOTO,@pXP,@pNIVEAU,@pVICTOIRES,@pDEFAITES,@pNBPARTIES,@pDATENAISS);";
-            var photoStr = Encoding.ASCII.GetString(Photo);
-            string[] parametres = new[] {"pPSEUDO", Pseudo,"pMDP", MDP,"pMAIL", Mail,"pPHOTO", photoStr,"pXP", Xp.ToString(),"pNIVEAU", Niveau.ToString(),"pVICTOIRES", Victoires.ToString(),"pDEFAITES", Defaites.ToString(),"pNBPARTIES", Nbparties.ToString(),"pDATENAISS", DateNaiss};
+            string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@pPSEUDO,@pMDP,@pMAIL,@pPHOTO,@pXP,@pNIVEAU,@pVICTOIRES,@pDEFAITES,@pNBPARTIES,@pDATENAISS);";
+            string[] parametres = new[] {"pPSEUDO", Pseudo,"pMDP", MDP,"pMAIL", Mail,"pXP", Xp.ToString(),"pNIVEAU", Niveau.ToString(),"pVICTOIRES", Victoires.ToString(),"pDEFAITES", Defaites.ToString(),"pNBPARTIES", Nbparties.ToString(),"pDATENAISS", DateNaiss};
             ExecuteCommandeModification(commande,parametres);
         }
         else
