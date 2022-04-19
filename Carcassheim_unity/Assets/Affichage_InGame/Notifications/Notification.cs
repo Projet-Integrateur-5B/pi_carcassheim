@@ -16,8 +16,8 @@ public class Notification : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        notification = false;
-        gameObject.SetActive(false);
+        // notification = false;
+        // gameObject.SetActive(false);
     }
 
     // Update is called once per frame
