@@ -59,6 +59,14 @@ def save_front_xml(tl_file: TileFile):
             id_el = ET.Element("id")
             id_el.text = f"{slot_id}"
             slot_el.append(id_el)
+
+            x_el = ET.Element("x")
+            x_el.text = f"{slot.x}"
+            slot_el.append(x_el)
+            y_el = ET.Element("y")
+            y_el.text = f"{slot.y}"
+            slot_el.append(y_el)
+            
             tile_slot_id_conv[tile.id][slot.id] = slot_id
 
             sprite_el = ET.Element("sprite")
