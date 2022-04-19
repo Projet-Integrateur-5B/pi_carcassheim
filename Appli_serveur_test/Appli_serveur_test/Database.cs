@@ -73,9 +73,8 @@ public class Database
             {
                 while (await reader.ReadAsync())
                 {
-                    int  tailleRow = (int)reader.Rows;
+                    int  tailleRow = (int)reader.FieldCount;
                     int  j;
-                    //Console.WriteLine(reader.GetString(0));
                     for ( j = 0; j < tailleRow; j++)
                     {
                         res.Add(reader.GetString(j));
@@ -262,9 +261,6 @@ public class Database
         object[] parametres = new object[] {"pLOGIN", login};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
 
-        for(int i=0; i < res.Result.Length; i++)
-            Console.WriteLine(res);
-        
         if (res.Result.Length == 0)
             return false;
 
@@ -343,7 +339,7 @@ public class Database
         
     }
     
-    public string[] GetStatistique(ulong idu)
+    public string[] GetStatistics(ulong idu)
     {
         string commande = "select XP,Niveau,Victoires,Defaites,Nbparties, from Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};

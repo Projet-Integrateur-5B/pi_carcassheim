@@ -22,7 +22,7 @@ public static class Tools
         Receive = 4,
         Data = 5,
         Permission = 6,
-        Success = 7,
+        Database = 7,
         ToBeDetermined = 999
     }
 
@@ -225,20 +225,20 @@ public static class Tools
             {
                 // ajoute la data dans le packet
                 packet.Data = new List<string>(packet.Data.ToList()) { original.Data[0] }.ToArray();
-                // réduit le nombre de string qu'il reste à ajouter
+                // rï¿½duit le nombre de string qu'il reste ï¿½ ajouter
                 packetLength--;
-                // réduit la place disponible dans le reste du packet
+                // rï¿½duit la place disponible dans le reste du packet
                 headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
                 // supprime de original la data mis dans le packet
                 original.Data = original.Data.Where((source, index) => index != 0).ToArray();
             }
             else
             {
-                // récupère ce qu'on peut encore rajouter dans le reste du packet
+                // rï¿½cupï¿½re ce qu'on peut encore rajouter dans le reste du packet
                 var chaine = original.Data[0][..(headerBytesMaxLength - 5)];
                 // original.Data[0].Substring(0, headerBytesMaxLength - 5);
 
-                // ajoute la chaine récupèrer
+                // ajoute la chaine rï¿½cupï¿½rer
                 packet.Data = new List<string>(packet.Data.ToList()) { chaine }.ToArray();
 
                 //supprimer dans original la chaine ajouter

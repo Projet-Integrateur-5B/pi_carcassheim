@@ -28,8 +28,6 @@ public partial class Server
         // TODO : get what the client asked from the database or whatever
         packet.Type = state.Packet.Type;
         packet.IdMessage = state.Packet.IdMessage;
-        packet.Error = state.Packet.Error;
-        packet.Final = state.Packet.Final;
         packet.IdPlayer = state.Packet.IdPlayer;
 
         // Check IdMessage : different action
@@ -37,10 +35,10 @@ public partial class Server
         switch (state.Packet.IdMessage)
         {
             case Tools.IdMessage.Login:
-                packet.Error = Login(state.Packet);
+                Login(state.Packet, ref packet);
                 break;
             case Tools.IdMessage.Signup:
-                packet.Error = Signup(state.Packet);
+                Signup(state.Packet, ref packet);
                 break;
             case Tools.IdMessage.Statistics:
                 Statistics(state.Packet, ref packet);
@@ -118,35 +116,44 @@ public partial class Server
     ///     connection au serveur du jeu
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <returns></returns>
-    public static Tools.Errors Login(Packet packetReceived)
+    /// /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void Login(Packet packetReceived, ref Packet packet)
     {
         // verifié ici si packetReceived.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packetReceived.Data[1] correspond au bon mdp
         // if a modifié pour return true si les infos sont valide
-        if (packetReceived.Data[0] == "pseudo" && packetReceived.Data[1] == "mdp18")
+        Database db = new Database();
+        try
         {
-            return Tools.Errors.Success;
+            var result = db.Identification(packetReceived.Data[0], packetReceived.Data[1]);
+            if(!result) packet.Error = Tools.Errors.Database;
         }
-
-        return Tools.Errors.Unknown;
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: Login : " + ex);
+            packet.Error = Tools.Errors.Database;
+        }
     }
 
     /// <summary>
     ///     inscription au jeu
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <returns></returns>
-    public static Tools.Errors Signup(Packet packetReceived)
+    /// /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void Signup(Packet packetReceived, ref Packet packet)
     {
         // verifie si les informations d'inscription sont valide ( ne sont pas les mêmes qu'un utilisateur deja inscrit
         // packetReceived.Data[0] = pseudp ; packetReceived.Data[1] = mdp ; packetReceived.Data[2] = mail ; packetReceived.Data[3] = date de naissance
         // if a modifié pour return true si info valide
-        if (packetReceived.Data[0] == "pseudo" && packetReceived.Data[1] == "mdp18")
+        Database db = new Database();
+        try
         {
-            return Tools.Errors.Success;
+            db.Adduser(packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], 0, 1, 0, 0, 0, packetReceived.Data[3]);
         }
-
-        return Tools.Errors.Unknown;
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: Signup : " + ex);
+            packet.Error = Tools.Errors.Database;
+        }
     }
 
     /// <summary>
@@ -156,21 +163,17 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void Statistics(Packet packetReceived, ref Packet packet)
     {
-        _ = packetReceived;
-        // id joueur dans packetReceived.IdPlayer
-        // doit chercher les infos dans la bdd et les mettre dans packet.Data comme indiquer
-
-        var list = new List<string>(packet.Data.ToList())
+        Database db = new Database();
+        try
         {
-            //remplacer ici les string par les valeurs de la bdd sous forme de string
-            "XP",
-            "Niveau",
-            "Victoires",
-            "Defaites",
-            "Nbpartie"
-        };
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Success; // remplacer par Unknown si erreur
+            packet.Data = db.GetStatistics(packetReceived.IdPlayer);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: Statistics : " + ex);
+            packet.Error = Tools.Errors.Database;
+            packet.Data = Array.Empty<string>();
+        }
     }
 
     /// <summary>
@@ -196,8 +199,9 @@ public partial class Server
             };
             packet.Data = list.ToArray();
             packet.Data = packet.Data.Concat(RoomSettingsGet(packetReceived)).ToArray();
-            packet.Error = Tools.Errors.Success;
+            packet.Error = Tools.Errors.None;
         }
+        // TODO
     }
 
     /// <summary>
@@ -207,19 +211,31 @@ public partial class Server
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void RoomList(Packet packetReceived, ref Packet packet)
     {
-        _ = packetReceived;
-        // doit chercher les infos dans la bdd pour les room dispo et les mettre dans packet.Data comme indiquer
-        var list = new List<string>(packet.Data.ToList());
-        for (var i = 0; i < 1; i++) // boucle a faire pour nb room
+        string[] res_db = Array.Empty<string>();
+        Database db = new Database();
+        try
         {
-            list.Add("id room"); // id room
-            list.Add("pseudo hote"); // pseudo de l'hote de la room
-            list.Add("nb joueur present"); // nb joueur deja present
-            list.Add("nb joueur max"); // nb joueur max de la room
+            res_db = db.GetRoomList();
         }
-
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: RoomList : " + ex);
+            packet.Error = Tools.Errors.Database;
+            return;
+        }
+        
+        var list = new List<string>();
+        var length = res_db.Length;
+        
+        for (var i = 0; i < length; i+=3) // boucle a faire pour nb room
+        {
+            list.Add(res_db[i]); // id room
+            list.Add(res_db[i+1]); // pseudo de l'hote de la room
+            //TODO
+            list.Add("nb joueur present"); // nb joueur deja present
+            list.Add(res_db[i+2]); // nb joueur max de la room
+        }
         packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Success; //remplacer par Unknown si erreur
     }
 
     /// <summary>
@@ -232,7 +248,7 @@ public partial class Server
         // return true si bien reussit et false si joueur non retirer de la partie ( si erreur en gros)
         if (packetReceived.IdPlayer == 999)
         {
-            return Tools.Errors.Success;
+            return Tools.Errors.None;
         }
 
         return Tools.Errors.Unknown;
@@ -249,7 +265,7 @@ public partial class Server
         // id joueur dans packet.IdPlayer
         if (packetReceived.IdPlayer == 999)
         {
-            return Tools.Errors.Success;
+            return Tools.Errors.None;
         }
 
         return Tools.Errors.Unknown;
@@ -335,7 +351,7 @@ public partial class Server
         }
 
         packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Success; // remplacer par Unknown si erreur
+        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
     }
 
     /// <summary>
@@ -353,7 +369,7 @@ public partial class Server
         };
 
         packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Success; // remplacer par Unknown si erreur
+        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
     }
 
     /// <summary>
@@ -447,7 +463,7 @@ public partial class Server
         }
 
         packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Success; // remplacer par Unknown si erreur
+        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
     }
 
     /// <summary>
@@ -475,7 +491,7 @@ public partial class Server
             "IdRoom" // id de la room
         };
         packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Success; // remplacer par Unknown si erreur
+        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
     }
 
     /// <summary>
@@ -510,7 +526,7 @@ public partial class Server
     {
         _ = packet;
         // previens au joueur que c'est un vilain tricheur
-        packet.Error = Tools.Errors.Success;
+        packet.Error = Tools.Errors.None;
     }
 
     /// <summary>
@@ -521,6 +537,6 @@ public partial class Server
     {
         _ = packet;
         // kick le joueur parce qu'il est afk depuis trop longtemps
-        packet.Error = Tools.Errors.Success;
+        packet.Error = Tools.Errors.None;
     }
 }
