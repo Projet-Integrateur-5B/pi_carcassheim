@@ -24,11 +24,11 @@ namespace Tests
             LireXml.ReadXml();
             int expectedKeyDicoTuile = 2;
             int actualKeyDicoTuile = Tuile.DicoTuiles.ElementAt(0).Key;
-            Debug.Log(actualKeyDicoTuile);
+            //Debug.Log(actualKeyDicoTuile);
             Assert.AreEqual(expectedKeyDicoTuile, actualKeyDicoTuile);
 
             File.Delete(file);
-
+            Tuile.DicoTuiles.Remove(2);
 
         }
 

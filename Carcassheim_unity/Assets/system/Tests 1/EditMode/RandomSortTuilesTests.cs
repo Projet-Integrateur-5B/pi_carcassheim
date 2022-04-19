@@ -14,8 +14,9 @@ namespace Tests
         [Test]
         public void Tuile_a_tirerTest()
         {
-            int id = 0, x = 8, actualResult = 0;
-            Dictionary<int, int> map = new Dictionary<int, int>()
+            ulong id = 0, actualResult = 0;
+            int x = 8;
+            Dictionary<ulong, ulong> map = new Dictionary<ulong, ulong>()
         {
             { 0, 2},
             { 1, 1},
@@ -36,8 +37,8 @@ namespace Tests
         public void Random_sort_tuilesTest()
         {
             int nbTuile = 60, minimumResult = 1;
-            List<int> list = null;
-            list = new List<int>();
+            List<ulong> list = null;
+            list = new List<ulong>();
             list =Thread_serveur_jeu.Random_sort_tuiles(nbTuile);
             int actualNbOfElements = list.Count;
             Assert.GreaterOrEqual(actualNbOfElements,minimumResult);
@@ -45,15 +46,15 @@ namespace Tests
         [Test]
         public void tirageTroisTuilesTest()
         {
-            List<int> expected = null;
-            expected = new List<int>();
+            List<ulong> expected = null;
+            expected = new List<ulong>();
             expected.Add(5);
             expected.Add(6);
             expected.Add(7);
-            List<int> actual = null;
-            actual = new List<int>();
-            List<int> list = null;
-            list=new List<int>();
+            List<ulong> actual = null;
+            actual = new List<ulong>();
+            List<ulong> list = null;
+            list=new List<ulong>();
             list.Add(1);
             list.Add(2);
             list.Add(3);
@@ -69,21 +70,21 @@ namespace Tests
         [Test]
         public void suppTuileChoisieTest()
         {
-            List<int> expected = null;
-            expected = new List<int>();
+            List<ulong> expected = null;
+            expected = new List<ulong>();
             expected.Add(55);
             expected.Add(32);
             expected.Add(2);
-            List<int> actual = null;
-            actual = new List<int>();
-            List<int> tuiles = null;
-            tuiles = new List<int>();
+            List<ulong> actual = null;
+            actual = new List<ulong>();
+            List<ulong> tuiles = null;
+            tuiles = new List<ulong>();
             tuiles.Add(15);
             tuiles.Add(55);
             tuiles.Add(32);
             tuiles.Add(4);
             tuiles.Add(2);
-            int idTuileToDelete = 4;//on veut supprimer le id 4
+            ulong idTuileToDelete = 4;//on veut supprimer le id 4
             actual = Thread_serveur_jeu.suppTuileChoisie(tuiles, idTuileToDelete);
             idTuileToDelete = 15;// aussi le 15
             actual = Thread_serveur_jeu.suppTuileChoisie(tuiles, idTuileToDelete);

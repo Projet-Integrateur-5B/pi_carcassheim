@@ -8,12 +8,12 @@ using UnityEngine;
 public partial class Thread_serveur_jeu : MonoBehaviour
 {
 
-    public static int tuile_a_tirer(int id, int x, Dictionary<int, int> dico)
+    public static ulong tuile_a_tirer(ulong id, int x, Dictionary<ulong, ulong> dico)
     {
-        int sum = 0;
+        ulong sum = 0;
         foreach (var item in dico)          //Parcourir dico:
         {
-            if (sum + item.Value < x)
+            if ((int)(sum + item.Value) < x)
             {
                 sum += item.Value;          //chercher l'id correspondant
                                             //Tant que sum+la proba de tuile actuele > id de tuile --> avance
@@ -30,12 +30,13 @@ public partial class Thread_serveur_jeu : MonoBehaviour
         return id;
     }
 
-    public static List<int> Random_sort_tuiles(int nbTuiles)
+    public static List<ulong> Random_sort_tuiles(int nbTuiles)
     {
-        List<int> list = null;
-        list = new List<int>();
+        List<ulong> list = null;
+        list = new List<ulong>();
         System.Random MyRand = new System.Random();
-        int x = 0, idTuile = 0, sumDesProbas = 0;
+        int x = 0;
+        ulong idTuile = 0, sumDesProbas = 0;
 
         //Recuperer les id des tuiles et leurs probas depuis la bdd
 
@@ -43,7 +44,7 @@ public partial class Thread_serveur_jeu : MonoBehaviour
         //La section suivante est à remplacer par une methode de l'équipe BDD qui retourne 
         //un dico des ids de tuile avec leurs probas
         /*************************/
-        Dictionary<int, int> map = new Dictionary<int, int>()
+        Dictionary<ulong, ulong> map = new Dictionary<ulong, ulong>()
         {
             { 0, 2},
             { 1, 4},
@@ -56,18 +57,19 @@ public partial class Thread_serveur_jeu : MonoBehaviour
             { 8, 14}
         };
         /*************************/
-
+        // a remplacer par : 
+        //RemplirTuiles(map);
         //Parcourir le dictionnaire resultat pour calculer la somme des probabilités des tuiles:
         foreach (var item in map)
         {
             sumDesProbas += item.Value;
 
         }
-
+        int tmp = (int)(sumDesProbas - sumDesProbas %1.0);
         //Tirage aléatoire des tuiles
         for (int i = 0; i < nbTuiles; i++)
         {
-            x = MyRand.Next(sumDesProbas);
+            x = MyRand.Next(tmp);
             idTuile = tuile_a_tirer(idTuile, x, map);
             list.Add(idTuile);
 
