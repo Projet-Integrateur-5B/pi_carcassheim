@@ -89,11 +89,11 @@ public class AccountMenu : Miscellaneous
 			GameObject.Find("InputField Month CA").GetComponent<InputField>().text +"/"+
 			GameObject.Find("InputField Day CA").GetComponent<InputField>().text
 			};
-			res = Communication/* .Instance */.CommunicationWithoutResult(Tools.IdMessage.Signup, values);
+			res = Communication.Instance.CommunicationWithoutResult(Tools.IdMessage.Signup, values);
 		}
 
 		SetState(res);
-		if (GetState() == true)
+		if (GetState())
 		{
 			HideAccountConnected();
 			return;
