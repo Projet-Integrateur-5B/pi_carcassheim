@@ -10,25 +10,36 @@ namespace Assets.System
 {
     public class Communication : MonoBehaviour
     {
-        private static Socket Socket;
-        /*public static Communication Instance { get; private set; }
-        
+        private Socket Socket;
+        private static Communication _instance;
 
-        private void Awake()
+        public static Communication Instance
         {
-            if (Instance != null && Instance != this)
+            get
             {
-                Destroy(this);
-            }
-            else
-            {
-                Instance = this;
-            }
-        }*/
+                if (_instance == null)
+                {
+                    _instance = GameObject.FindObjectOfType<Communication>();
 
-        public static void ConnectedToServer()
+                    if (_instance == null)
+                    {
+                        GameObject container = new GameObject("Bicycle");
+                        _instance = container.AddComponent<Communication>();
+                    }
+                }
+
+                return _instance;
+            }
+        }
+
+        void Awake()
         {
-            var error_value = Client.Connection(ref Socket, 19000);
+            _instance = this;
+        }
+
+        public void ConnectedToServer()
+        {
+            var error_value = Client.Connection(ref Communication.Instance.Socket, 19000);
             switch (error_value)
             {
                 case Tools.Errors.None:
@@ -62,12 +73,12 @@ namespace Assets.System
             }
         }
 
-        public static void DisconnectToServer()
+        public void DisconnectToServer()
         {
-            if (Socket != null)
+            if (Communication.Instance.Socket == null)
                 return;
 
-            var error_value = Client.Disconnection(Socket);
+            var error_value = Client.Disconnection(Communication.Instance.Socket);
             switch (error_value)
             {
                 case Tools.Errors.None:
@@ -99,18 +110,21 @@ namespace Assets.System
             }
         }
 
-        public static bool CommunicationWithoutResult(Tools.IdMessage typeMessage, string[] values)
+        public bool CommunicationWithoutResult(Tools.IdMessage typeMessage, string[] values)
         {
-            if (Socket == null)
+            if (Communication.Instance.Socket == null)
                  ConnectedToServer();
 
             Packet original = new Packet();
-            var error_value = Socket.Communication(ref original, typeMessage, values);
+            var error_value = Communication.Instance.Socket.Communication(ref original, typeMessage, values);
             bool res = false;
 
             switch (error_value)
             {
                 case Tools.Errors.None:
+                    if (original.Error == Tools.Errors.None)
+                        Debug.Log("None");
+                        res = true;
                     break;
                 case Tools.Errors.Format: // == Errors.Receive ?
                                           // TODO : handle case : wrong format
