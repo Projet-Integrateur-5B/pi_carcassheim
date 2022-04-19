@@ -114,8 +114,8 @@ public class Communication_ingame : MonoBehaviour
 
         
 
-
         // A FAIRE - Mise à jour des paramètres de la partie
+
 
         int idClient = -1;
 
@@ -129,14 +129,17 @@ public class Communication_ingame : MonoBehaviour
 
                 // Attente d'une action du client
 
-
                 /*
                 string[] data = { };
                 error_value = socket.Communication(ref original, Tools.IdMessage.SetRoomSettings, data);
                 */
+
+                // OU réception du serveur : quelqu'un a rejoint la game
+
+
             }
 
-            // Lancement d'une écoute synchrone si non modérateur
+            // Lancement d'une écoute synchrone si non modérateur (dans une task)  + prendre en compte le cas où le client part de la partie
             else
             {
 
