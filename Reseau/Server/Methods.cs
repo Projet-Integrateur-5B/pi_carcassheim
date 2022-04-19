@@ -483,9 +483,12 @@ public partial class Server
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void CancelTuilePlacement(Packet packetReceived, ref Packet packet) =>
+    public static void CancelTuilePlacement(Packet packetReceived, ref Packet packet)
+    {
+        _ = packetReceived;
         // cancel le placement de la tuile qui avais été validé par le joueur
         packet.Error = Tools.Errors.None; // remplacer par Permission si aucune erreur sinon par Unknown
+    }
 
     /// <summary>
     ///     annulation d'un pion

@@ -48,7 +48,16 @@ public static partial class Client
         {
             if (original.IdMessage is Tools.IdMessage.RoomJoin or Tools.IdMessage.RoomCreate)
             {
-                port = int.Parse(original.Data[0]);
+                try
+                {
+#pragma warning disable CA1305 // Spécifier IFormatProvider
+                    port = int.Parse(original.Data[0]);
+#pragma warning restore CA1305 // Spécifier IFormatProvider
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
         catch (FormatException e)
