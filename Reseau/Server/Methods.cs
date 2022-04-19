@@ -506,15 +506,21 @@ public partial class Server
     ///     warning envoyer quand suspision de triche
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static void WarningCheat(ref Packet packet) =>
+    public static void WarningCheat(ref Packet packet)
+    {
+        _ = packet;
         // previens au joueur que c'est un vilain tricheur
         packet.Error = Tools.Errors.Success;
+    }
 
     /// <summary>
     ///     deconnecte un joueur afk d'une partie et du serveur
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static void KickFromGame(ref Packet packet) =>
+    public static void KickFromGame(ref Packet packet)
+    {
+        _ = packet;
         // kick le joueur parce qu'il est afk depuis trop longtemps
         packet.Error = Tools.Errors.Success;
+    }
 }
