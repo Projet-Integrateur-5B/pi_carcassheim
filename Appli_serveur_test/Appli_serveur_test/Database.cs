@@ -28,7 +28,7 @@ public class Database
     }
     
     //"INSERT INTO data (some_field) VALUES (@p)"
-    public async void ExecuteCommandeModification(string commande,string[] parametres)
+    public async void ExecuteCommandeModification(string commande,object[] parametres)
     {
         await using NpgsqlConnection connection = this.Connect();
         await connection.OpenAsync();
@@ -38,7 +38,7 @@ public class Database
             int i, taille = parametres.Length;
             for (i = 0; i < taille; i+=2)
             {
-                cmd.Parameters.AddWithValue(parametres[i], parametres[i+1]);
+                cmd.Parameters.AddWithValue((string)parametres[i], parametres[i+1]);
             }
 		    cmd.Prepare();
             try
@@ -277,7 +277,7 @@ public class Database
         if (age >= 13)
         {
             string commande = "INSERT INTO Utilisateur (Pseudo,MDP,Mail,XP,Niveau,Victoires,Defaites,Nbparties,DateNaiss) VALUES(@pPSEUDO,@pMDP,@pMAIL,@pXP,@pNIVEAU,@pVICTOIRES,@pDEFAITES,@pNBPARTIES,@pDATENAISS);";
-            string[] parametres = new[] {"pPSEUDO", Pseudo,"pMDP", MDP,"pMAIL", Mail,"pXP", Xp.ToString(),"pNIVEAU", Niveau.ToString(),"pVICTOIRES", Victoires.ToString(),"pDEFAITES", Defaites.ToString(),"pNBPARTIES", Nbparties.ToString(),"pDATENAISS", DateNaiss};
+            object[] parametres = new object[] {"pPSEUDO", Pseudo,"pMDP", MDP,"pMAIL", Mail,"pXP", Xp,"pNIVEAU", Niveau,"pVICTOIRES", Victoires,"pDEFAITES", Defaites,"pNBPARTIES", Nbparties,"pDATENAISS", DateNaiss};
             ExecuteCommandeModification(commande,parametres);
         }
         else
