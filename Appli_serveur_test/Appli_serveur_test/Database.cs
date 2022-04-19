@@ -54,7 +54,7 @@ public class Database
         connection.Close();
     }
     
-    public async Task<string[]> ExecuteCommandeWithResult(string commande,string[] parametres)
+    public async Task<string[]> ExecuteCommandeWithResult(string commande,object[] parametres)
     {
         await using NpgsqlConnection connection = this.Connect();
         await connection.OpenAsync();
@@ -65,7 +65,7 @@ public class Database
             int i, taille = parametres.Length;
             for (i = 0; i < taille; i+=2)
             {
-                cmd.Parameters.AddWithValue(parametres[i], parametres[i+1]);
+                cmd.Parameters.AddWithValue((string)parametres[i], parametres[i+1]);
             }
             cmd.Prepare();
             
