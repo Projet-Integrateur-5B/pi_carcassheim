@@ -259,9 +259,12 @@ public class Database
     public bool Identification(string login, string mdp)
     {
         string commande = "SELECT MDP FROM Utilisateur WHERE Pseudo = @pLOGIN;";
-        string[] parametres = new[] {"pLOGIN", login};
+        object[] parametres = new object[] {"pLOGIN", login};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
 
+        for(int i=0; i < res.Result.Length; i++)
+            Console.WriteLine(res);
+        
         if (res.Result.Length == 0)
             return false;
 
