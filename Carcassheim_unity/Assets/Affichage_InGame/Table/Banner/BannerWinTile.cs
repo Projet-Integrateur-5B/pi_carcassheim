@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BannerWinCondition : MonoBehaviour
+public class BannerWinTile : BannerWinCondition
 {
     // Start is called before the first frame update
     void Start()
@@ -16,5 +16,8 @@ public abstract class BannerWinCondition : MonoBehaviour
 
     }
 
-    public abstract void setWinParameters(List<int> parameters);
+    override public void setWinParameters(List<int> win_cond)
+    {
+
+    }
 }

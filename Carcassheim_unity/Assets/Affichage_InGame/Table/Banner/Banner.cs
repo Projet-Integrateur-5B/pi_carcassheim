@@ -14,8 +14,6 @@ public class Banner : MonoBehaviour
     [SerializeField] private DisplaySystem master;
 
 
-    [SerializeField] private RectTransform separator_location;
-
 
     [SerializeField] private BannerWinCondition win_condition_time;
     [SerializeField] private BannerWinCondition win_condition_tile;
@@ -116,22 +114,24 @@ public class Banner : MonoBehaviour
         timerTourTMP.text = timerTour.ToString();
     }
 
-    public void setWinCondition(WinCondition win, List<int> param)
+    public void setWinCondition(WinCondition win, Table table, List<int> param)
     {
         BannerWinCondition win_cond;
         switch (win)
         {
             case WinCondition.WinByTime:
                 win_cond = Instantiate<BannerWinCondition>(win_condition_time, transform);
+                table.setTileNumber(-1);
                 break;
             case WinCondition.WinByPoint:
                 win_cond = Instantiate<BannerWinCondition>(win_condition_point, transform);
+                table.setTileNumber(-1);
                 break;
             default:
                 win_cond = Instantiate<BannerWinCondition>(win_condition_tile, transform);
+                table.setTileNumber(param[0]);
                 break;
         }
         win_cond.setWinParameters(param);
-        separator_location.anchoredPosition = win_cond.separator_position;
     }
 }

@@ -159,6 +159,7 @@ GameObject:
   - component: {fileID: 3941337800045219086}
   - component: {fileID: 1603874202237437114}
   - component: {fileID: 9069988838524148675}
+  - component: {fileID: 8573615294527523621}
   m_Layer: 3
   m_Name: TableMod
   m_TagString: Untagged
@@ -229,6 +230,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &8573615294527523621
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5648055049012072371}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1.8000001, y: 0.07056655, z: 1.0067233}
+  m_Center: {x: -0.000000834465, y: 0.7366558, z: 0.0020743408}
 --- !u!1 &6426538020135883850
 GameObject:
   m_ObjectHideFlags: 0

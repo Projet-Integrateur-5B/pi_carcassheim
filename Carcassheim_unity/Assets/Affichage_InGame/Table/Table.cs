@@ -282,8 +282,9 @@ public class Table : MonoBehaviour
         {
             old_tile.pivotPoint.rotation = unselected_angle;
         }
+        Debug.Log(old_tile);
+        Debug.Log(new_tile);
         new_tile.pivotPoint.rotation = Quaternion.identity;
-
     }
 
     public void activeMeepleChanged(Meeple old_meeple, Meeple new_meeple)
@@ -292,6 +293,8 @@ public class Table : MonoBehaviour
         {
             old_meeple.pivotPoint.rotation = unselected_angle;
         }
+        Debug.Log(old_meeple);
+        Debug.Log(new_meeple);
         new_meeple.pivotPoint.rotation = Quaternion.identity;
     }
 
@@ -315,7 +318,7 @@ public class Table : MonoBehaviour
 
     public void meeplePositionChanged(Meeple meeple)
     {
-        if (meeple.Pos == null)
+        if (meeple.ParentTile == null)
         {
             MeepleColliderStat mps = meeple_mapping[meeple];
             meeple.transform.position = mps.transform.position;

@@ -19,12 +19,14 @@ public class Meeple : MonoBehaviour
     public GameObject model;
     public Renderer color;
 
-    public MeepleType meeple_type { get; set; } = MeepleType.DefaultMeeple; //TODO set should be private
+    public MeepleType meeple_type { get; set; } = MeepleType.DefaultMeeple;
 
     // * POSITION *********************************************
-    //TODO create appropriate position for meeple
-    public Position Pos
-    { set; get; } = null; // null = not played
+    public int Id{get; private set;}
+
+    public Tuile ParentTile{set; get;} = null;
+    public int SlotPos 
+    {set; get;} = -1; // pos
     // Start is called before the first frame update
     void Start()
     {
@@ -33,6 +35,11 @@ public class Meeple : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+
+    }
+
+    public void setPos(Tuile tile, int slot_pos)
     {
 
     }

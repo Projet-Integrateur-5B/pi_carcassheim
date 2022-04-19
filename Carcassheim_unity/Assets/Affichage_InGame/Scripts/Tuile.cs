@@ -23,9 +23,11 @@ public class Tuile : MonoBehaviour
 
     // * POSITION *********************************************
     public Position Pos { set; get; } = null; // null = not played
+    public List<Position> possibilitiesPosition = new List<Position>();
 
     void Start()
     {
+        possibilitiesPosition = new List<Position>();
     }
 
     private void Update()

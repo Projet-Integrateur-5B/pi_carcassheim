@@ -57,6 +57,43 @@ public class CarcasheimBack : MonoBehaviour
 
     }
 
+    public void sendTile(int tile_id, Position tile_pos, int id_meeple, int slot_pos)
+    {
+
+    }
+
+    public void getTile(out int tile_id, out Position pos, out int id_meeple, out int slot_pos)
+    {
+        tile_id = -1;
+        pos = null;
+        id_meeple = -1;
+        slot_pos = -1;
+    }
+
+    public void getActionTileSetCoord(out Position pos)
+    {
+        pos = null;
+    }
+
+    public void getActionTileSelection(out int index, out int id)
+    {
+        index = 0;
+        id = 0;
+    }
+
+    public void getActionMeepleSelection(out int index, out int id, out Position pos, out int id_tile)
+    {
+        index = 0;
+        id = 0;
+        id_tile = 0;
+        pos = null;
+    }
+
+    public void getActionNextState(out DisplaySystemState state)
+    {
+        state = DisplaySystemState.noState;
+    }
+
     public void askMeeples(IList<MeepleType> meeples, IList<int> meeple_number)
     {
         do
@@ -98,6 +135,16 @@ public class CarcasheimBack : MonoBehaviour
         players_name.AddRange(players_names);
     }
 
+    public void getTilePossibilities(int tile_id, List<Position> positions)
+    {
+        
+    }
+
+    public void askPlayers(List<int> player_ids)
+    {
+        player_ids.AddRange(players);
+    }
+
     public void askPlayerOrder(List<int> player_ids)
     {
         player_ids.AddRange(players);
@@ -128,10 +175,19 @@ public class CarcasheimBack : MonoBehaviour
         sec = 0;
     }
 
+    public void sendAction(DisplaySystemAction action, int index, int id)
+    {
+
+    }
+    public void sendAction(DisplaySystemAction action, int index, int id, Position tile_pos, int tile_id)
+    {
+
+    }
+
 
     public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
     {
-        var r = Random.Range(0, 2);
+        var r = Random.Range(0, 3);
         switch (r)
         {
             case 0:
