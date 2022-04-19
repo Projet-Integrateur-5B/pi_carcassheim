@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class Communication_ingame : MonoBehaviour
@@ -158,6 +160,20 @@ public class Communication_ingame : MonoBehaviour
         int idClient = -1;
 
 
+        Action waitingForStart = () =>
+        {
+            var pack = new Packet();
+            string[] nothing = { };
+            Tools.Errors error;
+            do
+            {
+                error = socket.Communication(ref pack, Tools.IdMessage.RoomStart, nothing);
+            }
+            while ( error == Tools.Errors.Success || error == Tools.Errors.Permission || error == Tools.Errors.None);
+            _statut_partie = true;
+        };
+
+        Task.Run(waitingForStart);
 
         while (!_statut_partie) // Boucle tant que la partie n'est pas lancée
         {
@@ -170,9 +186,24 @@ public class Communication_ingame : MonoBehaviour
 
                 /*
                 string[] data = { };
-                errorValue = socket.Communication(ref original, Tools.IdMessage.SetRoomSettings, data);
+                errorValue = socket.Communication(ref original, Tools.IdMessage.RoomSettingsSet, data);
                 */
+                string[] data = new string[]
+                {
+                    _nb_joueur_max.ToString(),
+                    _privee.ToString(),
+                    _mode.ToString(),
+                    _nb_tuiles.ToString(),
+                    _meeples.ToString(),
+                    _timer.ToString(),
+                    _timer_max_joueur.ToString(),
+                    _score_max.ToString()
+                };
 
+                var reception = new Packet();
+                errorValue = socket.Communication(ref reception, Tools.IdMessage.RoomSettingsSet, data);
+
+                CheckErrorSocketRS(errorValue);
                 // OU réception du serveur : quelqu'un a rejoint la game
 
 
@@ -188,36 +219,7 @@ public class Communication_ingame : MonoBehaviour
 
 
         // Déconnexion du socket
-        errorValue = Client.Disconnection(socket);
-        switch (errorValue)
-        {
-            case Tools.Errors.None:
-                break;
-            case Tools.Errors.Socket:
-                // TODO : handle case : connection could not be closed
-                Debug.Log(string.Format("Errors.Socket"));
-                break;
-            case Tools.Errors.Unknown:
-                break;
-            case Tools.Errors.Format:
-                break;
-            case Tools.Errors.ConfigFile:
-                break;
-            case Tools.Errors.Receive:
-                break;
-            case Tools.Errors.Data:
-                break;
-            case Tools.Errors.ToBeDetermined:
-                break;
-            case Tools.Errors.Permission:
-                break;
-            case Tools.Errors.Success:
-                break;
-            default:
-                // TODO : handle case : default
-                Debug.Log(string.Format("Errors.Unknown"));
-                break;
-        }
+        Disconnect(socket);
 
 
 
@@ -265,6 +267,49 @@ public class Communication_ingame : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+    }
+    /*
+    private void WaitForStart(Socket socket)
+    {
+        var pack = new Packet();
+        string[] nothing = { };
+        var error = socket.Communication(ref pack, Tools.IdMessage.RoomStart, nothing);
+
+        if (error == Tools.Errors.Success || error == Tools.Errors.Permission || error == Tools.Errors.None)
+            _statut_partie = true;
+    }*/
+
+    private void Disconnect(Socket socket)
+    {
+        Tools.Errors errorValue = Client.Disconnection(socket);
+        switch (errorValue)
+        {
+            case Tools.Errors.None:
+                break;
+            case Tools.Errors.Socket:
+                // TODO : handle case : connection could not be closed
+                Debug.Log(string.Format("Errors.Socket"));
+                break;
+            case Tools.Errors.Unknown:
+                break;
+            case Tools.Errors.Format:
+                break;
+            case Tools.Errors.ConfigFile:
+                break;
+            case Tools.Errors.Receive:
+                break;
+            case Tools.Errors.Data:
+                break;
+            case Tools.Errors.ToBeDetermined:
+                break;
+            case Tools.Errors.Permission:
+                break;
+            case Tools.Errors.Success:
+                break;
+            default:
+                // TODO : handle case : default
+                Debug.Log(string.Format("Errors.Unknown"));
+                break;
+        }
     }
 }
