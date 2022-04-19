@@ -140,6 +140,12 @@ public class DisplaySystem : MonoBehaviour
                 table.setBaseState(TableState.TileState);
                 banner.timerTour.resetStop();
                 break;
+            case DisplaySystemState.tilePosing:
+                board.hideTilePossibilities();
+                break;
+            case DisplaySystemState.meeplePosing:
+                board.hideMeeplePossibilities();
+                break;
         }
 
         int id_tile, id_meeple, slot_pos, index;
@@ -256,7 +262,12 @@ public class DisplaySystem : MonoBehaviour
                     if (meeples_hand.Count > 0)
                         setSelectedMeeple(0, true);
                 }
+                board.displayTilePossibilities();
                 break;
+            case DisplaySystemState.meeplePosing:
+                board.displayMeeplePossiblities();
+                break;
+
         }
     }
 
