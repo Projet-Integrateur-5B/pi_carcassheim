@@ -255,18 +255,15 @@ public class Database
         Drop("Partie");
     }
     
-    public bool Identification(string login, string mdp)
+    public long Identification(string login, string mdp)
     {
-        string commande = "SELECT MDP FROM Utilisateur WHERE Pseudo = @pLOGIN;";
-        object[] parametres = new object[] {"pLOGIN", login};
+        string commande = "SELECT IDU FROM Utilisateur WHERE Pseudo = @pLOGIN AND MDP = @pMDP;";
+        object[] parametres = new object[] {"pLOGIN", login, "pMDP", mdp};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         if (res.Result.Length == 0)
-            return false;
-
-        if (String.Equals(res.Result[0], mdp))
-            return true;
-        return false;
+            return -1;
+        return long.Parse(res.Result[1]);
     }
     
     public void Adduser(string Pseudo, string MDP, string Mail, int Xp, int Niveau, int Victoires, int Defaites, int Nbparties, string DateNaiss)
@@ -309,11 +306,16 @@ public class Database
     }
     
     // focntion d'ajout de la partie 
-    public void AddPartie(int Moderateur, string Statut, int NbMaxJ, string Prive, int Timer, int TMaxJ, int Meeples)
+    public long AddPartie(ulong Moderateur, string Statut, string NbMaxJ, string Prive, string Timer, string TMaxJ, string Meeples)
     {
-        string commande = "INSERT INTO Partie (Moderateur,Statut,NbMaxJ,Prive,Timer,TMaxJ,Meeples) VALUES(@pMODERATEUR, @pSTATUT, @pNBMAXJ, @pPRIVE, @pTIMER, @pTMAXJ, @pMEEPLES);";
-        string[] parametres = new[] {"pMODERATEUR",Moderateur.ToString(),"pSTATUT", Statut,"pNBMAXJ",NbMaxJ.ToString(),"pPRIVE",Prive,"pTIMER",Timer.ToString(),"pTMAXJ",TMaxJ.ToString(),"pMEEPLES",Meeples.ToString()};
+        string commande = "INSERT INTO Partie (Moderateur,Statut,NbMaxJ,Prive,Timer,TMaxJ,Meeples) VALUES(@pMODERATEUR, @pSTATUT, @pNBMAXJ, @pPRIVE, @pTIMER, @pTMAXJ, @pMEEPLES) RETURNING IDP;";
+        string[] parametres = new[] {"pMODERATEUR",Moderateur.ToString(),"pSTATUT", Statut,"pNBMAXJ",NbMaxJ,"pPRIVE",Prive,"pTIMER",Timer,"pTMAXJ",TMaxJ,"pMEEPLES",Meeples};
         ExecuteCommandeModification(commande,parametres);
+        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+
+        if (res.Result.Length == 0)
+            return -1;
+        return long.Parse(res.Result[0]);
     }
     
     void RemplirTuiles(Dictionary<ulong, ulong> dico)

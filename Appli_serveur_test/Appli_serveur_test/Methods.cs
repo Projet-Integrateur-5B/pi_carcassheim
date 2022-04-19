@@ -125,7 +125,10 @@ public partial class Server
         try
         {
             var result = db.Identification(packetReceived.Data[0], packetReceived.Data[1]);
-            if(!result) packet.Error = Tools.Errors.Database;
+            if (result == -1)
+                packet.Error = Tools.Errors.Database;
+            else
+                packet.IdPlayer = (ulong) result;
         }
         catch (Exception ex)
         {
@@ -177,6 +180,33 @@ public partial class Server
     }
 
     /// <summary>
+    ///     creation d'une room
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void RoomCreate(Packet packetReceived, ref Packet packet)
+    {
+        Database db = new Database();
+        try
+        {
+            var result = db.AddPartie(packetReceived.IdPlayer, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4], packetReceived.Data[5]);
+            if (result == -1)
+                packet.Error = Tools.Errors.Database;
+            else
+            {
+                packet.Data[0] = result.ToString();
+                // TODO : packet.Data[1] = GetNewPort();
+            }
+            // TODO : join room auto ?
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR: RoomCreate : " + ex);
+            packet.Error = Tools.Errors.Database;
+        }
+    }
+    
+    /// <summary>
     ///     joueur rejoignant une room
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
@@ -187,6 +217,8 @@ public partial class Server
         // id joueur dans packetReceived.IdPlayer
         // ajouter le joueur a la partie dans le systeme de jeu
         // doit chercher les infos dans la bdd e la room et les mettre dans packetReceived.Data comme indiquer
+        
+        Database db = new Database();
         if (false) // entrer ici si erreur
         {
             packet.Error = Tools.Errors.Unknown; // remplacer par le bon code erreur
@@ -474,24 +506,6 @@ public partial class Server
     {
         _ = packetReceived;
         return Tools.Errors.None;
-    }
-
-    /// <summary>
-    ///     creation d'une room
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void RoomCreate(Packet packetReceived, ref Packet packet)
-    {
-        _ = packetReceived;
-        // creation d'une nouvelle room par un joueur
-        var list = new List<string>(packet.Data.ToList())
-        {
-            "10001", // nouveau numero port
-            "IdRoom" // id de la room
-        };
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
     }
 
     /// <summary>
