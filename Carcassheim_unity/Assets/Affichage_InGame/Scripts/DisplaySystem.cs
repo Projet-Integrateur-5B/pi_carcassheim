@@ -272,15 +272,15 @@ public class DisplaySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        bool mouse_consumed = true;
+        if (mouse_consumed && Input.GetMouseButtonUp(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            bool consumed = false;
-            tableCheck(ray, ref consumed);
+            tableCheck(ray, ref mouse_consumed);
 
             //! TEST 
             float enter;
-            if ((act_player == my_player) && !consumed && board_plane.Raycast(ray, out enter))
+            if ((act_player == my_player) && !mouse_consumed && board_plane.Raycast(ray, out enter))
             {
                 if (enter > 0)
                 {

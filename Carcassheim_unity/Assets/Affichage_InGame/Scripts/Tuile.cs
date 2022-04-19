@@ -11,6 +11,8 @@ public class Tuile : MonoBehaviour
     public GameObject model;
 
     [SerializeField] private TMPro.TMP_Text _id_repre;
+    [SerializeField] private List<SlotIndic> slots;
+    [SerializeField] private Transform rep_O, rep_u, rep_v;
 
     // * STAT *************************************************
     private int _id = 0;
