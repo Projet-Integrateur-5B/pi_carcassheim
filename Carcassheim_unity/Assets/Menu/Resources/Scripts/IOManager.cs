@@ -32,9 +32,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	void Start()
 	{
-		#if !(UNITY_IOS || UNITY_ANDROID)
-			boolPC = true;
-		#endif
+#if !(UNITY_IOS || UNITY_ANDROID)
+		boolPC = true;
+#endif
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		// ---------------------------------- PATCH : ------------------------------------
 		/* 		Debug.Log("Liste des scripts : ");
@@ -144,8 +144,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		//IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
 		//if (!IF)
 		//{
-			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-			selectionChange();
+		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+		selectionChange();
 		//}
 	}
 
