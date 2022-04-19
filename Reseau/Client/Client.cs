@@ -7,6 +7,12 @@ using Assets;
 
 public static partial class Client
 {
+    /// <summary>
+    ///     connction du client au serveur
+    /// </summary>
+    /// <param name="socket"> socket où enregistrer le connection</param>
+    /// <param name="port"> numéro de port</param>
+    /// <returns></returns>
     private static Tools.Errors Connection(ref Socket socket, int port)
     {
         // TODO : trycatch lors de la récupération des données de config
@@ -108,6 +114,11 @@ public static partial class Client
         }
     }
 
+    /// <summary>
+    ///     déconnexion du client avec le serveur
+    /// </summary>
+    /// <param name="socket">socket à utilisé</param>
+    /// <returns></returns>
     private static Tools.Errors Disconnection(Socket socket)
     {
         var original = new Packet();
@@ -142,6 +153,14 @@ public static partial class Client
         }
     }
 
+    /// <summary>
+    ///     envoye des message et réception
+    /// </summary>
+    /// <param name="socket"> socket à utilisé</param>
+    /// <param name="received"> variable où enregistré le packet recu </param>
+    /// <param name="idMessage"> numéro du message </param>
+    /// <param name="data"> data à envoyée </param>
+    /// <returns></returns>
     private static Tools.Errors Communication(this Socket socket, ref Packet received,
         Tools.IdMessage idMessage, string[] data)
     {
@@ -149,9 +168,12 @@ public static partial class Client
         {
             byte[]? bytes = null;
             var error_value = Tools.Errors.None;
+            // création de la liste de packet
             var packets = new List<Packet>();
+            // création du packet
             var original = new Packet(false, idMessage, true, 999, data);
 
+            // split du packet si trop grand
             packets = original.Split(ref error_value);
             if (error_value != Tools.Errors.None)
             {
@@ -159,6 +181,7 @@ public static partial class Client
                 return Tools.Errors.Data;
             }
 
+            // envoye des packets
             foreach (var packet in packets)
             {
                 // Send the data through the socket.

@@ -42,14 +42,17 @@ public static partial class Client
                 break;
         }
 
+        // string de test
         string[] test = { "pseudo", "mdp18" };
         error_value = socket.Communication(ref original, Tools.IdMessage.Login, test);
         try
         {
+            // vérifie si le numéro de port doit changer grâce a l'idmessage
             if (original.IdMessage is Tools.IdMessage.RoomJoin or Tools.IdMessage.RoomCreate)
             {
                 try
                 {
+                    // récupère le nouveau numéro de port
 #pragma warning disable CA1305 // Spécifier IFormatProvider
                     port = int.Parse(original.Data[0]);
 #pragma warning restore CA1305 // Spécifier IFormatProvider
@@ -147,9 +150,12 @@ public static partial class Client
 
     public static int Main()
     {
+        // initialisation numéro port
         var port = 10000;
         int newPort;
+        // lancement client
         newPort = StartConnection(port);
+        // vérification si changement de port, si non alors terminer
         if (newPort != port)
         {
             port = newPort;
