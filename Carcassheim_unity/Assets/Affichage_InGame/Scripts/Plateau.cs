@@ -25,7 +25,6 @@ public class Plateau : MonoBehaviour
 
     public void setTilePossibilities(PlayerRepre player, Tuile tile)
     {
-
     }
 
     public void displayTilePossibilities()
