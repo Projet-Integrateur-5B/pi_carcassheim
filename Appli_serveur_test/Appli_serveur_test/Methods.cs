@@ -139,7 +139,7 @@ public partial class Server
         Database db = new Database();
         try
         {
-            db.Adduser(packet.Data[0], packet.Data[1], packet.Data[2], "", 0, 1, 0, 0, 0, packet.Data[3]);
+            db.Adduser(packet.Data[0], packet.Data[1], packet.Data[2], Array.Empty<byte>(), 0, 1, 0, 0, 0, packet.Data[3]);
             return Tools.Errors.Success;
         }
         catch (Exception ex)
