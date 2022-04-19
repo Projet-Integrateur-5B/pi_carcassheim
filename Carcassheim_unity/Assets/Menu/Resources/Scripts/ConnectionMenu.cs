@@ -70,7 +70,7 @@ public class ConnectionMenu : Miscellaneous
 		bool b = string.Equals(passwordCM.text, "");
 		*/
 		string[] values = new[] { RemoveLastSpace(loginCM.text), RemoveLastSpace(passwordCM.text) };
-		bool res = Communication.Instance.CommunicationWithoutResult(Tools.IdMessage.Login, values);
+		bool res = Communication/* .Instance */.CommunicationWithoutResult(Tools.IdMessage.Login, values);
 
 		SetState(res);
 		GameObject tmpGO = GameObject.Find("Instructions");

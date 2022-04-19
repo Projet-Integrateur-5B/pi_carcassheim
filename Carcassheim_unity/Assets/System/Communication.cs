@@ -10,8 +10,9 @@ namespace Assets.System
 {
     public class Communication : MonoBehaviour
     {
-        public static Communication Instance { get; private set; }
         private static Socket Socket;
+        /*public static Communication Instance { get; private set; }
+        
 
         private void Awake()
         {
@@ -23,9 +24,9 @@ namespace Assets.System
             {
                 Instance = this;
             }
-        }
+        }*/
 
-        public void ConnectedToServer()
+        public static void ConnectedToServer()
         {
             var error_value = Client.Connection(ref Socket, 19000);
             switch (error_value)
@@ -61,7 +62,7 @@ namespace Assets.System
             }
         }
 
-        public void DisconnectToServer()
+        public static void DisconnectToServer()
         {
             if (Socket != null)
                 return;
@@ -98,7 +99,7 @@ namespace Assets.System
             }
         }
 
-        public bool CommunicationWithoutResult(Tools.IdMessage typeMessage, string[] values)
+        public static bool CommunicationWithoutResult(Tools.IdMessage typeMessage, string[] values)
         {
             if (Socket == null)
                  ConnectedToServer();

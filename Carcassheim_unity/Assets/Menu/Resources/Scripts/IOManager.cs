@@ -28,9 +28,13 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private bool boolSelectionChange = true;
 	private bool cooldown = false;
 	private InputField IF = null;
+	private static bool boolPC = true;
 
 	void Start()
 	{
+		#if !(UNITY_IOS || UNITY_ANDROID)
+			boolPC = true;
+		#endif
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		// ---------------------------------- PATCH : ------------------------------------
 		/* 		Debug.Log("Liste des scripts : ");
@@ -209,7 +213,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void resetHoverPreviousGo()
 	{
-		if (previousGo != null)
+		if (previousGo != null && boolPC == true)
 		{
 			//GameObject.Find("Trident").SetActive(false);
 			Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
@@ -240,7 +244,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void changeHover()
 	{
-		if (boolSelectionChange == true)
+		if ((boolSelectionChange && boolPC) == true)
 		{
 			if (TridentGo.activeSelf == true) // TRIDENT
 				TridentGo.SetActive(false);
