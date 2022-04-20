@@ -23,6 +23,10 @@ public static class Tools
         Data = 5,
         Permission = 6,
         Database = 7,
+        RoomJoin = 8,
+        RoomLeave = 9,
+        RoomCreate = 10,
+        PlayerReady = 11,
         ToBeDetermined = 999
     }
 
@@ -38,9 +42,9 @@ public static class Tools
         Statistics = 4,
         RoomList = 5,
         RoomCreate = 6,
-        RoomJoin = 7,
-        RoomLeave = 8,
-        RoomReady = 9,
+        PlayerJoin = 7,
+        PlayerLeave = 8,
+        PlayerReady = 9,
         RoomSettingsGet = 10,
         RoomSettingsSet = 11,
         RoomStart = 12,
@@ -51,10 +55,8 @@ public static class Tools
         CancelPionPlacement = 17,
         TourValidation = 18,
         TimerExpiration = 19,
-        WarningCheat = 20,
-        KickFromGame = 21,
-        LeaveGame = 22,
-        EndGame = 23
+        PlayerCheat = 23,
+        EndGame = 24
     }
 
     public enum PlayerStatus

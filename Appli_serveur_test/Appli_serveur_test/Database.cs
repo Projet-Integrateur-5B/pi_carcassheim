@@ -310,7 +310,6 @@ public class Database
     {
         string commande = "INSERT INTO Partie (Moderateur,Statut,NbMaxJ,Prive,Timer,TMaxJ,Meeples) VALUES(@pMODERATEUR, @pSTATUT, @pNBMAXJ, @pPRIVE, @pTIMER, @pTMAXJ, @pMEEPLES) RETURNING IDP;";
         string[] parametres = new[] {"pMODERATEUR",Moderateur.ToString(),"pSTATUT", Statut,"pNBMAXJ",NbMaxJ,"pPRIVE",Prive,"pTIMER",Timer,"pTMAXJ",TMaxJ,"pMEEPLES",Meeples};
-        ExecuteCommandeModification(commande,parametres);
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         if (res.Result.Length == 0)
@@ -347,21 +346,7 @@ public class Database
         string[] parametres = new[] {"pIDU", idu.ToString()};
         Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
         
-        if (res.Result.Length == 0)
-            return Array.Empty<string>();
-        
-        return res.Result.ToArray();
+        return res.Result.Length == 0 ? Array.Empty<string>() : res.Result.ToArray();
     }
     
-    public string[] GetRoomList()
-    {
-        string commande = "select IDP,Moderateur,NbMaxJ from Partie where Prive = 0 and Status = 0;";
-        string[] parametres = Array.Empty<string>();
-        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
-        
-        if (res.Result.Length == 0)
-            return Array.Empty<string>();
-        
-        return res.Result.ToArray();
-    }
 }

@@ -1,3 +1,5 @@
+using System.Diagnostics.Tracing;
+
 namespace Server;
 
 using ClassLibrary;
@@ -34,36 +36,52 @@ public partial class Server
 
         switch (state.Packet.IdMessage)
         {
-            case Tools.IdMessage.Login:
-                Login(state.Packet, ref packet);
-                break;
             case Tools.IdMessage.Signup:
-                Signup(state.Packet, ref packet);
+                AccountSignup(state.Packet, ref packet);
+                break;
+            case Tools.IdMessage.Login:
+                AccountLogin(state.Packet, ref packet);
+                break;
+            case Tools.IdMessage.Logout: // impossible
                 break;
             case Tools.IdMessage.Statistics:
-                Statistics(state.Packet, ref packet);
+                AccountStatistics(state.Packet, ref packet);
                 break;
-            case Tools.IdMessage.RoomJoin:
-                RoomJoin(state.Packet, ref packet);
-                break;
+            
             case Tools.IdMessage.RoomList:
                 RoomList(state.Packet, ref packet);
                 break;
-            case Tools.IdMessage.RoomLeave:
-                packet.Error = RoomLeave(state.Packet);
-                break;
-            case Tools.IdMessage.RoomReady:
-                packet.Error = RoomReady(state.Packet);
+            case Tools.IdMessage.RoomCreate:
+                RoomCreate(state.Packet, ref packet);
+                PlayerJoin(state.Packet, ref packet);
                 break;
             case Tools.IdMessage.RoomSettingsGet:
-                packet.Data = RoomSettingsGet(state.Packet);
+                RoomSettingsGet(state.Packet, ref packet);
                 break;
             case Tools.IdMessage.RoomSettingsSet:
-                packet.Data = RoomSettingsSet(state.Packet);
+                RoomSettingsSet(state.Packet, ref packet);
                 break;
+            
+            case Tools.IdMessage.PlayerJoin:
+                PlayerJoin(state.Packet, ref packet);
+                break;
+            case Tools.IdMessage.PlayerLeave:
+                PlayerLeave(state.Packet, ref packet);
+                break;
+            case Tools.IdMessage.PlayerReady:
+                PlayerReady(state.Packet, ref packet);
+                break;
+            case Tools.IdMessage.PlayerCheat:
+                PlayerCheat(state.Packet, ref packet);
+                break;
+            
             case Tools.IdMessage.RoomStart:
-                RoomStart(state.Packet, ref packet);
+                GameStart(state.Packet, ref packet);
                 break;
+            case Tools.IdMessage.EndGame:
+                GameEnd(state.Packet, ref packet);
+                break;
+            
             case Tools.IdMessage.TuileDraw:
                 TuileDraw(state.Packet, ref packet);
                 break;
@@ -79,30 +97,13 @@ public partial class Server
             case Tools.IdMessage.TimerExpiration:
                 TimerExpiration(ref packet);
                 break;
-            case Tools.IdMessage.LeaveGame:
-                LeaveGame(state.Packet, ref packet);
-                break;
-            case Tools.IdMessage.EndGame:
-                EndGame(state.Packet, ref packet);
-                break;
-            case Tools.IdMessage.Logout: // impossible
-                packet.Error = Logout(state.Packet);
-                break;
-            case Tools.IdMessage.RoomCreate:
-                RoomCreate(state.Packet, ref packet);
-                break;
             case Tools.IdMessage.CancelTuilePlacement:
                 CancelTuilePlacement(state.Packet, ref packet);
                 break;
             case Tools.IdMessage.CancelPionPlacement:
                 CancelPionPlacement(state.Packet, ref packet);
                 break;
-            case Tools.IdMessage.WarningCheat:
-                WarningCheat(ref packet);
-                break;
-            case Tools.IdMessage.KickFromGame:
-                KickFromGame(ref packet);
-                break;
+            
             case Tools.IdMessage.Default:
             default:
                 packet.Error = Tools.Errors.Unknown;
@@ -113,263 +114,277 @@ public partial class Server
     }
 
     /// <summary>
-    ///     connection au serveur du jeu
+    ///     New user is creating an account.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void Login(Packet packetReceived, ref Packet packet)
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void AccountSignup(Packet packetReceived, ref Packet packet)
     {
-        // verifié ici si packetReceived.data[0] correspond bien a un pseudo et une adresse mail de la bdd et si packetReceived.Data[1] correspond au bon mdp
-        // if a modifié pour return true si les infos sont valide
-        Database db = new Database();
+        var db = new Database();
         try
         {
+            // Adding new user to the database.
+            db.Adduser(packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], 0, 1, 0, 0, 0, packetReceived.Data[3]);
+        }
+        catch (Exception ex)
+        {
+            // Something went wrong.
+            Console.WriteLine("ERROR: Signup : " + ex);
+            packet = new Packet
+            {
+                Error = Tools.Errors.Database
+            };
+        }
+    }
+    /// <summary>
+    ///     Player is attempting to login.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void AccountLogin(Packet packetReceived, ref Packet packet)
+    {
+        var db = new Database();
+        try
+        {
+            // Check if the input data correspond to a user.
             var result = db.Identification(packetReceived.Data[0], packetReceived.Data[1]);
-            if (result == -1)
+            // Data does not correspond to a user.
+            if (result == -1) 
                 packet.Error = Tools.Errors.Database;
+            // Data does correspond : return the user's IdPlayer.
             else
                 packet.IdPlayer = (ulong) result;
         }
         catch (Exception ex)
         {
+            // Something went wrong.
             Console.WriteLine("ERROR: Login : " + ex);
-            packet.Error = Tools.Errors.Database;
+            packet = new Packet
+            {
+                Error = Tools.Errors.Database
+            };
         }
     }
-
     /// <summary>
-    ///     inscription au jeu
+    ///     Get the player's statistics from the database.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void Signup(Packet packetReceived, ref Packet packet)
-    {
-        // verifie si les informations d'inscription sont valide ( ne sont pas les mêmes qu'un utilisateur deja inscrit
-        // packetReceived.Data[0] = pseudp ; packetReceived.Data[1] = mdp ; packetReceived.Data[2] = mail ; packetReceived.Data[3] = date de naissance
-        // if a modifié pour return true si info valide
-        Database db = new Database();
-        try
-        {
-            db.Adduser(packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], 0, 1, 0, 0, 0, packetReceived.Data[3]);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR: Signup : " + ex);
-            packet.Error = Tools.Errors.Database;
-        }
-    }
-
-    /// <summary>
-    ///     envoye des statistiques d'un joueur
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void Statistics(Packet packetReceived, ref Packet packet)
+    public static void AccountStatistics(Packet packetReceived, ref Packet packet)
     {
-        Database db = new Database();
+        var db = new Database();
         try
         {
+            // Put the statistics in the data field.
             packet.Data = db.GetStatistics(packetReceived.IdPlayer);
         }
         catch (Exception ex)
         {
+            // Something went wrong.
             Console.WriteLine("ERROR: Statistics : " + ex);
-            packet.Error = Tools.Errors.Database;
-            packet.Data = Array.Empty<string>();
-        }
-    }
-
-    /// <summary>
-    ///     creation d'une room
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void RoomCreate(Packet packetReceived, ref Packet packet)
-    {
-        Database db = new Database();
-        try
-        {
-            var result = db.AddPartie(packetReceived.IdPlayer, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4], packetReceived.Data[5]);
-            if (result == -1)
-                packet.Error = Tools.Errors.Database;
-            else
+            packet = new Packet
             {
-                packet.Data[0] = result.ToString();
-                // TODO : packet.Data[1] = GetNewPort();
-            }
-            // TODO : join room auto ?
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR: RoomCreate : " + ex);
-            packet.Error = Tools.Errors.Database;
+                Error = Tools.Errors.Database
+            };
         }
     }
     
+    
+    
     /// <summary>
-    ///     joueur rejoignant une room
+    ///     List of rooms.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void RoomJoin(Packet packetReceived, ref Packet packet)
-    {
-        // id room dans packetReceived.IdRoom
-        // id joueur dans packetReceived.IdPlayer
-        // ajouter le joueur a la partie dans le systeme de jeu
-        // doit chercher les infos dans la bdd e la room et les mettre dans packetReceived.Data comme indiquer
-        
-        Database db = new Database();
-        if (false) // entrer ici si erreur
-        {
-            packet.Error = Tools.Errors.Unknown; // remplacer par le bon code erreur
-        }
-        else
-        {
-            var list = new List<string>(packet.Data.ToList())
-            {
-                "10001" // nouveau port
-            };
-            packet.Data = list.ToArray();
-            packet.Data = packet.Data.Concat(RoomSettingsGet(packetReceived)).ToArray();
-            packet.Error = Tools.Errors.None;
-        }
-        // TODO
-    }
-
-    /// <summary>
-    ///     liste des rooms dispo
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void RoomList(Packet packetReceived, ref Packet packet)
     {
-        string[] res_db = Array.Empty<string>();
-        Database db = new Database();
-        try
-        {
-            res_db = db.GetRoomList();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("ERROR: RoomList : " + ex);
-            packet.Error = Tools.Errors.Database;
-            return;
-        }
+        // Attempt to get the list of rooms and some data for each room.
+        var result = Thread_communication.GetRoomList();
         
-        var list = new List<string>();
-        var length = res_db.Length;
+        if (result.Error == Tools.Errors.None)
+        {
+            // Copy the list of rooms in packet.Data
+            packet.Data = result.Data;
+        }
+        else
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = result.Error
+            };
+        }
+    }
+    /// <summary>
+    ///     User is creating a room.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void RoomCreate(Packet packetReceived, ref Packet packet)
+    {
+        // Attempt to insert a new room.
+        var result = Thread_communication.CreateRoom(packetReceived.IdPlayer, packetReceived.Data[0], packetReceived.Data[1],
+            packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4], packetReceived.Data[5]);
+
+        if (result != Tools.Errors.None)
+        {
+            // Something went wrong.
+            packet.Error = Tools.Errors.RoomCreate;
+        }
+        else
+        {
+            // Sending the room's ID back to the client. 
+            packet.Data[0] = result.ToString();
+            // Sending the new server's port (i.e. room port) back to the client.
+            packet.Data[1] = SocketPortRoom(packet.Data[0]);
+        }
+    }
+
+    /// <summary>
+    ///     Get the settings of a specific room.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void RoomSettingsGet(Packet packetReceived, ref Packet packet)
+    {
+        // Attempt to get the room settings.
+        Packet result = GetRoomSettings(packetReceived.Data[0]);
         
-        for (var i = 0; i < length; i+=3) // boucle a faire pour nb room
+        if (result.Error == Tools.Errors.None)
         {
-            list.Add(res_db[i]); // id room
-            list.Add(res_db[i+1]); // pseudo de l'hote de la room
-            //TODO
-            list.Add("nb joueur present"); // nb joueur deja present
-            list.Add(res_db[i+2]); // nb joueur max de la room
+            // Copy the settings in packet.Data
+            packet.Data = result.Data;
         }
-        packet.Data = list.ToArray();
+        else
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = result.Error
+            };
+        }
     }
+    /// <summary>
+    ///     Update the settings of a specific room.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void RoomSettingsSet(Packet packetReceived, ref Packet packet)
+    {
+        // Attempt to update a room.
+        var result = UpdateRoom(packetReceived.Data[0], packetReceived.IdPlayer,
+            packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3],
+            packetReceived.Data[4], packetReceived.Data[5], packetReceived.Data[6]);
+        
+        if (result.Error != Tools.Errors.None)
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = result.Error
+            };
+        }
+    }
+
+
 
     /// <summary>
-    ///     joueur quitant une room
+    ///     Player is joining the room.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static Tools.Errors RoomLeave(Packet packetReceived)
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void PlayerJoin(Packet packetReceived, ref Packet packet)
     {
-        // supprimer le joueur de la prtie dans le systeme de jeu
-        // return true si bien reussit et false si joueur non retirer de la partie ( si erreur en gros)
-        if (packetReceived.IdPlayer == 999)
+        // Attempt to add a player to the room.
+        var playerStatus = PlayerJoinRoom(packetReceived.Data[0], packetReceived.IdPlayer);
+        if (playerStatus == Tools.PlayerStatus.Success)
         {
-            return Tools.Errors.None;
+            // Player has successfully joined the room.
+            // Need to get the server's port for this specific room.
+            packet.Data = packet.Data.Concat(SocketPortRoom(packetReceived.Data[0]));
+            // TODO : ensuite client switch port, thread serveur detecte nouveau joueur et broadcast
         }
-
-        return Tools.Errors.Unknown;
+        else
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = Tools.Errors.RoomJoin
+            };
+        }
     }
-
     /// <summary>
-    ///     joueur qui se met prêt
+    ///     Player is leaving the room/game.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static Tools.Errors RoomReady(Packet packetReceived)
+    /// <remarks>Player might also be forcefully removed.</remarks>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void PlayerLeave(Packet packetReceived, ref Packet packet)
     {
-        // met le joueur prêt dans le jeu ( true si bien passer, false sinon )
-        // id room dans packet.IdRoom
-        // id joueur dans packet.IdPlayer
-        if (packetReceived.IdPlayer == 999)
+        // Attempt to remove a player from the room.
+        var playerStatus = PlayerLeaveRoom(packetReceived.Data[0], packetReceived.IdPlayer);
+        if (playerStatus != Tools.PlayerStatus.Success)
         {
-            return Tools.Errors.None;
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = Tools.Errors.RoomLeave
+            };
         }
-
-        return Tools.Errors.Unknown;
+        // TODO : ensuite thread serveur detecte fin client et broadcast
     }
-
     /// <summary>
-    ///     recup parametre d'une room
+    ///     Player switched its status.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static string[] RoomSettingsGet(Packet packetReceived)
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void PlayerReady(Packet packetReceived, ref Packet packet)
     {
-        _ = packetReceived;
-        // id room dans packetReceived.IdRoom
-        // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
-        var retour = new Packet();
-        var list = new List<string>(retour.Data.ToList())
+        // Attempt to update a player status within the room.
+        var playerStatus = PlayerReadyRoom(packetReceived.Data[0], packetReceived.IdPlayer);
+        if (playerStatus != Tools.PlayerStatus.Success)
         {
-            "nb joueur max",
-            "partie privé ou public",
-            "mode de la partie",
-            "nb tuile",
-            "nb pion",
-            "timer partie",
-            "timer par joueur",
-            "nb score max" // parametre de la room a donner ici ( mettre a -1 si non remplit)
-        };
-        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
-        {
-            list.Add("pseudo joueur"); // pseudo du joueur X
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = Tools.Errors.PlayerReady
+            };
         }
-
-        retour.Data = list.ToArray();
-        return retour.Data;
+        // TODO : ensuite thread serveur broadcast
     }
-
     /// <summary>
-    ///     modif parametre d'une room
+    ///     Player cheated.
     /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static string[] RoomSettingsSet(Packet packetReceived)
+    /// <remarks>Player might get kicked out the game in case he cheated too much.</remarks>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void PlayerCheat(Packet packetReceived, ref Packet packet)
     {
-        _ = packetReceived;
-        // info a modif dans packetReceived.Data
-        // id room dans packetReceived.IdRoom
-        // doit chercher les infos dans la bdd de la room et les mettre dans packet.Data comme indiquer
-        var retour = new Packet();
-        var list = new List<string>(retour.Data.ToList())
+        // Attempt to update the number of times a player has cheated in a specific game.
+        var playerStatus = PlayerCheatRoom(packetReceived.Data[0], packetReceived.IdPlayer);
+        // Player has reached the limit
+        if (playerStatus == Tools.PlayerStatus.Kicked)
         {
-            "nb joueur max",
-            "partie privé ou public",
-            "mode de la partie",
-            "nb tuile",
-            "nb pion",
-            "timer partie",
-            "timer par joueur",
-            "nb score max" // parametre de la room a donner ici ( mettre a -1 si non remplit)
-        };
-        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
-        {
-            list.Add("pseudo joueur"); // pseudo du joueur X
+            // TODO : kick
         }
-
-        retour.Data = list.ToArray();
-        return retour.Data;
+        else if (playerStatus != Tools.PlayerStatus.Success)
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = Tools.Errors.ToBeDetermined
+            };
+        }
     }
+
+
 
     /// <summary>
     ///     lancement d'une room
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void RoomStart(Packet packetReceived, ref Packet packet)
+    public static void GameStart(Packet packetReceived, ref Packet packet)
     {
         _ = packetReceived;
         // lancement de la partie
@@ -385,7 +400,33 @@ public partial class Server
         packet.Data = list.ToArray();
         packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
     }
+    /// <summary>
+    ///     fin de la partie
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void GameEnd(Packet packetReceived, ref Packet packet)
+    {
+        _ = packetReceived;
+        // partie finit, on choisis un emplacement X Y de tuile où sera afficher les scores
+        // donner les score des joueurs ( peut importe l'ordre )
+        var list = new List<string>(packet.Data.ToList())
+        {
+            "position X", // position afficher X
+            "position Y" // position afficher Y
+        };
+        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
+        {
+            list.Add("pseudo joueur"); // pseudo du joueur X
+            list.Add("score"); // score du joueur X
+        }
 
+        packet.Data = list.ToArray();
+        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
+    }
+    
+    
+    
     /// <summary>
     ///     tirage d'une tuile
     /// </summary>
@@ -457,58 +498,6 @@ public partial class Server
     }
 
     /// <summary>
-    ///     joueur qui quitte une room
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void LeaveGame(Packet packetReceived, ref Packet packet)
-    {
-        _ = packetReceived;
-        // joueur quitte la partie ( le supprimer de la partie du coup ? )
-        var list = new List<string>(packet.Data.ToList())
-        {
-            "pseudo" // pseudo ou ID du joueur qui a leave la game
-        };
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.None;
-    }
-
-    /// <summary>
-    ///     fin de la partie
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void EndGame(Packet packetReceived, ref Packet packet)
-    {
-        _ = packetReceived;
-        // partie finit, on choisis un emplacement X Y de tuile où sera afficher les scores
-        // donner les score des joueurs ( peut importe l'ordre )
-        var list = new List<string>(packet.Data.ToList())
-        {
-            "position X", // position afficher X
-            "position Y" // position afficher Y
-        };
-        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
-        {
-            list.Add("pseudo joueur"); // pseudo du joueur X
-            list.Add("score"); // score du joueur X
-        }
-
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
-    }
-
-    /// <summary>
-    ///     deconnection d'un joueur
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static Tools.Errors Logout(Packet packetReceived)
-    {
-        _ = packetReceived;
-        return Tools.Errors.None;
-    }
-
-    /// <summary>
     ///     annulation d'une tuile
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
@@ -530,27 +519,5 @@ public partial class Server
         _ = packetReceived;
         // cancel le placement du pion qui avais été validé par le joueur
         packet.Error = Tools.Errors.None; // remplacer par Permission si aucune erreur sinon par Unknown
-    }
-
-    /// <summary>
-    ///     warning envoyer quand suspision de triche
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static void WarningCheat(ref Packet packet)
-    {
-        _ = packet;
-        // previens au joueur que c'est un vilain tricheur
-        packet.Error = Tools.Errors.None;
-    }
-
-    /// <summary>
-    ///     deconnecte un joueur afk d'une partie et du serveur
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    public static void KickFromGame(ref Packet packet)
-    {
-        _ = packet;
-        // kick le joueur parce qu'il est afk depuis trop longtemps
-        packet.Error = Tools.Errors.None;
     }
 }
