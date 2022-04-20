@@ -15,11 +15,11 @@ namespace system
         private readonly int _id_partie;
 
         /* Attributs en lien avec le Dictionary Player */
-        private Dictionary<long, Player> _dico_joueur; // Contient les ID's de chaque joueur
+        private Dictionary<ulong, Player> _dico_joueur; // Contient les ID's de chaque joueur
         private Semaphore _s_dico_joueur;
         private uint _nombre_joueur;
         private uint _nombre_joueur_max;
-        private long _id_moderateur; // Identifiant du joueur modérateur
+        private ulong _id_moderateur; // Identifiant du joueur modérateur
 
         private string _statut_partie;
 
@@ -54,12 +54,12 @@ namespace system
         }
 
         // Constructeur
-        public Thread_serveur_jeu(int id_partie, int id_joueur_createur)
+        public Thread_serveur_jeu(int id_partie, ulong id_joueur_createur)
         {
             _id_partie = id_partie;
 
             /* Zone  du Dictionary Score */
-            _dico_joueur = new Dictionary<long, Player>();
+            _dico_joueur = new Dictionary<ulong, Player>();
             _s_dico_joueur = new Semaphore(1, 1);
             _nombre_joueur = 1;
             _nombre_joueur_max = 8;
@@ -80,7 +80,7 @@ namespace system
 
         // Méthodes
 
-        public Tools.PlayerStatus AddJoueur(long id_joueur)
+        public Tools.PlayerStatus AddJoueur(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
             if (_nombre_joueur >= _nombre_joueur_max)
@@ -102,7 +102,7 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
-        public Tools.PlayerStatus RemoveJoueur(long id_joueur)
+        public Tools.PlayerStatus RemoveJoueur(ulong id_joueur)
         {
 
             _s_dico_joueur.WaitOne();
@@ -132,7 +132,7 @@ namespace system
         }
 
 
-        public Tools.PlayerStatus SetPlayerTriche(long id_joueur)
+        public Tools.PlayerStatus SetPlayerTriche(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
             if (!_dico_joueur.ContainsKey(id_joueur))
@@ -157,7 +157,7 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
-        public Tools.PlayerStatus SetPlayerStatus(long id_joueur)
+        public Tools.PlayerStatus SetPlayerStatus(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
             if (!_dico_joueur.ContainsKey(id_joueur))
@@ -175,7 +175,7 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
-        public Tools.PlayerStatus SetPlayerPoint(long id_joueur,uint score)
+        public Tools.PlayerStatus SetPlayerPoint(ulong id_joueur,uint score)
         {
             _s_dico_joueur.WaitOne();
             if (!_dico_joueur.ContainsKey(id_joueur))
