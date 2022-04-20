@@ -17,7 +17,8 @@ public class CameraManager : MonoBehaviour
     bool mouseUp = false, mouseDown = false;
 
 
-    private enum Axis : int{
+    private enum Axis : int
+    {
         X,
         Y,
         Z
@@ -31,16 +32,18 @@ public class CameraManager : MonoBehaviour
         mainCameraPosition = mainCamera.transform.position;
         mainCameraRotation = mainCamera.transform.rotation;
         limitRay = 5;
-        dragSpeed  = 5.5f;
+        dragSpeed = 5.5f;
     }
 
-    private void OnEnable() {
-        board.OnBoardExpanded += limitUpdate;
+    private void OnEnable()
+    {
+        //board.OnBoardExpanded += limitUpdate;
     }
 
 
-    private void OnDisable() {
-        board.OnBoardExpanded -= limitUpdate;
+    private void OnDisable()
+    {
+        //board.OnBoardExpanded -= limitUpdate;
     }
     // Update is called once per frame
     void Update()
@@ -75,11 +78,13 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    
-    bool cameraClickAndDrag() {
+
+    bool cameraClickAndDrag()
+    {
         Vector3 pointGap;
         float ray = .5f;
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0))
+        {
             dragOrigin = Input.mousePosition;
             mouseDown = true;
         }
@@ -89,17 +94,18 @@ public class CameraManager : MonoBehaviour
         {
             pointGap = Input.mousePosition - dragOrigin;
             mouseDown = false;
-            return (Mathf.Pow(pointGap.x,2)) + (Mathf.Pow(pointGap.y, 2)) + (Mathf.Pow(pointGap.z,2)) >= Mathf.Pow(ray, 2);
-        } 
-        if (mouseDown == true) 
+            return (Mathf.Pow(pointGap.x, 2)) + (Mathf.Pow(pointGap.y, 2)) + (Mathf.Pow(pointGap.z, 2)) >= Mathf.Pow(ray, 2);
+        }
+        if (mouseDown == true)
         {
             Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
 
             if (reachLimit(mainCameraPosition.x - pos.x, (int)Axis.X)
-                || reachLimit(mainCameraPosition.y - pos.y, (int)Axis.Y)) {
+                || reachLimit(mainCameraPosition.y - pos.y, (int)Axis.Y))
+            {
                 return false;
-            }            
-            
+            }
+
             mainCameraPosition.x -= pos.x * dragSpeed * Time.deltaTime;
             mainCameraPosition.y -= pos.y * dragSpeed * Time.deltaTime;
             mainCamera.transform.position = mainCameraPosition;
@@ -113,7 +119,7 @@ public class CameraManager : MonoBehaviour
     void upAndDownMotion(float target)
     {
 
-        if (reachLimit(target, (int)Axis.Y))  
+        if (reachLimit(target, (int)Axis.Y))
             return;
         mainCameraPosition.y += target * Time.deltaTime;
         mainCamera.transform.position = mainCameraPosition;
@@ -154,21 +160,20 @@ public class CameraManager : MonoBehaviour
     // Axis : 0->X; 1->Y; 2->Z
     float cameraRay(float value, int axis)
     {
-        float mainX =  mainCamera.transform.position.x;
+        float mainX = mainCamera.transform.position.x;
         float mainY = mainCamera.transform.position.y;
-        float mainZ =  mainCamera.transform.position.z;
+        float mainZ = mainCamera.transform.position.z;
 
-        mainX = (axis==(int)Axis.X) ? mainX+value : mainX;
-        mainY = (axis==(int)Axis.Y) ? mainY+value : mainY;
-        mainZ = (axis==(int)Axis.Z) ? mainZ+value : mainZ;
+        mainX = (axis == (int)Axis.X) ? mainX + value : mainX;
+        mainY = (axis == (int)Axis.Y) ? mainY + value : mainY;
+        mainZ = (axis == (int)Axis.Z) ? mainZ + value : mainZ;
 
-        return Mathf.Sqrt((Mathf.Pow(mainX,2)) + (Mathf.Pow(mainY, 2)) + (Mathf.Pow(mainZ,2)));
+        return Mathf.Sqrt((Mathf.Pow(mainX, 2)) + (Mathf.Pow(mainY, 2)) + (Mathf.Pow(mainZ, 2)));
     }
 
     bool reachLimit(float target, int axis)
     {
         float camRay = cameraRay(target, axis);
-        print(camRay);
 
         if (camRay >= limitRay)
             return true;
@@ -177,7 +182,8 @@ public class CameraManager : MonoBehaviour
 
     }
 
-    void limitUpdate() {
+    void limitUpdate()
+    {
         limitRay = board.BoardRadius;
     }
 

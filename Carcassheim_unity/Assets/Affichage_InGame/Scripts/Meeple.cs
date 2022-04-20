@@ -22,11 +22,11 @@ public class Meeple : MonoBehaviour
     public MeepleType meeple_type { get; set; } = MeepleType.DefaultMeeple;
 
     // * POSITION *********************************************
-    public int Id{get; private set;}
+    public int Id { get; private set; }
 
-    public Tuile ParentTile{set; get;} = null;
-    public int SlotPos 
-    {set; get;} = -1; // pos
+    public Tuile ParentTile { set; get; } = null;
+    public int SlotPos
+    { set; get; } = -1; // pos
     // Start is called before the first frame update
     void Start()
     {

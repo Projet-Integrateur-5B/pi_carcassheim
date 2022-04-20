@@ -117,12 +117,12 @@ public class Table : MonoBehaviour
             tile.transform.parent = tile_zone.transform;
             tile.model.layer = DisplaySystem.TableLayer;
             tile.pivotPoint.rotation = unselected_angle;
-            tile.transform.localPosition = tile_origin + tile_step * act_tile_count;
+            tile.transform.localPosition = tile_origin + tile_step * act_tile_count - tile.pivotPoint.localPosition;
 
             if (perma_tile)
             {
                 ColliderStat collider = Instantiate<ColliderStat>(tile_collider_model, tile_zone.transform);
-                collider.transform.position = tile.transform.position;
+                collider.transform.position = tile.transform.position + tile.pivotPoint.localPosition;
                 collider.Index = act_tile_count;
                 tile_mapping.Add(tile, collider);
                 act_tile_count += 1;
@@ -304,7 +304,7 @@ public class Table : MonoBehaviour
         {
             ColliderStat tst = tile_mapping[tile];
             tile.transform.parent = tile_zone.transform;
-            tile.transform.position = tst.transform.position;
+            tile.transform.localPosition = tst.transform.localPosition - tile.pivotPoint.localPosition;
             tile.model.layer = DisplaySystem.TableLayer;
             if (tile != display_system.act_tile)
                 tile.pivotPoint.rotation = unselected_angle;
@@ -321,8 +321,8 @@ public class Table : MonoBehaviour
         if (meeple.ParentTile == null)
         {
             MeepleColliderStat mps = meeple_mapping[meeple];
-            meeple.transform.position = mps.transform.position;
             meeple.transform.parent = meeple_zone.transform;
+            meeple.transform.localPosition = mps.transform.localPosition;
             meeple.model.layer = DisplaySystem.TableLayer;
             if (meeple != display_system.act_meeple)
                 meeple.pivotPoint.rotation = unselected_angle;

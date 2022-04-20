@@ -35,17 +35,6 @@ public class SlotIndic : MonoBehaviour
     }
     private string mmaskname = null;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public void show(PlayerRepre player)
     {

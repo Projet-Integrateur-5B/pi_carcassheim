@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class test_tile : MonoBehaviour
 {
-    public Tuile tile_model;
-    public SlotIndic slot_model;
     public int id_read = 0;
 
     public Tuile act_tuile = null;
@@ -29,6 +27,24 @@ public class test_tile : MonoBehaviour
                 Destroy(act_tuile.gameObject);
             act_tuile = Resources.Load<Tuile>("tile" + id_read.ToString());
             act_tuile = Instantiate<Tuile>(act_tuile, transform);
+
+            act_tuile.possibilitiesPosition.Clear();
+            int rotation = Random.Range(0, 4);
+            int x = Random.Range(-100, 101), y = Random.Range(-100, 101);
+            for (int i = 1; i <= 3; i++)
+            {
+                if (Random.Range(0f, 1f) < 0.4)
+                {
+                    if (Random.Range(0f, 1f) < 0.2)
+                        x += 1;
+                    Position pos = new Position(x, y, (rotation + i) % 4);
+                    act_tuile.possibilitiesPosition.Add(pos);
+                    Debug.Log("Position possible : " + pos.ToString());
+                }
+            }
+            act_tuile.Pos = new Position(x, y, rotation);
+            act_tuile.possibilitiesPosition.Add(act_tuile.Pos);
+            Debug.Log("Position " + act_tuile.Pos);
         }
         else if (Input.GetKeyUp(KeyCode.A) && act_tuile != null)
         {
@@ -44,6 +60,8 @@ public class test_tile : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            if (act_tuile == null)
+                return;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << PlateauLayer)))
@@ -65,12 +83,22 @@ public class test_tile : MonoBehaviour
                         }
                         break;
                     case "TileBodyCollider":
-                        if (hit.transform.parent != act_tuile.pivotPoint)
-                            Debug.Log("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tuile.pivotPoint.name);
-                        else
+                        if (act_tuile != null)
                         {
-                            tile = hit.transform.parent.parent.GetComponent<Tuile>();
-                            tile.nextRotation();
+                            if (hit.transform.parent != act_tuile.pivotPoint)
+                                Debug.Log("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tuile.pivotPoint.name);
+                            else
+                            {
+                                tile = hit.transform.parent.parent.GetComponent<Tuile>();
+                                if (tile.nextRotation())
+                                {
+                                    Debug.Log("Rotated  to " + tile.Pos);
+                                }
+                                else
+                                {
+                                    Debug.Log("No rotation done");
+                                }
+                            }
                         }
                         break;
                     default:
