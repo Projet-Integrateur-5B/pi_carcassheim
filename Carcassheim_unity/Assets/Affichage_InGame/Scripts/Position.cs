@@ -24,4 +24,9 @@ public class Position
         Y = 0;
         Rotation = -1;
     }
+
+    public override string ToString()
+    {
+        return "(" + X.ToString() + ", " + Y.ToString() + ") rot : " + Rotation.ToString();
+    }
 }

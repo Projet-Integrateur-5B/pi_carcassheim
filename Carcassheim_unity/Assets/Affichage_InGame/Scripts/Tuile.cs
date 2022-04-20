@@ -10,6 +10,8 @@ public class Tuile : MonoBehaviour
     public Transform pivotPoint;
     public GameObject model;
 
+    [SerializeField] private Collider body_collider;
+
     [SerializeField] private TMPro.TMP_Text _id_repre;
     [SerializeField] private List<SlotIndic> slots;
     [SerializeField] private Transform rep_O, rep_u, rep_v;
@@ -26,7 +28,18 @@ public class Tuile : MonoBehaviour
     }
 
     // * POSITION *********************************************
-    public Position Pos { set; get; } = null; // null = not played
+    private Position _pos;
+    public Position Pos
+    {
+        set
+        {
+            _pos = value;
+            body_collider.enabled = _pos != null;
+            int rotation = _pos != null ? _pos.Rotation : 0;
+            transform.localRotation = Quaternion.Euler(0, 0, rotation * 90);
+        }
+        get => _pos;
+    }
     public List<Position> possibilitiesPosition = new List<Position>();
 
     void Awake()
@@ -67,6 +80,8 @@ public class Tuile : MonoBehaviour
 
     public Position isPossible(Position pos)
     {
+        if (pos == null)
+            return null;
         foreach (Position true_pos in possibilitiesPosition)
         {
             if (true_pos.X == pos.X && true_pos.Y == pos.Y && (pos.Rotation == -1 || true_pos.Rotation == pos.Rotation))
@@ -75,8 +90,10 @@ public class Tuile : MonoBehaviour
         return null;
     }
 
-    public void nextRotation()
+    public bool nextRotation()
     {
+        if (Pos == null)
+            return false;
         int x = Pos.X;
         int y = Pos.Y;
         int rotation = Pos.Rotation;
@@ -94,6 +111,7 @@ public class Tuile : MonoBehaviour
         {
             Pos = new Position(x, y, rotation);
         }
+        return found;
     }
 
     public void addSlot(SlotIndic slot)

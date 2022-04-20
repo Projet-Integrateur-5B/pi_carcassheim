@@ -51,7 +51,7 @@ MonoBehaviour:
   _id: 0
   meeple_collider: {fileID: 8864210986714651835}
   alpha_ref: 0.2
-  alpha_front_ref: 0.2
+  alpha_front_ref: 0.7
 --- !u!1001 &5301607743714606349
 PrefabInstance:
   m_ObjectHideFlags: 0

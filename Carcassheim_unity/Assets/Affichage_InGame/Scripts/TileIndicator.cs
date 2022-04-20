@@ -8,7 +8,7 @@ public class TileIndicator
 
     public Color Color { get => _color; private set => _color = value; }
     // public Renderer color; ?
-    [SerializeField] private Collider TileCollider;
+    [SerializeField] private Collider _tileCollider;
 
     private Color _color;
 

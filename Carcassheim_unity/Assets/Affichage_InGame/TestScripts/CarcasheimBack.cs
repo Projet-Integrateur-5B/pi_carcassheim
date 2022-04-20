@@ -47,8 +47,6 @@ public class CarcasheimBack : MonoBehaviour
             players.Add(id);
             players_names.Add(randomStrong(Random.Range(8, 20)));
         }
-        foreach (string name in players_names)
-            Debug.Log(name);
     }
 
     // Update is called once per frame
@@ -117,7 +115,7 @@ public class CarcasheimBack : MonoBehaviour
         {
             for (int i = 0; i < total; i++)
             {
-                tile_ids.Add(Random.Range(1, 100));
+                tile_ids.Add(Random.Range(0, 6));
                 bool tile_flag = (i == total - 1) || (true_total < 4 && Random.Range(0f, 1f) < 0.4);
                 tile_flags.Add(tile_flag);
                 if (tile_flag)
@@ -137,7 +135,7 @@ public class CarcasheimBack : MonoBehaviour
 
     public void getTilePossibilities(int tile_id, List<Position> positions)
     {
-        
+
     }
 
     public void askPlayers(List<int> player_ids)

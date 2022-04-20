@@ -18,7 +18,7 @@ public enum DisplaySystemState
     turnStart,
     StateTransition,
     noState,
-    idleState, 
+    idleState,
     endOfGame
 };
 
@@ -152,6 +152,11 @@ public class DisplaySystem : MonoBehaviour
         Position pos;
         switch (old_state)
         {
+            case DisplaySystemState.meeplePosing:
+                act_tile.hidePossibilities();
+                board.hideMeeplePossibilities();
+                break;
+
             case DisplaySystemState.idleState:
                 system_back.getTile(out id_tile, out pos, out id_meeple, out slot_pos);
                 if (id_tile != -1)
@@ -193,9 +198,6 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.tilePosing:
                 board.hideTilePossibilities();
-                break;
-            case DisplaySystemState.meeplePosing:
-                board.hideMeeplePossibilities();
                 break;
         }
     }
@@ -272,16 +274,16 @@ public class DisplaySystem : MonoBehaviour
                 board.displayTilePossibilities();
                 break;
             case DisplaySystemState.meeplePosing:
+                act_tile.showPossibilities(act_player);
                 board.displayMeeplePossiblities();
                 break;
-
         }
     }
 
     void tableCheck(Ray ray, ref bool consumed)
     {
         RaycastHit hit;
-        if ((act_player == my_player) && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << TableLayer)))
+        if ((true || act_player == my_player) && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << TableLayer)))
         {
             consumed = table.colliderHit(hit.transform);
         }
@@ -290,18 +292,16 @@ public class DisplaySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool mouse_consumed = true;
-        if (mouse_consumed && Input.GetMouseButtonUp(0))
+        bool mouse_consumed = false;
+        if (!mouse_consumed && Input.GetMouseButtonUp(0))
         {
+            Debug.Log("HERE");
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             tableCheck(ray, ref mouse_consumed);
 
             //! TEST 
-            //float enter;
-            if ((act_player == my_player) && !mouse_consumed && board.boardCollide(ray))
+            if ((true || act_player == my_player) && !mouse_consumed && board.boardCollide(ray))
             {
-                //if (enter > 0)
-                //{
                 Vector3 p = board.BoardCollidePos;
                 if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
                 {
@@ -310,21 +310,37 @@ public class DisplaySystem : MonoBehaviour
                     act_tile.transform.rotation = Quaternion.identity;
                     table.tilePositionChanged(act_tile);
                 }
-                else if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null)
+            }
+            RaycastHit hit;
+            if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << BoardLayer)))
+            {
+                SlotIndic slot;
+                switch (hit.transform.tag)
                 {
-                    act_meeple.ParentTile = tiles_hand[0];
-                    act_meeple.transform.position = p;
-                    act_meeple.transform.rotation = Quaternion.identity;
-                    table.meeplePositionChanged(act_meeple);
+                    case "SlotCollider":
+                        slot = hit.transform.parent.GetComponent<SlotIndic>();
+                        if (hit.transform.parent.parent != act_tile.pivotPoint)
+                            Debug.Log("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tile.pivotPoint.name);
+                        else
+                        {
+                            act_meeple.ParentTile = act_tile;
+                            act_meeple.SlotPos = slot.Id;
+
+                            act_meeple.transform.position = slot.transform.position;
+                            table.meeplePositionChanged(act_meeple);
+                        }
+                        break;
+                    default:
+                        Debug.Log("Hit " + hit.transform.tag + " collider in system");
+                        break;
                 }
-                //}
             }
         }
 
         switch (act_system_state)
         {
             case DisplaySystemState.meeplePosing:
-                if (act_player == my_player)
+                if (act_player == my_player || true)
                 {
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
@@ -337,11 +353,12 @@ public class DisplaySystem : MonoBehaviour
                 }
                 break;
             case DisplaySystemState.tilePosing:
-                if (act_player == my_player &&
+                if ((act_player == my_player || true) &&
                     Input.GetKeyDown(KeyCode.Return) &&
                     act_tile != null &&
                     act_tile.Pos != null)
                 {
+                    Debug.Log("Here " + (meeples_hand.Count > 0).ToString());
                     if (meeples_hand.Count > 0)
                         setNextState(DisplaySystemState.meeplePosing);
                     else
@@ -418,10 +435,16 @@ public class DisplaySystem : MonoBehaviour
 
         int final_count = system_back.askTiles(tile_ids, tile_perma);
         L = tile_ids.Count;
+        Tuile model;
         for (int i = 0; i < L; i++)
         {
-            // TODO should instatntiate in function of id
-            Tuile tl = Instantiate<Tuile>(tuile_model);
+            model = Resources.Load<Tuile>("tile" + tile_ids[i].ToString());
+            if (model == null)
+            {
+                Debug.Log("Tried to log unknown tile " + tile_ids[i].ToString());
+                model = tuile_model;
+            }
+            Tuile tl = Instantiate<Tuile>(model);
             Renderer red = tl.model.GetComponent<Renderer>();
             red.material.color = act_player.color;
             tl.Id = tile_ids[i];

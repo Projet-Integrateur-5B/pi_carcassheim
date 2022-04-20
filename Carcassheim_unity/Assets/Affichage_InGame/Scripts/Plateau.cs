@@ -19,7 +19,7 @@ public class Plateau : MonoBehaviour
     private Dictionary<int, TileOnBoard> tiles_on_board;
     //private Collider tile_collider_model;
     
-    private List<TileIndicator> act_tile_indicator;
+    [SerializeField] private List<TileIndicator> act_tile_indicator;
 
     public Vector3 BoardCollidePos { get => _board_collide_pos; set { _board_collide_pos = value; } }
     private Vector3 _board_collide_pos;
@@ -133,7 +133,7 @@ public class Plateau : MonoBehaviour
         }
         else
         {
-            Debug.Log("Shouldn't have been an input in " + act_table_state.ToString());
+            Debug.Log("Shouldn't have been an input");
         }
 
         return true;  
