@@ -11,14 +11,14 @@ GameObject:
   - component: {fileID: 8537671873906324577}
   - component: {fileID: 8537671873906324590}
   - component: {fileID: 8537671873906324591}
-  - component: {fileID: 8537671873906324576}
+  - component: {fileID: 4111877435764995757}
   m_Layer: 0
   m_Name: Face
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8537671873906324577
 Transform:
   m_ObjectHideFlags: 0
@@ -27,8 +27,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8537671873906324578}
   m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: 0.0005, y: 0.0759, z: -0.0021}
-  m_LocalScale: {x: -0.15322167, y: -0.15322167, z: -0.15322167}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.1532217, y: -0.15322167, z: -0.15322167}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -82,17 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8537671873906324576
-MeshCollider:
+--- !u!114 &4111877435764995757
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8537671873906324578}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93b7e95056b6f7248b8fe602558dae9b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  model_renderer: {fileID: 8537671873906324591}

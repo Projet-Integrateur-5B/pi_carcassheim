@@ -18,7 +18,8 @@ public enum DisplaySystemState
     turnStart,
     StateTransition,
     noState,
-    idleState
+    idleState, 
+    endOfGame
 };
 
 public class DisplaySystem : MonoBehaviour
@@ -31,6 +32,7 @@ public class DisplaySystem : MonoBehaviour
     [SerializeField] private Table table;
     [SerializeField] private Banner banner;
     [SerializeField] private PlayerList player_list;
+    [SerializeField] private ScoreBoard score_board;
 
     // * STATE ***********************************************
 
@@ -128,7 +130,7 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.idleState:
                 if (my_player == act_player && (old_state == DisplaySystemState.tilePosing || old_state == DisplaySystemState.meeplePosing))
-                { 
+                {
                     if (act_meeple != null)
                         system_back.sendTile(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos);
                     else
@@ -140,6 +142,10 @@ public class DisplaySystem : MonoBehaviour
                 table.setBaseState(TableState.TileState);
                 banner.timerTour.resetStop();
                 break;
+            case DisplaySystemState.endOfGame:
+                score_board.setEndOfGame(my_player);
+                break;
+
         }
 
         int id_tile, id_meeple, slot_pos, index;
@@ -155,7 +161,7 @@ public class DisplaySystem : MonoBehaviour
                         index = -1;
                         for (int i = 0; i < tiles_hand.Count; i++)
                         {
-                            if (tiles_hand[i].Id == id_tile) {index = i; break;}
+                            if (tiles_hand[i].Id == id_tile) { index = i; break; }
                         }
                         if (index == -1)
                         {
@@ -172,7 +178,7 @@ public class DisplaySystem : MonoBehaviour
                             index = -1;
                             for (int i = 0; i < meeples_hand.Count; i++)
                             {
-                                if (meeples_hand[i].Id == id_meeple) {index = i; break;}
+                                if (meeples_hand[i].Id == id_meeple) { index = i; break; }
                             }
                             if (index == -1)
                             {
@@ -213,8 +219,9 @@ public class DisplaySystem : MonoBehaviour
                 if (index < 0 || index >= tiles_hand.Count || tiles_hand[index].Id != id)
                 {
                     index = -1;
-                    for (int i = 0; i < tiles_hand.Count; i++){
-                        if (tiles_hand[i].Id == id) {index = i; break;}
+                    for (int i = 0; i < tiles_hand.Count; i++)
+                    {
+                        if (tiles_hand[i].Id == id) { index = i; break; }
                     }
                 }
                 if (index != -1)
@@ -229,7 +236,7 @@ public class DisplaySystem : MonoBehaviour
                         index = -1;
                         for (int i = 0; i < meeples_hand.Count; i++)
                         {
-                            if (meeples_hand[i].Id == id) {index = i; break;}
+                            if (meeples_hand[i].Id == id) { index = i; break; }
                         }
                     }
                     if (index != -1)
@@ -257,7 +264,7 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.tilePosing:
                 if (old_state == DisplaySystemState.turnStart)
                 {
-                    if ( tiles_hand.Count > 0)
+                    if (tiles_hand.Count > 0)
                         setSelectedTile(0, true);
                     if (meeples_hand.Count > 0)
                         setSelectedMeeple(0, true);
@@ -330,12 +337,12 @@ public class DisplaySystem : MonoBehaviour
                 }
                 break;
             case DisplaySystemState.tilePosing:
-                if (act_player == my_player && 
+                if (act_player == my_player &&
                     Input.GetKeyDown(KeyCode.Return) &&
                     act_tile != null &&
                     act_tile.Pos != null)
                 {
-                    if (meeples_hand.Count  > 0)
+                    if (meeples_hand.Count > 0)
                         setNextState(DisplaySystemState.meeplePosing);
                     else
                         setNextState(DisplaySystemState.idleState);
@@ -466,12 +473,12 @@ public class DisplaySystem : MonoBehaviour
             if (act_tile != null && act_tile.Pos != null)
             {
                 act_tile.Pos = null;
-                table.tilePositionChanged(act_tile); //! should be in event
+                table.tilePositionChanged(act_tile);
             }
             if (act_meeple != null && act_meeple.ParentTile != null)
             {
                 act_meeple.ParentTile = null;
-                table.meeplePositionChanged(act_meeple); //! should be in event
+                table.meeplePositionChanged(act_meeple);
             }
             table.activeTileChanged(act_tile, n_tuile);
             act_tile = n_tuile;
@@ -486,7 +493,7 @@ public class DisplaySystem : MonoBehaviour
 
     public void setSelectedMeeple(int index, bool forced = false)
     {
-        Debug.Log("Meeple posing : "+index.ToString() + " "+meeples_hand.Count);
+        Debug.Log("Meeple posing : " + index.ToString() + " " + meeples_hand.Count);
         if (0 <= index && index < meeples_hand.Count && (act_system_state == DisplaySystemState.meeplePosing || forced))
         {
             Meeple n_meeple = meeples_hand[index];

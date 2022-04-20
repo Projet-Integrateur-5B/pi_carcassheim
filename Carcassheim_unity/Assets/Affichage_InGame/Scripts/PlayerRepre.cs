@@ -47,6 +47,7 @@ public class PlayerRepre
         _id = id_gen++;
         _nb_meeple = 0;
         _score = 0;
+        _name = "Zorglub";
     }
 
     public PlayerRepre(string name, int id, Color col)
