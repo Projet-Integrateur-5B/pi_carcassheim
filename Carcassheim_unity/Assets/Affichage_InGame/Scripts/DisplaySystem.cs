@@ -140,12 +140,6 @@ public class DisplaySystem : MonoBehaviour
                 table.setBaseState(TableState.TileState);
                 banner.timerTour.resetStop();
                 break;
-            case DisplaySystemState.tilePosing:
-                board.hideTilePossibilities();
-                break;
-            case DisplaySystemState.meeplePosing:
-                board.hideMeeplePossibilities();
-                break;
         }
 
         int id_tile, id_meeple, slot_pos, index;
@@ -189,7 +183,13 @@ public class DisplaySystem : MonoBehaviour
                         act_meeple.setPos(act_tile, slot_pos);
                     }
                 }
-                board.finalizeTurn();
+                board.finalizeTurn(act_tile.Pos, act_tile);
+                break;
+            case DisplaySystemState.tilePosing:
+                board.hideTilePossibilities();
+                break;
+            case DisplaySystemState.meeplePosing:
+                board.hideMeeplePossibilities();
                 break;
         }
     }
