@@ -18,7 +18,8 @@ public enum DisplaySystemState
     turnStart,
     StateTransition,
     noState,
-    idleState
+    idleState, 
+    endOfGame
 };
 
 public class DisplaySystem : MonoBehaviour
@@ -31,6 +32,7 @@ public class DisplaySystem : MonoBehaviour
     [SerializeField] private Table table;
     [SerializeField] private Banner banner;
     [SerializeField] private PlayerList player_list;
+    [SerializeField] private ScoreBoard score_board;
 
     // * STATE ***********************************************
 
@@ -140,6 +142,10 @@ public class DisplaySystem : MonoBehaviour
                 table.setBaseState(TableState.TileState);
                 banner.timerTour.resetStop();
                 break;
+            case DisplaySystemState.endOfGame:
+                score_board.setEndOfGame(my_player);
+                break;
+
         }
 
         int id_tile, id_meeple, slot_pos, index;
