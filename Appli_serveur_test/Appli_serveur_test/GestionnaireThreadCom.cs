@@ -25,6 +25,11 @@ namespace system
         // Récupération du singleton
         // ==========================
 
+
+        /// <summary>
+        /// Get an instance of the singleton
+        /// </summary>
+        /// <returns> An instance of the singleton </returns>
         public static GestionnaireThreadCom GetInstance()
         {
 
@@ -52,8 +57,10 @@ namespace system
         // Méthodes privées, pour utilisation interne
         // =========================================
 
-        // Génère un nouveau thread de communication
-        // Retourne la position du thread de com dans la liste _lst_obj_threads_com
+        /// <summary>
+        /// Generate a new communication thread manager
+        /// </summary>
+        /// <returns> The position of the thread manager in the list _lst_obj_threads_com </returns>
         private static int Creation_thread_com()
         {
 
@@ -91,8 +98,34 @@ namespace system
         // Méthodes publiques
         // ====================
 
-        // Retourne le port du thread de com gérant la partie dont l'ID est passé en paramètre
-        public int GetPortFromPartyID (int partyID)
+        /// <summary>
+        /// List all the rooms that exists
+        /// </summary>
+        /// <returns> A list of all rooms : first value is ID, then number of player and number of player max </returns>
+        public string[] GetRoomList()
+        {
+            List<string> room_list = new List<string>();
+
+            // Parcours des threads de communication pour lister ses rooms
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    room_list.Add(thread_serv_ite.Get_ID().ToString());
+                    room_list.Add(thread_serv_ite.NbJoueurs.ToString());
+                    room_list.Add(thread_serv_ite.NbJoueursMax.ToString());
+                }
+            }
+
+            return room_list.ToArray();
+        }
+
+        /// <summary>
+        /// Get the port with wich communicate for a given room
+        /// </summary>
+        /// <param name="roomID"> ID of the room </param>
+        /// <returns> The port of the communication thread that manage the room </returns>
+        public int GetPortFromPartyID (int roomID)
         {
             int port = -1;
 
@@ -103,7 +136,7 @@ namespace system
                 {
                     List<int> lst_id_parties_gerees = thread_com_iterateur.Get_id_parties_gerees();
 
-                    if (lst_id_parties_gerees.Contains(partyID))
+                    if (lst_id_parties_gerees.Contains(roomID))
                     {
 
                         // Port du thread de com
@@ -119,9 +152,12 @@ namespace system
             return port;
         }
 
-        // Créer une nouvelle room et retourne le port du thread de com s'en occupant
-        // Retour : [port] tout s'est bien passé
-        // Retour : -1 la room n'a pas pu être créée 
+
+        /// <summary>
+        /// Create a new room and return the port of the manager thread
+        /// </summary>
+        /// <param name="idPlayer"> Id of the player making this request </param>
+        /// <returns> Returns the port if all goes well, -1 otherwise </returns>
         public int CreateRoom(int idPlayer)
         {
             int portThreadCom = -1;

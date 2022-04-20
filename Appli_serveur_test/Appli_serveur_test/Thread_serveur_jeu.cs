@@ -18,7 +18,7 @@ namespace system
         private Dictionary<long, Player> _dico_joueur; // Contient les ID's de chaque joueur
         private Semaphore _s_dico_joueur;
         private uint _nombre_joueur;
-        private uint _nombre_joeur_max;
+        private uint _nombre_joueur_max;
         private long _id_moderateur; // Identifiant du joueur modérateur
 
         private string _statut_partie;
@@ -36,7 +36,22 @@ namespace system
 
         // Champs nécessaires pour le bon fonctionnement du programme
 
+        // Getters et setters
 
+        public int Get_ID()
+        {
+            return this._id_partie;
+        }
+
+        public uint NbJoueurs
+        {
+            get { return this._nombre_joueur; }
+        }
+
+        public uint NbJoueursMax
+        {
+            get { return this._nombre_joueur_max;  }
+        }
 
         // Constructeur
         public Thread_serveur_jeu(int id_partie, int id_joueur_createur)
@@ -47,7 +62,7 @@ namespace system
             _dico_joueur = new Dictionary<long, Player>();
             _s_dico_joueur = new Semaphore(1, 1);
             _nombre_joueur = 1;
-            _nombre_joeur_max = 8;
+            _nombre_joueur_max = 8;
             _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur));
             _id_moderateur = id_joueur_createur;
 
@@ -68,7 +83,7 @@ namespace system
         public Tools.PlayerStatus AddJoueur(long id_joueur)
         {
             _s_dico_joueur.WaitOne();
-            if (_nombre_joueur >= _nombre_joeur_max)
+            if (_nombre_joueur >= _nombre_joueur_max)
             {
                 _s_dico_joueur.Release();
                 return Tools.PlayerStatus.Full;

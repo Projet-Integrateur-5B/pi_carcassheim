@@ -3,7 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 
 namespace system
-{
+{j
 
     public class Thread_communication
     {
@@ -63,6 +63,11 @@ namespace system
         public int Get_port()
         {
             return _numero_port;
+        }
+
+        public List<Thread_serveur_jeu> Get_list_server_thread()
+        {
+            return this._lst_serveur_jeu;
         }
 
         // Ajoute une nouvelle partie au thread de communication
