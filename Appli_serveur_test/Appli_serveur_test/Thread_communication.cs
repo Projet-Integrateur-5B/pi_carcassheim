@@ -71,7 +71,12 @@ namespace system
         }
 
         // Ajoute une nouvelle partie au thread de communication
-        public int AddNewGame(int playerId)
+        /// <summary>
+        /// Add a new game (room)
+        /// </summary>
+        /// <param name="playerId"> Id of the moderator </param>
+        /// <returns> The id of the game (-1 if error occurs) </returns>
+        public int AddNewGame(ulong playerId)
         {
 
             int id_nouv_partie = -1;
@@ -101,12 +106,12 @@ namespace system
 
                 nouv_thread.Start();
 
-                return 0;
+                return id_nouv_partie;
 
             }
             else // La partie n'a pas pu être créée
             {
-                return -1;
+                return id_nouv_partie;
             }
 
 

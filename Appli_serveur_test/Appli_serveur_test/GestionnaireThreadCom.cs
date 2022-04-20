@@ -157,10 +157,11 @@ namespace system
         /// Create a new room and return the port of the manager thread
         /// </summary>
         /// <param name="idPlayer"> Id of the player making this request </param>
-        /// <returns> Returns the port if all goes well, -1 otherwise </returns>
-        public int CreateRoom(int idPlayer)
+        /// <returns> Returns a list containing the id then the port if all goes well, -1 otherwise </returns>
+        public List<int> CreateRoom(ulong idPlayer)
         {
             int portThreadCom = -1;
+            int idNewRoom = -1;
 
             if (_lst_threads_com.Count == 0 && _lst_obj_threads_com.Count == 0)
             { // Aucun thread de comm n'existe
@@ -171,8 +172,8 @@ namespace system
                 { // Seulement si un nouveau thread de com a pu être créé
 
                     // Demande de création d'une nouvelle partie dans le bon thread de com
-                    int retourAddNewGame = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
-                    if( retourAddNewGame != -1)
+                    idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
+                    if(idNewRoom != -1)
                     {
                         portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
                     }
@@ -195,8 +196,8 @@ namespace system
 
                     if (thread_com_libre_trouve)
                     {
-                        int retourAddNewGame = thread_com_iterateur.AddNewGame(idPlayer);
-                        if (retourAddNewGame != -1)
+                        idNewRoom = thread_com_iterateur.AddNewGame(idPlayer);
+                        if (idNewRoom != -1)
                         {
                             portThreadCom = thread_com_iterateur.Get_port();
                         }
@@ -216,8 +217,8 @@ namespace system
                     { // Seulement si un nouveau thread de com a pu être créé
 
                         // Demande de création d'une nouvelle partie dans le bon thread de com
-                        int retourAddNewGame = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
-                        if (retourAddNewGame != -1)
+                        idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
+                        if (idNewRoom != -1)
                         {
                             portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
                         }
@@ -227,7 +228,9 @@ namespace system
 
             }
 
-            return portThreadCom;
+            List<int> listReturn = new List<int>{ idNewRoom, portThreadCom };
+
+            return listReturn;
         }
     }
 }
