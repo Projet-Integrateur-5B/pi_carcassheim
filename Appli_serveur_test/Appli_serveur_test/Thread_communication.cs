@@ -60,11 +60,51 @@ namespace system
             return _lock_id_parties_gerees;
         }
 
-        // Augmente le nombre de parties gérées de 1
-        public void Add_partie_geree(int id_partie_ajoutee)
+        public int Get_port()
         {
-            _id_parties_gerees.Add(id_partie_ajoutee);
-            _nb_parties_gerees++;
+            return _numero_port;
+        }
+
+        // Ajoute une nouvelle partie au thread de communication
+        public int AddNewGame(int playerId)
+        {
+
+            int id_nouv_partie = -1;
+
+            lock (this._lock_nb_parties_gerees)
+            {
+                if (_nb_parties_gerees < 5)
+                {
+                    // Dixaine : numéro de thread, unité : numéro de partie
+                    id_nouv_partie = _id_thread_com * 10 + (_nb_parties_gerees+1) ;
+
+                    lock (this._lock_id_parties_gerees)
+                    {
+                        _id_parties_gerees.Add(id_nouv_partie);
+                    }
+
+                    _nb_parties_gerees++;
+                }
+            }
+
+            if (id_nouv_partie != -1) // Si la partie a pu être crée
+            {
+                Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId);
+                Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
+
+                _lst_serveur_jeu.Add(thread_serveur_jeu);
+
+                nouv_thread.Start();
+
+                return 0;
+
+            }
+            else // La partie n'a pas pu être créée
+            {
+                return -1;
+            }
+
+
         }
 
         // Création d'un nouveau thread_serveur_jeu
@@ -105,66 +145,8 @@ namespace system
                 //      • Kick (afk ou triche)
 
 
-                int typeMsg = 0; // (Dépend du RESEAU) Dépendra du type : création de partie, connexion à la partie, etc
-                int id_joueur_client = 0; // (Dépend du RESEAU)
 
-                switch (typeMsg)
-                {
-                    case 1:  // Création de partie
-
-                        int id_nouv_partie = -1;
-
-                        lock (this.Get_lock_nb_parties_gerees())
-                        {
-                            if (_nb_parties_gerees < 5)
-                            {
-                                id_nouv_partie = 1; // TEMPORAIRE     //  BDD - Fonction de récupération d'ID libre
-
-                                this.Add_partie_geree(id_nouv_partie);
-                            }
-                        }
-
-                        if (id_nouv_partie != -1) // Si la partie a pu être crée
-                        {
-                            Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, id_joueur_client);
-                            Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
-
-                            _lst_serveur_jeu.Add(thread_serveur_jeu);
-
-                            nouv_thread.Start();
-
-                            // A FAIRE - Rajouter ce joueur dans la partie
-                        }
-                        else
-                        {
-                            // RESEAU - Fonction qui indique au client que la partie n'a pas pu être créée 
-                        }
-
-                        break;
-
-                    case 2: // Connexion à une partie
-
-                        break;
-
-                    case 3: // Pose d'une tuile
-
-                        break;
-
-                    case 4: // Pose d'un pion
-
-                        break;
-
-                    case 5: // Fin de tour
-
-                        break;
-
-                    default:
-
-                        break;
-
-                }
-
-
+                //Thread.Sleep(20000);
 
             }
 
