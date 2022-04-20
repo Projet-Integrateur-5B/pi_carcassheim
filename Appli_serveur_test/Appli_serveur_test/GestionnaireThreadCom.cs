@@ -142,6 +142,54 @@ namespace system
                     }
                 }            
             }
+            else
+            {
+                bool thread_com_libre_trouve = false;
+
+                // Parcours des différents threads de communication pour trouver un qui gère < 5 parties
+                foreach (Thread_communication thread_com_iterateur in _lst_obj_threads_com)
+                {
+                    lock (thread_com_iterateur.Get_lock_nb_parties_gerees())
+                    {
+                        if (thread_com_iterateur.Get_nb_parties_gerees() < 5)
+                        {
+                            thread_com_libre_trouve = true;
+                        }
+                    }
+
+                    if (thread_com_libre_trouve)
+                    {
+                        int retourAddNewGame = thread_com_iterateur.AddNewGame(idPlayer);
+                        if (retourAddNewGame != -1)
+                        {
+                            portThreadCom = thread_com_iterateur.Get_port();
+                        }
+
+                        break; // Sort du foreach
+                    }
+
+                }
+
+                // Si aucun des threads n'est libre pour héberger une partie de plus
+                if (thread_com_libre_trouve == false)
+                {
+
+                    int positionThreadCom = Creation_thread_com();
+
+                    if (positionThreadCom != -1)
+                    { // Seulement si un nouveau thread de com a pu être créé
+
+                        // Demande de création d'une nouvelle partie dans le bon thread de com
+                        int retourAddNewGame = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
+                        if (retourAddNewGame != -1)
+                        {
+                            portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
+                        }
+                    }
+
+                }
+
+            }
 
             return portThreadCom;
         }
