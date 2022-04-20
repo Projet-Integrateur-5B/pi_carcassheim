@@ -27,6 +27,7 @@ public static class Tools
         RoomLeave = 9,
         RoomCreate = 10,
         PlayerReady = 11,
+        BadPort = 12,
         ToBeDetermined = 999
     }
 
