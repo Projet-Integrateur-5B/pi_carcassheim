@@ -1,4 +1,4 @@
-using System;
+﻿namespace ClassLibrary;
 
 /// <summary>
 ///     Object used when data is sent or received through the sockets between client and server.

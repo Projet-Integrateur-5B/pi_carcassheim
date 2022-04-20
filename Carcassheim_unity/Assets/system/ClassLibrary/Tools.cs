@@ -1,10 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace ClassLibrary;
+
 using System.ComponentModel;
 using System.Text;
 using Newtonsoft.Json;
-using UnityEngine;
 
 /// <summary>
 ///     Class involving methods used by an instance of <see cref="Packet" /> while communicating.
@@ -24,7 +22,11 @@ public static class Tools
         Receive = 4,
         Data = 5,
         Permission = 6,
-        Success = 7,
+        Database = 7,
+        RoomJoin = 8,
+        RoomLeave = 9,
+        RoomCreate = 10,
+        PlayerReady = 11,
         ToBeDetermined = 999
     }
 
@@ -33,7 +35,6 @@ public static class Tools
     /// </summary>
     public enum IdMessage : byte
     {
-
         Default = 0,
         Login = 1,
         Logout = 2,
@@ -41,9 +42,9 @@ public static class Tools
         Statistics = 4,
         RoomList = 5,
         RoomCreate = 6,
-        RoomJoin = 7,
-        RoomLeave = 8,
-        RoomReady = 9,
+        PlayerJoin = 7,
+        PlayerLeave = 8,
+        PlayerReady = 9,
         RoomSettingsGet = 10,
         RoomSettingsSet = 11,
         RoomStart = 12,
@@ -54,11 +55,37 @@ public static class Tools
         CancelPionPlacement = 17,
         TourValidation = 18,
         TimerExpiration = 19,
-        WarningCheat = 20,
-        KickFromGame = 21,
-        LeaveGame = 22,
-        EndGame = 23
+        PlayerCheat = 23,
+        EndGame = 24
+    }
 
+    public enum PlayerStatus
+    {
+        Default = 0,
+        Success = 1,
+        Kicked = 2,
+        Full = 3,
+        Found = 4,
+        NotFound = -1
+    }
+
+    public enum Timer 
+    {
+        Minute = 60,
+        DemiHeure = 1800,
+        Heure = 3600,
+    }
+
+    public enum Meeple
+    {
+        Quatre = 4,
+        Huit = 8,
+        Dix = 10
+    }
+
+    public enum Mode
+    {
+        Default = 0
     }
 
     /// <summary>
@@ -95,7 +122,7 @@ public static class Tools
         }
         catch (Exception e)
         {
-            Debug.Log(string.Format(e.ToString()));
+            Console.WriteLine(e.ToString());
             // Setting the error value.
             error = Errors.Socket;
         }
@@ -138,7 +165,7 @@ public static class Tools
         }
         catch (Exception e)
         {
-            Debug.Log(string.Format(e.ToString()));
+            Console.WriteLine(e.ToString());
             // Setting the error value.
             error = Errors.Socket;
         }
@@ -215,31 +242,45 @@ public static class Tools
         {
             try
             {
+                // get the data length
                 dataLength = Encoding.ASCII.GetBytes(original.Data[0]).Length;
             }
             catch (Exception e)
             {
-                Debug.Log(string.Format(e.ToString()));
+                Console.WriteLine(e);
                 throw;
             }
 
+            // ajout d'un string dans le packet si il y a assez de place
             if (dataLength < headerBytesMaxLength - 3)
             {
+                // ajoute la data dans le packet
                 packet.Data = new List<string>(packet.Data.ToList()) { original.Data[0] }.ToArray();
+                // r�duit le nombre de string qu'il reste � ajouter
                 packetLength--;
+                // r�duit la place disponible dans le reste du packet
                 headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
+                // supprime de original la data mis dans le packet
                 original.Data = original.Data.Where((source, index) => index != 0).ToArray();
             }
             else
             {
-                var chaine = original.Data[0].Substring(0, headerBytesMaxLength - 5);
+                // r�cup�re ce qu'on peut encore rajouter dans le reste du packet
+                var chaine = original.Data[0][..(headerBytesMaxLength - 5)];
                 // original.Data[0].Substring(0, headerBytesMaxLength - 5);
+
+                // ajoute la chaine r�cup�rer
                 packet.Data = new List<string>(packet.Data.ToList()) { chaine }.ToArray();
-                original.Data[0] = original.Data[0].Substring(headerBytesMaxLength - 5);
+
+                //supprimer dans original la chaine ajouter
+                original.Data[0] = original.Data[0][(headerBytesMaxLength - 5)..];
                 // original.Data[0].Substring(headerBytesMaxLength - 5);
 
+                //packet non final
                 packet.Final = false;
+                //ajout du packet
                 packets.Add(packet);
+                //reinitialisation du packet pour le prochain ajout
                 packet = headerBytes.ByteArrayToPacket(ref error);
                 packet.Data = new List<string>(packet.Data.ToList()) { "" }.ToArray();
                 if (error != Errors.None)
@@ -247,13 +288,15 @@ public static class Tools
                     // TODO : ByteArrayToPacket => handle error
                     return new List<Packet>();
                 }
-
+                // reinitialisation de la place dispo dans le prochain packet
                 headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength - 4;
             }
 
             if (packetLength == 0)
             {
+                // dernier packet
                 packet.Final = true;
+                // ajout du dernier pacekt
                 packets.Add(packet);
                 break;
             }
@@ -287,7 +330,7 @@ public static class Tools
             }
             catch (Exception e)
             {
-                Debug.Log(string.Format(e.ToString()));
+                Console.WriteLine(e);
                 // Setting the error value.
                 error = Errors.Data;
             }
