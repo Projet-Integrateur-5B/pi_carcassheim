@@ -297,27 +297,27 @@ public class DisplaySystem : MonoBehaviour
             tableCheck(ray, ref mouse_consumed);
 
             //! TEST 
-            float enter;
-            if ((act_player == my_player) && !mouse_consumed && board_plane.Raycast(ray, out enter))
+            //float enter;
+            if ((act_player == my_player) && !mouse_consumed && board.boardCollide(ray))
             {
-                if (enter > 0)
+                //if (enter > 0)
+                //{
+                Vector3 p = board.BoardCollidePos;
+                if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
                 {
-                    Vector3 p = ray.GetPoint(enter);
-                    if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
-                    {
-                        act_tile.Pos = new Position();
-                        act_tile.transform.position = p;
-                        act_tile.transform.rotation = Quaternion.identity;
-                        table.tilePositionChanged(act_tile);
-                    }
-                    else if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null)
-                    {
-                        act_meeple.ParentTile = tiles_hand[0];
-                        act_meeple.transform.position = p;
-                        act_meeple.transform.rotation = Quaternion.identity;
-                        table.meeplePositionChanged(act_meeple);
-                    }
+                    act_tile.Pos = new Position();
+                    act_tile.transform.position = p;
+                    act_tile.transform.rotation = Quaternion.identity;
+                    table.tilePositionChanged(act_tile);
                 }
+                else if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null)
+                {
+                    act_meeple.ParentTile = tiles_hand[0];
+                    act_meeple.transform.position = p;
+                    act_meeple.transform.rotation = Quaternion.identity;
+                    table.meeplePositionChanged(act_meeple);
+                }
+                //}
             }
         }
 

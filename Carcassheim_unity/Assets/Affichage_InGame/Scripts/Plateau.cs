@@ -17,8 +17,12 @@ public class Plateau : MonoBehaviour
     private bool _meeplePossibilitiesShown;
 
     private Dictionary<int, TileOnBoard> tiles_on_board;
-    private Collider tile_collider_model;
+    //private Collider tile_collider_model;
+    
     private List<TileIndicator> act_tile_indicator;
+
+    public Vector3 BoardCollidePos { get => _board_collide_pos; set { _board_collide_pos = value; } }
+    private Vector3 _board_collide_pos;
 
     [SerializeField] private Transform rep_O, rep_u, rep_v;
 
@@ -106,13 +110,16 @@ public class Plateau : MonoBehaviour
 
     // u et v les axes x et y
 
-    public Position boardCollide(Transform hit)
+    public bool boardCollide(Ray ray)
     {
+        RaycastHit hit;
         // Voir si le joueur a cliqué sur une tuile du plateau
         if(_tilePossibilitiesShown)
         {
-            //Pos = display_system.setSelectedTile(hit.GetComponent<ColliderStat>().Index);
-            return null;           
+            Physics.Raycast(ray, out hit);
+            _board_collide_pos = hit.collider.gameObject.GetComponent<Collider>().transform.position;
+            //board_collide_pos = display_system.setSelectedTile(hit.GetComponent<ColliderStat>().Index);
+            return true;
         }
         else if(_meeplePossibilitiesShown)
         {
@@ -122,14 +129,14 @@ public class Plateau : MonoBehaviour
                 break;
             }
             display_system.setSelectedMeeple(hit.GetComponent<MeepleColliderStat>().Index); */
-            return null;
+            return true;
         }
         else
         {
-            //Debug.Log("Shouldn't have been an input in " + act_table_state.ToString());
+            Debug.Log("Shouldn't have been an input in " + act_table_state.ToString());
         }
 
-        return null;  
+        return true;  
     }
 
     public void displayMeeplePossiblities()
