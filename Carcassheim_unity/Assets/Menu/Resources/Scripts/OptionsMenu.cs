@@ -12,13 +12,24 @@ public class OptionsMenu : Miscellaneous
 	float lastSoundValue = 0;
 	float lastMusicValue = 0;
 	public Toggle toggle_french, toggle_english, toggle_german;
-	private GameObject containerButtons, _btnSonUnselected, _btnMusicUnselected;
+	private GameObject _btnSonUnselected, _btnMusicUnselected;
 	private Transform optionsMenu, OCB, OCS, OCT; // Options Container Buttons
+	private GameObject _btnSonUnselectedP, _btnMusicUnselectedP;
+	private Button _btnSonP, _btnMusiqueP;
+	private Transform panelMenu, PCB; // Options Container Buttons
 	private Sprite _spriteMusicON, _spriteMusicOFF, _spriteSoundON, _spriteSoundOFF, _spriteMusicUnselectedON, _spriteMusicUnselectedOFF, _spriteSoundUnselectedON, _spriteSoundUnselectedOFF;
 	// Start is called before the first frame update
 	void Start()
 	{
 		// INITIALISATION
+		panelMenu = GameObject.Find("SubMenus").transform.Find("Panel Options").transform;
+		PCB = panelMenu.Find("Buttons").transform;
+		_btnMusiqueP = PCB.Find("SwitchMusic").GetComponent<Button>();
+		_btnMusicUnselectedP = _btnMusiqueP.transform.GetChild(0).gameObject;
+		_btnSonP = PCB.Find("SwitchSound").GetComponent<Button>();
+		_btnSonUnselectedP = _btnSonP.transform.GetChild(0).gameObject;
+
+
 		optionsMenu = GameObject.Find("SubMenus").transform.Find("OptionsMenu").transform;
 		OCB = optionsMenu.Find("Buttons").transform;
 		OCS = optionsMenu.Find("Sliders").transform;
@@ -73,21 +84,29 @@ public class OptionsMenu : Miscellaneous
 			{
 				_btnSon.GetComponent<Image>().sprite = _spriteSoundON;
 				_btnSonUnselected.GetComponent<Image>().sprite = _spriteSoundUnselectedON;
+				_btnSonP.GetComponent<Image>().sprite = _spriteSoundON;
+				_btnSonUnselectedP.GetComponent<Image>().sprite = _spriteSoundUnselectedON;
 			}
 			else
 			{
 				_btnMusique.GetComponent<Image>().sprite = _spriteMusicON;
 				_btnMusicUnselected.GetComponent<Image>().sprite = _spriteMusicUnselectedON;
+				_btnMusiqueP.GetComponent<Image>().sprite = _spriteMusicON;
+				_btnMusicUnselectedP.GetComponent<Image>().sprite = _spriteMusicUnselectedON;
 			}
 		else if (b == 0)
 		{
 			_btnSon.GetComponent<Image>().sprite = _spriteSoundOFF;
 			_btnSonUnselected.GetComponent<Image>().sprite = _spriteSoundUnselectedOFF;
+			_btnSonP.GetComponent<Image>().sprite = _spriteSoundOFF;
+			_btnSonUnselectedP.GetComponent<Image>().sprite = _spriteSoundUnselectedOFF;
 		}
 		else
 		{
 			_btnMusique.GetComponent<Image>().sprite = _spriteMusicOFF;
 			_btnMusicUnselected.GetComponent<Image>().sprite = _spriteMusicUnselectedOFF;
+			_btnMusiqueP.GetComponent<Image>().sprite = _spriteMusicOFF;
+			_btnMusicUnselectedP.GetComponent<Image>().sprite = _spriteMusicUnselectedOFF;
 		}
 
 		if (b == 0)

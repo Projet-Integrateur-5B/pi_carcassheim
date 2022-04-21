@@ -1,11 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
+using system;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CreateRoomMenu : Miscellaneous
 {
-	public void HideCreateRoom()
+    private void Start()
+    {
+		this.gameObject.AddComponent<Communication_inRoom>();
+    }
+
+    public void HideCreateRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("CreateRoomMenu", "RoomSelectionMenu");

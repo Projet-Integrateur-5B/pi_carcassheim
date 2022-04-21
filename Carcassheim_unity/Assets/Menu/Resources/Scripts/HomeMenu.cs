@@ -1,5 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
+using Assets.System;
 
 public class HomeMenu : Miscellaneous
 {
@@ -24,7 +26,9 @@ public class HomeMenu : Miscellaneous
 	public void ShowRoomSelection()
 	{
 		ChangeMenu("HomeMenu", "RoomSelectionMenu");
-	/* SceneManager.LoadScene("InGame"); */
+		var test = this.GetComponent<RoomSelectionMenu>();
+		test.LoadRoomInfo();
+		/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void ShowOptions()
@@ -39,6 +43,9 @@ public class HomeMenu : Miscellaneous
 
 	public void QuitGame() // A LA FIN : quand tout fonctionnera : RemoveAllListeners(); (bouton -> "free")
 	{
+
+		//TODO il manque le changement de la view
+		Communication.Instance.DisconnectToServer();
 		Application.Quit();
 	}
 }
