@@ -20,9 +20,9 @@ public abstract class DisplaySystemAction
 public class DisplaySystemActionTileSetCoord : DisplaySystemAction
 {
     public int tile_id;
-    public Position new_pos;
+    public PositionRepre new_pos;
 
-    public DisplaySystemActionTileSetCoord(int tile_id, Position new_pos)
+    public DisplaySystemActionTileSetCoord(int tile_id, PositionRepre new_pos)
     {
         action_type = DisplaySystemActionTypes.tileSetCoord;
         this.tile_id = tile_id;
@@ -45,10 +45,10 @@ public class DisplaySystemActionTileSelection : DisplaySystemAction
 public class DisplaySystemActionMeepleSetCoord : DisplaySystemAction
 {
     public int tile_id;
-    public Position tile_pos;
+    public PositionRepre tile_pos;
     public int meeple_id;
     public int slot_pos;
-    public DisplaySystemActionMeepleSetCoord(int tile_id, Position tile_pos, int meeple_id, int slot_pos)
+    public DisplaySystemActionMeepleSetCoord(int tile_id, PositionRepre tile_pos, int meeple_id, int slot_pos)
     {
         action_type = DisplaySystemActionTypes.meepleSetCoord;
         this.tile_id = tile_id;

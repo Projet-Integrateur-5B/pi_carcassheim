@@ -204,7 +204,7 @@ public class DisplaySystem : MonoBehaviour
         }
 
         int id_tile, id_meeple, slot_pos, index;
-        Position pos;
+        PositionRepre pos;
         switch (old_state)
         {
             case DisplaySystemState.meeplePosing:
@@ -364,7 +364,7 @@ public class DisplaySystem : MonoBehaviour
                     case "TileBodyCollider":
                         if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
                         {
-                            Position rotation;
+                            PositionRepre rotation;
                             if (hit.transform.parent != act_tile.pivotPoint)
                                 Debug.Log("Tried to rotate " + hit.transform.parent.name + " instead of act tile");
                             else if (act_tile.nextRotation(out rotation))

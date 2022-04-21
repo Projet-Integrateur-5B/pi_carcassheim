@@ -28,8 +28,8 @@ public class TuileRepre : MonoBehaviour
     }
 
     // * POSITION *********************************************
-    private Position _pos;
-    public Position Pos
+    private PositionRepre _pos;
+    public PositionRepre Pos
     {
         set
         {
@@ -41,7 +41,7 @@ public class TuileRepre : MonoBehaviour
         }
         get => _pos;
     }
-    public List<Position> possibilitiesPosition = new List<Position>();
+    public List<PositionRepre> possibilitiesPosition = new List<PositionRepre>();
 
     void Awake()
     {
@@ -79,11 +79,11 @@ public class TuileRepre : MonoBehaviour
         slots_mapping[id].unlightFace();
     }
 
-    public Position isPossible(Position pos)
+    public PositionRepre isPossible(PositionRepre pos)
     {
         if (pos == null)
             return null;
-        foreach (Position true_pos in possibilitiesPosition)
+        foreach (PositionRepre true_pos in possibilitiesPosition)
         {
             if (true_pos.X == pos.X && true_pos.Y == pos.Y && (pos.Rotation == -1 || true_pos.Rotation == pos.Rotation))
                 return true_pos;
@@ -102,7 +102,7 @@ public class TuileRepre : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             rotation = (rotation + 1) % 4;
-            if (isPossible(new Position(x, y, rotation)) != null)
+            if (isPossible(new PositionRepre(x, y, rotation)) != null)
             {
                 found = true;
                 break;
@@ -110,12 +110,12 @@ public class TuileRepre : MonoBehaviour
         }
         if (found)
         {
-            Pos = new Position(x, y, rotation);
+            Pos = new PositionRepre(x, y, rotation);
         }
         return found;
     }
 
-    public bool nextRotation(out Position npos)
+    public bool nextRotation(out PositionRepre npos)
     {
         Debug.Log("Rotation from " + (Pos == null ? "nothing" : Pos.ToString()));
         npos = null;
@@ -128,7 +128,7 @@ public class TuileRepre : MonoBehaviour
         for (int i = 0; i < 3; i++)
         {
             rotation = (rotation + 1) % 4;
-            if (isPossible(new Position(x, y, rotation)) != null)
+            if (isPossible(new PositionRepre(x, y, rotation)) != null)
             {
                 found = true;
                 break;
@@ -136,7 +136,7 @@ public class TuileRepre : MonoBehaviour
         }
         if (found)
         {
-            npos = new Position(x, y, rotation);
+            npos = new PositionRepre(x, y, rotation);
             Debug.Log("Rotation to " + (npos == null ? "nothing" : npos.ToString()));
         }
         else

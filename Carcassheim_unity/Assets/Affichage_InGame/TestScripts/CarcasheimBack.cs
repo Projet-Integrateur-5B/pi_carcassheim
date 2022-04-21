@@ -48,13 +48,13 @@ public struct TileInitParam
 
 public struct Zone
 {
-    public Zone(Position pos, int id_tuile, int id_slot)
+    public Zone(PositionRepre pos, int id_tuile, int id_slot)
     {
         this.pos = pos;
         this.id_tuile = id_tuile;
         this.id_slot = id_slot;
     }
-    public Position pos;
+    public PositionRepre pos;
     public int id_tuile;
     public int id_slot;
 };
@@ -118,12 +118,12 @@ public class CarcasheimBack : MonoBehaviour
 
     }
 
-    public void sendTile(int tile_id, Position tile_pos, int id_meeple, int slot_pos)
+    public void sendTile(int tile_id, PositionRepre tile_pos, int id_meeple, int slot_pos)
     {
 
     }
 
-    public void getTile(out int tile_id, out Position pos, out int id_meeple, out int slot_pos)
+    public void getTile(out int tile_id, out PositionRepre pos, out int id_meeple, out int slot_pos)
     {
         tile_id = -1;
         pos = null;
@@ -174,7 +174,7 @@ public class CarcasheimBack : MonoBehaviour
         }
     }
 
-    public void getTilePossibilities(int tile_id, List<Position> positions)
+    public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
     {
         int new_pos, new_r;
 
@@ -186,7 +186,7 @@ public class CarcasheimBack : MonoBehaviour
                 {
                     new_r = Random.Range(0, 4);
                     for (int r = 0; r < new_r; r++)
-                        positions.Add(new Position(new_pos, new_pos, r));
+                        positions.Add(new PositionRepre(new_pos, new_pos, r));
                 }
             }
         } while (positions.Count == 0);

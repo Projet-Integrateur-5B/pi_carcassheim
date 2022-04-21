@@ -2,7 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum TileIndicatorState{
+public enum TileIndicatorState
+{
     TilePossibilitie,
     TilePosed,
     LastTile
@@ -13,23 +14,25 @@ public class TileIndicator : MonoBehaviour
     [SerializeField] Collider tile_collider;
 
     private TileIndicatorState _state = TileIndicatorState.TilePossibilitie;
-    public TileIndicatorState state{
-        set{
+    public TileIndicatorState state
+    {
+        set
+        {
             _state = value;
             if (value == TileIndicatorState.TilePossibilitie)
                 tile_collider.enabled = true;
             else
-                tile_collider.enabled = false;   
+                tile_collider.enabled = false;
         }
         get => _state;
     }
-    public Position position = new Position();
+    public PositionRepre position = new PositionRepre();
     public PlayerRepre player;
     public Renderer model_renderer;
 
     [SerializeField] private float alpha_ref = 1f;
 
-    public void setAttributes(PlayerRepre player, Position pos)
+    public void setAttributes(PlayerRepre player, PositionRepre pos)
     {
         this.position = pos;
         this.player = player;
@@ -37,7 +40,7 @@ public class TileIndicator : MonoBehaviour
         col.a = alpha_ref;
         model_renderer.material.SetColor("_Color", col);
     }
-    
+
     public void display()
     {
         model_renderer.enabled = true;
@@ -50,6 +53,6 @@ public class TileIndicator : MonoBehaviour
     {
         model_renderer.enabled = false;
         if (state == TileIndicatorState.TilePossibilitie)
-            tile_collider.enabled = false; 
+            tile_collider.enabled = false;
     }
 }
