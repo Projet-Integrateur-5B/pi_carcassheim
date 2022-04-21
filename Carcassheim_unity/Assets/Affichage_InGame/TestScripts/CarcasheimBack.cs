@@ -9,6 +9,19 @@ public enum WinCondition
     WinByPoint,
     WinByTile
 };
+
+public struct PlayerInitParam
+{
+    int id_player;
+    string player_name;
+};
+
+public struct nombidon
+{
+    int id_meeple;
+    bool tile_flags;
+};
+
 public class CarcasheimBack : MonoBehaviour
 {
 
@@ -103,10 +116,10 @@ public class CarcasheimBack : MonoBehaviour
         return true_total;
     }
 
-    public void askPlayers(List<int> player_ids, List<string> players_name)
+    public void askPlayers(List<PlayerInitParam> player)
     {
-        player_ids.AddRange(players);
-        players_name.AddRange(players_names);
+        /*         player_ids.AddRange(players);
+                players_name.AddRange(players_names); */
     }
 
     public void getTilePossibilities(int tile_id, List<Position> positions)

@@ -247,7 +247,10 @@ public class DisplaySystem : MonoBehaviour
                         act_meeple.setPos(act_tile, slot_pos);
                     }
                 }
-                board.finalizeTurn();
+                board.finalizeTurn(act_tile.Pos, act_tile);
+                break;
+            case DisplaySystemState.tilePosing:
+                board.hideTilePossibilities();
                 break;
         }
     }
@@ -272,6 +275,7 @@ public class DisplaySystem : MonoBehaviour
                     if (meeples_hand.Count > 0)
                         setSelectedMeeple(0, true);
                 }
+                board.displayTilePossibilities();
                 break;
             case DisplaySystemState.meeplePosing:
                 act_tile.showPossibilities(act_player);
@@ -302,7 +306,7 @@ public class DisplaySystem : MonoBehaviour
             float enter;
             if (!hit_valid && (true || act_player == my_player) && !mouse_consumed && board_plane.Raycast(ray, out enter))
             {
-                if (enter > 0)
+                if (act_system_state == DisplaySystemState.tilePosing && hit.transform.tag == "TileIndicCollider" && act_tile != null)
                 {
                     Vector3 p = ray.GetPoint(enter);
                     if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
@@ -312,12 +316,21 @@ public class DisplaySystem : MonoBehaviour
                         table.tilePositionChanged(act_tile);
                     }
                 }
+                else
+                    Debug.Log("PROBLEM " + hit.transform.tag);
             }
             if (hit_valid)
             {
                 SlotIndic slot;
                 switch (hit.transform.tag)
                 {
+                    case "TileIndicCollider":
+                        if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
+                        {
+                            //TileInd
+                        }
+                        break;
+
                     case "SlotCollider":
                         if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null)
                         {
@@ -419,7 +432,7 @@ public class DisplaySystem : MonoBehaviour
 
         List<int> player_ids = new List<int>();
         List<string> player_names = new List<string>();
-        system_back.askPlayers(player_ids, player_names);
+        // system_back.askPlayers(player_ids, player_names);
 
         int L = player_ids.Count;
         for (int i = 0; i < L; i++)
