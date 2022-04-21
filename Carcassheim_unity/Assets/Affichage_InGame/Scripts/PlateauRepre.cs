@@ -6,14 +6,14 @@ using UnityEngine.UI;
 
 public class PlateauRepre : MonoBehaviour
 {
-    private class PositionComparer : IEqualityComparer<Position>
+    private class PositionComparer : IEqualityComparer<PositionRepre>
     {
-        public bool Equals(Position pos0, Position pos1)
+        public bool Equals(PositionRepre pos0, PositionRepre pos1)
         {
             return pos0.X == pos1.X && pos0.Y == pos1.Y;
         }
 
-        public int GetHashCode(Position pos)
+        public int GetHashCode(PositionRepre pos)
         {
             int x = pos.X, y = pos.Y;
             return ((x + y) * (x + y + 1) / 2) + y;
@@ -28,7 +28,7 @@ public class PlateauRepre : MonoBehaviour
     private bool _tilePossibilitiesShown;
 
     // Dictionnaire pour stocker les données des tuiles posées sur le plateau
-    private Dictionary<Position, TuileRepre> tiles_on_board;
+    private Dictionary<PositionRepre, TuileRepre> tiles_on_board;
 
     [SerializeField] private List<TileIndicator> act_tile_indicator;
 
@@ -39,12 +39,12 @@ public class PlateauRepre : MonoBehaviour
 
     void Awake()
     {
-        tiles_on_board = new Dictionary<Position, TuileRepre>(new PositionComparer());
+        tiles_on_board = new Dictionary<PositionRepre, TuileRepre>(new PositionComparer());
     }
 
 
     // Récupère la tuile présente à une certaine position et la renvoie
-    public TuileRepre getTileAt(Position pos)
+    public TuileRepre getTileAt(PositionRepre pos)
     {
         // Parcours du dictionnaire pour récupérer la tuile dont les coordonnées correspondent
         TuileRepre res = null;
@@ -54,7 +54,7 @@ public class PlateauRepre : MonoBehaviour
         return tile_found ? res : null;
     }
 
-    public bool setTileAt(Position pos, TuileRepre tile)
+    public bool setTileAt(PositionRepre pos, TuileRepre tile)
     {
         TuileRepre act_tile = null;
         bool tile_found;
@@ -124,7 +124,7 @@ public class PlateauRepre : MonoBehaviour
         return res;
     }
 
-    private void addTile(PlayerRepre player, Position pos, Position last_pos = null)
+    private void addTile(PlayerRepre player, PositionRepre pos, PositionRepre last_pos = null)
     {
         if (last_pos != null && last_pos.X == pos.X && last_pos.Y == pos.Y)
             return;
@@ -183,8 +183,8 @@ public class PlateauRepre : MonoBehaviour
         cleanTileIndic(player);
 
         //Remplissage de la liste de tile indicateurs avec la liste des positions donnée par la tuile
-        Position last_pos = null;
-        foreach (Position tilePos in tile.possibilitiesPosition)
+        PositionRepre last_pos = null;
+        foreach (PositionRepre tilePos in tile.possibilitiesPosition)
         {
             addTile(player, tilePos, last_pos);
             last_pos = tilePos;
@@ -238,7 +238,7 @@ public class PlateauRepre : MonoBehaviour
         return true;
     }
 
-    public void finalizeTurn(Position pos, TuileRepre tile)
+    public void finalizeTurn(PositionRepre pos, TuileRepre tile)
     {
         // Fin de tour
         // Ajouter la position finale de la tuile au dictionnaire contenant les tuiles présentes sur le tableau

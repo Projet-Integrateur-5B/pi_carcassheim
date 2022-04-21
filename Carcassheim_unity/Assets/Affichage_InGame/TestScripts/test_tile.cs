@@ -37,12 +37,12 @@ public class test_tile : MonoBehaviour
                 {
                     if (Random.Range(0f, 1f) < 0.2)
                         x += 1;
-                    Position pos = new Position(x, y, (rotation + i) % 4);
+                    PositionRepre pos = new PositionRepre(x, y, (rotation + i) % 4);
                     act_tuile.possibilitiesPosition.Add(pos);
                     Debug.Log("Position possible : " + pos.ToString());
                 }
             }
-            act_tuile.Pos = new Position(x, y, rotation);
+            act_tuile.Pos = new PositionRepre(x, y, rotation);
             act_tuile.possibilitiesPosition.Add(act_tuile.Pos);
             Debug.Log("Position " + act_tuile.Pos);
         }
