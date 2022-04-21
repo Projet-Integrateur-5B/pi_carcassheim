@@ -14,8 +14,7 @@ namespace system
         public uint _score { get; set; }
         public uint _triche { get; set; }
         public bool _is_ready { get; set; }
-
-        private Socket? _socket_of_player;
+        public Socket? _socket_of_player { get; set; }
 
         public Semaphore _s_player;
 
