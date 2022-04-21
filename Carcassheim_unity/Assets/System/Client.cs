@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Security;
 using UnityEngine;
 using Newtonsoft.Json;
+using ClassLibrary;
 
 public static partial class Client
 {

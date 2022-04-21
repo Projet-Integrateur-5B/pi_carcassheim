@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using Assets.System;
 using System;
+using ClassLibrary;
 
 public class RoomSelectionMenu : Miscellaneous
 {

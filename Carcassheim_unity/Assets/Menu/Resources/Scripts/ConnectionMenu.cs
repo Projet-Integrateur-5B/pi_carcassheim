@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Assets.System;
+using ClassLibrary;
 
 public class ConnectionMenu : Miscellaneous
 {

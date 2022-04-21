@@ -1,6 +1,7 @@
-using System;
 using System.Net.Sockets;
 using UnityEngine;
+using System;
+using ClassLibrary;
 
 public class Rejoindre_room : MonoBehaviour
 {
@@ -39,8 +40,6 @@ public class Rejoindre_room : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -78,8 +77,6 @@ public class Rejoindre_room : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -91,7 +88,7 @@ public class Rejoindre_room : MonoBehaviour
         // Sauvegarde les informations pour communiquer avec le bon thread de com du serveur
         int portThreadCom = -1;
 
-        if (original.Error == Tools.Errors.Success)
+        if (original.Error == Tools.Errors.None)
         {
             portThreadCom = Int32.Parse(original.Data[0]);
         }
@@ -125,8 +122,6 @@ public class Rejoindre_room : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -135,7 +130,7 @@ public class Rejoindre_room : MonoBehaviour
 
 
         // Si la connexion est un succès, on lance "Communication_ingame" et on lui donne le nouveau port (celui du thread de com)
-        if(original.Error == Tools.Errors.Success)
+        if(original.Error == Tools.Errors.None)
         {
 
         }

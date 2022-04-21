@@ -1,3 +1,4 @@
+using ClassLibrary;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,8 +40,6 @@ public class Recuperation_liste_room : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -79,8 +78,6 @@ public class Recuperation_liste_room : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -110,8 +107,6 @@ public class Recuperation_liste_room : MonoBehaviour
             case Tools.Errors.ToBeDetermined:
                 break;
             case Tools.Errors.Permission:
-                break;
-            case Tools.Errors.Success:
                 break;
             default:
                 // TODO : handle case : default

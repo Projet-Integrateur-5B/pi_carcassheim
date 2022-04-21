@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Net.Sockets;
+using ClassLibrary;
 
 namespace Assets.System
 {
@@ -59,8 +60,6 @@ namespace Assets.System
                     break;
                 case Tools.Errors.Permission:
                     break;
-                case Tools.Errors.Success:
-                    break;
                 default:
                     // TODO : handle case : default
                     Debug.Log(string.Format("Errors.Unknown"));
@@ -95,8 +94,6 @@ namespace Assets.System
                 case Tools.Errors.ToBeDetermined:
                     break;
                 case Tools.Errors.Permission:
-                    break;
-                case Tools.Errors.Success:
                     break;
                 default:
                     // TODO : handle case : default
@@ -144,10 +141,6 @@ namespace Assets.System
                 case Tools.Errors.ToBeDetermined:
                     break;
                 case Tools.Errors.Permission:
-                    break;
-                case Tools.Errors.Success:
-                    if(original.Error == Tools.Errors.Success)
-                        res = true;
                     break;
                 default:
                     // TODO : handle case : default

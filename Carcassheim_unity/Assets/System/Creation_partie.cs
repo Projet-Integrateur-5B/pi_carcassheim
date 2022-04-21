@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using ClassLibrary;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -38,8 +37,6 @@ public class Creation_partie : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -77,8 +74,6 @@ public class Creation_partie : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -108,8 +103,6 @@ public class Creation_partie : MonoBehaviour
             case Tools.Errors.ToBeDetermined:
                 break;
             case Tools.Errors.Permission:
-                break;
-            case Tools.Errors.Success:
                 break;
             default:
                 // TODO : handle case : default

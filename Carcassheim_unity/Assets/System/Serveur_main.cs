@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
+using ClassLibrary;
 
 public class Serveur_main : MonoBehaviour
 {
@@ -188,8 +189,6 @@ public class Serveur_main : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -236,8 +235,6 @@ public class Serveur_main : MonoBehaviour
                 break;
             case Tools.Errors.Permission:
                 break;
-            case Tools.Errors.Success:
-                break;
             default:
                 // TODO : handle case : default
                 Debug.Log(string.Format("Errors.Unknown"));
@@ -276,8 +273,6 @@ public class Serveur_main : MonoBehaviour
             case Tools.Errors.ToBeDetermined:
                 break;
             case Tools.Errors.Permission:
-                break;
-            case Tools.Errors.Success:
                 break;
             default:
                 // TODO : handle case : default

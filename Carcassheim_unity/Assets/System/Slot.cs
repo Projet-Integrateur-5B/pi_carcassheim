@@ -1,28 +1,30 @@
 using System.Collections.Generic;
 
-public class Slot
+namespace Assets.system
 {
-    private readonly TypeTerrain _terrain;
-    public TypeTerrain Terrain => _terrain;
-    public int IdJoueur { get; set; }
-
-    private static Dictionary<int, TypeTerrain> TerrainFromId;
-
-    public Slot(TypeTerrain terrain)
+    public class Slot
     {
-        _terrain = terrain;
-        IdJoueur = 0;
-    }
+        private readonly TypeTerrain _terrain;
+        public TypeTerrain Terrain => _terrain;
+        public ulong IdJoueur { get; set; }
 
-    public Slot(int idTerrain)
-    {
-        _terrain = TerrainFromId[idTerrain];
-        IdJoueur = 0;
-    }
+        private static Dictionary<ulong, TypeTerrain> TerrainFromId;
 
-    static Slot()
-    {
-        TerrainFromId = new Dictionary<int, TypeTerrain>
+        public Slot(TypeTerrain terrain)
+        {
+            _terrain = terrain;
+            IdJoueur = 0;
+        }
+
+        public Slot(ulong idTerrain)
+        {
+            _terrain = TerrainFromId[idTerrain];
+            IdJoueur = 0;
+        }
+
+        static Slot()
+        {
+            TerrainFromId = new Dictionary<ulong, TypeTerrain>
         {
             { 0, TypeTerrain.Ville },
             { 1, TypeTerrain.Route },
@@ -31,5 +33,6 @@ public class Slot
             { 4, TypeTerrain.Auberge },
             { 5, TypeTerrain.Cathedrale }
         };
+        }
     }
 }

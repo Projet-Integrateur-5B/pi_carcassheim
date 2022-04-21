@@ -1,16 +1,16 @@
 using System;
-
+using Assets.system;
 public class Partie
 {
     Plateau _plateau;
-    int[] _idJoueurs;
-    int _idCurrentJoueur;
-    readonly int _idClient;
+    ulong[] _idJoueurs;
+    ulong _idCurrentJoueur;
+    readonly ulong _idClient;
     bool _over;
-    int _nbTour;
+    ulong _nbTour;
     public Plateau Plateau => _plateau;
 
-    public Partie(params int[] idJoueurs)
+    public Partie(params ulong[] idJoueurs)
     {
         _plateau = new Plateau();
         _idJoueurs = idJoueurs;
@@ -24,7 +24,7 @@ public class Partie
         {
             _idCurrentJoueur = _idJoueurs[_nbTour];
 
-            if (_nbTour % _idJoueurs.Length == _idClient)
+            if (_nbTour % (ulong)_idJoueurs.Length == _idClient)
                 JouerTour();
             else
                 TourAutreJoueur();
@@ -70,7 +70,7 @@ public class Partie
 
         // RECEVOIR PLACEMENT PION DU JOUEUR
 
-        int slot = 0;
+        ulong slot = 0;
 
         _plateau.PoserPion(_idCurrentJoueur, tuile, slot);
     }
@@ -93,7 +93,7 @@ public class Partie
         }
 
         // RECEPTIONNE COUP
-        int idTuile = 0, slot = 0;
+        ulong idTuile = 0, slot = 0;
         Position pos = new Position();
         _plateau.PoserTuile(idTuile, pos);
         _plateau.PoserPion(_idCurrentJoueur, idTuile, slot);
