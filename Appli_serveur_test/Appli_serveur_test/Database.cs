@@ -317,7 +317,7 @@ public class Database
         return long.Parse(res.Result[0]);
     }
     
-    void RemplirTuiles(Dictionary<ulong, ulong> dico)
+    public void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
         string commande = "SELECT T.IDT,M.Proba FROM Tuile T,Modele M where T.IDM = M.IDM;";
         string[] parametres = Array.Empty<string>();

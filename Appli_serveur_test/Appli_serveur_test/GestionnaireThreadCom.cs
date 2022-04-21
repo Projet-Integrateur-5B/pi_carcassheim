@@ -359,7 +359,7 @@ namespace system
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     if (idPlayer == thread_serv_ite.Get_Moderateur())
-                        thread_serv_ite.Start();
+                        thread_serv_ite.StartGame();
                     return; // return valeur correcte
                 }
             }
@@ -373,7 +373,7 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
-                    thread_serv_ite.End();
+                    thread_serv_ite.EndGame();
                     return; // return valeur correcte
                 }
             }

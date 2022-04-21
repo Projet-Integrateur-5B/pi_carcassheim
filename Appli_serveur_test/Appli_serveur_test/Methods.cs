@@ -89,7 +89,7 @@ public partial class Server
                 break;
             
             case Tools.IdMessage.TourValidation:
-                GameRound(state.Packet, ref packet, socket);
+                EndTurn(state.Packet, ref packet, socket);
                 break;
             case Tools.IdMessage.TimerExpiration:
                 TimerPlayer(ref packet, socket, "0", 0); // TODO : fix param
@@ -607,6 +607,7 @@ public partial class Server
         gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer);
         
         // TODO : check le retour de StartGame
+        // TODO : implémenter broadcast au début de game
     }
     /// <summary>
     ///     Ends the game.
@@ -647,7 +648,7 @@ public partial class Server
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void GameRound(Packet packetReceived, ref Packet packet, Socket socket)
+    public static void EndTurn(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
