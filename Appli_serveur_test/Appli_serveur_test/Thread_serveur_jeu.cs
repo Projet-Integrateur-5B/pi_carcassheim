@@ -33,6 +33,9 @@ namespace system
         private Tools.Timer _timer_max_joueur; // En secondes
         private Tools.Meeple _meeples; // Nombre de meeples par joueur
 
+        // Locks
+
+        private readonly object _lock_settings;
 
         // Champs nécessaires pour le bon fonctionnement du programme
 
@@ -48,6 +51,11 @@ namespace system
             return this._id_moderateur;
         }
 
+        public bool Is_Private()
+        {
+            return this._privee;
+        }
+
         public uint NbJoueurs
         {
             get { return this._nombre_joueur; }
@@ -58,17 +66,125 @@ namespace system
             get { return this._nombre_joueur_max;  }
         }
 
+        /// <summary>
+        /// Settings of that game
+        /// </summary>
+        /// <returns> 
+        /// Returns a string[] in that order: { id_moderator, player_number, player_number_max,
+        /// private, mode, number_tiles, number_pawn, timer, timer_max_player }.
+        /// </returns>
         public string[] Get_Settings()
         {
-            // TODO :
-            return Array.Empty<string>();
+            List<string> settingsList = new List<string>();
+
+            settingsList.Add(_id_moderateur.ToString());
+            settingsList.Add(_nombre_joueur.ToString());
+            settingsList.Add(_nombre_joueur_max.ToString());
+            settingsList.Add(_privee.ToString());
+            settingsList.Add(_mode.ToString());
+            settingsList.Add(_nb_tuiles.ToString());
+            settingsList.Add(_meeples.ToString());
+            settingsList.Add(_timer.ToString());
+            settingsList.Add(_timer_max_joueur.ToString());
+            settingsList.Add(_score_max.ToString());
+           
+            return settingsList.ToArray();
         }
 
+        /// <summary>
+        /// Sets the settings of the game
+        /// </summary>
+        /// <param name="idPlayer"> Id of the player making the request </param>
+        /// <param name="settings"> The new set of settings (in the same order than Get_settings, without the 2 firsts) </param>
         public void Set_Settings(ulong idPlayer, string[] settings)
         {
             if (idPlayer == Get_Moderateur())
             {
-                // TODO :
+                lock (_lock_settings)
+                {
+                    try
+                    {
+                        _nombre_joueur_max = Convert.ToUInt32(settings[0]);
+                        _privee = bool.Parse(settings[1]);
+
+                        switch (Int32.Parse(settings[2]))
+                        {
+                            case 0:
+                                _mode = Tools.Mode.Default;
+                                break;
+                            case 1:
+                                _mode = Tools.Mode.TimeAttack;
+                                break;
+                            case 2:
+                                _mode = Tools.Mode.Score;
+                                break;
+                            default:
+                                _mode = Tools.Mode.Default;
+                                break;
+                        }
+
+                        _nb_tuiles = int.Parse(settings[3]);
+
+                        switch (int.Parse(settings[4]))
+                        {
+                            case 4:
+                                _meeples = Tools.Meeple.Quatre;
+                                break;
+                            case 8:
+                                _meeples = Tools.Meeple.Huit;
+                                break;
+                            case 10:
+                                _meeples = Tools.Meeple.Dix;
+                                break;
+                            default:
+                                _meeples = Tools.Meeple.Huit;
+                                break;
+                        }
+
+                        switch (int.Parse(settings[5]))
+                        {
+                            case 60:
+                                _timer = Tools.Timer.Minute;
+                                break;
+                            case 1800:
+                                _timer = Tools.Timer.DemiHeure;
+                                break;
+                            case 3600:
+                                _timer = Tools.Timer.Heure;
+                                break;
+                            default:
+                                _timer = Tools.Timer.DemiHeure;
+                                break;
+
+                        }
+
+                        switch (int.Parse(settings[6]))
+                        {
+                            case 10:
+                                _timer = Tools.Timer.DixSecondes;
+                                break;
+                            case 30:
+                                _timer = Tools.Timer.DemiMinute;
+                                break;
+                            case 60:
+                                _timer = Tools.Timer.Minute;
+                                break;
+                            default:
+                                _timer = Tools.Timer.DemiMinute;
+                                break;
+
+                        }
+
+                        _score_max = int.Parse(settings[7]);
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ERROR: Set_settings : " + ex);
+                        return;
+                    }
+                }
+                
             }
         }
         

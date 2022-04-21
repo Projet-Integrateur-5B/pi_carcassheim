@@ -73,7 +73,7 @@ public static class Tools
         Permissions = 5,
         NotFound = -1
     }
-
+    
     public enum GameStatus
     {
         Room = 0,
@@ -81,11 +81,13 @@ public static class Tools
         Stopped = 2
     }
 
-    public enum Timer 
+    public enum Timer
     {
+        DixSecondes = 10,
+        DemiMinute = 30,
         Minute = 60,
         DemiHeure = 1800,
-        Heure = 3600,
+        Heure = 3600
     }
 
     public enum Meeple
@@ -97,7 +99,9 @@ public static class Tools
 
     public enum Mode
     {
-        Default = 0
+        Default = 0,
+        TimeAttack = 1,
+        Score = 2
     }
 
     /// <summary>
