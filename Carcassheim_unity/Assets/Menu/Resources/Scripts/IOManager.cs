@@ -28,13 +28,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 	private bool boolSelectionChange = true;
 	private bool cooldown = false;
 	private InputField IF = null;
-	private static bool boolPC = true;
 
 	void Start()
 	{
-#if !(UNITY_IOS || UNITY_ANDROID)
-		boolPC = true;
-#endif
 		// SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
 		// ---------------------------------- PATCH : ------------------------------------
 		/* 		Debug.Log("Liste des scripts : ");
@@ -141,12 +137,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		//IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
-		//if (!IF)
-		//{
-		nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
-		selectionChange();
-		//}
+		IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
+		if (!IF)
+		{
+			nextGo = eventData.pointerCurrentRaycast.gameObject.transform.parent.gameObject;
+			selectionChange();
+		}
 	}
 
 
@@ -165,10 +161,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 		// nextGo.GetComponent<Button>() est testé d'abord donc si false la partie gauche du ET non testé donc pas d'erreur
 		bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
 		bool slider = nextGo.transform.GetChild(0).name == "Handle";
-		bool inputfd = nextGo.transform.parent.name == "InputField" || nextGo.transform.parent.name == "InputFieldEndEdit";
+		/* 		bool inputfd = nextGo.transform.parent.name == "InputField";
+				Debug.Log(inputfd);  */
 		// RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
 		// Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
-		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || inputfd || nextGo.GetComponent<Toggle>()))
+		if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || nextGo.GetComponent<Toggle>()))
 		{
 			previousGo = eventSystem.currentSelectedGameObject;
 			eventSystem.SetSelectedGameObject(nextGo);
@@ -212,7 +209,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void resetHoverPreviousGo()
 	{
-		if (previousGo != null && boolPC == true)
+		if (previousGo != null)
 		{
 			//GameObject.Find("Trident").SetActive(false);
 			Component previousTarget = previousGo.transform.GetChild(0).GetComponent<Component>();
@@ -243,7 +240,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
 	public void changeHover()
 	{
-		if ((boolSelectionChange && boolPC) == true)
+		if (boolSelectionChange == true)
 		{
 			if (TridentGo.activeSelf == true) // TRIDENT
 				TridentGo.SetActive(false);
