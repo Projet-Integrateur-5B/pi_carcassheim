@@ -273,7 +273,7 @@ namespace system
             return Array.Empty<string>();
         }
 
-        public int JoinPlayer(string idRoom, ulong idPlayer)
+        public int JoinPlayer(string idRoom, ulong idPlayer, Socket? playerSocket)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
@@ -281,7 +281,7 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
-                    var playerStatus = thread_serv_ite.AddJoueur(idPlayer);
+                    var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
                     if (playerStatus != Tools.PlayerStatus.Success)
                         return -1;
                     return thread_com_iterateur.Get_port();
