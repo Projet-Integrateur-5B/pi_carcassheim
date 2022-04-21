@@ -1,18 +1,203 @@
+from __future__ import annotations
 from io import BufferedRandom
+from typing import Any, Tuple, Union, List
 from PIL import Image
+import xml.etree.ElementTree as ET
 from collections import deque
-import os
+import os, sys
 
 MAXWIDTH = 1000
 MAXHEIGHT = 720
+
+Number = Union[float, int]
+ERR_OUT = sys.stdout
+
+UNITY_PATH = "../"
+UNITY_FILE = "Carcassheim_unity/"
+UNITY_TILE_PATH = os.path.join(UNITY_FILE, "Assets/Affichage_InGame/Tile/")
+UNITY_MASK_PATH = os.path.join(UNITY_TILE_PATH, "Mask/")
+
+
+def save_front_xml(tl_file: TileFile):
+    print("start save front")
+    root = ET.ElementTree()
+    root_el = ET.Element("carcasheim")
+    meeple_id = 0
+    zone_id = 0
+    tile_id_conv = {}
+    tile_slot_id_conv = {}
+    meeple_id_conv = {}
+    zone_id_conv = {}
+
+    for tile_id, tile in enumerate(tl_file.getTiles()):
+        tile_el = ET.Element("tuile")
+        root_el.append(tile_el)
+
+        id_el = ET.Element("id")
+        id_el.text = f"{tile_id}"
+        tile_el.append(id_el)
+        tile_id_conv[tile.id] = tile_id
+        tile_slot_id_conv[tile.id] = {}
+
+        sprite_el = ET.Element("sprite")
+        if tile.sprite is None:
+            print(f"Error : Tile {tile.id} has no sprite", file=ERR_OUT)
+            return
+        try:
+            path = os.path.relpath(
+                tile.spriteName, os.path.join(UNITY_PATH, UNITY_FILE)
+            )
+            sprite_el.text = f"{path}"
+        except:
+            print("Error: trying to create path to sprite", file=ERR_OUT)
+        tile_el.append(sprite_el)
+
+        for slot_id, slot in enumerate(tile.lslots):
+            slot_el = ET.Element("slot")
+            tile_el.append(slot_el)
+
+            id_el = ET.Element("id")
+            id_el.text = f"{slot_id}"
+            slot_el.append(id_el)
+
+            x_el = ET.Element("x")
+            x_el.text = f"{slot.x}"
+            slot_el.append(x_el)
+            y_el = ET.Element("y")
+            y_el.text = f"{slot.y}"
+            slot_el.append(y_el)
+            
+            tile_slot_id_conv[tile.id][slot.id] = slot_id
+
+            sprite_el = ET.Element("sprite")
+            if slot.mask_name is None:
+                print(
+                    f"Error: Slot {slot.id} in tile {tile.id} has no mask",
+                    file=ERR_OUT,
+                )
+                return
+            try:
+                path = os.path.relpath(
+                    slot.mask_name, os.path.join(UNITY_PATH, UNITY_FILE)
+                )
+                sprite_el.text = f"{path}"
+            except:
+                print("Error: trying to create path for slot", file=ERR_OUT)
+            slot_el.append(sprite_el)
+
+    root = ET.ElementTree(root_el)
+    root.write("config_front.xml")
+
+
+def save_back_xml(tl_file: TileFile):
+    tl_file = tl_file.getActive()
+    root_el = ET.Element("carcasheim")
+    meeple_id = 0
+    zone_id = 0
+    tile_id_conv = {}
+    tile_slot_id_conv = {}
+    meeple_id_conv = {}
+    zone_id_conv = {}
+    slots_el = {}
+    for zone_id, zone in enumerate(tl_file.getSlotType()):
+        zone_el = ET.Element("terrain")
+
+        id_el = ET.Element("id")  # zone id
+        id_el.text = f"{zone_id}"
+        zone_el.append(id_el)
+
+        zone_id_conv[zone.id] = zone_id  # zone id normalization
+
+        name_el = ET.Element("nom")
+        if zone.name == "":
+            print(f"Warning: Zone {zone.id} has no name", file=ERR_OUT)
+        name_el.text = f"{zone.name}"
+        zone_el.append(name_el)
+
+        root_el.append(zone_el)
+
+    for tile_id, tile in enumerate(tl_file.getTiles()):
+        tile_el = ET.Element("tuile")
+        tile_dir = {}
+        for dir in DIR:
+            tile_dir[dir] = False
+
+        id_el = ET.Element("id")  # tile id
+        id_el.text = f"{tile_id}"
+        tile_el.append(id_el)
+        tile_id_conv[tile.id] = tile_id  # tile id normalization
+        tile_slot_id_conv[tile.id] = {}
+        slots_el[tile.id] = {}
+
+        for slot_id, slot in enumerate(tile.lslots):
+            slot_el = ET.Element("slot")
+            slots_el[tile.id][slot.id] = slot_el
+
+            id_el = ET.Element("id")  # slot id
+            id_el.text = f"{slot_id}"
+            slot_el.append(id_el)
+            tile_slot_id_conv[tile.id][slot.id] = slot_id  # slot id normalization
+
+            zone_el = ET.Element("terrain")  # zone
+            if slot.zone is None:
+                print(
+                    f"Error: Slot {slot.id} in tile {tile.id} has no type",
+                    file=ERR_OUT,
+                )
+                return
+            zone_el.text = f"{zone_id_conv[slot.zone.id]}"
+            slot_el.append(zone_el)
+
+            for dir in DIR:
+                if slot.dir[dir]:
+                    if tile_dir[dir]:
+                        print(
+                            f"Error: Position {dir} is linked more than once in tile {tile.id}",
+                            file=ERR_OUT,
+                        )
+                        return
+                    slot_el.append(ET.Element(dir))
+                    tile_dir[dir] = True
+            tile_el.append(slot_el)
+        for dir in DIR:
+            if not tile_dir[dir]:
+                print(
+                    f"Error: Position {dir} is linked to no slot in tile {tile.id}",
+                    file=sys.stderr,
+                )
+
+        root_el.append(tile_el)
+
+    for tile_id, tile in enumerate(tl_file.getTiles()):
+        for slot_id, slot in enumerate(tile.lslots):
+            for linked in slot.slot_links:
+                link_el = ET.Element("link")
+                link_el.text = f"{tile_slot_id_conv[tile.id][linked]}"
+                slots_el[tile.id][slot.id].append(link_el)
+
+    root = ET.ElementTree(root_el)
+    root.write("config_back.xml")
+
+
+EXPORT = {
+    "front XML": save_front_xml,
+    "back XML": save_back_xml,
+}
+
+
+def relpath(path=""):
+    if len(path) == 0:
+        return ""
+    else:
+        return os.path.relpath(path)
 
 
 class SlotComptabilities:
     def __init__(self):
         self.comp = {}
 
-    def add(self, id0, id1):
-        print(f"ADD {id0} {id1}")
+    def add(self, id0: int, id1: int):
+        # print(f"ADD {id0} {id1}")
         if id0 in self.comp:
             self.comp[id0].append(id1)
         else:
@@ -26,18 +211,18 @@ class SlotComptabilities:
     def reset(self):
         self.comp.clear()
 
-    def remove(self, id0, id1):
+    def remove(self, id0: int, id1: int):
         self.comp[id0].remove(id1)
         if id0 != id1:
             self.comp[id1].remove(id0)
 
-    def remove_species(self, id):
+    def remove_species(self, id: int):
         for idf in self.comp[id]:
             self.comp.remove(idf)
         self.comp.pop(id)
 
-    def connectedTo(self, id0, id1):
-        print("RESULT", id0, id1, id0 in self.comp and id1 in self.comp[id0])
+    def connectedTo(self, id0: int, id1: int):
+        # print("RESULT", id0, id1, id0 in self.comp and id1 in self.comp[id0])
         return id0 in self.comp and id1 in self.comp[id0]
 
     def __str__(self):
@@ -57,7 +242,7 @@ class SlotType:
         SlotType.NEXTID += 1
         return id
 
-    def __init__(self, tl_master, name="", spriteName=None):
+    def __init__(self, tl_master: TileFile, name: str = "", spriteName: str = None):
         self.id = self._nextId()
         self.tl_master = tl_master
         self.name = name
@@ -74,22 +259,22 @@ class SlotType:
             self.sprite = None
         self.tl_master.addSlotType(self)
 
-    def setId(self, id):
+    def setId(self, id: int):
         self.id = id
         if id > SlotType.NEXTID:
             SlotType.NEXTID = id + 1
 
-    def connectedTo(self, other):
+    def connectedTo(self, other: Union[SlotType, Meeples]):
         if type(other) == type(self):
-            print("SLOTTYPE", self.id, other.id)
+            # print("SLOTTYPE", self.id, other.id)
             return self.tl_master.getComptabilities().connectedTo(self.id, other.id)
         else:
             return other.connectedTo(self)
 
-    def addComptabilities(self, other):
+    def addComptabilities(self, other: SlotType):
         self.tl_master.getComptabilities().add(self.id, other.id)
 
-    def removeComptabilities(self, other):
+    def removeComptabilities(self, other: SlotType):
         self.tl_master.getComptabilities().remove(self.id, other.id)
 
     def destroy(self):
@@ -125,39 +310,65 @@ DIR_vect = {
 
 
 class Slot:
-    def __init__(self, tile, coord, zone=None, mask_name=None) -> None:
+    def __init__(
+        self,
+        tile: Tile,
+        coord: Tuple[float, float],
+        zone: SlotType = None,
+        mask_name: str = None,
+        slot_links: list = None,
+    ) -> None:
         self.x, self.y = coord
         self.zone = zone
         self.tile = tile
-        self.mask_name = None if mask_name == "" else mask_name
+        self.setMask(mask_name)
         self.id = self.tile.addSlot(self)
 
+        self.slot_links = slot_links if slot_links is not None else []
         self.dir = {}
         for dir in DIR:
             self.dir[dir] = False
 
-    def setMask(self, name):
+    def setMask(self, name: str):
         self.mask_name = None if name == "" else name
+        if self.mask_name is None:
+            self.mask = None
+            return
+        try:
+            self.mask = Image.open(self.mask_name).convert("L")
+            if self.mask.size != self.tile.dim:
+                self.mask = None
+                self.mask_name = None
+                return
+            elif self.mask.size != self.tile.sprite.size:
+                self.mask = self.mask.resize(self.tile.sprite.size)
+        except:
+            self.mask = None
+            self.mask_name = None
+            return
+        img0 = Image.new("RGBA", self.mask.size, (0, 255, 0, 100))
+        img1 = Image.new("RGBA", self.mask.size, (0, 0, 0, 0))
+        self.mask = Image.composite(img0, img1, mask=self.mask)
 
-    def setId(self, id):
+    def setId(self, id: int):
         self.id = id
         self.tile.changedSlotId(id)
 
     def destroy(self):
         self.tile.removeSlot(self)
 
-    def distSqr(self, x, y):
-        return (self.x - x) ** 2 + (self.y - y) ** 2
-
     def __str__(self):
-        zone = -1 if self.zone is None else self.zone.id
         tile = self.tile.id
+        zone = self.zone.id if self.zone is not None else -1
         mask_name = self.mask_name if self.mask_name is not None else ""
         pos = ""
         for dir in DIR:
             if self.dir[dir]:
                 pos += f"pos,{tile},{self.id},{dir};"
-        return f"{tile},{self.id},{zone},{mask_name},{self.x},{self.y};" + pos
+        link = ""
+        for lnk in self.slot_links:
+            link += f"link,{self.id},{lnk};"
+        return f"{tile},{self.id},{zone},{mask_name},{self.x},{self.y};" + pos + link
 
 
 class FailedCreation(Exception):
@@ -218,7 +429,7 @@ class Meeples:
         Meeples.NEXT_ID += 1
         return id
 
-    def __init__(self, tl_master, name="", spriteName=None):
+    def __init__(self, tl_master: TileFile, name: str = "", spriteName: str = None):
         self.tl_master = tl_master
         self.id = Meeples._nextId()
 
@@ -241,13 +452,13 @@ class Meeples:
         if id > Meeples.NEXT_ID:
             Meeples.NEXT_ID = id + 1
 
-    def connectedTo(self, other):
+    def connectedTo(self, other: SlotType):
         return self.tl_master.getMeepleComptabilities().connectedTo(self.id, other.id)
 
-    def addComptabilities(self, other):
+    def addComptabilities(self, other: SlotType):
         self.tl_master.getMeepleComptabilities().add(self.id, other.id)
 
-    def removeComptabilities(self, other):
+    def removeComptabilities(self, other: SlotType):
         self.tl_master.getMeepleComptabilities().remove(self.id, other.id)
 
     def destroy(self):
@@ -261,8 +472,9 @@ class Meeples:
 
 class Tile:
     NEXT_ID = 0
+    lslots: List[Slot]
 
-    def __init__(self, tl_master, spriteName, exception_on=True) -> None:
+    def __init__(self, tl_master: TileFile, spriteName: str, exception_on=True) -> None:
         self.tl_master = tl_master
         self.spriteName = spriteName
         self.id = Tile.NEXT_ID
@@ -272,26 +484,18 @@ class Tile:
         self.next_id_slot = 0
         self.tl_master.addTile(self)
 
-        try:
-            self.sprite = Image.open(spriteName)
-            if self.sprite.width > MAXWIDTH or self.sprite.height > MAXHEIGHT:
-                ratio = min(
-                    MAXWIDTH / self.sprite.width, MAXHEIGHT / self.sprite.height
-                )
-                self.sprite = self.sprite.resize(
-                    (int(ratio * self.sprite.width), int(ratio * self.sprite.height))
-                )
-        except:
-            self.sprite = None
-            if exception_on:
-                raise FailedCreation()
+        self.dim = None
+        self.sprite = None
+        self.spriteName = None
+        self.setSprite(spriteName, exception_on)
 
     def __bool__(self):
         return self.sprite is not None
 
-    def setSprite(self, spriteName):
+    def setSprite(self, spriteName: str, exception_on: bool = True):
         try:
             sprite = Image.open(spriteName)
+            self.dim = sprite.size
             if sprite.width > MAXWIDTH or sprite.height > MAXHEIGHT:
                 ratio = min(MAXWIDTH / sprite.width, MAXHEIGHT / sprite.height)
                 sprite = sprite.resize(
@@ -300,24 +504,25 @@ class Tile:
             self.sprite = sprite
             self.spriteName = spriteName
         except:
-            raise FailedCreation()
+            if exception_on:
+                raise FailedCreation()
 
-    def changedSlotId(self, id):
+    def changedSlotId(self, id: int):
         if id > self.next_id_slot:
             self.next_id_slot = id + 1
 
-    def setId(self, id):
+    def setId(self, id: int):
         self.id = id
         if self.id > Tile.NEXT_ID:
             Tile.NEXT_ID = self.id + 1
 
-    def setNextId(next_id):
+    def setNextId(next_id: int):
         Tile.NEXT_ID = next_id
 
-    def removeSlot(self, slot):
+    def removeSlot(self, slot: Slot):
         self.lslots.remove(slot)
 
-    def addSlot(self, slot):
+    def addSlot(self, slot: Slot):
         self.lslots.append(slot)
         id = self.next_id_slot
         self.next_id_slot += 1
@@ -333,6 +538,15 @@ class Tile:
 
 class TileFile:
     VERSION = "1"
+    tiles: List[Tile]
+    slotTypes: List[SlotType]
+    meepleTypes: List[Meeples]
+
+    def getActive(self):
+        if self.valid == 0:
+            return self
+        else:
+            return self.nfile
 
     def __init__(self, other=None):
         self.Comptabilities = SlotComptabilities()
@@ -480,7 +694,7 @@ class TileFile:
                     if e is not True:
                         self.restoreNextId()
                         self.valid = (self.valid + 1) % 2
-                        print(e.__repr__())
+                        print(e.__repr__(), file=ERR_OUT)
                     else:
                         nfile.nfile.reset()
                         res = True
@@ -575,6 +789,15 @@ class TileFile:
                                         )
                                     else:
                                         slot.dir[dir] = True
+                                    index += 1
+                                elif len(arg) == 3 and arg[0] == "link":
+                                    _, id_a, id_b = arg
+                                    id_a = int(id_a)
+                                    id_b = int(id_b)
+                                    if id_a != id_slot1:
+                                        return f"Error: should be {id_slot1} in first id instead of {id_a}"
+                                    else:
+                                        slot.slot_links.append(id_b)
                                     index += 1
                                 else:
                                     break
@@ -1027,9 +1250,7 @@ if __name__ == "__main__":
                 self.iter_index == len(self.columns_to_slot)
                 and self.iter_creation is not None
             ):
-                print("myself")
                 return self.iter_creation
-            print(type(self), self.iter_index)
             item = self.columns_to_slot[self.iter_index].pointed_object
             self.iter_index += 1
             return item
@@ -1050,7 +1271,7 @@ if __name__ == "__main__":
                 self.selected_type.setSprite(
                     self.icon,
                     self.icon_remove,
-                    os.path.relpath(filedialog.askopenfilename()),
+                    relpath(filedialog.askopenfilename()),
                 )
 
         def selectByColumn(self, sti):
@@ -1293,10 +1514,13 @@ if __name__ == "__main__":
 
             self.islots = []
             self.selected = False
+            slot_maps = {}
             for slot in tile.lslots:
                 si = SlotIndicator(self.masterT, slot)
+                slot_maps[slot.id] = si
                 self.islots.append(si)
                 si.destroy()
+            SlotIndicator.treatLink(slot_maps)
 
         def __bool__(self):
             return bool(self.tile)
@@ -1342,6 +1566,43 @@ if __name__ == "__main__":
             self.selected = False
 
     class SlotIndicator:
+        class SlotLink:
+            def __init__(self, master, a, b):
+                self.master = master
+                if a.slot.id >= b.slot.id:
+                    a, b = b, a
+                self.a = a
+                self.b = b
+                self.repre = None
+
+            def draw(self):
+                if self.repre is None:
+                    self.repre = self.master.drawLine(
+                        self.a.x, self.a.y, self.b.x, self.b.y
+                    )
+                    self.master.iconfig(self.repre, fill="#FF5C20")
+
+            def move(self, target=None, x=None, y=None):
+                if self.repre is not None:
+                    if target == self.a:
+                        c = (x, y) + self.b.center()
+                    elif target == self.b:
+                        c = (x, y) + self.a.center()
+                    else:
+                        c = self.a.center() + self.b.center()
+                    self.master.imove(self.repre, *c)
+
+            def destroy(self):
+                if self.repre is not None:
+                    self.master.idelete(self.repre)
+                    self.repre = None
+
+            def isEdge(self, a, b):
+                if a < b:
+                    return self.a.slot.id == a and self.b.slot.id == b
+                else:
+                    return self.a.slot.id == b and self.b.slot.id == a
+
         SLOT_SIZE = 30
         ENABLE_COL = "#1144ff"
         DISABLE_COL = "#000000"
@@ -1422,8 +1683,18 @@ if __name__ == "__main__":
             self.lines = {}
             for dir in DIR:
                 self.lines[dir] = None
+            self.slot_links = []
             self.drawned = False
             self.draw()
+
+        def treatLink(slots_ind):
+            for id_a in slots_ind:
+                slt = slots_ind[id_a]
+                for id_b in slt.slot.slot_links:
+                    if id_a < id_b:
+                        l = SlotIndicator.SlotLink(slt.master, slt, slots_ind[id_b])
+                        slt.slot_links.append(l)
+                        slots_ind[id_b].slot_links.append(l)
 
         def changeSlotType(self, slt_type: SlotType):
             self.slot.zone = slt_type
@@ -1448,6 +1719,9 @@ if __name__ == "__main__":
                         self.master.iconfig(l, width=2, tag="graph", fill=col)
                         self.lines[dir] = l
 
+                for l in self.slot_links:
+                    l.draw()
+
                 self.node.enable()
                 self.drawned = True
 
@@ -1461,6 +1735,9 @@ if __name__ == "__main__":
                     if l is not None:
                         self.master.idelete(l)
                     self.lines[dir] = None
+
+                for l in self.slot_links:
+                    l.destroy()
 
                 self.repre_img = None
                 self.repre_outline = None
@@ -1478,6 +1755,8 @@ if __name__ == "__main__":
                 if l is not None:
                     c = DIR_COORD[dir].center()
                     self.master.imove(l, x, y, *c)
+            for l in self.slot_links:
+                l.move(self, x, y)
 
         def moveTo(self, x=None, y=None):
             tile = self.slot.tile
@@ -1509,6 +1788,11 @@ if __name__ == "__main__":
                         self.master.imove(l, x, y, *c)
                 self.master.imove(self.repre_img, x, y)
                 self.master.imove(self.repre_outline, x, y, self.SLOT_SIZE // 2)
+            for l in self.slot_links:
+                l.move()
+
+        def center(self):
+            return self.node.center()
 
         def enableSel(self):
             self.master.iconfig(self.repre_outline, outline=SlotIndicator.ENABLE_COL)
@@ -1550,6 +1834,35 @@ if __name__ == "__main__":
                     )
                     self.master.iconfig(line, fill=col)
                     return False
+            elif node.spec == "Slot":
+                source = self
+                target = node.object
+                source_slt = source.slot
+                target_slt = target.slot
+                source_id = source_slt.id
+                target_id = target_slt.id
+                # print(source_id, target_id)
+                if target_id == source_id:
+                    return True
+
+                if target_id in source_slt.slot_links:
+                    target_slt.slot_links.remove(source_id)
+                    source_slt.slot_links.remove(target_id)
+
+                    for l in (source.slot_links, target.slot_links):
+                        for i in range(len(l) - 1, -1, -1):
+                            if l[i].isEdge(source_id, target_id):
+                                l.pop(i).destroy()
+                else:
+                    target_slt.slot_links.append(source_id)
+                    source_slt.slot_links.append(target_id)
+
+                    l = SlotIndicator.SlotLink(self.master, source, target)
+                    source.slot_links.append(l)
+                    target.slot_links.append(l)
+                    l.draw()
+                # print(source_slt.slot_links, target_slt.slot_links)
+                return True
 
     class TileParameters(Editor):
         def __init__(self, master, tiles, tl_master, byrow=3, size_rect=40):
@@ -1596,6 +1909,11 @@ if __name__ == "__main__":
             fr = tk.Frame(slot_parameters, bg="#CCCCCC")
             fr.grid(column=0, row=1, columnspan=2, sticky="ew")
 
+            slot_mask_show = tk.Button(fr, text="Show", state=tk.DISABLED)
+            slot_mask_show.pack(side=tk.LEFT)
+            slot_mask_show.bind("<Enter>", lambda x: tl_master.showMask())
+            slot_mask_show.bind("<Leave>", lambda x: tl_master.hideMask())
+
             self.slot_mask = tk.Label(fr, text="", justify=tk.LEFT, bg="#DDDDDD")
             self.slot_mask.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
@@ -1623,13 +1941,13 @@ if __name__ == "__main__":
         def changeSprite(self):
             if self.tl_master.selected_tile is not None:
                 self.tl_master.selected_tile.setSpriteName(
-                    os.path.relpath(filedialog.askopenfilename())
+                    relpath(filedialog.askopenfilename(filetypes=[("image", "*.png")]))
                 )
 
         def changeMask(self):
             if self.tl_master.selected_slot is not None:
                 self.tl_master.selected_slot.slot.setMask(
-                    os.path.relpath(filedialog.askopenfilename())
+                    relpath(filedialog.askopenfilename(filetypes=[("image", "*.png")]))
                 )
                 self.maskSelected()
 
@@ -1927,6 +2245,9 @@ if __name__ == "__main__":
             self.drawned_tile = self.tile_zone.create_image(
                 self.pos_size, self.pos_size, anchor="nw"
             )
+            self.drawned_mask = self.tile_zone.create_image(
+                self.pos_size, self.pos_size, anchor="nw"
+            )
 
             self.outline = self.tile_zone.create_rectangle(0, 0, 0, 0, tag="root")
             self.tile_zone.tag_raise("graph", "root")
@@ -1934,6 +2255,7 @@ if __name__ == "__main__":
             self.graphe.addSpecies("Pos")
             self.graphe.addSpecies("Slot")
             self.graphe.addComptabilities("Pos", "Slot")
+            self.graphe.addComptabilities("Slot", "Slot")
 
             self.pos_nnw = TileEditor.NodePos(self, "nnw")
             self.pos_nww = TileEditor.NodePos(self, "nww")
@@ -1991,18 +2313,18 @@ if __name__ == "__main__":
                         or x >= self.selected_tile.tile.sprite.width
                         or y >= self.selected_tile.tile.sprite.height
                     ):
-                        print("Hors zone")
+                        # print("Hors zone")
                         self.selectSlot(None)
                     else:
                         self.MouseDown = True
                         for s in self.selected_tile.islots:
                             if s.closeTo(x, y):
-                                print("Found")
+                                # print("Found")
                                 self.selectSlot(s)
                                 return
-                        print("Not Found")
+                        # print("Not Found")
                         if self.GrapheMode == "Add":
-                            print("Adding")
+                            # print("Adding")
                             self.newSlot(x, y)
                         else:
                             self.selectSlot(None)
@@ -2035,9 +2357,9 @@ if __name__ == "__main__":
         def newTile(self):
             self.tile_zone.unbind("<ButtonPress-1>", self.pressid)
             try:
-                tile = Tile(self.tiles, os.path.relpath(filedialog.askopenfilename()))
+                tile = Tile(self.tiles, relpath(filedialog.askopenfilename(filetypes=[("image", "*.png")])))
             except FailedCreation:
-                print("Failed creation of tile")
+                print("Failed creation of tile", file=ERR_OUT)
                 self.pressid = self.tile_zone.bind(
                     "<ButtonPress-1>", self.tileZoneClick
                 )
@@ -2052,10 +2374,8 @@ if __name__ == "__main__":
         def addTile(self, tile: Tile):
             ti = TileIndicator(self.tile_list.frame, self, tile)
             self.tile_list.add(ti)
-            # for slt in tile.lslots:
-            #     si = ti.addSlot(slt)
-            #     self.graphe.addNode(si.node)
-            #     si.destroy()
+            for slt in ti.islots:
+                self.graphe.addNode(slt.node)
 
         def newSlot(self, x, y):
             coord = (
@@ -2118,6 +2438,17 @@ if __name__ == "__main__":
             self.pos_e.updateZone_center(can, width, height // 2, size)
             self.pos_s.updateZone_center(can, width // 2, height, size)
             self.pos_w.updateZone_center(can, 0, height // 2, size)
+
+        def showMask(self):
+            if self.selected_slot is not None:
+                tile = self.selected_tile.tile
+                slt = self.selected_slot.slot
+                if slt.mask is not None and tile.sprite is not None:
+                    self.mask = ImageTk.PhotoImage(slt.mask)
+                    self.tile_zone.itemconfig(self.drawned_mask, image=self.mask)
+
+        def hideMask(self):
+            self.tile_zone.itemconfig(self.drawned_mask, image="")
 
         def drawTile(self):
             if self.selected_tile:
@@ -2186,11 +2517,11 @@ if __name__ == "__main__":
 
     def save(redo=False):
         global save_file
-        print("soive")
+        # print("soive")
         if redo or save_file == "":
-            name = os.path.relpath(filedialog.asksaveasfilename())
+            name = relpath(filedialog.asksaveasfilename())
             if name == "" or type(name) == tuple or ".py" in name or ".png" in name:
-                print("Wrong filename")
+                print("Wrong filename", file=ERR_OUT)
                 return
             else:
                 save_file = name
@@ -2198,8 +2529,8 @@ if __name__ == "__main__":
 
     def load():
         global save_file
-        name = os.path.relpath(filedialog.askopenfilename())
-        if tiles.load(name):
+        name = relpath(filedialog.askopenfilename())
+        if name != "" and tiles.load(name):
             save_file = name
             me.clear()
             te.clear()
@@ -2212,6 +2543,17 @@ if __name__ == "__main__":
                 me.addMeeple(mt)
 
     file_menu = tk.Menu(men, tearoff=False)
+
+    if len(EXPORT) > 0:
+        export_menu = tk.Menu(file_menu, tearoff=False)
+        for name in EXPORT:
+
+            def f(name):
+                return lambda: EXPORT[name](tiles)
+
+            export_menu.add_command(label=name, command=f(name))
+        file_menu.add_cascade(menu=export_menu, label="Export")
+
     file_menu.add_command(
         label="Sauvegarder",
         accelerator="Ctrl + S",
@@ -2225,6 +2567,7 @@ if __name__ == "__main__":
     file_menu.add_command(
         label="Ouvrir", accelerator="Ctrl + O", command=lambda: load()
     )
+
     men.add_cascade(menu=file_menu, label="Fichier")
     fen.config(menu=men)
     onglets = ttk.Notebook(fen)

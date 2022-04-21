@@ -3,16 +3,21 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - BannerInfo
+  - RayCollider
+  - SlotCollider
+  - TileBodyCollider
+  - TileIndicCollider
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Table
   - Water
   - UI
-  - 
-  - 
+  - Board
+  - Indicator
   - 
   - 
   - 
