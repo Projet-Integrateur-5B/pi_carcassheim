@@ -72,6 +72,9 @@ public partial class Server
             case Tools.IdMessage.PlayerReady:
                 PlayerReady(state.Packet, ref packet);
                 break;
+            case Tools.IdMessage.PlayerKick:
+                PlayerKick(state.Packet, ref packet);
+                break;
             case Tools.IdMessage.PlayerCheat:
                 PlayerCheat(state.Packet, ref packet);
                 break;
@@ -279,12 +282,11 @@ public partial class Server
     public static void PlayerJoin(Packet packetReceived, ref Packet packet)
     {
         // Attempt to add a player to the room.
-        var playerStatus = PlayerJoinRoom(packetReceived.Data[0], packetReceived.IdPlayer);
-        if (playerStatus == Tools.PlayerStatus.Success)
+        var port = GestionnaireThreadCom.JoinPlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+
+        if (port != -1)
         {
-            // Player has successfully joined the room.
-            // Need to get the server's port for this specific room.
-            packet.Data[0] = GestionnaireThreadCom.GetPortFromPartyID(packetReceived.Data[0]).ToString();
+            packet.Data[0] = port.ToString();
             // TODO : ensuite client switch port, thread serveur detecte nouveau joueur et broadcast
         }
         else
@@ -299,13 +301,48 @@ public partial class Server
     /// <summary>
     ///     Player is leaving the room/game.
     /// </summary>
-    /// <remarks>Player might also be forcefully removed.</remarks>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     public static void PlayerLeave(Packet packetReceived, ref Packet packet)
     {
-        // Attempt to remove a player from the room.
-        var playerStatus = PlayerLeaveRoom(packetReceived.Data[0], packetReceived.IdPlayer);
+        // Attempt from a player to leave the room.
+        var playerStatus = GestionnaireThreadCom.RemovePlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+        if (playerStatus != Tools.PlayerStatus.Success)
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = Tools.Errors.RoomLeave
+            };
+        }
+        // TODO : ensuite thread serveur detecte fin client et broadcast
+    }
+    /// <summary>
+    ///     Player is being kicked out of the room/game.
+    /// </summary>
+    /// <remarks>Player might also be forcefully removed.</remarks>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    public static void PlayerKick(Packet packetReceived, ref Packet packet)
+    {
+        // Parse idPlayerToKick from string to ulong.
+        ulong idPlayerToKick;
+        try
+        {
+            idPlayerToKick = ulong.Parse(packetReceived.Data[1]);
+        }
+        catch (Exception e)
+        {
+            // Something went wrong.
+            packet = new Packet
+            {
+                Error = Tools.Errors.RoomLeave
+            };
+            return;
+        }
+        
+        // Attempt to kick a player from the room.
+        var playerStatus = GestionnaireThreadCom.KickPlayer(packetReceived.Data[0], packetReceived.IdPlayer, idPlayerToKick);
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
@@ -324,13 +361,13 @@ public partial class Server
     public static void PlayerReady(Packet packetReceived, ref Packet packet)
     {
         // Attempt to update a player status within the room.
-        var playerStatus = PlayerReadyRoom(packetReceived.Data[0], packetReceived.IdPlayer);
+        var playerStatus = GestionnaireThreadCom.ReadyPlayer(packetReceived.Data[0], packetReceived.IdPlayer);
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
             packet = new Packet
             {
-                Error = Tools.Errors.PlayerReady
+                Error = Tools.Errors.RoomLeave
             };
         }
         // TODO : ensuite thread serveur broadcast
@@ -344,11 +381,13 @@ public partial class Server
     public static void PlayerCheat(Packet packetReceived, ref Packet packet)
     {
         // Attempt to update the number of times a player has cheated in a specific game.
-        var playerStatus = PlayerCheatRoom(packetReceived.Data[0], packetReceived.IdPlayer);
-        // Player has reached the limit
+        // Count will be incremented but player can keep playing until the limit is reached.
+        var playerStatus = GestionnaireThreadCom.CheatPlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+        
+        // Player has reached the limit and must be kicked out.
         if (playerStatus == Tools.PlayerStatus.Kicked)
         {
-            // TODO : kick
+            // TODO : player is kicked
         }
         else if (playerStatus != Tools.PlayerStatus.Success)
         {

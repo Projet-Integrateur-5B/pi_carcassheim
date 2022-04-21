@@ -48,16 +48,17 @@ public static class Tools
         PlayerJoin = 7,
         PlayerLeave = 8,
         PlayerReady = 9,
-        RoomSettingsGet = 10,
-        RoomSettingsSet = 11,
-        RoomStart = 12,
-        TuileDraw = 13,
-        TuilePlacement = 14,
-        PionPlacement = 15,
-        CancelTuilePlacement = 16,
-        CancelPionPlacement = 17,
-        TourValidation = 18,
-        TimerExpiration = 19,
+        PlayerKick = 10,
+        RoomSettingsGet = 11,
+        RoomSettingsSet = 12,
+        RoomStart = 13,
+        TuileDraw = 14,
+        TuilePlacement = 15,
+        PionPlacement = 16,
+        CancelTuilePlacement = 17,
+        CancelPionPlacement = 18,
+        TourValidation = 19,
+        TimerExpiration = 20,
         PlayerCheat = 23,
         EndGame = 24
     }
@@ -69,6 +70,7 @@ public static class Tools
         Kicked = 2,
         Full = 3,
         Found = 4,
+        Permissions = 5,
         NotFound = -1
     }
 
