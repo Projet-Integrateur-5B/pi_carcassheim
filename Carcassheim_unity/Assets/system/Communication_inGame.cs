@@ -2,7 +2,6 @@ using System;
 using System.Net.Sockets;
 using UnityEngine;
 using ClassLibrary;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace Assets.system
@@ -70,7 +69,8 @@ namespace Assets.system
             // ==== DANS LA GAME ====
             // ======================
             lePlateau = new Plateau();
-            dico_tuile = LireXml.ReadXml();
+            LireXml reader = new LireXml("config_back.xml");
+            dico_tuile = reader.ReadXml();
 
             ClientAsync.OnPacketReceived += OnPacketReceived;
             ClientAsync.Receive(socket);

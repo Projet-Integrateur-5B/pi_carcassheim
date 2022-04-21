@@ -14,7 +14,7 @@ namespace Assets.system
         {
             _file = file;
         }
-        public static Dictionary<ulong, Tuile> ReadXml()
+        public Dictionary<ulong, Tuile> ReadXml()
         {
             ulong idTu = 0, idTe = 0, idSl = 0;
             int i = 0, j = 0, nbPos = 0;
