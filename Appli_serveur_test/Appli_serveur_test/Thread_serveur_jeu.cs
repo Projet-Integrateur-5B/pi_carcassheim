@@ -51,6 +51,11 @@ namespace system
             return this._id_moderateur;
         }
 
+        public Tools.Mode Get_Mode()
+        {
+            return this._mode;
+        }
+
         public bool Is_Private()
         {
             return this._privee;

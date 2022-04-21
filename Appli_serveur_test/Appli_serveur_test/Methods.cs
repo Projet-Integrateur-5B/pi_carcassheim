@@ -265,6 +265,8 @@ public partial class Server
             // Attempt to get the list of rooms and some data for each room.
             string[] result = gestionnaire.GetRoomList();
 
+            // TODO : pseudo from idPlayer in result[1]
+            
             // Copy the list of rooms in packet.Data
             packet.Data = result;
         }

@@ -66,9 +66,10 @@ public static partial class Server
     ///     Setup a listening socket for the <see cref="Server" /> from <see cref="Settings" />.
     /// </summary>
     /// <param name="error">Stores the <see cref="Tools.Errors" /> value.</param>
+    /// <param name="port">Server's local port.</param>
     /// <returns>The listening socket.</returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static Socket GetListenerSocket(ref Tools.Errors error)
+    public static Socket GetListenerSocket(ref Tools.Errors error, int port)
     {
         // Check if enum "Errors" do exist.
         if (!Enum.IsDefined(typeof(Tools.Errors), error))
@@ -87,7 +88,7 @@ public static partial class Server
             Console.WriteLine("Server is preparing to listen...");
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var localEndPoint = new IPEndPoint(ipAddress, Settings.ServerPort);
+            var localEndPoint = new IPEndPoint(ipAddress, port == 0 ? Settings.ServerPort : port);
 
             // Create a TCP/IP socket and Bind to the local endpoint and listen for incoming connections.
             listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -111,7 +112,8 @@ public static partial class Server
     /// <summary>
     ///     Main server method which accepts incoming connections and starts an asynchronous communication.
     /// </summary>
-    public static void StartListening()
+    /// <param name="port">Server's local port.</param>
+    public static void StartListening(int port)
     {
         var error_value = Tools.Errors.None;
         Console.WriteLine("Server is setting up...");
@@ -126,7 +128,7 @@ public static partial class Server
         }
 
         // Getting the listening socket from the server settings.
-        var listener = GetListenerSocket(ref error_value);
+        var listener = GetListenerSocket(ref error_value, port);
         if (error_value != Tools.Errors.None) // Checking for errors.
         {
             // Setting the error value.

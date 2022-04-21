@@ -115,8 +115,10 @@ namespace system
                     if (thread_serv_ite.Is_Private() == false)
                     {
                         room_list.Add(thread_serv_ite.Get_ID().ToString());
+                        room_list.Add(thread_serv_ite.Get_Moderateur().ToString());
                         room_list.Add(thread_serv_ite.NbJoueurs.ToString());
                         room_list.Add(thread_serv_ite.NbJoueursMax.ToString());
+                        room_list.Add(thread_serv_ite.Get_Mode().ToString());
                     }            
                 }
             }
