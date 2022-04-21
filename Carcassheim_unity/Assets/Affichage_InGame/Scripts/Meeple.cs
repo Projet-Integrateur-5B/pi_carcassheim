@@ -24,7 +24,15 @@ public class Meeple : MonoBehaviour
     // * POSITION *********************************************
     public int Id { get; private set; }
 
-    public Tuile ParentTile { set; get; } = null;
+    Tuile _parentTile = null;
+    public Tuile ParentTile { 
+        set
+        {
+            _parentTile = value;
+            transform.localScale = _parentTile == null ? new Vector3(1, 1, 1) : new Vector3(0.5f, 0.5f, 0.5f);
+        }
+         get=>_parentTile;
+    }
     public int SlotPos
     { set; get; } = -1; // pos
     // Start is called before the first frame update

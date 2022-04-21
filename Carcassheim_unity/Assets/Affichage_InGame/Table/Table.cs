@@ -154,7 +154,7 @@ public class Table : MonoBehaviour
             mps.Index = i;
 
             mpl.transform.parent = meeple_zone.transform;
-            mpl.transform.localPosition = mps.transform.localPosition;
+            mpl.transform.localPosition = mps.transform.localPosition - mpl.pivotPoint.localPosition;
             mpl.model.layer = DisplaySystem.TableLayer;
             mpl.pivotPoint.rotation = unselected_angle;
 
@@ -322,7 +322,7 @@ public class Table : MonoBehaviour
         {
             MeepleColliderStat mps = meeple_mapping[meeple];
             meeple.transform.parent = meeple_zone.transform;
-            meeple.transform.localPosition = mps.transform.localPosition;
+            meeple.transform.localPosition = mps.transform.localPosition - meeple.pivotPoint.localPosition;
             meeple.model.layer = DisplaySystem.TableLayer;
             if (meeple != display_system.act_meeple)
                 meeple.pivotPoint.rotation = unselected_angle;
