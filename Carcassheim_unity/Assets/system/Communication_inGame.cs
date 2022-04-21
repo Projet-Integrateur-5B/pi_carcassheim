@@ -198,12 +198,10 @@ namespace Assets.system
             packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
             packet.IdPlayer = _mon_id;
 
-            int i;
             packet.Data = new string[5];
 
             packet.Data[0] = _id_partie.ToString();
             packet.Data[1] = id_tuile.ToString();
-
             packet.Data[2] = position[0].X.ToString();
             packet.Data[3] = position[0].Y.ToString();
             packet.Data[4] = position[0].ROT.ToString();
