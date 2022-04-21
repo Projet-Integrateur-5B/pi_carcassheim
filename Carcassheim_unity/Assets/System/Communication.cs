@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Net.Sockets;
 
 namespace Assets.System
@@ -161,6 +156,17 @@ namespace Assets.System
             }
 
             return res;
+        }
+
+        public Packet CommunicationWithResult(Tools.IdMessage typeMessage, string[] values)
+        {
+            if (Communication.Instance.Socket == null)
+                ConnectedToServer();
+
+            Packet original = new Packet();
+            Communication.Instance.Socket.Communication(ref original, typeMessage, values);
+
+            return original;
         }
 
     }

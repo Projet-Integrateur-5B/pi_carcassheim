@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Assets.System;
+using System;
 
 public class RoomSelectionMenu : Miscellaneous
 {
@@ -15,6 +17,8 @@ public class RoomSelectionMenu : Miscellaneous
 		text_Endgame = panelRooms.Find("Endgame_Test").GetComponent<Text>();
 		text_Players = panelRooms.Find("Players_Test").GetComponent<Text>();
 		text_MaxPlayers = panelRooms.Find("Max players_Test").GetComponent<Text>();
+
+		LoadRoomInfo();
 	}
 
 	public void HideRoomSelection()
@@ -90,5 +94,28 @@ public class RoomSelectionMenu : Miscellaneous
 	public void SetMaxPlayersRoom(string texte)
 	{
 		this.text_MaxPlayers.text = texte;
+	}
+
+	private void LoadRoomInfo()
+    {
+		//text_ID,text_Hosts, text_Players, text_MaxPlayers, text_Endgame
+		string[] values = Array.Empty<string>();
+		Packet packet = Communication.Instance.CommunicationWithResult(Tools.IdMessage.RoomList, values);
+
+		if (packet.Error != Tools.Errors.None)
+			return;
+
+		/* A modifier quand il y aura une liste*/
+		//int taille_liste = res.Data.Length;
+		int taille_liste = 1;
+
+		for (int i = 0; i < taille_liste; i += 5)
+        {
+			text_ID.text = packet.Data[i];
+			text_Hosts.text = packet.Data[i+1];
+			text_Players.text = packet.Data[i+2];
+			text_MaxPlayers.text = packet.Data[i+3];
+			text_Endgame.text = packet.Data[i+4];
+		}
 	}
 }

@@ -5,7 +5,12 @@ using UnityEngine.UI;
 
 public class CreateRoomMenu : Miscellaneous
 {
-	public void HideCreateRoom()
+    private void Start()
+    {
+        
+    }
+
+    public void HideCreateRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("CreateRoomMenu", "RoomSelectionMenu");
