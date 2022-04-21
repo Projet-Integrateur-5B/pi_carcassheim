@@ -260,23 +260,25 @@ public partial class Server
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
+        // Attempt to get the list of rooms and some data for each room.
+        var result = gestionnaire.GetRoomList();
+        var db = new Database();
+        
         try
         {
-            // Attempt to get the list of rooms and some data for each room.
-            string[] result = gestionnaire.GetRoomList();
-
-            // TODO : pseudo from idPlayer in result[1]
-            
-            // Copy the list of rooms in packet.Data
-            packet.Data = result;
+            // Retrieve the hosts pseudo's from the database.
+            for(var i=0; i < result.Length; i+=5)
+                result[i+1] = db.GetPseudo(ulong.Parse(result[i+1]));
         }
         catch (Exception ex)
         {
-            Console.WriteLine("ERROR: GetPortFromPartyID : " + ex);
-            packet.Error = Tools.Errors.ToBeDetermined;
+            Console.WriteLine("ERROR: RoomList : " + ex);
+            packet.Error = Tools.Errors.Database;
             return;
         }
-
+        
+        // Copy the list of rooms in packet.Data
+        packet.Data = result;
     }
     /// <summary>
     ///     User is creating a room.
@@ -682,6 +684,7 @@ public partial class Server
         
         packet.IdMessage = Tools.IdMessage.TimerExpiration;
     }
+    
     
     
     // id room, id tuile, x, y, rot
