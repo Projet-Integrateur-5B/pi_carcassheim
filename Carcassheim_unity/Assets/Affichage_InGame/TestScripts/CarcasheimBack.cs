@@ -12,14 +12,64 @@ public enum WinCondition
 
 public struct PlayerInitParam
 {
-    int id_player;
-    string player_name;
+    public PlayerInitParam(int id_player, int nb_meeple, string player_name)
+    {
+        this.id_player = id_player;
+        this.nb_meeple = nb_meeple;
+        this.player_name = player_name;
+    }
+
+    public int id_player;
+    public int nb_meeple;
+    public string player_name;
 };
 
-public struct nombidon
+public struct MeepleInitParam
 {
-    int id_meeple;
-    bool tile_flags;
+    public MeepleInitParam(int id_meeple, int nb_meeple)
+    {
+        this.id_meeple = id_meeple;
+        this.nb_meeple = nb_meeple;
+    }
+    public int id_meeple;
+    public int nb_meeple;
+};
+
+public struct TileInitParam
+{
+    public TileInitParam(int id_tile, bool tile_flags)
+    {
+        this.id_tile = id_tile;
+        this.tile_flags = tile_flags;
+    }
+    public int id_tile;
+    public bool tile_flags;
+};
+
+public struct Zone
+{
+    public Zone(Position pos, int id_tuile, int id_slot)
+    {
+        this.pos = pos;
+        this.id_tuile = id_tuile;
+        this.id_slot = id_slot;
+    }
+    public Position pos;
+    public int id_tuile;
+    public int id_slot;
+};
+
+public struct PlayerScore
+{
+    public PlayerScore(int id_player, int points_gagnes, Zone zone)
+    {
+        this.id_player = id_player;
+        this.points_gagnes = points_gagnes;
+        this.zone = zone;
+    }
+    public int id_player;
+    public int points_gagnes;
+    public Zone zone;
 };
 
 public class CarcasheimBack : MonoBehaviour
@@ -27,7 +77,7 @@ public class CarcasheimBack : MonoBehaviour
 
     public int tile_number;
 
-    public List<int> players;
+    public List<int> players_id;
     public List<string> players_names;
     public int player_index;
     public bool first = true;
@@ -56,8 +106,8 @@ public class CarcasheimBack : MonoBehaviour
             do
             {
                 id = Random.Range(0, 500);
-            } while (players.Contains(id));
-            players.Add(id);
+            } while (players_id.Contains(id));
+            players_id.Add(id);
             players_names.Add(randomStrong(Random.Range(8, 20)));
         }
     }
@@ -81,22 +131,21 @@ public class CarcasheimBack : MonoBehaviour
         slot_pos = -1;
     }
 
-    public void askMeeples(IList<MeepleType> meeples, IList<int> meeple_number)
+    public void askMeeplesInit(IList<MeepleInitParam> meeples)
     {
         do
         {
-            foreach (MeepleType mt in System.Enum.GetValues(typeof(MeepleType)))
+            for (int i = 0; i < 4; i++)
             {
                 if (Random.Range(0f, 1f) < 0.3f)
                 {
-                    meeples.Add(mt);
-                    meeple_number.Add(Random.Range(1, 24));
+                    meeples.Add(new MeepleInitParam(i, Random.Range(1, 10)));
                 }
             }
         } while (meeples.Count <= 0);
     }
 
-    public int askTiles(IList<int> tile_ids, IList<bool> tile_flags)
+    public int askTilesInit(IList<TileInitParam> tiles)
     {
         int total = Random.Range(1, 10);
         int true_total = 0;
@@ -104,9 +153,9 @@ public class CarcasheimBack : MonoBehaviour
         {
             for (int i = 0; i < total; i++)
             {
-                tile_ids.Add(Random.Range(0, 6));
+                int id = Random.Range(0, 6);
                 bool tile_flag = (i == total - 1) || (true_total < 4 && Random.Range(0f, 1f) < 0.4);
-                tile_flags.Add(tile_flag);
+                tiles.Add(new TileInitParam(id, tile_flag));
                 if (tile_flag)
                 {
                     true_total++;
@@ -116,45 +165,60 @@ public class CarcasheimBack : MonoBehaviour
         return true_total;
     }
 
-    public void askPlayers(List<PlayerInitParam> player)
+    public void askPlayersInit(List<PlayerInitParam> players)
     {
-        /*         player_ids.AddRange(players);
-                players_name.AddRange(players_names); */
+        for (int j = 0; j < players_id.Count; j++)
+        {
+            int nb_meeple = Random.Range(3, 20);
+            players.Add(new PlayerInitParam(players_id[j], nb_meeple, players_names[j]));
+        }
     }
 
     public void getTilePossibilities(int tile_id, List<Position> positions)
     {
-        for (int r = 0; r < 4; r++)
-            positions.Add(new Position(0, 0, r));
-    }
+        int new_pos, new_r;
 
-    public void askPlayers(List<int> player_ids)
-    {
-        player_ids.AddRange(players);
+        do
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                if ((new_pos = Random.Range(0, 10)) < 3)
+                {
+                    new_r = Random.Range(0, 4);
+                    for (int r = 0; r < new_r; r++)
+                        positions.Add(new Position(new_pos, new_pos, r));
+                }
+            }
+        } while (positions.Count == 0);
     }
 
     public void askPlayerOrder(List<int> player_ids)
     {
-        player_ids.AddRange(players);
+        player_ids.AddRange(players_id);
+    }
+
+    public void askScores(List<PlayerScore> players_scores)
+    {
+
     }
 
     public int getNextPlayer()
     {
         if (!first)
         {
-            player_index = (player_index + 1) % players.Count;
-            return players[player_index];
+            player_index = (player_index + 1) % players_id.Count;
+            return players_id[player_index];
         }
         else
         {
             first = false;
-            return players[player_index];
+            return players_id[player_index];
         }
     }
 
     public int getMyPlayer()
     {
-        return players[Random.Range(0, players.Count)];
+        return players_id[Random.Range(0, players_id.Count)];
     }
 
     public void askTimerTour(out int min, out int sec)

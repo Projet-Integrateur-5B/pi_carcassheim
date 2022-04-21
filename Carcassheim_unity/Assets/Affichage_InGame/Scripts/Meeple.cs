@@ -2,15 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum MeepleType
-{
-    DefaultMeeple,
-    SlowMeeple,
-    FastMeeple,
-    GlowingMeeple,
-    DrowsyMeeple
-};
-
 public class Meeple : MonoBehaviour
 {
 
@@ -19,10 +10,8 @@ public class Meeple : MonoBehaviour
     public GameObject model;
     public Renderer color;
 
-    public MeepleType meeple_type { get; set; } = MeepleType.DefaultMeeple;
-
     // * POSITION *********************************************
-    public int Id { get; private set; }
+    public int Id { get; set; }
 
     Tuile _parentTile = null;
     public Tuile ParentTile
@@ -53,11 +42,6 @@ public class Meeple : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-
-    }
-
-    public void setPos(Tuile tile, int slot_pos)
     {
 
     }

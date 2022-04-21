@@ -8,26 +8,30 @@ public class PlayerRepre
 
     public Color color;
 
-    public event Action<uint, uint> OnScoreUpdate;
-    public event Action<uint> OnMeepleUpdate;
+    public event Action<int, int> OnScoreUpdate;
+    public event Action<int> OnMeepleUpdate;
 
 
     public int Id { get => _id; private set => _id = value; }
     public string Name { get => _name; private set => _name = value; }
-    public uint Score
+    public int Score
     {
         get => _score;
         set
         {
+            if (value < 0)
+                value = 0;
             OnScoreUpdate?.Invoke(_score, value);
             _score = value;
         }
     }
-    public uint NbMeeple
+    public int NbMeeple
     {
         get => _nb_meeple;
         set
         {
+            if (value < 0)
+                value = 0;
             OnMeepleUpdate?.Invoke(value);
             _nb_meeple = value;
         }
@@ -35,8 +39,8 @@ public class PlayerRepre
 
     static private int id_gen = 0;
     private int _id;
-    private uint _score;
-    private uint _nb_meeple;
+    private int _score;
+    private int _nb_meeple;
     private string _name;
 
 
@@ -57,5 +61,13 @@ public class PlayerRepre
         color = col;
         _score = 0;
         _nb_meeple = 0;
+    }
+    public PlayerRepre(PlayerInitParam param, Color col)
+    {
+        Id = param.id_player;
+        Name = param.player_name;
+        _nb_meeple = param.nb_meeple;
+        color = col;
+        _score = 0;
     }
 }

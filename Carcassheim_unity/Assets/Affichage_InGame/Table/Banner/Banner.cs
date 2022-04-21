@@ -93,12 +93,12 @@ public class Banner : MonoBehaviour
         timerTourTMP.text = timerTour.ToString();
     }
 
-    void scoreUpdated(uint old_score, uint new_score)
+    void scoreUpdated(int old_score, int new_score)
     {
         nbPointsTMP.text = new_score.ToString();
     }
 
-    void meepleUpdated(uint meeple)
+    void meepleUpdated(int meeple)
     {
         nbMeepleTMP.text = meeple.ToString();
     }

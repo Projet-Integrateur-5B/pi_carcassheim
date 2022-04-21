@@ -44,12 +44,12 @@ public class PlayerIcon : MonoBehaviour
         }
     }
 
-    public void meepleUpdated(uint nb_meeple)
+    public void meepleUpdated(int nb_meeple)
     {
         player_meeple.text = nb_meeple.ToString();
     }
 
-    public void scoreUpdated(uint old_score, uint new_score)
+    public void scoreUpdated(int old_score, int new_score)
     {
         player_score.text = new_score.ToString();
     }
