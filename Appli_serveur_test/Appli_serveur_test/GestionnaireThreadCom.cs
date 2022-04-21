@@ -232,5 +232,36 @@ namespace system
 
             return listReturn;
         }
+
+        
+        
+        public void UpdateRoom(string idRoom, ulong idPlayer, string[] settings)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    thread_serv_ite.Set_Settings(idPlayer, settings);
+                    return;
+                }
+            }
+        }
+        
+        public string[] SettingsRoom(string idRoom)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom == thread_serv_ite.Get_ID().ToString())
+                        return thread_serv_ite.Get_Settings();
+                }
+            }
+
+            return Array.Empty<string>();
+        }
     }
 }

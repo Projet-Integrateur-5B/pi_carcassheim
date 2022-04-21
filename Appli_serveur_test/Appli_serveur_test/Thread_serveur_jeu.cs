@@ -42,6 +42,11 @@ namespace system
         {
             return this._id_partie;
         }
+        
+        public ulong Get_Moderateur()
+        {
+            return this._id_moderateur;
+        }
 
         public uint NbJoueurs
         {
@@ -51,6 +56,20 @@ namespace system
         public uint NbJoueursMax
         {
             get { return this._nombre_joueur_max;  }
+        }
+
+        public string[] Get_Settings()
+        {
+            // TODO :
+            return Array.Empty<string>();
+        }
+
+        public void Set_Settings(ulong idPlayer, string[] settings)
+        {
+            if (idPlayer == Get_Moderateur())
+            {
+                // TODO :
+            }
         }
 
         // Constructeur

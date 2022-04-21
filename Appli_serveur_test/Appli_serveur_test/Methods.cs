@@ -1,4 +1,5 @@
 using System.Diagnostics.Tracing;
+using system;
 
 namespace Server;
 
@@ -49,7 +50,7 @@ public partial class Server
                 break;
             
             case Tools.IdMessage.RoomList:
-                RoomList(state.Packet, ref packet);
+                RoomList(ref packet);
                 break;
             case Tools.IdMessage.RoomCreate:
                 RoomCreate(state.Packet, ref packet);
@@ -196,23 +197,20 @@ public partial class Server
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    public static void RoomList(Packet packetReceived, ref Packet packet)
+    public static void RoomList(ref Packet packet)
     {
         // Attempt to get the list of rooms and some data for each room.
-        var result = Thread_communication.GetRoomList();
+        var data = GestionnaireThreadCom.GetRoomList();
         
-        if (result.Error == Tools.Errors.None)
+        if (data.Length > 0)
         {
             // Copy the list of rooms in packet.Data
-            packet.Data = result.Data;
+            packet.Data = data;
         }
         else
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                Error = result.Error
-            };
+            packet.Error = Tools.Errors.RoomList;
         }
     }
     /// <summary>
@@ -223,20 +221,19 @@ public partial class Server
     public static void RoomCreate(Packet packetReceived, ref Packet packet)
     {
         // Attempt to insert a new room.
-        var result = Thread_communication.CreateRoom(packetReceived.IdPlayer, packetReceived.Data[0], packetReceived.Data[1],
-            packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4], packetReceived.Data[5]);
+        var data = GestionnaireThreadCom.CreateRoom(packetReceived.IdPlayer);
 
-        if (result != Tools.Errors.None)
+        if (data.Count > 0)
         {
-            // Something went wrong.
-            packet.Error = Tools.Errors.RoomCreate;
+            // Sending the room's ID back to the client.
+            packet.Data[0] = data[0].ToString();
+            // Sending the new server's port (i.e. room port) back to the client.
+            packet.Data[1] = data[1].ToString();
         }
         else
         {
-            // Sending the room's ID back to the client. 
-            packet.Data[0] = result.ToString();
-            // Sending the new server's port (i.e. room port) back to the client.
-            packet.Data[1] = SocketPortRoom(packet.Data[0]);
+            // Something went wrong.
+            packet.Error = Tools.Errors.RoomCreate;
         }
     }
 
@@ -248,20 +245,17 @@ public partial class Server
     public static void RoomSettingsGet(Packet packetReceived, ref Packet packet)
     {
         // Attempt to get the room settings.
-        Packet result = GetRoomSettings(packetReceived.Data[0]);
+        var data = GestionnaireThreadCom.SettingsRoom(packetReceived.Data[0]);
         
-        if (result.Error == Tools.Errors.None)
+        if (data.Length > 0)
         {
-            // Copy the settings in packet.Data
-            packet.Data = result.Data;
+            // Copy the list of rooms in packet.Data
+            packet.Data = data;
         }
         else
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                Error = result.Error
-            };
+            packet.Error = Tools.Errors.RoomSettings;
         }
     }
     /// <summary>
@@ -272,18 +266,7 @@ public partial class Server
     public static void RoomSettingsSet(Packet packetReceived, ref Packet packet)
     {
         // Attempt to update a room.
-        var result = UpdateRoom(packetReceived.Data[0], packetReceived.IdPlayer,
-            packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3],
-            packetReceived.Data[4], packetReceived.Data[5], packetReceived.Data[6]);
-        
-        if (result.Error != Tools.Errors.None)
-        {
-            // Something went wrong.
-            packet = new Packet
-            {
-                Error = result.Error
-            };
-        }
+        GestionnaireThreadCom.UpdateRoom(packetReceived.Data[0], packetReceived.IdPlayer, packetReceived.Data.Skip(0).ToArray());
     }
 
 
@@ -301,7 +284,7 @@ public partial class Server
         {
             // Player has successfully joined the room.
             // Need to get the server's port for this specific room.
-            packet.Data = packet.Data.Concat(SocketPortRoom(packetReceived.Data[0]));
+            packet.Data[0] = GestionnaireThreadCom.GetPortFromPartyID(packetReceived.Data[0]).ToString();
             // TODO : ensuite client switch port, thread serveur detecte nouveau joueur et broadcast
         }
         else

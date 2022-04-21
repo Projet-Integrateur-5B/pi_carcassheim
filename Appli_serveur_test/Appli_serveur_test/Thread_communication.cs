@@ -3,7 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 
 namespace system
-{j
+{
 
     public class Thread_communication
     {

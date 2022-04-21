@@ -23,11 +23,13 @@ public static class Tools
         Data = 5,
         Permission = 6,
         Database = 7,
-        RoomJoin = 8,
-        RoomLeave = 9,
-        RoomCreate = 10,
-        PlayerReady = 11,
-        BadPort = 12,
+        RoomList = 8,
+        RoomJoin = 9,
+        RoomLeave = 10,
+        RoomCreate = 11,
+        RoomSettings = 12,
+        PlayerReady = 20,
+        BadPort = 21,
         ToBeDetermined = 999
     }
 
