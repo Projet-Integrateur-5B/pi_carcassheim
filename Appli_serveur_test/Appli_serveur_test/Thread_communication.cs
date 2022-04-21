@@ -126,8 +126,30 @@ namespace system
 
         }
 
+        public void TransmitStartToAll(int roomId)
+        {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.RoomStart;
+            packet.Type = true;
+
+            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
+            {
+                if(thread_serv_ite.Get_ID() == roomId)
+                {
+                    foreach(var joueur in thread_serv_ite.Get_Dico_Joueurs())
+                    {
+                        ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                        // Lancement de l'écoute des réponse du client async
+                        ClientAsync.OnPacketReceived += OnPacketReceived;
+                        ClientAsync.Receive(joueur.Value._socket_of_player); 
+                    }
+                }
+            }
+        }
+
         /// <summary>
-        /// Get the parameters needed to communicate with a clien
+        /// Get the parameters needed to communicate with a client
         /// </summary>
         /// <param name="socket"> The listening socket that has received communications from player </param>
         /// <param name="idPlayer"> Id of the player </param>
@@ -169,11 +191,18 @@ namespace system
 
         public void OnPacketReceived(object sender, Packet packet)
         {
-            // Cas où aucune des 3 tuiles n'est posable
-            if (packet.IdMessage == Tools.IdMessage.TuileDraw)
+            switch (packet.IdMessage)
             {
-                // TODO
+                // Cas où aucune des 3 tuiles n'est posable
+                case Tools.IdMessage.TuileDraw:
+                    // TODO
+                    break;
+
+                case Tools.IdMessage.RoomStart:
+                    // TODO : Check s'il renvoit des erreurs
+                    break;
             }
+     
         }
 
         // ===============================

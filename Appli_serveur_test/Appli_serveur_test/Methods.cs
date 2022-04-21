@@ -605,6 +605,8 @@ public partial class Server
 
         // Attemp to start the game.
         gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer, socket);
+
+        // Tells to all players that the game has started
         
         // TODO : check le retour de StartGame
         // TODO : implémenter broadcast au début de game

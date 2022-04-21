@@ -52,6 +52,10 @@ namespace system
 
         // Getters et setters
 
+        public Dictionary<ulong, Player> Get_Dico_Joueurs()
+        {
+            return this._dico_joueur;
+        }
         public int Get_ID()
         {
             return this._id_partie;
