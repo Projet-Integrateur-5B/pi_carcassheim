@@ -3,8 +3,9 @@ using System.Net.Sockets;
 using UnityEngine;
 using ClassLibrary;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace system
+namespace Assets.system
 {
     public class Communication_inGame : MonoBehaviour
     {
@@ -25,6 +26,8 @@ namespace system
         private int _meeples; // Nombre de meeples par joueur
 
         private Socket? socket = null;
+        private Dictionary<ulong, Tuile> dico_tuile;
+        private Plateau lePlateau;
 
         private void CheckErrorSocketConnect(Tools.Errors error_value)
         {
@@ -66,6 +69,8 @@ namespace system
             // ======================
             // ==== DANS LA GAME ====
             // ======================
+            lePlateau = new Plateau();
+            dico_tuile = LireXml.ReadXml();
 
             ClientAsync.OnPacketReceived += OnPacketReceived;
             ClientAsync.Receive(socket);
@@ -128,8 +133,82 @@ namespace system
 
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
-                //ReceiveRoomSettings(packet);
+                OnTuileReceived(packet);
             }
+        }
+
+        public void OnTuileReceived(Packet packet)
+        {
+            ulong id_tuile;
+            Tuile tuile;
+            int i;
+            Position[] position;
+
+            if (packet.IdMessage == Tools.IdMessage.TuileDraw)
+            {
+                for (i = 0; i < 3; i++)
+                {
+                    id_tuile = Convert.ToUInt64(packet.Data[i]);
+                    tuile = dico_tuile[id_tuile];
+                    position = lePlateau.PositionsPlacementPossible(tuile);
+
+                    if (position != null)
+                    {
+                        if (position.Length >= 0)
+                        {
+                            Debug.Log("Les positions de la " + i + "ème tuile : " + position);
+                            SendAllPosition(position, id_tuile);
+                            return;
+                        }
+                    }
+
+                }
+
+                ClientAsync.Send(socket, packet);
+            }
+        }
+
+        private void SendAllPosition(Position[] position,ulong id_tuile)
+        {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
+            packet.IdPlayer = _mon_id;
+
+            int i, taille = position.Length;
+            int taille_data = 2 + taille*3;
+            packet.Data = new string[taille_data];
+
+            packet.Data[0] = _id_partie.ToString();
+            packet.Data[1] = id_tuile.ToString();
+
+            for (i= 2; i < taille_data - 2; i+=3)
+            {
+                packet.Data[i] = position[taille_data / 3].X.ToString();
+                packet.Data[i+1] = position[(taille_data / 3)].Y.ToString();
+                packet.Data[i+2] = position[(taille_data / 3)].ROT.ToString();
+
+            }
+
+            ClientAsync.Send(socket, packet);
+        }
+
+        public void SendPosition(Position[] position, ulong id_tuile)
+        {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
+            packet.IdPlayer = _mon_id;
+
+            int i;
+            packet.Data = new string[5];
+
+            packet.Data[0] = _id_partie.ToString();
+            packet.Data[1] = id_tuile.ToString();
+
+            packet.Data[2] = position[0].X.ToString();
+            packet.Data[3] = position[0].Y.ToString();
+            packet.Data[4] = position[0].ROT.ToString();
+
+            ClientAsync.Send(socket, packet);
         }
     }
 }
