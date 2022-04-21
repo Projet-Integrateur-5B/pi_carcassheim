@@ -36,9 +36,7 @@ public class Plateau : MonoBehaviour
     private Vector3 _board_collide_pos;
 
     [SerializeField] private Transform rep_O, rep_u, rep_v;
-
-    // TODO : Quand on rajoute une tuile, on met à jour la taille du plateau dans BoardRadius => la valeur du centre de la tuile qui est la plus loin en x ou en y et on expand
-
+    
     void Awake()
     {
         tiles_on_board = new Dictionary<Position, Tuile>(new PositionComparer());
@@ -192,5 +190,11 @@ public class Plateau : MonoBehaviour
         // Fin de tour
         // Ajouter la position finale de la tuile au dictionnaire contenant les tuiles présentes sur le tableau
         setTileAt(pos, tile);
+
+
+        // On regarde si board radius a changé
+        float new_radius = pos.X * pos.X + pos.Y * pos.Y;
+        if(new_radius > BoardRadius)
+            BoardRadius = new_radius;
     }
 }
