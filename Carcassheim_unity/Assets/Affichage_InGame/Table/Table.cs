@@ -293,8 +293,6 @@ public class Table : MonoBehaviour
         {
             old_meeple.pivotPoint.rotation = unselected_angle;
         }
-        Debug.Log(old_meeple);
-        Debug.Log(new_meeple);
         new_meeple.pivotPoint.rotation = Quaternion.identity;
     }
 
@@ -329,7 +327,6 @@ public class Table : MonoBehaviour
         }
         else
         {
-            meeple.transform.parent = null;
             meeple.model.layer = DisplaySystem.BoardLayer;
         }
     }

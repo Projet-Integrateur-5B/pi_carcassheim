@@ -25,13 +25,23 @@ public class Meeple : MonoBehaviour
     public int Id { get; private set; }
 
     Tuile _parentTile = null;
-    public Tuile ParentTile { 
+    public Tuile ParentTile
+    {
         set
         {
+            if (value != _parentTile && (value == null || _parentTile == null))
+            {
+                if (value == null)
+                {
+                    transform.parent = null;
+                    transform.localScale = new Vector3(1f, 1f, 1f);
+                }
+                else
+                    transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
+            }
             _parentTile = value;
-            transform.localScale = _parentTile == null ? new Vector3(1, 1, 1) : new Vector3(0.5f, 0.5f, 0.5f);
         }
-         get=>_parentTile;
+        get => _parentTile;
     }
     public int SlotPos
     { set; get; } = -1; // pos

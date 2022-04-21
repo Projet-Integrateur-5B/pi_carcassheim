@@ -68,30 +68,6 @@ public class CarcasheimBack : MonoBehaviour
         slot_pos = -1;
     }
 
-    public void getActionTileSetCoord(out Position pos)
-    {
-        pos = null;
-    }
-
-    public void getActionTileSelection(out int index, out int id)
-    {
-        index = 0;
-        id = 0;
-    }
-
-    public void getActionMeepleSelection(out int index, out int id, out Position pos, out int id_tile)
-    {
-        index = 0;
-        id = 0;
-        id_tile = 0;
-        pos = null;
-    }
-
-    public void getActionNextState(out DisplaySystemState state)
-    {
-        state = DisplaySystemState.noState;
-    }
-
     public void askMeeples(IList<MeepleType> meeples, IList<int> meeple_number)
     {
         do
@@ -135,7 +111,8 @@ public class CarcasheimBack : MonoBehaviour
 
     public void getTilePossibilities(int tile_id, List<Position> positions)
     {
-
+        for (int r = 0; r < 4; r++)
+            positions.Add(new Position(0, 0, r));
     }
 
     public void askPlayers(List<int> player_ids)
@@ -173,13 +150,9 @@ public class CarcasheimBack : MonoBehaviour
         sec = 0;
     }
 
-    public void sendAction(DisplaySystemAction action, int index, int id)
+    public void sendAction(DisplaySystemAction action)
     {
-
-    }
-    public void sendAction(DisplaySystemAction action, int index, int id, Position tile_pos, int tile_id)
-    {
-
+        return;
     }
 
 

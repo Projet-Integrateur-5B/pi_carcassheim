@@ -33,6 +33,7 @@ public class Tuile : MonoBehaviour
     {
         set
         {
+            Debug.Log("Setting position " + (_pos == null ? "nothing" : _pos.ToString()) + " to " + (value == null ? "nothing" : value.ToString()));
             _pos = value;
             body_collider.enabled = _pos != null;
             int rotation = _pos != null ? _pos.Rotation : 0;
@@ -114,6 +115,35 @@ public class Tuile : MonoBehaviour
         return found;
     }
 
+    public bool nextRotation(out Position npos)
+    {
+        Debug.Log("Rotation from " + (Pos == null ? "nothing" : Pos.ToString()));
+        npos = null;
+        if (Pos == null)
+            return false;
+        int x = Pos.X;
+        int y = Pos.Y;
+        int rotation = Pos.Rotation;
+        bool found = false;
+        for (int i = 0; i < 3; i++)
+        {
+            rotation = (rotation + 1) % 4;
+            if (isPossible(new Position(x, y, rotation)) != null)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (found)
+        {
+            npos = new Position(x, y, rotation);
+            Debug.Log("Rotation to " + (npos == null ? "nothing" : npos.ToString()));
+        }
+        else
+            Debug.Log("No rotation");
+        return found;
+    }
+
     public void addSlot(SlotIndic slot)
     {
         slot.transform.parent = pivotPoint;
@@ -122,5 +152,30 @@ public class Tuile : MonoBehaviour
         slot.front.transform.localPosition = whynot;
         slot.transform.localPosition = rep_O.localPosition + (rep_u.localPosition - rep_O.localPosition) * slot.Xf + (rep_v.localPosition - rep_O.localPosition) * slot.Yf;
         slots.Add(slot);
+    }
+
+    public bool setMeeplePos(Meeple meeple, int id_slot)
+    {
+        if (id_slot == -1)
+        {
+            meeple.ParentTile = null;
+            meeple.SlotPos = -1;
+            return true;
+        }
+        SlotIndic slot_indic;
+        if (slots_mapping.TryGetValue(id_slot, out slot_indic))
+        {
+            return setMeeplePos(meeple, slot_indic);
+        }
+        else
+            return false;
+    }
+    public bool setMeeplePos(Meeple meeple, SlotIndic slot_indic)
+    {
+        meeple.ParentTile = this;
+        meeple.SlotPos = slot_indic.Id;
+        meeple.transform.parent = slot_indic.transform;
+        meeple.transform.localPosition = new Vector3(0, 0, 0);
+        return true;
     }
 }
