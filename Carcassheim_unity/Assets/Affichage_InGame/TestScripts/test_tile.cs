@@ -6,7 +6,7 @@ public class test_tile : MonoBehaviour
 {
     public int id_read = 0;
 
-    public Tuile act_tuile = null;
+    public TuileRepre act_tuile = null;
     public PlayerRepre act_player = null;
     private bool hidden = true;
     int PlateauLayer;
@@ -25,8 +25,8 @@ public class test_tile : MonoBehaviour
         {
             if (act_tuile != null)
                 Destroy(act_tuile.gameObject);
-            act_tuile = Resources.Load<Tuile>("tile" + id_read.ToString());
-            act_tuile = Instantiate<Tuile>(act_tuile, transform);
+            act_tuile = Resources.Load<TuileRepre>("tile" + id_read.ToString());
+            act_tuile = Instantiate<TuileRepre>(act_tuile, transform);
 
             act_tuile.possibilitiesPosition.Clear();
             int rotation = Random.Range(0, 4);
@@ -67,7 +67,7 @@ public class test_tile : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << PlateauLayer)))
             {
                 SlotIndic slot;
-                Tuile tile;
+                TuileRepre tile;
                 switch (hit.transform.tag)
                 {
                     case "SlotCollider":
@@ -89,7 +89,7 @@ public class test_tile : MonoBehaviour
                                 Debug.Log("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tuile.pivotPoint.name);
                             else
                             {
-                                tile = hit.transform.parent.parent.GetComponent<Tuile>();
+                                tile = hit.transform.parent.parent.GetComponent<TuileRepre>();
                                 if (tile.nextRotation())
                                 {
                                     Debug.Log("Rotated  to " + tile.Pos);

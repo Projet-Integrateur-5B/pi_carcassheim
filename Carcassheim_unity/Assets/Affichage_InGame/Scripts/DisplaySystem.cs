@@ -35,27 +35,27 @@ public class DisplaySystem : MonoBehaviour
 
     // * BOARD ***********************************************
 
-    [SerializeField] private Plateau board;
+    [SerializeField] private PlateauRepre board;
     Plane board_plane;
-    public Tuile reference_tile;
+    public TuileRepre reference_tile;
 
 
     // * PLAYER GESTION ***************************************
     public event System.Action<PlayerRepre> OnPlayerDisconnected;
 
     // * TILE *************************************************
-    [SerializeField] private Tuile tuile_model; //! shouldn't be a model but read assets to choose model
-    private List<Tuile> tiles_hand;
-    private Queue<Tuile> tiles_drawned;
+    [SerializeField] private TuileRepre tuile_model; //! shouldn't be a model but read assets to choose model
+    private List<TuileRepre> tiles_hand;
+    private Queue<TuileRepre> tiles_drawned;
     private Queue<bool> lifespan_tiles_drawned;
 
-    public Tuile act_tile;
+    public TuileRepre act_tile;
 
     // * MEEPLE ***********************************************
 
-    [SerializeField] private Meeple meeple_model; //! shouldn't be a model but read assets to choose model
-    private List<Meeple> meeples_hand;
-    public Meeple act_meeple;
+    [SerializeField] private MeepleRepre meeple_model; //! shouldn't be a model but read assets to choose model
+    private List<MeepleRepre> meeples_hand;
+    public MeepleRepre act_meeple;
     public Dictionary<int, int> meeple_distrib;
 
     // * PLAYERS **********************************************
@@ -78,10 +78,10 @@ public class DisplaySystem : MonoBehaviour
 
         board_plane = new Plane(reference_tile.transform.forward, reference_tile.transform.position);
 
-        meeples_hand = new List<Meeple>();
+        meeples_hand = new List<MeepleRepre>();
         meeple_distrib = new Dictionary<int, int>();
-        tiles_hand = new List<Tuile>();
-        tiles_drawned = new Queue<Tuile>();
+        tiles_hand = new List<TuileRepre>();
+        tiles_drawned = new Queue<TuileRepre>();
         lifespan_tiles_drawned = new Queue<bool>();
 
         if (players_color.Count == 0)
@@ -478,7 +478,7 @@ public class DisplaySystem : MonoBehaviour
         for (int i = 0; i < L; i++)
         {
             // TODO should instantiate dependnat on the type
-            Meeple mp = Instantiate<Meeple>(meeple_model);
+            MeepleRepre mp = Instantiate<MeepleRepre>(meeple_model);
             mp.color.material.color = act_player.color;
             mp.Id = meeples_init[i].id_meeple;
             meeples_hand.Add(mp);
@@ -488,16 +488,16 @@ public class DisplaySystem : MonoBehaviour
 
         int final_count = system_back.askTilesInit(tiles_init);
         L = tiles_init.Count;
-        Tuile model;
+        TuileRepre model;
         for (int i = 0; i < L; i++)
         {
-            model = Resources.Load<Tuile>("tile" + tiles_init[i].id_tile.ToString());
+            model = Resources.Load<TuileRepre>("tile" + tiles_init[i].id_tile.ToString());
             if (model == null)
             {
                 Debug.Log("Tried to log unknown tile " + tiles_init[i].id_tile.ToString());
                 model = tuile_model;
             }
-            Tuile tl = Instantiate<Tuile>(model);
+            TuileRepre tl = Instantiate<TuileRepre>(model);
             Renderer red = tl.model.GetComponent<Renderer>();
             red.material.color = act_player.color;
             tl.Id = tiles_init[i].id_tile;
@@ -518,7 +518,7 @@ public class DisplaySystem : MonoBehaviour
             players.AddLast(players_mapping[players_id[i]]);
     }
 
-    public Tuile getNextTile(out bool perma)
+    public TuileRepre getNextTile(out bool perma)
     {
         perma = false;
         if (tiles_drawned.Count == 0)
@@ -527,7 +527,7 @@ public class DisplaySystem : MonoBehaviour
             return null;
         }
 
-        Tuile tile = tiles_drawned.Dequeue();
+        TuileRepre tile = tiles_drawned.Dequeue();
 
         perma = lifespan_tiles_drawned.Dequeue();
         if (perma)
@@ -543,7 +543,7 @@ public class DisplaySystem : MonoBehaviour
         if (0 <= index && index < tiles_hand.Count && (act_system_state == DisplaySystemState.tilePosing || forced))
         {
 
-            Tuile n_tuile = tiles_hand[index];
+            TuileRepre n_tuile = tiles_hand[index];
             if (n_tuile == act_tile)
                 return;
             if (act_tile != null && act_tile.Pos != null)
@@ -573,7 +573,7 @@ public class DisplaySystem : MonoBehaviour
         Debug.Log("Meeple posing : " + index.ToString() + " " + meeples_hand.Count);
         if (0 <= index && index < meeples_hand.Count && (act_system_state == DisplaySystemState.meeplePosing || forced))
         {
-            Meeple n_meeple = meeples_hand[index];
+            MeepleRepre n_meeple = meeples_hand[index];
             if (n_meeple == act_meeple)
                 return;
             if (act_meeple != null && act_meeple.ParentTile != null)

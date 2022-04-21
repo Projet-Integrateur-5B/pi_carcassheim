@@ -57,14 +57,14 @@ public class Table : MonoBehaviour
     private int planned_tile_count;
 
     private Vector3 tile_origin, tile_step;
-    private Dictionary<Tuile, ColliderStat> tile_mapping;
+    private Dictionary<TuileRepre, ColliderStat> tile_mapping;
 
     // * MEEPLE ***********************************************
     [SerializeField] private GameObject meeple_zone;
     [SerializeField] private MeepleColliderStat meeple_collider_model;
 
     private Vector3 meeple_origin, meeple_step;
-    private Dictionary<Meeple, MeepleColliderStat> meeple_mapping;
+    private Dictionary<MeepleRepre, MeepleColliderStat> meeple_mapping;
 
     // * INFO *************************************************
     [SerializeField] private GameObject info_zone;
@@ -73,8 +73,8 @@ public class Table : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        tile_mapping = new Dictionary<Tuile, ColliderStat>();
-        meeple_mapping = new Dictionary<Meeple, MeepleColliderStat>();
+        tile_mapping = new Dictionary<TuileRepre, ColliderStat>();
+        meeple_mapping = new Dictionary<MeepleRepre, MeepleColliderStat>();
         state_transition = new Queue<TableState>();
 
         balise1 = balise1_model.position;
@@ -103,9 +103,9 @@ public class Table : MonoBehaviour
 
     IEnumerator RawDrawTile()
     {
-        Tuile last_tile = null;
+        TuileRepre last_tile = null;
         bool perma_tile, last_perma_tile = true;
-        Tuile tile = null;
+        TuileRepre tile = null;
         while ((tile = display_system.getNextTile(out perma_tile)) != null)
         {
             tile_pack.Value--;
@@ -134,7 +134,7 @@ public class Table : MonoBehaviour
         }
     }
 
-    public void resetHandSize(int hand_size, List<Meeple> meeples)
+    public void resetHandSize(int hand_size, List<MeepleRepre> meeples)
     {
         planned_tile_count = hand_size;
 
@@ -147,7 +147,7 @@ public class Table : MonoBehaviour
         cleanHand();
 
         int i = 0;
-        foreach (Meeple mpl in meeples)
+        foreach (MeepleRepre mpl in meeples)
         {
             MeepleColliderStat mps = Instantiate<MeepleColliderStat>(meeple_collider_model, meeple_zone.transform);
             mps.transform.localPosition = meeple_origin + meeple_step * i;
@@ -276,7 +276,7 @@ public class Table : MonoBehaviour
         return true;
     }
 
-    public void activeTileChanged(Tuile old_tile, Tuile new_tile)
+    public void activeTileChanged(TuileRepre old_tile, TuileRepre new_tile)
     {
         if (old_tile != null)
         {
@@ -287,7 +287,7 @@ public class Table : MonoBehaviour
         new_tile.pivotPoint.rotation = Quaternion.identity;
     }
 
-    public void activeMeepleChanged(Meeple old_meeple, Meeple new_meeple)
+    public void activeMeepleChanged(MeepleRepre old_meeple, MeepleRepre new_meeple)
     {
         if (old_meeple != null)
         {
@@ -296,7 +296,7 @@ public class Table : MonoBehaviour
         new_meeple.pivotPoint.rotation = Quaternion.identity;
     }
 
-    public void tilePositionChanged(Tuile tile)
+    public void tilePositionChanged(TuileRepre tile)
     {
         if (tile.Pos == null)
         {
@@ -314,7 +314,7 @@ public class Table : MonoBehaviour
         }
     }
 
-    public void meeplePositionChanged(Meeple meeple)
+    public void meeplePositionChanged(MeepleRepre meeple)
     {
         if (meeple.ParentTile == null)
         {

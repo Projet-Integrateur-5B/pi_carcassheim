@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField] Plateau board;
+    [SerializeField] PlateauRepre board;
     Camera mainCamera;
     Vector3 mainCameraPosition;
     Quaternion mainCameraRotation;
