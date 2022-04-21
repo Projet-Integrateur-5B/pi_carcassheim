@@ -304,7 +304,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to insert a new room.
-        List<int> result = gestionnaire.CreateRoom(packetReceived.IdPlayer);
+        List<int> result = gestionnaire.CreateRoom(packetReceived.IdPlayer, socket);
 
         if (result[0] == -1 || result[1] == -1 || result.Count != 2)
         {
@@ -409,7 +409,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to add a player to the room.
-        var port = gestionnaire.JoinPlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+        var port = gestionnaire.JoinPlayer(packetReceived.Data[0], packetReceived.IdPlayer, socket);
 
         if (port != -1)
         {
@@ -604,7 +604,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer);
+        gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer, socket);
         
         // TODO : check le retour de StartGame
         // TODO : implémenter broadcast au début de game

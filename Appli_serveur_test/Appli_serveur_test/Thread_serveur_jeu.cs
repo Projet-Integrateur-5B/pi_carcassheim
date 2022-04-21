@@ -390,8 +390,6 @@ namespace system
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
             _s_tuilesGame.Release();
 
-            GenerateThreeTiles();
-
             // TODO :
             // synchronisation de la methode
             // genere les tuiles

@@ -353,7 +353,7 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
 
-        public void StartGame(string idRoom, ulong idPlayer)
+        public void StartGame(string idRoom, ulong idPlayer, Socket? playerSocket)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
@@ -362,7 +362,12 @@ namespace system
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     if (idPlayer == thread_serv_ite.Get_Moderateur())
+                    {
+                        // Lancement de la game
                         thread_serv_ite.StartGame();
+                        // Envoi des 3 tuiles de début de tour
+                        thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GenerateThreeTiles(), playerSocket);
+                    }                 
                     return; // return valeur correcte
                 }
             }

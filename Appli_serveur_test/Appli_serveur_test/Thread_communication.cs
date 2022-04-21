@@ -3,6 +3,8 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using ClassLibrary;
+
 
 namespace system
 {
@@ -25,8 +27,9 @@ namespace system
         private readonly object _lock_nb_parties_gerees;
         private readonly object _lock_id_parties_gerees;
 
-
+        // =============
         // Constructeur
+        // =============
 
         public Thread_communication(int num_port, int id)
         {
@@ -38,7 +41,9 @@ namespace system
             _lock_id_parties_gerees = new object();
     }
 
+        // ==================
         // Getters et setters
+        // ==================
 
         public int Get_nb_parties_gerees()
         {
@@ -69,6 +74,10 @@ namespace system
         {
             return this._lst_serveur_jeu;
         }
+
+        // =================
+        // Méthodes moteur
+        // =================
 
         /// <summary>
         /// Add a new game (room)
@@ -136,14 +145,40 @@ namespace system
             return playerParameters;
         }
 
-        public void SendThreeTiles()
+        public void SendTilesRoundStart(string[] tilesToSend, Socket? socket)
         {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.TuileDraw;
+            packet.Type = true;
+
+            packet.Data = tilesToSend;
+
+            ClientAsync.Send(socket, packet);
+
+            // Lancement de l'écoute des réponse du client async
+            ClientAsync.OnPacketReceived += OnPacketReceived;
+            ClientAsync.Receive(socket);
 
         }
 
-        // Création d'un nouveau thread_serveur_jeu
 
-        // Méthodes
+
+        // ===============================
+        // Méthode réseau de réception
+        // ===============================
+
+        public void OnPacketReceived(object sender, Packet packet)
+        {
+            // Cas où aucune des 3 tuiles n'est posable
+            if (packet.IdMessage == Tools.IdMessage.TuileDraw)
+            {
+                // TODO
+            }
+        }
+
+        // ===============================
+        // Fonction principale (threadée)
+        // ===============================
 
         public void Lancement_thread_com()
         {
@@ -186,6 +221,14 @@ namespace system
 
             //Server.Server.StartListening();
 
+            
+            // Lancement du serveur d'écoute du thread de com
+            Server.Server.StartListening(_numero_port);
+
+
+            
+
+
             /*
             TextAsset contents = Resources.Load<TextAsset>("network/config");
             Parameters parameters = JsonConvert.DeserializeObject<Parameters>(contents.ToString());
@@ -197,8 +240,8 @@ namespace system
 
             ClientAsync.OnPacketReceived += OnPacketReceived;
             ClientAsync.Receive(socket);
+            
             */
-
 
         }
     }
