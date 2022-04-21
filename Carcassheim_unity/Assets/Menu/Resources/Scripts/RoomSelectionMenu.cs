@@ -3,22 +3,50 @@ using UnityEngine.UI;
 using Assets.System;
 using System;
 using ClassLibrary;
+using System.Collections.Generic;
 
 public class RoomSelectionMenu : Miscellaneous
 {
 	private Transform roomSelectMenu, panelRooms; 
-	private Text text_ID, text_Hosts, text_Endgame, text_Players, text_MaxPlayers;
+
+	//il faut qu'on recoive le nombre de room /////////////////////////////////
+
+	private static int nombreRoom = 5;
+
+    ///////////////////////////////////////////////////////////////////////////
+
+
+	List<List<GameObject>> List_of_Rooms;
 
 	void Start()
 	{
 		roomSelectMenu = GameObject.Find("SubMenus").transform.Find("RoomSelectionMenu").transform;
 		panelRooms = roomSelectMenu.Find("Canvas").transform.Find("ListOfRoom").transform.Find("PanelRooms").transform;
-		text_ID = panelRooms.Find("ID_Test").GetComponent<Text>();
-		text_Hosts = panelRooms.Find("Hosts_Test").GetComponent<Text>();
-		text_Endgame = panelRooms.Find("Endgame_Test").GetComponent<Text>();
-		text_Players = panelRooms.Find("Players_Test").GetComponent<Text>();
-		text_MaxPlayers = panelRooms.Find("Max players_Test").GetComponent<Text>();
 
+		List_of_Rooms = new List<List<GameObject>>();
+		for(int i = 0; i < nombreRoom; i++)
+        {
+			List_of_Rooms.Add(new List<GameObject>() { new GameObject("ID_Test " + i), new GameObject("Hosts_Test " + i), new GameObject("Endgame_Test " + i), new GameObject("Players_Test " + i), new GameObject("Max players_Test " + i) });
+		}
+
+		int temp = 0;
+
+		foreach (List<GameObject> room_list in List_of_Rooms)
+		{
+			foreach (GameObject item in room_list)
+			{
+				//Debug.Log(item.name);
+				item.transform.parent = panelRooms;
+				item.AddComponent<Text>();
+				item.GetComponent<Text>().text = "" + temp;
+				item.GetComponent<Text>().font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+				item.GetComponent<Text>().fontSize = 49;
+				item.transform.localScale = new Vector3(1, 1, 1);
+				item.GetComponent<Text>().alignment = TextAnchor.UpperCenter;
+				item.GetComponent<Text>().color = Color.black;
+				temp++;
+			}
+		}
 		LoadRoomInfo();
 	}
 
@@ -46,55 +74,55 @@ public class RoomSelectionMenu : Miscellaneous
 		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");	
 	}
 
-	public string GetIDRoom()
+	public string GetIDRoom(int index)
     {
-		return text_ID.text;
+		return this.List_of_Rooms[index][0].GetComponent<Text>().text;
     }
 
-	public string GetHostsRoom()
+	public string GetHostsRoom(int index)
 	{
-		return text_Hosts.text;
+		return this.List_of_Rooms[index][1].GetComponent<Text>().text;
 	}
 
-	public string GetEndgameRoom()
+	public string GetEndgameRoom(int index)
 	{
-		return text_Endgame.text;
+		return this.List_of_Rooms[index][2].GetComponent<Text>().text;
 	}
 
-	public string GetPlayersRoom()
+	public string GetPlayersRoom(int index)
 	{
-		return text_Players.text;
+		return this.List_of_Rooms[index][3].GetComponent<Text>().text;
 	}
 
-	public string GetMaxPlayersRoom()
+	public string GetMaxPlayersRoom(int index)
 	{
-		return text_MaxPlayers.text;
+		return this.List_of_Rooms[index][4].GetComponent<Text>().text;
 	}
 
 
-	public void SetIDRoom(string texte)
+	public void SetIDRoom(int index, string texte)
 	{
-		this.text_ID.text = texte;
+		this.List_of_Rooms[index][0].GetComponent<Text>().text = texte;
 	}
 
-	public void SetHostsRoom(string texte)
+	public void SetHostsRoom(int index, string texte)
 	{
-		this.text_Hosts.text = texte;
+		this.List_of_Rooms[index][1].GetComponent<Text>().text = texte;
 	}
 
-	public void SetEndgameRoom(string texte)
+	public void SetEndgameRoom(int index, string texte)
 	{
-		this.text_Endgame.text = texte;
+		this.List_of_Rooms[index][2].GetComponent<Text>().text = texte;
 	}
 
-	public void SetPlayersRoom(string texte)
+	public void SetPlayersRoom(int index, string texte)
 	{
-		this.text_Players.text = texte;
+		this.List_of_Rooms[index][3].GetComponent<Text>().text = texte;
 	}
 
-	public void SetMaxPlayersRoom(string texte)
+	public void SetMaxPlayersRoom(int index, string texte)
 	{
-		this.text_MaxPlayers.text = texte;
+		this.List_of_Rooms[index][4].GetComponent<Text>().text = texte;
 	}
 
 	private void LoadRoomInfo()
@@ -106,7 +134,7 @@ public class RoomSelectionMenu : Miscellaneous
 		if (packet.Error != Tools.Errors.None)
 			return;
 
-		/* A modifier quand il y aura une liste*/
+		// A modifier quand il y aura une liste
 		//int taille_liste = res.Data.Length;
 		int taille_liste = 1;
 
