@@ -307,7 +307,7 @@ public static partial class Server
             // TODO: check if packet.IdMessage requires an answer for the client
 
             // Get required data from the database.
-            var packet = GetFromDatabase(ar);
+            var packet = GetFromDatabase(ar, listener);
             // Send answer to the client.
             SendBackToClient(ar, packet);
 
