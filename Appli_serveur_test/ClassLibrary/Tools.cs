@@ -74,6 +74,13 @@ public static class Tools
         NotFound = -1
     }
 
+    public enum GameStatus
+    {
+        Room = 0,
+        Running = 1,
+        Stopped = 2
+    }
+
     public enum Timer 
     {
         Minute = 60,

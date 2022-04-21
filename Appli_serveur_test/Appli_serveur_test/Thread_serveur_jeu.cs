@@ -21,7 +21,7 @@ namespace system
         private uint _nombre_joueur_max;
         private ulong _id_moderateur; // Identifiant du joueur modérateur
 
-        private string _statut_partie;
+        private Tools.GameStatus _statut_partie;
 
         private Tools.Mode _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
@@ -71,6 +71,12 @@ namespace system
                 // TODO :
             }
         }
+        
+        public ulong Get_NextPlayer()
+        {
+            // TODO :
+            return 0;
+        }
 
         // Constructeur
         public Thread_serveur_jeu(int id_partie, ulong id_joueur_createur)
@@ -85,7 +91,7 @@ namespace system
             _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur));
             _id_moderateur = id_joueur_createur;
 
-            _statut_partie = "ACCUEIL";
+            _statut_partie = Tools.GameStatus.Room;
 
             // Initialisation des valeurs par défaut
             _mode = Tools.Mode.Default;
@@ -137,7 +143,7 @@ namespace system
                     }
                     else
                     {/* Il n'y a plus personne dans la room */
-                        Close();
+                        End();
                     }
                 }
                     
@@ -149,8 +155,7 @@ namespace system
             _s_dico_joueur.Release();
             return Tools.PlayerStatus.NotFound;
         }
-
-
+        
         public Tools.PlayerStatus SetPlayerTriche(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
@@ -212,9 +217,43 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
-        public void Close()
+        public void Start()
         {
-            //TODO
+            _statut_partie = Tools.GameStatus.Running;
+            
+            // TODO :
+            // synchronisation de la methode
+            // genere les tuiles
+            // envoie 3 tuiles au player 1
+            // start timer
+            // return valeur d'erreur pour la méthode parent
+        }
+        public void End()
+        {
+            _statut_partie = Tools.GameStatus.Stopped;
+            
+            // TODO :
+            // synchronisation de la methode
+            // close timer
+            // return valeur d'erreur pour la méthode parent
+        }
+        
+        public void Round()
+        {
+            // TODO :
+            // synchronisation de la methode
+            // check que c'est bien au tour du joueur
+            // calcul des points
+            // envoie 3 tuiles au player suivant
+            // update timer
+            // return valeur d'erreur pour la méthode parent
+        }
+
+        public void TimerPlayer(ulong idPlayer)
+        {
+            // TODO :
+            // inc player timer count + check limit ?
+            Round();
         }
 
         public void Lancement_thread_serveur_jeu()

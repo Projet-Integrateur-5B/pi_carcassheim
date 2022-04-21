@@ -87,6 +87,13 @@ public partial class Server
             case Tools.IdMessage.EndGame:
                 GameEnd(state.Packet, ref packet, socket);
                 break;
+            
+            case Tools.IdMessage.TourValidation:
+                GameRound(state.Packet, ref packet, socket);
+                break;
+            case Tools.IdMessage.TimerExpiration:
+                TimerPlayer(ref packet, socket, "0", 0); // TODO : fix param
+                break;
 
             case Tools.IdMessage.TuileDraw:
                 TuileDraw(state.Packet, ref packet, socket);
@@ -96,12 +103,6 @@ public partial class Server
                 break;
             case Tools.IdMessage.PionPlacement:
                 packet.Error = PionPlacement(state.Packet, socket);
-                break;
-            case Tools.IdMessage.TourValidation:
-                TourValidation(state.Packet, ref packet, socket);
-                break;
-            case Tools.IdMessage.TimerExpiration:
-                TimerExpiration(ref packet, socket);
                 break;
             case Tools.IdMessage.CancelTuilePlacement:
                 CancelTuilePlacement(state.Packet, ref packet, socket);
@@ -314,7 +315,6 @@ public partial class Server
             packet.Data[1] = result[1].ToString();
         }
     }
-
     /// <summary>
     ///     Get the settings of a specific room.
     /// </summary>
@@ -577,7 +577,7 @@ public partial class Server
 
 
     /// <summary>
-    ///     lancement d'une room
+    ///     Starts a room.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
@@ -595,48 +595,94 @@ public partial class Server
             };
             return;
         }
+        
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
-        _ = packetReceived;
-        // lancement de la partie
-        // id room dans packetreceived.IdRoom
-        // start le timer general
-        // retourne l'ordre des joueurs et l'ordre des tuiles
-        var list = new List<string>(packet.Data.ToList());
-        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present dans l'ordre de tirage
-        {
-            list.Add("pseudo joueur"); // pseudo du joueur X
-        }
-
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
+        // Attemp to start the game.
+        gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer);
+        
+        // TODO : check le retour de StartGame
     }
     /// <summary>
-    ///     fin de la partie
+    ///     Ends the game.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void GameEnd(Packet packetReceived, ref Packet packet, Socket socket)
     {
-        _ = packetReceived;
-        // partie finit, on choisis un emplacement X Y de tuile où sera afficher les scores
-        // donner les score des joueurs ( peut importe l'ordre )
-        var list = new List<string>(packet.Data.ToList())
+        // joueur ou serveur ? si serveur alors à modifier
+        
+        // Vérification que la communication est reçue par un thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
         {
-            "position X", // position afficher X
-            "position Y" // position afficher Y
-        };
-        for (var i = 0; i < 4; i++) // boucle a faire pour nb joueur present
-        {
-            list.Add("pseudo joueur"); // pseudo du joueur X
-            list.Add("score"); // score du joueur X
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet = new Packet
+            {
+                Error = Tools.Errors.BadPort
+            };
+            return;
         }
+        
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
+        // Attemp to start the game.
+        gestionnaire.EndGame(packetReceived.Data[0], packetReceived.IdPlayer);
+        
+        // TODO : check le retour de EndGame
     }
+    
+    
+    
+    /// <summary>
+    ///     Ends a player round.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    /// <param name="socket">Socket <see cref="Socket" />.</param>
+    public static void GameRound(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par un thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet = new Packet
+            {
+                Error = Tools.Errors.BadPort
+            };
+            return;
+        }
+        
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
+        // Attemp to start the game.
+        gestionnaire.RoundGame(packetReceived.Data[0], packetReceived.IdPlayer);
+        
+        // TODO : check le retour de RoundGame
+    }
+    /// <summary>
+    ///     Player's timer has expired.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="socket">Socket <see cref="Socket" />.</param>
+    public static void TimerPlayer(ref Packet packet, Socket socket, string idRoom, ulong idPlayer)
+    {
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
+        // Attempt to stop the timer and close the round.
+        gestionnaire.PlayerTimer(idRoom, idPlayer);
+        
+        packet.IdMessage = Tools.IdMessage.TimerExpiration;
+    }
+    
+    
+    // id room, id tuile, x, y, rot
 
     /// <summary>
     ///     tirage d'une tuile
@@ -715,50 +761,6 @@ public partial class Server
         _ = packetReceived;
         // test si la Pion est bien a un emplacement valide
         return Tools.Errors.Unknown; // remplacer par Permission si validation du joueur sinon par Success
-    }
-
-    /// <summary>
-    ///     validation d'un tour
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void TourValidation(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Vérification que la communication est reçue par un thread de com
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening == 10000)
-        {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                Error = Tools.Errors.BadPort
-            };
-            return;
-        }
-
-        _ = packetReceived;
-        // valide le tour
-        // calculer les points du tour avec les zone qui viennent de se fermé
-        var list = new List<string>(packet.Data.ToList()) // a faire seulement si une zone se ferme ( d'apres ce que j'ai compris )
-        {
-                "position X", // position pion où la zone a été fermé
-                "position Y"
-        };
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.Permission; // remplacer par Unknown si erreur dans la validation
-    }
-
-    /// <summary>
-    ///     expiration d'un timer
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void TimerExpiration(ref Packet packet, Socket socket)
-    {
-        // timer du joueur expirer, on passe au prochaine joueur
-        packet.Error = Tools.Errors.None;
-        packet.IdMessage = Tools.IdMessage.TimerExpiration;
     }
 
     /// <summary>

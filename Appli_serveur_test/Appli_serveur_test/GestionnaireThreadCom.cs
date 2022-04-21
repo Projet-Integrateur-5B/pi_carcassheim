@@ -344,5 +344,63 @@ namespace system
 
             return Tools.PlayerStatus.NotFound;
         }
+
+        public void StartGame(string idRoom, ulong idPlayer)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idPlayer == thread_serv_ite.Get_Moderateur())
+                        thread_serv_ite.Start();
+                    return; // return valeur correcte
+                }
+            }
+        }
+        
+        public void EndGame(string idRoom, ulong idPlayer)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    thread_serv_ite.End();
+                    return; // return valeur correcte
+                }
+            }
+        }
+        
+        public void RoundGame(string idRoom, ulong idPlayer)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idPlayer == thread_serv_ite.Get_NextPlayer())
+                        thread_serv_ite.Round();
+                    return; // return valeur correcte
+                }
+            }
+        }
+        
+        public void PlayerTimer(string idRoom, ulong idPlayer)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    thread_serv_ite.TimerPlayer(idPlayer);
+                    return; // return valeur correcte
+                }
+            }
+        }
     }
 }
