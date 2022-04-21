@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using ClassLibrary;
 
+using Server;
+
 namespace system
 {
 
@@ -37,7 +39,12 @@ namespace system
 
         private readonly object _lock_settings;
 
-        // Champs nécessaires pour le bon fonctionnement du programme
+        // Attribut pour le bon fonctionnement du moteur de jeu
+
+        private ulong _id_joueur_actuel;
+        private Semaphore _s_id_joueur_actuel;
+        private List<ulong> _tuilesGame; // Totalité des tuiles de la game
+        private Semaphore _s_tuilesGame;
 
         // Getters et setters
 
@@ -45,15 +52,20 @@ namespace system
         {
             return this._id_partie;
         }
-        
+
+        public Tools.Mode Get_Mode()
+        {
+            return this._mode;
+        }
+
         public ulong Get_Moderateur()
         {
             return this._id_moderateur;
         }
 
-        public Tools.Mode Get_Mode()
+        public Tools.GameStatus Get_Status()
         {
-            return this._mode;
+            return this._statut_partie;
         }
 
         public bool Is_Private()
@@ -68,7 +80,7 @@ namespace system
 
         public uint NbJoueursMax
         {
-            get { return this._nombre_joueur_max;  }
+            get { return this._nombre_joueur_max; }
         }
 
         /// <summary>
@@ -92,7 +104,7 @@ namespace system
             settingsList.Add(_timer.ToString());
             settingsList.Add(_timer_max_joueur.ToString());
             settingsList.Add(_score_max.ToString());
-           
+
             return settingsList.ToArray();
         }
 
@@ -189,10 +201,10 @@ namespace system
                         return;
                     }
                 }
-                
+
             }
         }
-        
+
         public ulong Get_NextPlayer()
         {
             // TODO :
@@ -206,7 +218,7 @@ namespace system
 
             /* Zone  du Dictionary Score */
             _dico_joueur = new Dictionary<ulong, Player>();
-            _s_dico_joueur = new Semaphore(1, 1);
+            _s_dico_joueur = new Semaphore(0, 1);
             _nombre_joueur = 1;
             _nombre_joueur_max = 8;
             _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur));
@@ -222,6 +234,13 @@ namespace system
             _timer = Tools.Timer.Heure; // Une heure par défaut
             _timer_max_joueur = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
+
+            // Initialisation des attributs moteurs
+            _id_joueur_actuel = 0;
+            _s_id_joueur_actuel = new Semaphore(0, 1);
+            _tuilesGame = new List<ulong>();
+            _s_tuilesGame = new Semaphore(0, 1);
+
         }
 
         // Méthodes
@@ -256,27 +275,27 @@ namespace system
             if (res)
             {
                 _nombre_joueur--;
-                if(id_joueur == _id_moderateur)
+                if (id_joueur == _id_moderateur)
                 {
-                    if(_dico_joueur.Count != 1)
+                    if (_dico_joueur.Count != 1)
                     {
                         _id_moderateur = _dico_joueur.First().Key;
                     }
                     else
                     {/* Il n'y a plus personne dans la room */
-                        End();
+                        EndGame();
                     }
                 }
-                    
+
                 _s_dico_joueur.Release();
-                
+
                 return Tools.PlayerStatus.Success;
             }
-                
+
             _s_dico_joueur.Release();
             return Tools.PlayerStatus.NotFound;
         }
-        
+
         public Tools.PlayerStatus SetPlayerTriche(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
@@ -289,7 +308,7 @@ namespace system
             Player player = _dico_joueur[id_joueur];
             player._s_player.WaitOne();
             player._triche++;
-            if(player._triche == (uint)Tools.PlayerStatus.Kicked)
+            if (player._triche == (uint)Tools.PlayerStatus.Kicked)
             {
                 player._s_player.Release();
                 _s_dico_joueur.Release();
@@ -320,7 +339,7 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
-        public Tools.PlayerStatus SetPlayerPoint(ulong id_joueur,uint score)
+        public Tools.PlayerStatus SetPlayerPoint(ulong id_joueur, uint score)
         {
             _s_dico_joueur.WaitOne();
             if (!_dico_joueur.ContainsKey(id_joueur))
@@ -338,10 +357,31 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
-        public void Start()
+        // =======================
+        // Méthodes moteur de jeu
+        // =======================
+
+        public void StartGame()
         {
             _statut_partie = Tools.GameStatus.Running;
-            
+
+            // Récupération de la liste de joueurs
+            _s_dico_joueur.WaitOne();
+            ulong[] idPlayer_array = _dico_joueur.Keys.ToArray();
+            _s_dico_joueur.Release();
+
+            // Indication du joueur actuel
+            _s_id_joueur_actuel.WaitOne();
+            _id_joueur_actuel = idPlayer_array[_id_joueur_actuel];
+            _s_id_joueur_actuel.Release();
+
+            // Génération des tuiles de la game
+            _s_tuilesGame.WaitOne();
+            _tuilesGame = Random_sort_tuiles(_nb_tuiles);
+            _s_tuilesGame.Release();
+
+            GenerateTileTrio();
+
             // TODO :
             // synchronisation de la methode
             // genere les tuiles
@@ -349,16 +389,38 @@ namespace system
             // start timer
             // return valeur d'erreur pour la méthode parent
         }
-        public void End()
+
+        /// <summary>
+        /// Get a trio of tiles' id from the game's list of tile
+        /// </summary>
+        /// <returns> A array of 3 tiles' id </returns>
+        public string[] GenerateTileTrio()
+        {
+            // Génère les 3 tuiles à envoyer
+            List<string> tuilesTirees = tirageTroisTuiles(_tuilesGame);
+            return tuilesTirees.ToArray();
+        }
+
+        /// <summary>
+        /// End the turn
+        /// </summary>
+        /// <returns> The ID of the next player to play </returns>
+        public ulong EndTurn()
+        {
+
+            return 0;
+        }
+
+        public void EndGame()
         {
             _statut_partie = Tools.GameStatus.Stopped;
-            
+
             // TODO :
             // synchronisation de la methode
             // close timer
             // return valeur d'erreur pour la méthode parent
         }
-        
+
         public void Round()
         {
             // TODO :
@@ -376,6 +438,98 @@ namespace system
             // inc player timer count + check limit ?
             Round();
         }
+
+        /// <summary>
+        /// Get 3 tiles id in string format from a tile list
+        /// </summary>
+        /// <param name="tuiles"> Tiles list </param>
+        /// <returns> List of 3 tiles id in string format </returns>
+        public static List<string> tirageTroisTuiles(List<ulong> tuiles)
+        {
+            List<string> list = new List<string>();
+            for (int i = tuiles.Count - 3; i < tuiles.Count; i++)
+                list.Add(tuiles[i].ToString());
+            return list;
+        }
+        public static List<ulong> suppTuileChoisie(List<ulong> tuiles, ulong idTuile)
+        {
+            int i = 0;
+            for (i = tuiles.Count - 1; i >= 0 && tuiles[i] != idTuile; i--) ;
+            tuiles.Remove(tuiles[i]);
+
+            return tuiles;
+        }
+
+
+        public static ulong tuile_a_tirer(ulong id, int x, Dictionary<ulong, ulong> dico)
+        {
+            ulong sum = 0;
+            foreach (var item in dico)          //Parcourir dico:
+            {
+                if ((int)(sum + item.Value) < x)
+                {
+                    sum += item.Value;          //chercher l'id correspondant
+                                                //Tant que sum+la proba de tuile actuele > id de tuile --> avance
+                }
+
+                else
+                {
+                    id = item.Key;              //id retrouvé
+                    break;
+                }
+
+            }
+
+            return id;
+        }
+
+        /// <summary>
+        /// Get a randomized list of tiles 
+        /// </summary>
+        /// <param name="nbTuiles"> Number of tiles to have in the list </param>
+        /// <returns> List of tiles </returns>
+        public static List<ulong> Random_sort_tuiles(int nbTuiles)
+        {
+            List<ulong> list = null;
+            list = new List<ulong>();
+            System.Random MyRand = new System.Random();
+            int x = 0;
+            ulong idTuile = 0, sumDesProbas = 0;
+
+            //Recuperer les id des tuiles et leurs probas depuis la bdd
+
+            //Dictionary<int, int> map = new Dictionary<int, int>();
+            //La section suivante est à remplacer par une methode de l'équipe BDD qui retourne 
+            //un dico des ids de tuile avec leurs probas
+            /*************************/
+            Dictionary<ulong, ulong> map = new Dictionary<ulong, ulong>();
+
+            var db = new Database();
+            db.RemplirTuiles(map);
+
+
+            //Parcourir le dictionnaire resultat pour calculer la somme des probabilités des tuiles:
+            foreach (var item in map)
+            {
+                sumDesProbas += item.Value;
+
+            }
+            int tmp = (int)(sumDesProbas - sumDesProbas % 1.0);
+            //Tirage aléatoire des tuiles
+            for (int i = 0; i < nbTuiles; i++)
+            {
+                x = MyRand.Next(tmp);
+                idTuile = tuile_a_tirer(idTuile, x, map);
+                list.Add(idTuile);
+
+            }
+            //Retourner la liste 
+            return list;
+
+        }
+
+
+
 
         public void Lancement_thread_serveur_jeu()
         {
