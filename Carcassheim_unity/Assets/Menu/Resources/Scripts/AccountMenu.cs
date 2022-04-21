@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI; /* using System.Text.RegularExpressions; // needed for Regex */
-using Assets.System;
-using ClassLibrary;
 
 public class AccountMenu : Miscellaneous
 {
@@ -65,10 +63,16 @@ public class AccountMenu : Miscellaneous
 
 	public bool GetInputFields()
 	{
-		string tmpPwd = RemoveLastSpace(passwordCA.text);
-		string tmpPwd2 = RemoveLastSpace(confirmPwdCA.text);
-
-		return string.Equals(tmpPwd2, tmpPwd) && boolCGU;
+		bool a = string.Equals(RemoveLastSpace(pseudoCA.text), "a");
+		bool b = string.Equals(RemoveLastSpace(emailCA.text), "b");
+		bool c = string.Equals(GameObject.Find("InputField Day CA").GetComponent<InputField>().text, "01");
+		bool d = string.Equals(GameObject.Find("InputField Month CA").GetComponent<InputField>().text, "02");
+		bool e = string.Equals(GameObject.Find("InputField Year CA").GetComponent<InputField>().text, "0304");
+		string tmpPwd = passwordCA.text;
+		string tmpPwd2 = confirmPwdCA.text;
+		bool f = string.Equals(tmpPwd, "c");
+		bool g = string.Equals(tmpPwd2, tmpPwd);
+		return a && b && c && d && e && f && g;
 	}
 
 	public void CreateAccount()
@@ -78,29 +82,11 @@ public class AccountMenu : Miscellaneous
 		//Texte deborde sur formulaire. Rendre code portable et utilisable :
 		// Modification position texte en ajoutant a sa coordonne la moitie de sa hauteur.
 		Text tmpText = tmpGO.GetComponent<Text>();
-		bool res = false;
-
-		if (GetInputFields())
-        {
-			string[] values = new[] {
-			RemoveLastSpace(pseudoCA.text),
-			RemoveLastSpace(passwordCA.text),
-			RemoveLastSpace(emailCA.text),
-			GameObject.Find("InputField Year CA").GetComponent<InputField>().text +"/"+
-			GameObject.Find("InputField Month CA").GetComponent<InputField>().text +"/"+
-			GameObject.Find("InputField Day CA").GetComponent<InputField>().text
-			};
-			res = Communication.Instance.CommunicationWithoutResult(Tools.IdMessage.Signup, values);
-		}
-
-		SetState(res);
-		if (GetState())
-		{
+		SetState(boolCGU && GetInputFields());
+		if (GetState() == true)
 			HideAccountConnected();
-			return;
-		}
-        else
-        {
+		else
+		{
 			tmpGO.GetComponent<Text>().color = Color.yellow;
 			tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
 		}
