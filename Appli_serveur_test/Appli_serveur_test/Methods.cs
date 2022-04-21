@@ -606,10 +606,8 @@ public partial class Server
         // Attemp to start the game.
         gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer, socket);
 
-        // Tells to all players that the game has started
         
         // TODO : check le retour de StartGame
-        // TODO : implémenter broadcast au début de game
     }
     /// <summary>
     ///     Ends the game.
@@ -735,11 +733,7 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                Error = Tools.Errors.BadPort
-            };
-            return;
+            return Tools.Errors.BadPort;
         }
 
         _ = packetReceived;
@@ -759,11 +753,7 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                Error = Tools.Errors.BadPort
-            };
-            return;
+            return Tools.Errors.BadPort;
         }
 
         _ = packetReceived;

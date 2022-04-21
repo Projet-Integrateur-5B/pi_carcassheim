@@ -30,6 +30,7 @@ public static class Tools
         RoomSettings = 12,
         PlayerReady = 20,
         BadPort = 21,
+        IllegalPlay = 22,
         ToBeDetermined = 999
     }
 
@@ -49,16 +50,18 @@ public static class Tools
         PlayerLeave = 8,
         PlayerReady = 9,
         PlayerKick = 10,
-        RoomSettingsGet = 11,
-        RoomSettingsSet = 12,
-        RoomStart = 13,
-        TuileDraw = 14,
-        TuilePlacement = 15,
-        PionPlacement = 16,
-        CancelTuilePlacement = 17,
-        CancelPionPlacement = 18,
-        TourValidation = 19,
-        TimerExpiration = 20,
+        PlayerList = 11,
+        PlayerNext = 12,
+        RoomSettingsGet = 13,
+        RoomSettingsSet = 14,
+        RoomStart = 15,
+        TuileDraw = 16,
+        TuilePlacement = 17,
+        PionPlacement = 18,
+        CancelTuilePlacement = 19,
+        CancelPionPlacement = 20,
+        TourValidation = 21,
+        TimerExpiration = 22,
         PlayerCheat = 23,
         EndGame = 24
     }
