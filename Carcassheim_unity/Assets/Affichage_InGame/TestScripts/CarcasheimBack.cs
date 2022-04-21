@@ -135,7 +135,8 @@ public class CarcasheimBack : MonoBehaviour
 
     public void getTilePossibilities(int tile_id, List<Position> positions)
     {
-
+        positions.Add(new Position(1,0,0));
+        positions.Add(new Position(0,1,0));
     }
 
     public void askPlayers(List<int> player_ids)

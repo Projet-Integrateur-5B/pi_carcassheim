@@ -154,7 +154,6 @@ public class DisplaySystem : MonoBehaviour
         {
             case DisplaySystemState.meeplePosing:
                 act_tile.hidePossibilities();
-                board.hideMeeplePossibilities();
                 break;
 
             case DisplaySystemState.idleState:
@@ -275,7 +274,6 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.meeplePosing:
                 act_tile.showPossibilities(act_player);
-                board.displayMeeplePossiblities();
                 break;
         }
     }
@@ -300,18 +298,22 @@ public class DisplaySystem : MonoBehaviour
             tableCheck(ray, ref mouse_consumed);
 
             //! TEST 
-            if ((true || act_player == my_player) && !mouse_consumed && board.boardCollide(ray))
+            RaycastHit hit;
+            Debug.Log("READING HIT ? "+mouse_consumed.ToString());
+            if ((true || act_player == my_player) && !mouse_consumed && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << BoardLayer)))
             {
-                Vector3 p = board.BoardCollidePos;
-                if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
+                if (act_system_state == DisplaySystemState.tilePosing && hit.transform.tag == "TileIndicCollider" && act_tile != null)
                 {
-                    act_tile.Pos = new Position();
-                    act_tile.transform.position = p;
+                    TileIndicator indic = hit.transform.parent.GetComponent<TileIndicator>();
+                    act_tile.Pos = indic.position;
+                    act_tile.transform.position = indic.transform.position;
                     act_tile.transform.rotation = Quaternion.identity;
                     table.tilePositionChanged(act_tile);
+                    Debug.Log("SHOULD HAVE CHANGED "+act_tile.Pos.ToString());
                 }
+                else
+                    Debug.Log("PROBLEM "+hit.transform.tag);
             }
-            RaycastHit hit;
             if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << BoardLayer)))
             {
                 SlotIndic slot;
@@ -505,7 +507,7 @@ public class DisplaySystem : MonoBehaviour
             }
             table.activeTileChanged(act_tile, n_tuile);
             act_tile = n_tuile;
-            board.setTilePossibilities(act_player, act_tile); //! peut être pas la bonne manière
+            board.setTilePossibilities(act_player, act_tile);
             system_back.sendAction(DisplaySystemAction.meepleSelection, index, act_tile.Id);
         }
         else

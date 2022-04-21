@@ -2,24 +2,54 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TileIndicator
+public enum TileIndicatorState{
+    TilePossibilitie,
+    TilePosed,
+    LastTile
+};
+
+public class TileIndicator : MonoBehaviour
 {
-    public GameObject Cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+    [SerializeField] Collider tile_collider;
 
-    public Color Color { get => _color; private set => _color = value; }
-    // public Renderer color; ?
-    [SerializeField] private Collider _tileCollider;
+    private TileIndicatorState _state = TileIndicatorState.TilePossibilitie;
+    public TileIndicatorState state{
+        set{
+            _state = value;
+            if (value == TileIndicatorState.TilePossibilitie)
+                tile_collider.enabled = true;
+            else
+                tile_collider.enabled = false;   
+        }
+        get => _state;
+    }
+    public Position position = new Position();
+    public PlayerRepre player;
+    public Renderer model_renderer;
 
-    private Color _color;
+    [SerializeField] private float alpha_ref = 1f;
 
-    public TileIndicator()
+    public void setAttributes(PlayerRepre player, Position pos)
     {
-        _color = new Color(UnityEngine.Random.Range(0, 1.0f), UnityEngine.Random.Range(0, 1.0f), UnityEngine.Random.Range(0, 1.0f));
+        this.position = pos;
+        this.player = player;
+        Color col = player.color;
+        col.a = alpha_ref;
+        model_renderer.material.SetColor("_Color", col);
+    }
+    
+    public void display()
+    {
+        model_renderer.enabled = true;
+        if (state == TileIndicatorState.TilePossibilitie)
+            tile_collider.enabled = true;
     }
 
-    public TileIndicator(Color color, ColliderStat coll_model)
+
+    public void hide()
     {
-        Color = color;
-        //TileCollider = Instantiate<ColliderStat>(coll_model, Cube.transform);
+        model_renderer.enabled = false;
+        if (state == TileIndicatorState.TilePossibilitie)
+            tile_collider.enabled = false; 
     }
 }
