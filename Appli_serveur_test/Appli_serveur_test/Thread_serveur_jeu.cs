@@ -47,6 +47,8 @@ namespace system
         private Semaphore _s_id_joueur_actuel;
         private List<ulong> _tuilesGame; // Totalité des tuiles de la game
         private Semaphore _s_tuilesGame;
+        private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
+        private Semaphore _s_tuilesEnvoyees;
 
         // Sockets des joueurs de la partie
         private Dictionary<ulong, List<Socket?>> _dico_player_sockets;
@@ -406,6 +408,12 @@ namespace system
         {
             // Génère les 3 tuiles à envoyer
             List<string> tuilesTirees = tirageTroisTuiles(_tuilesGame);
+
+            // Met à jour le stockage des 3 tuiles envoyées
+            _s_tuilesEnvoyees.WaitOne();
+            _tuilesEnvoyees = tuilesTirees.ToArray();
+            _s_tuilesEnvoyees.Release();
+            
             return tuilesTirees.ToArray();
         }
 
