@@ -50,10 +50,6 @@ namespace system
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
         private Semaphore _s_tuilesEnvoyees;
 
-        // Sockets des joueurs de la partie
-        private Dictionary<ulong, List<Socket?>> _dico_player_sockets;
-        private Semaphore _s_dico_player_sockets;
-
         // Getters et setters
 
         public int Get_ID()
@@ -249,9 +245,6 @@ namespace system
             _tuilesGame = new List<ulong>();
             _s_tuilesGame = new Semaphore(0, 1);
 
-            // Initialisation des attributs sockets
-            _dico_player_sockets = new Dictionary<ulong, List<Socket?>>();
-            _s_dico_player_sockets = new Semaphore(0, 1);
 
         }
 
