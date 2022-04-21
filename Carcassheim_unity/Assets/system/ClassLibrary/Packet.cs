@@ -130,6 +130,18 @@ namespace ClassLibrary
                                              + "Final:" + this.Final + ";"
                                              + "IdPlayer:" + this.IdPlayer + "; "
                                              + "Data:" + string.Join(" ", this.Data) + ";";
+
+        public Packet Clone()
+        {
+            Packet packet = new Packet();
+            packet.Type = this.Type;
+            packet.Error = this.Error;
+            packet.Final = this.Final;
+            packet.IdPlayer = this.IdPlayer;
+            packet.Data = (string[])this.Data.Clone();
+
+            return packet;
+        }
     }
 }
 

@@ -38,14 +38,10 @@ public class ClientAsync
     // ManualResetEvent instances signal completion.
     public static ManualResetEvent connectDone =
         new ManualResetEvent(false);
-    private static ManualResetEvent sendDone =
-        new ManualResetEvent(false);
-    public static ManualResetEvent receiveDone =
-        new ManualResetEvent(false);
 
-    // The response from the remote device.
-    public static Packet? Response { get; set; }
-    public static Semaphore s_packet = new Semaphore(1, 1);
+    public delegate void OnPacketReceivedHandler(object sender, Packet packet);
+    public static event OnPacketReceivedHandler OnPacketReceived;
+
 
     public static void Connection(Socket client_socket,Parameters parameters)
     {
@@ -60,29 +56,6 @@ public class ClientAsync
         // Connect to the remote endpoint.
         client_socket.BeginConnect(remoteEP,
             new AsyncCallback(ConnectCallback), client_socket);
-    }
-
-    public static void StartClient(Socket client_socket)
-    {
-        // TODO : trycatch lors de la récupération des données de config
-
-        // Connect to a remote device.
-        try
-        {
-            Console.WriteLine("Client is setting up...");
-
-            Receive(client_socket);
-
-            Console.WriteLine("Fin de la communication.");
-
-            // Release the socket.
-            client_socket.Shutdown(SocketShutdown.Both);
-            client_socket.Close();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());
-        }
     }
 
     private static void ConnectCallback(IAsyncResult ar)
@@ -180,15 +153,14 @@ public class ClientAsync
                     bytesRead);
 
                 state.Packet.Data = state.Data;
-                Response = state.Packet;
 
+                OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
+                Receive(client);
                 // TODO: check if packet.IdMessage requires an answer for the client
 
                 // Start listening again.
                 // StartReading(ar, listener, true);
 
-                // Signal that all bytes have been received.
-                receiveDone.Set();
             }
             // More packets to receive in this series.
             else
@@ -233,7 +205,6 @@ public class ClientAsync
             Console.WriteLine("Sent {0} bytes =>\t" + packet, size);
             client.BeginSend(bytes, 0, size, 0,
                 null, client);
-            sendDone.Set();
         }
     }
 
@@ -247,9 +218,6 @@ public class ClientAsync
             // Complete sending the data to the remote device.
             int bytesSent = client.EndSend(ar);
             Console.WriteLine("Sent total {0} bytes to server.", bytesSent);
-
-            // Signal that all bytes have been sent.
-            sendDone.Set();
         }
         catch (Exception e)
         {
@@ -260,6 +228,5 @@ public class ClientAsync
     public static void StopListening(Socket client)
     {
         client.EndReceive(null);
-        receiveDone.Set();
     }
 }

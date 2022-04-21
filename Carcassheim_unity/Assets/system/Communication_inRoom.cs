@@ -29,11 +29,8 @@ namespace system
         private int _meeples; // Nombre de meeples par joueur
 
         private Socket? socket = null;
-        private Packet _packet;
 
-        private bool isInRoom = true;
-
-        private void ReceiveRoomSettings()
+        private void ReceiveRoomSettings(Packet _packet)
         {
             _nb_joueur_max = int.Parse(_packet.Data[0]);
             _privee = Convert.ToBoolean(_packet.Data[1]);
@@ -78,6 +75,10 @@ namespace system
             }
         }
 
+        private void OnPacketReceived(Packet packet)
+        {
+
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -87,7 +88,6 @@ namespace system
             // ======================
 
             Packet packet = new Packet();
-            _packet = new Packet();
 
             var errorValue = Client.Communication(socket, ref packet, Tools.IdMessage.PlayerJoin, Array.Empty<string>());
             CheckErrorSocketConnect(errorValue);
@@ -101,27 +101,9 @@ namespace system
             ClientAsync.Connection(socket, parameters);
             ClientAsync.connectDone.WaitOne();
 
-            while (isInRoom)
-            {
-                ClientAsync.Receive(socket);
-                ClientAsync.receiveDone.WaitOne();
+            ClientAsync.OnPacketReceived += OnPacketReceived;
+            ClientAsync.Receive(socket);
 
-                ClientAsync.s_packet.WaitOne();
-                if (packet.IdMessage == Tools.IdMessage.RoomStart)
-                    isInRoom = false;
-
-                if(packet.IdMessage == Tools.IdMessage.RoomSettingsSet)
-                {
-                    Array.Copy(ClientAsync.Response.Data, _packet.Data, ClientAsync.Response.Data.Length);
-                    ClientAsync.s_packet.Release();
-
-                    ReceiveRoomSettings();
-                }
-                else
-                {
-                    ClientAsync.s_packet.Release();
-                }
-            }
             
             /*
             Action listening = () =>
@@ -180,7 +162,6 @@ namespace system
 
         public void Disconnection(Socket socket)
         {
-            isInRoom = false;
             ClientAsync.StopListening(socket);
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
@@ -219,6 +200,17 @@ namespace system
             };
 
             ClientAsync.Send(socket, packet);
+        }
+
+        public void OnPacketReceived(object sender,Packet packet) 
+        {
+            if (packet.IdMessage == Tools.IdMessage.RoomStart)
+                //ToDo changement de page
+
+            if (packet.IdMessage == Tools.IdMessage.RoomSettingsSet)
+            {
+                ReceiveRoomSettings(packet);
+            }
         }
     }
 }
