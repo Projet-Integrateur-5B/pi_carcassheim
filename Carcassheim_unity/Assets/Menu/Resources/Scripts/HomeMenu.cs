@@ -26,7 +26,9 @@ public class HomeMenu : Miscellaneous
 	public void ShowRoomSelection()
 	{
 		ChangeMenu("HomeMenu", "RoomSelectionMenu");
-	/* SceneManager.LoadScene("InGame"); */
+		var test = this.GetComponent<RoomSelectionMenu>();
+		test.LoadRoomInfo();
+		/* SceneManager.LoadScene("InGame"); */
 	}
 
 	public void ShowOptions()

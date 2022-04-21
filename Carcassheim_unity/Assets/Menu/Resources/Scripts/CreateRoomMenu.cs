@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using system;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +6,7 @@ public class CreateRoomMenu : Miscellaneous
 {
     private void Start()
     {
-        
+		this.gameObject.AddComponent<Communication_inRoom>();
     }
 
     public void HideCreateRoom()

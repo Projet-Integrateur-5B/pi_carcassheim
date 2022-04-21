@@ -19,7 +19,7 @@ public class RoomSelectionMenu : Miscellaneous
 		text_Players = panelRooms.Find("Players_Test").GetComponent<Text>();
 		text_MaxPlayers = panelRooms.Find("Max players_Test").GetComponent<Text>();
 
-		LoadRoomInfo();
+		//LoadRoomInfo();
 	}
 
 	public void HideRoomSelection()
@@ -43,7 +43,7 @@ public class RoomSelectionMenu : Miscellaneous
 	public void ShowCreateRoom()
 	{
 		HidePopUpOptions();
-		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");	
+		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");
 	}
 
 	public string GetIDRoom()
@@ -97,7 +97,8 @@ public class RoomSelectionMenu : Miscellaneous
 		this.text_MaxPlayers.text = texte;
 	}
 
-	private void LoadRoomInfo()
+
+    public void LoadRoomInfo()
     {
 		//text_ID,text_Hosts, text_Players, text_MaxPlayers, text_Endgame
 		string[] values = Array.Empty<string>();
