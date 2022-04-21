@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 
 namespace system
 {
@@ -23,8 +25,6 @@ namespace system
         private readonly object _lock_nb_parties_gerees;
         private readonly object _lock_id_parties_gerees;
 
-        // Rajouter un objet RESEAU pour les communications ?
-
 
         // Constructeur
 
@@ -36,7 +36,7 @@ namespace system
             _id_thread_com = id;
             _lock_nb_parties_gerees = new object();
             _lock_id_parties_gerees = new object();
-        }
+    }
 
         // Getters et setters
 
@@ -70,13 +70,13 @@ namespace system
             return this._lst_serveur_jeu;
         }
 
-        // Ajoute une nouvelle partie au thread de communication
         /// <summary>
         /// Add a new game (room)
         /// </summary>
         /// <param name="playerId"> Id of the moderator </param>
+        /// <param name="socket"> Socket of the moderator (first player) </param>
         /// <returns> The id of the game (-1 if error occurs) </returns>
-        public int AddNewGame(ulong playerId)
+        public int AddNewGame(ulong playerId, Socket? playerSocket)
         {
 
             int id_nouv_partie = -1;
@@ -99,7 +99,7 @@ namespace system
 
             if (id_nouv_partie != -1) // Si la partie a pu être crée
             {
-                Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId);
+                Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId, playerSocket);
                 Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
 
                 _lst_serveur_jeu.Add(thread_serveur_jeu);
@@ -114,6 +114,30 @@ namespace system
                 return id_nouv_partie;
             }
 
+
+        }
+
+        /// <summary>
+        /// Get the parameters needed to communicate with a clien
+        /// </summary>
+        /// <param name="socket"> The listening socket that has received communications from player </param>
+        /// <param name="idPlayer"> Id of the player </param>
+        /// <returns> The parameters of the player's socket </returns>
+        public Parameters GetPlayerSocketParameters(Socket? socket, ulong idPlayer)
+        {
+            Parameters playerParameters = new Parameters();
+
+            IPAddress playerIpAddress = ((IPEndPoint)socket.RemoteEndPoint).Address;
+            int playerPort = ((IPEndPoint)socket.RemoteEndPoint).Port;
+
+            playerParameters.ServerIP = playerIpAddress.ToString();
+            playerParameters.ServerPort = playerPort;
+
+            return playerParameters;
+        }
+
+        public void SendThreeTiles()
+        {
 
         }
 
@@ -159,6 +183,21 @@ namespace system
                 //Thread.Sleep(20000);
 
             }
+
+            //Server.Server.StartListening();
+
+            /*
+            TextAsset contents = Resources.Load<TextAsset>("network/config");
+            Parameters parameters = JsonConvert.DeserializeObject<Parameters>(contents.ToString());
+            parameters.ServerPort = Convert.ToInt32(packet.Data[0]);
+            _mon_id = packet.IdPlayer;
+
+            ClientAsync.Connection(socket, parameters);
+            ClientAsync.connectDone.WaitOne();
+
+            ClientAsync.OnPacketReceived += OnPacketReceived;
+            ClientAsync.Receive(socket);
+            */
 
 
         }

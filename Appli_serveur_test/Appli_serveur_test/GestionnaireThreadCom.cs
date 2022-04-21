@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Sockets;
 using ClassLibrary;
 
 namespace system
@@ -163,8 +165,9 @@ namespace system
         /// Create a new room and return the port of the manager thread
         /// </summary>
         /// <param name="idPlayer"> Id of the player making this request </param>
+        /// <param name="socket"> Socket of the player making this request </param>
         /// <returns> Returns a list containing the id then the port if all goes well, -1 otherwise </returns>
-        public List<int> CreateRoom(ulong idPlayer)
+        public List<int> CreateRoom(ulong idPlayer, Socket? socket)
         {
             int portThreadCom = -1;
             int idNewRoom = -1;
@@ -178,7 +181,7 @@ namespace system
                 { // Seulement si un nouveau thread de com a pu être créé
 
                     // Demande de création d'une nouvelle partie dans le bon thread de com
-                    idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
+                    idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket);
                     if(idNewRoom != -1)
                     {
                         portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
@@ -202,7 +205,7 @@ namespace system
 
                     if (thread_com_libre_trouve)
                     {
-                        idNewRoom = thread_com_iterateur.AddNewGame(idPlayer);
+                        idNewRoom = thread_com_iterateur.AddNewGame(idPlayer, socket);
                         if (idNewRoom != -1)
                         {
                             portThreadCom = thread_com_iterateur.Get_port();
@@ -223,7 +226,7 @@ namespace system
                     { // Seulement si un nouveau thread de com a pu être créé
 
                         // Demande de création d'une nouvelle partie dans le bon thread de com
-                        idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer);
+                        idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket);
                         if (idNewRoom != -1)
                         {
                             portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();

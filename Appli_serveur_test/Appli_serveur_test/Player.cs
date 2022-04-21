@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace system
 {
@@ -14,14 +15,17 @@ namespace system
         public uint _triche { get; set; }
         public bool _is_ready { get; set; }
 
+        private Socket? _socket_of_player;
+
         public Semaphore _s_player;
 
-        public Player(ulong id_player)
+        public Player(ulong id_player, Socket? playerSocket)
         {
             _id_player = id_player;
             _score = 0; 
             _triche = 0;
             _is_ready = false;
+            _socket_of_player = playerSocket;
             _s_player = new Semaphore(1, 1);
         }
     }

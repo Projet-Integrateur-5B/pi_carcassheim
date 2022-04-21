@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using ClassLibrary;
+using System.Net;
+using System.Net.Sockets;
 
 using Server;
 
@@ -45,6 +47,10 @@ namespace system
         private Semaphore _s_id_joueur_actuel;
         private List<ulong> _tuilesGame; // Totalité des tuiles de la game
         private Semaphore _s_tuilesGame;
+
+        // Sockets des joueurs de la partie
+        private Dictionary<ulong, List<Socket?>> _dico_player_sockets;
+        private Semaphore _s_dico_player_sockets;
 
         // Getters et setters
 
@@ -212,7 +218,7 @@ namespace system
         }
 
         // Constructeur
-        public Thread_serveur_jeu(int id_partie, ulong id_joueur_createur)
+        public Thread_serveur_jeu(int id_partie, ulong id_joueur_createur, Socket? playerSocket)
         {
             _id_partie = id_partie;
 
@@ -221,7 +227,7 @@ namespace system
             _s_dico_joueur = new Semaphore(0, 1);
             _nombre_joueur = 1;
             _nombre_joueur_max = 8;
-            _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur));
+            _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur, playerSocket));
             _id_moderateur = id_joueur_createur;
 
             _statut_partie = Tools.GameStatus.Room;
@@ -241,11 +247,15 @@ namespace system
             _tuilesGame = new List<ulong>();
             _s_tuilesGame = new Semaphore(0, 1);
 
+            // Initialisation des attributs sockets
+            _dico_player_sockets = new Dictionary<ulong, List<Socket?>>();
+            _s_dico_player_sockets = new Semaphore(0, 1);
+
         }
 
         // Méthodes
 
-        public Tools.PlayerStatus AddJoueur(ulong id_joueur)
+        public Tools.PlayerStatus AddJoueur(ulong id_joueur, Socket? playerSocket)
         {
             _s_dico_joueur.WaitOne();
             if (_nombre_joueur >= _nombre_joueur_max)
@@ -260,7 +270,7 @@ namespace system
                 return Tools.PlayerStatus.Found;
             }
 
-            _dico_joueur.Add(id_joueur, new Player(id_joueur));
+            _dico_joueur.Add(id_joueur, new Player(id_joueur, playerSocket));
             _nombre_joueur++;
             _s_dico_joueur.Release();
 
@@ -380,7 +390,7 @@ namespace system
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
             _s_tuilesGame.Release();
 
-            GenerateTileTrio();
+            GenerateThreeTiles();
 
             // TODO :
             // synchronisation de la methode
@@ -391,10 +401,10 @@ namespace system
         }
 
         /// <summary>
-        /// Get a trio of tiles' id from the game's list of tile
+        /// Get three tiles' id from the game's list of tile
         /// </summary>
         /// <returns> A array of 3 tiles' id </returns>
-        public string[] GenerateTileTrio()
+        public string[] GenerateThreeTiles()
         {
             // Génère les 3 tuiles à envoyer
             List<string> tuilesTirees = tirageTroisTuiles(_tuilesGame);
