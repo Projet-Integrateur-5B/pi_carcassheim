@@ -45,7 +45,7 @@ namespace system
                         _instance = new GestionnaireThreadCom();
                         _instance._lst_obj_threads_com = new List<Thread_communication>();
                         _instance._lst_threads_com = new List<Thread>();
-                        int[] portsDispos = { 19001, 19002, 19003, 19004, 19005, 19006, 19007 };
+                        int[] portsDispos = { 10001, 10002, 10003, 10004, 10005, 10006, 10007 };
                         _instance._lst_port_dispo = new List<int>(portsDispos);
                         _instance._compteur_id_thread_com = 0;
                     }
