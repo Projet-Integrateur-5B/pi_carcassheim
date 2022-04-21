@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Plateau : MonoBehaviour
+public class PlateauRepre : MonoBehaviour
 {
     private class PositionComparer : IEqualityComparer<Position>
     {
@@ -28,7 +28,7 @@ public class Plateau : MonoBehaviour
     private bool _tilePossibilitiesShown;
 
     // Dictionnaire pour stocker les données des tuiles posées sur le plateau
-    private Dictionary<Position, Tuile> tiles_on_board;
+    private Dictionary<Position, TuileRepre> tiles_on_board;
 
     [SerializeField] private List<TileIndicator> act_tile_indicator;
 
@@ -39,24 +39,24 @@ public class Plateau : MonoBehaviour
 
     void Awake()
     {
-        tiles_on_board = new Dictionary<Position, Tuile>(new PositionComparer());
+        tiles_on_board = new Dictionary<Position, TuileRepre>(new PositionComparer());
     }
 
 
     // Récupère la tuile présente à une certaine position et la renvoie
-    public Tuile getTileAt(Position pos)
+    public TuileRepre getTileAt(Position pos)
     {
         // Parcours du dictionnaire pour récupérer la tuile dont les coordonnées correspondent
-        Tuile res = null;
+        TuileRepre res = null;
         bool tile_found = pos != null && tiles_on_board.TryGetValue(pos, out res);
 
         //renvoie null si la position donnée n'est pas dans le plateau actuel
         return tile_found ? res : null;
     }
 
-    public bool setTileAt(Position pos, Tuile tile)
+    public bool setTileAt(Position pos, TuileRepre tile)
     {
-        Tuile act_tile = null;
+        TuileRepre act_tile = null;
         bool tile_found;
         bool res = false;
         if (pos == null)
@@ -174,7 +174,7 @@ public class Plateau : MonoBehaviour
         }
     }
 
-    public void setTilePossibilities(PlayerRepre player, Tuile tile)
+    public void setTilePossibilities(PlayerRepre player, TuileRepre tile)
     {
         // Si les possibilités de l'ancienne tuile sont affichées, on les hide => pas de paramètre à ces fonctions, elles utilisent la liste qui est globale à la classe
         if (_tilePossibilitiesShown)
@@ -238,7 +238,7 @@ public class Plateau : MonoBehaviour
         return true;
     }
 
-    public void finalizeTurn(Position pos, Tuile tile)
+    public void finalizeTurn(Position pos, TuileRepre tile)
     {
         // Fin de tour
         // Ajouter la position finale de la tuile au dictionnaire contenant les tuiles présentes sur le tableau

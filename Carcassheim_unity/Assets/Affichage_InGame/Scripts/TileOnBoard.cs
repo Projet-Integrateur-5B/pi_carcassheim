@@ -6,7 +6,7 @@ public class TileOnBoard
 {
     public int Id { get; private set; }
     public Position Pos { get; private set; }
-    public Tuile Tile { get; private set; }
+    public TuileRepre Tile { get; private set; }
 
     static private int id_gen = 0;
 
@@ -17,7 +17,7 @@ public class TileOnBoard
         Tile = null;
     }
 
-    public TileOnBoard(int id, Position pos, Tuile tile)
+    public TileOnBoard(int id, Position pos, TuileRepre tile)
     {
         Id = id;
         Pos = pos;

@@ -58,7 +58,7 @@ public class generator
         }
     }
 
-    static public Tuile readingTile(XmlReader reader)
+    static public TuileRepre readingTile(XmlReader reader)
     {
         Debug.Log("READ TILE");
         bool tile_finished = false;
@@ -67,7 +67,7 @@ public class generator
         bool all_slot = true;
         List<SlotIndic> slots = new List<SlotIndic>();
 
-        Tuile tile = null;
+        TuileRepre tile = null;
         int state = -1;
         while (!tile_finished && reader.Read())
         {
@@ -132,7 +132,7 @@ public class generator
             Debug.Log("Tried to create tile " + id.ToString() + " of sprite " + sprite);
             GameObject obj = PrefabUtility.LoadPrefabContents("Assets/Affichage_InGame/Tuiles/tile_default.prefab");
 
-            tile = obj.GetComponent<Tuile>();
+            tile = obj.GetComponent<TuileRepre>();
             // PrefabUtility.UnpackPrefabInstance(tile.model, PrefabUnpackMode.OutermostRoot, InteractionMode.AutomatedAction);
             Renderer red = tile.model.GetComponent<Renderer>();
             Material mat = new Material(red.sharedMaterials[2]);

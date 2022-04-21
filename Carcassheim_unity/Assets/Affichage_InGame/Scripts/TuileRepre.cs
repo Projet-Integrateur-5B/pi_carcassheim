@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Tuile : MonoBehaviour
+public class TuileRepre : MonoBehaviour
 {
 
     // * LOOK *************************************************
@@ -154,7 +154,7 @@ public class Tuile : MonoBehaviour
         slots.Add(slot);
     }
 
-    public bool setMeeplePos(Meeple meeple, int id_slot)
+    public bool setMeeplePos(MeepleRepre meeple, int id_slot)
     {
         if (id_slot == -1)
         {
@@ -170,7 +170,7 @@ public class Tuile : MonoBehaviour
         else
             return false;
     }
-    public bool setMeeplePos(Meeple meeple, SlotIndic slot_indic)
+    public bool setMeeplePos(MeepleRepre meeple, SlotIndic slot_indic)
     {
         meeple.ParentTile = this;
         meeple.SlotPos = slot_indic.Id;

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Meeple : MonoBehaviour
+public class MeepleRepre : MonoBehaviour
 {
 
     // * LOOK *************************************************
@@ -13,8 +13,8 @@ public class Meeple : MonoBehaviour
     // * POSITION *********************************************
     public int Id { get; set; }
 
-    Tuile _parentTile = null;
-    public Tuile ParentTile
+    TuileRepre _parentTile = null;
+    public TuileRepre ParentTile
     {
         set
         {
