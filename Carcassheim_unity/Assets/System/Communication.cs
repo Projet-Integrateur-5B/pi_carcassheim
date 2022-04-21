@@ -8,6 +8,7 @@ namespace Assets.System
     {
         private Socket Socket;
         private static Communication _instance;
+        public static int port;
 
         public static Communication Instance
         {
