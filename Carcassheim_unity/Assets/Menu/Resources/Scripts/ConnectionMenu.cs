@@ -48,6 +48,7 @@ public class ConnectionMenu : Miscellaneous
 
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ForgottenPwdUser()
@@ -79,6 +80,7 @@ public class ConnectionMenu : Miscellaneous
 
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void InputFieldEndEdit(InputField inp)

@@ -62,6 +62,7 @@ public class RoomSelectionMenu : Miscellaneous
 		ChangeMenu("RoomSelectionMenu", "HomeMenu");
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ShowJoinById()
@@ -70,6 +71,7 @@ public class RoomSelectionMenu : Miscellaneous
 		ChangeMenu("RoomSelectionMenu", "JoinByIdMenu");
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 1;
 	}
 
 	public void ShowJoinPublicRoom()
@@ -78,6 +80,7 @@ public class RoomSelectionMenu : Miscellaneous
 		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 1;
 	}
 
 	public void ShowCreateRoom()
@@ -86,6 +89,7 @@ public class RoomSelectionMenu : Miscellaneous
 		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 1;
 	}
 
 	public string GetIDRoom(int index)

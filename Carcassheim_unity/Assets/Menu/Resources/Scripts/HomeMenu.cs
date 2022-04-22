@@ -21,6 +21,7 @@ public class HomeMenu : Miscellaneous
 	public void ShowConnection()
 	{
 		ChangeMenu("HomeMenu", "ConnectionMenu");
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ShowRoomSelection()
@@ -29,16 +30,19 @@ public class HomeMenu : Miscellaneous
 		var test = this.GetComponent<RoomSelectionMenu>();
 		test.LoadRoomInfo();
 		/* SceneManager.LoadScene("InGame"); */
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ShowOptions()
 	{
 		ChangeMenu("HomeMenu", "OptionsMenu");
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ShowStat()
 	{
 		ChangeMenu("HomeMenu", "StatMenu");
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void QuitGame() // A LA FIN : quand tout fonctionnera : RemoveAllListeners(); (bouton -> "free")

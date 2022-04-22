@@ -53,6 +53,7 @@ public class AccountMenu : Miscellaneous
 		ChangeMenu("AccountMenu", "ConnectionMenu");
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void HideAccountConnected()
@@ -63,6 +64,7 @@ public class AccountMenu : Miscellaneous
 		Connected();
 		/* Stop la reception dans cette class */
 		Communication.Instance.StopListening(OnPacketReceived);
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ToggleValueChangedAM(Toggle curT)

@@ -1,3 +1,4 @@
+using Assets.System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -169,6 +170,7 @@ public class OptionsMenu : Miscellaneous
 	public void HideOptions()
 	{
 		ChangeMenu("OptionsMenu", "HomeMenu");
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void FullScreen()
@@ -184,5 +186,6 @@ public class OptionsMenu : Miscellaneous
 	public void ShowCredits()
 	{
 		ChangeMenu("OptionsMenu", "CreditsMenu");
+		Communication.Instance.isInRoom = 0;
 	}
 }

@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using ClassLibrary;
 using Newtonsoft.Json;
+using Assets.System;
 
 namespace system
 {
@@ -170,7 +171,7 @@ namespace system
             packet.IdMessage = Tools.IdMessage.PlayerReady;
             packet.IdPlayer = _mon_id;
             packet.Data = Array.Empty<string>();
-            ClientAsync.Send(packet);
+            Communication.Instance.SendAsync(packet);
         }
 
         public void SendModification(Socket socket)
@@ -194,7 +195,7 @@ namespace system
                 _score_max.ToString()
             };
 
-            ClientAsync.Send(packet);
+            Communication.Instance.SendAsync(packet);
         }
 
         public void OnPacketReceived(object sender,Packet packet) 

@@ -1,3 +1,4 @@
+using Assets.System;
 using system;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,12 +14,14 @@ public class CreateRoomMenu : Miscellaneous
 	{
 		HidePopUpOptions();
 		ChangeMenu("CreateRoomMenu", "RoomSelectionMenu");
+		Communication.Instance.isInRoom = 0;
 	}
 
 	public void ShowRoomIsCreated()
 	{
 		HidePopUpOptions();
 		ChangeMenu("CreateRoomMenu", "RoomIsCreatedMenu");
+		Communication.Instance.isInRoom = 1;
 	}
 
 	public void ToggleValueChangedCRM(Toggle curT)

@@ -4,6 +4,7 @@ using UnityEngine;
 using ClassLibrary;
 using System.Collections.Generic;
 using Assert.system;
+using Assets.System;
 
 namespace Assets.system
 {
@@ -262,8 +263,7 @@ namespace Assets.system
             LireXml reader = new LireXml("config_back.xml");
             dico_tuile = reader.ReadXml();
 
-            ClientAsync.OnPacketReceived += OnPacketReceived;
-            ClientAsync.Receive();
+            Communication.Instance.StartListening(OnPacketReceived);
 
             /*
             Action listening = () =>
@@ -373,7 +373,7 @@ namespace Assets.system
             }
 
             packet.Error = Tools.Errors.Data;
-            ClientAsync.Send( packet);
+            Communication.Instance.SendAsync(packet);
         }
 
         private void SendAllPosition(Position[] position,ulong id_tuile)
@@ -397,7 +397,7 @@ namespace Assets.system
 
             }
 
-            ClientAsync.Send(packet);
+            Communication.Instance.SendAsync(packet);
         }
 
         public void SendPosition(ulong id_tuile, int X, int Y, int ROT, int id_meeple, int slot_pos)
@@ -416,7 +416,7 @@ namespace Assets.system
             packet.Data[5] = id_meeple.ToString();
             packet.Data[6] = slot_pos.ToString();
 
-            ClientAsync.Send(packet);
+            Communication.Instance.SendAsync(packet);
         }
 
         public void OnPlayerListReceive(Packet packet)

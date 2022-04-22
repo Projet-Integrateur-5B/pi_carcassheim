@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using ClassLibrary;
 using Newtonsoft.Json;
+using System;
 
 namespace Assets.System
 {
@@ -10,10 +11,12 @@ namespace Assets.System
         
         private static Communication _instance;
 
-        private Socket socket;
-        private bool isConnected = false;
         private int port;
         public ulong idClient = 0;
+
+        private Socket[] lesSockets = {null,null};
+        private bool[] isConnected = {false,false};
+        public int isInRoom = 0;
 
         public static Communication Instance
         {
@@ -47,38 +50,42 @@ namespace Assets.System
             ClientAsync.Connection(parameters);
             ClientAsync.connectDone.WaitOne();
 
-            socket = ClientAsync.clientSocket;
-            isConnected = true;
+            isConnected[isInRoom] = true;
         }
 
         public void LancementDeconnexion()
         {
 
-            ClientAsync.Disconnection(socket);
+            ClientAsync.Disconnection(lesSockets[isInRoom]);
             ClientAsync.connectDone.WaitOne();
 
-            socket = null;
-            isConnected = false;
+            lesSockets[isInRoom] = null;
+            isConnected[isInRoom] = false;
         }
 
         public void StartListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
-            if(!isConnected)
+            if(!isConnected[isInRoom])
                 LancementConnexion();
 
             ClientAsync.OnPacketReceived += pointeurFonction;
-            ClientAsync.Receive();
+            ClientAsync.Receive(lesSockets[isInRoom]);
         }
         public void StopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
             ClientAsync.OnPacketReceived -= pointeurFonction;
-            ClientAsync.StopListening(socket);
+            ClientAsync.StopListening(lesSockets[isInRoom]);
         }
 
 
         public void SendAsync(Packet packet)
         {
-            ClientAsync.Send(packet);
+            ClientAsync.Send(lesSockets[isInRoom],packet);
+        }
+
+        public void SetSocket(Socket socket)
+        {
+            lesSockets[isInRoom] = socket;
         }
     }
 }

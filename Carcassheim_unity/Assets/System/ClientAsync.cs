@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ClassLibrary;
 using UnityEngine;
+using Assets.System;
 
 // State object for receiving data from remote device.
 public class StateObject
@@ -34,7 +35,7 @@ public class ClientAsync
 {
 
     // The port number for the remote device.
-    public static Socket clientSocket { get; private set; }
+    //public static Socket clientSocket { get; private set; }
 
     // ManualResetEvent instances signal completion.
     public static ManualResetEvent connectDone =
@@ -52,8 +53,10 @@ public class ClientAsync
         var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);
 
         // Create a TCP/IP socket.
-        clientSocket = new Socket(ipAddress.AddressFamily,
+        Socket clientSocket = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);
+
+        Communication.Instance.SetSocket(clientSocket);
 
         // Connect to the remote endpoint.
         clientSocket.BeginConnect(remoteEP,
@@ -104,7 +107,7 @@ public class ClientAsync
         }
     }
 
-    public static void Receive()
+    public static void Receive(Socket clientSocket)
     {
         try
         {
@@ -182,7 +185,7 @@ public class ClientAsync
                 state.Packet.Data = state.Data;
 
                 OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
-                Receive();
+                Receive(client);
                 // TODO: check if packet.IdMessage requires an answer for the client
 
                 // Start listening again.
@@ -203,7 +206,7 @@ public class ClientAsync
         }
     }
 
-    public static void Send( Packet original)
+    public static void Send(Socket clientSocket, Packet original)
     {
 
         byte[]? bytes = null;
