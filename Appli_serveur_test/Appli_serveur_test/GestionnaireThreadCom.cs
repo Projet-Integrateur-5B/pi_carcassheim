@@ -386,7 +386,7 @@ namespace system
         /// <param name="posY"></param>
         /// <param name="rotat"></param>
         /// <returns> Errors.Permission if it is not the actual player, IllegalPlay if incorrect place or None if all goes well </returns>
-        public Tools.Errors CallVerifyPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
+        public Tools.Errors CallVerifyTilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -397,14 +397,34 @@ namespace system
                 // Thread de com gérant la partie trouvé
                 if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
                 {
-                    errors = thread_com_iterateur.VerifyPlacement(idPlayer, playerSocket, idRoom, idTuile, posX, posY, rotat);
+                    errors = thread_com_iterateur.VerifyTilePlacement(idPlayer, playerSocket, idRoom, idTuile, posX, posY, rotat);
                     break;
                 }
 
             }
             return errors; // return valeur correcte
         }
-        
+
+        public Tools.Errors CallVerifyPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string idMeeple, string slotPos)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                {
+                    errors = thread_com_iterateur.VerifyPionPlacement(idPlayer, playerSocket, idRoom, idTuile, idMeeple, slotPos);
+                    break;
+                }
+
+            }
+            return errors; // return valeur correcte
+        }
+
+
         public void EndGame(string idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée

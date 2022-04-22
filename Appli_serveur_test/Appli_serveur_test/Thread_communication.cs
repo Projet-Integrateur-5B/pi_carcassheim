@@ -260,7 +260,7 @@ namespace system
             }
         }
 
-        public Tools.Errors VerifyPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
+        public Tools.Errors VerifyTilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -280,6 +280,39 @@ namespace system
             }
             
             if(errors == Tools.Errors.IllegalPlay)
+            {
+                PlayerCheated(idPlayer, playerSocket, idRoom);
+            }
+
+            return errors; // return valeur correcte
+        }
+
+        public Tools.Errors VerifyPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string idMeeple, string slotPos)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de jeu pour trouver celui qui gère la partie cherchée
+
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
+                {
+                    // Vérification qu'une tuile a bien été placée auparavant
+                    if(thread_serv_ite.Get_posTuileTourActu().IsExisting() == true)
+                    {
+                        // Vérification du placement
+                        errors = thread_serv_ite.PionPlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(idMeeple), Int32.Parse(slotPos));
+                        break;
+                    }
+
+                    // Dans le cas où aucune tuile n'a été placée auparavant, on renvoie une erreur Permission                 
+                }
+
+            }
+
+            if (errors == Tools.Errors.IllegalPlay)
             {
                 PlayerCheated(idPlayer, playerSocket, idRoom);
             }

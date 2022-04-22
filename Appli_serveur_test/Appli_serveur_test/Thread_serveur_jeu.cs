@@ -49,7 +49,7 @@ namespace system
         private List<ulong> _tuilesGame; // Totalité des tuiles de la game       
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
-        private Position _posPionTourActu; // Position temporaire du pion de ce tour
+        private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, idTuile, idSlot}
 
         // Attributs anticheat
         private bool _AC_drawedTilesValid;
@@ -110,6 +110,12 @@ namespace system
                 _AC_drawedTilesValid = true;
             }
         }
+
+        public Position Get_posTuileTourActu()
+        {
+            return _posTuileTourActu;
+        }
+
 
         public uint NbJoueurs
         {
@@ -256,7 +262,7 @@ namespace system
 
             /* Zone  du Dictionary Score */
             _dico_joueur = new Dictionary<ulong, Player>();
-            _s_dico_joueur = new Semaphore(0, 1);
+            _s_dico_joueur = new Semaphore(1, 1);
             _nombre_joueur = 1;
             _nombre_joueur_max = 8;
             _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur, playerSocket));
@@ -275,14 +281,14 @@ namespace system
 
             // Initialisation des attributs moteurs
             _id_joueur_actuel = 0;
-            _s_id_joueur_actuel = new Semaphore(0, 1);
+            _s_id_joueur_actuel = new Semaphore(1, 1);
             _tuilesGame = new List<ulong>();
-            _s_tuilesGame = new Semaphore(0, 1);
-            _s_tuilesEnvoyees = new Semaphore(0, 1);
+            _s_tuilesGame = new Semaphore(1, 1);
+            _s_tuilesEnvoyees = new Semaphore(1, 1);
 
-            _s_plateau = new Semaphore(0, 1);
-            _s_posPionTourActu = new Semaphore(0, 1);
-            _s_posTuileTourActu = new Semaphore(0, 1);
+            _s_plateau = new Semaphore(1, 1);
+            _s_posPionTourActu = new Semaphore(1, 1);
+            _s_posTuileTourActu = new Semaphore(1, 1);
 
         }
 
@@ -444,6 +450,10 @@ namespace system
             // Génération des attributs d'anti cheat
             _AC_drawedTilesValid = false;
             _AC_tileVerificationReceived = 0;
+
+            // Initialise la tuile placée de ce tour inexistante
+            _posTuileTourActu = new Position();
+            _posTuileTourActu.SetNonExistent();
             
 
             // TODO :
@@ -492,9 +502,37 @@ namespace system
             _s_plateau.Release();
         }
 
+        public Tools.Errors PionPlacement(ulong idPlayer, ulong idTuile, int idMeeple, int slotPos)
+        {
+            _s_plateau.WaitOne();
+            // Si placement légal, on le sauvegarde
+            if (isPionPlacementLegal(idTuile, slotPos, idPlayer))
+            {
+                string[] posPion = { idPlayer.ToString(), idTuile.ToString(), slotPos.ToString() };
+                _s_posPionTourActu.WaitOne();
+                _posPionTourActu = posPion;
+                _s_posPionTourActu.Release();
+
+                return Tools.Errors.None;
+            }
+            else // Si non, renvoie l'erreur illegalPlay + envoi message cheat
+            {
+                // Le thread de com s'occupera d'appeller le setplayerstatus pour indiquer la triche
+
+                return Tools.Errors.IllegalPlay;
+            }
+            _s_plateau.Release();
+        }
+
+
         public bool isTilePlacementLegal(ulong idTuile, int posX, int posY, int rotat)
         {
             return _plateau.PlacementLegal(idTuile, posX, posY, rotat);
+        }
+
+        public bool isPionPlacementLegal(ulong idTuile, int idSlot, ulong idPlayer)
+        {
+            return _plateau.PionPosable(idTuile, (ulong)idSlot, idPlayer);
         }
 
         /// <summary>
