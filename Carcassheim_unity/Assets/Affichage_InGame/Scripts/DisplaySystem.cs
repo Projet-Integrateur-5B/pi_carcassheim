@@ -11,7 +11,8 @@ public enum DisplaySystemState
     StateTransition,
     noState,
     idleState,
-    endOfGame
+    endOfGame,
+    scoreChange
 };
 
 public class DisplaySystem : MonoBehaviour
@@ -92,8 +93,7 @@ public class DisplaySystem : MonoBehaviour
             }
         }
         //! TEST
-        gameBegin();
-        setNextState(DisplaySystemState.turnStart);
+        //gameBegin();
     }
 
 
@@ -461,6 +461,7 @@ public class DisplaySystem : MonoBehaviour
         banner.setPlayer(my_player);
 
         banner.setWinCondition(win, table, param);
+        setNextState(DisplaySystemState.turnStart);
     }
 
     public void turnBegin()

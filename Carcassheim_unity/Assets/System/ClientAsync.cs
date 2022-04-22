@@ -33,7 +33,7 @@ public class ClientAsync
 {
 
     // The port number for the remote device.
-    private const int port = 10000;
+    public static Socket clientSocket { get; private set; }
 
     // ManualResetEvent instances signal completion.
     public static ManualResetEvent connectDone =
@@ -43,19 +43,20 @@ public class ClientAsync
     public static event OnPacketReceivedHandler OnPacketReceived;
 
 
-    public static void Connection(Socket client_socket,Parameters parameters)
+
+    public static void Connection(Parameters parameters)
     {
         //Version : Unity
         IPAddress ipAddress = IPAddress.Parse(parameters.ServerIP);
         var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);
 
         // Create a TCP/IP socket.
-        client_socket = new Socket(ipAddress.AddressFamily,
+        clientSocket = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);
 
         // Connect to the remote endpoint.
-        client_socket.BeginConnect(remoteEP,
-            new AsyncCallback(ConnectCallback), client_socket);
+        clientSocket.BeginConnect(remoteEP,
+            new AsyncCallback(ConnectCallback), clientSocket);
     }
 
     private static void ConnectCallback(IAsyncResult ar)
@@ -79,16 +80,16 @@ public class ClientAsync
         }
     }
 
-    public static void Receive(Socket client)
+    public static void Receive()
     {
         try
         {
             // Create the state object.
             StateObject state = new StateObject();
-            state.workSocket = client;
+            state.workSocket = clientSocket;
 
             // Begin receiving the data from the remote device.
-            client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+            clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReceiveCallback), state);
         }
         catch (Exception e)
@@ -155,7 +156,7 @@ public class ClientAsync
                 state.Packet.Data = state.Data;
 
                 OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
-                Receive(client);
+                Receive();
                 // TODO: check if packet.IdMessage requires an answer for the client
 
                 // Start listening again.
@@ -176,7 +177,7 @@ public class ClientAsync
         }
     }
 
-    public static void Send(Socket client, Packet original)
+    public static void Send( Packet original)
     {
 
         byte[]? bytes = null;
@@ -203,8 +204,8 @@ public class ClientAsync
             // Begin sending the data to the remote device.
             var size = bytes.Length;
             Console.WriteLine("Sent {0} bytes =>\t" + packet, size);
-            client.BeginSend(bytes, 0, size, 0,
-                null, client);
+            clientSocket.BeginSend(bytes, 0, size, 0,
+                SendCallback, clientSocket);
         }
     }
 

@@ -28,8 +28,6 @@ namespace system
         private int _timer_max_joueur; // En secondes
         private int _meeples; // Nombre de meeples par joueur
 
-        private Socket? socket = null;
-
         private void ReceiveRoomSettings(Packet _packet)
         {
             _nb_joueur_max = int.Parse(_packet.Data[0]);
@@ -98,11 +96,11 @@ namespace system
             parameters.ServerPort = Convert.ToInt32(packet.Data[0]);
             _mon_id = packet.IdPlayer;
 
-            ClientAsync.Connection(socket, parameters);
+            ClientAsync.Connection( parameters);
             ClientAsync.connectDone.WaitOne();
 
             ClientAsync.OnPacketReceived += OnPacketReceived;
-            ClientAsync.Receive(socket);
+            ClientAsync.Receive();
 
             
             /*
@@ -175,7 +173,7 @@ namespace system
             packet.IdMessage = Tools.IdMessage.PlayerReady;
             packet.IdPlayer = _mon_id;
             packet.Data = Array.Empty<string>();
-            ClientAsync.Send(socket, packet);
+            ClientAsync.Send(packet);
         }
 
         public void SendModification(Socket socket)
@@ -199,7 +197,7 @@ namespace system
                 _score_max.ToString()
             };
 
-            ClientAsync.Send(socket, packet);
+            ClientAsync.Send(packet);
         }
 
         public void OnPacketReceived(object sender,Packet packet) 
