@@ -142,7 +142,9 @@ namespace system
 
                         // Lancement de l'écoute des réponse du client async
                         ClientAsync.OnPacketReceived += OnPacketReceived;
-                        ClientAsync.Receive(joueur.Value._socket_of_player); 
+                        ClientAsync.Receive(joueur.Value._socket_of_player);
+
+                        break;
                     }
                 }
             }
@@ -184,6 +186,67 @@ namespace system
         }
 
 
+        public Tools.Errors VerifyPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de jeu pour trouver celui qui gère la partie cherchée
+
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
+                {
+                    // Vérification du placement
+                    errors = thread_serv_ite.TilePlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
+                    break; 
+                }
+
+            }
+            
+            if(errors == Tools.Errors.IllegalPlay)
+            {
+                PlayerCheated(idPlayer, playerSocket, idRoom);
+            }
+
+            return errors; // return valeur correcte
+        }
+
+        public void PlayerCheated(ulong idPlayer, Socket? playerSocket, string idRoom)
+        {
+            Packet packet = new Packet();
+            packet.Type = true;
+
+
+            // Recherche de la partie
+            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if(threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    // Indique au serveur la triche
+                    Tools.PlayerStatus playerStatus = threadJeu.SetPlayerStatus(idPlayer);
+
+
+                    if (playerStatus == Tools.PlayerStatus.Kicked) // Deuxième triche -> kick
+                    {
+                        packet.IdMessage = Tools.IdMessage.PlayerKick;
+                    }
+                    else // Première triche -> avertissement
+                    {
+                        packet.IdMessage = Tools.IdMessage.PlayerCheat;
+                    }
+                    break;
+                }
+            }
+
+            ClientAsync.Send(playerSocket, packet);
+
+            // Lancement de l'écoute des réponse du client async
+            ClientAsync.OnPacketReceived += OnPacketReceived;
+            ClientAsync.Receive(playerSocket);
+
+        }
 
         // ===============================
         // Méthode réseau de réception

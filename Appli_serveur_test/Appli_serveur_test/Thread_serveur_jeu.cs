@@ -43,12 +43,20 @@ namespace system
 
         // Attribut pour le bon fonctionnement du moteur de jeu
 
-        private ulong _id_joueur_actuel;
-        private Semaphore _s_id_joueur_actuel;
-        private List<ulong> _tuilesGame; // Totalité des tuiles de la game
-        private Semaphore _s_tuilesGame;
+        private Plateau _plateau;
+        private ulong _id_joueur_actuel; 
+        private List<ulong> _tuilesGame; // Totalité des tuiles de la game       
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
+        private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
+        private Position _posPionTourActu; // Position temporaire du pion de ce tour
+
+        // Semaphores moteur
+        private Semaphore _s_plateau;
+        private Semaphore _s_id_joueur_actuel;
+        private Semaphore _s_tuilesGame;
         private Semaphore _s_tuilesEnvoyees;
+        private Semaphore _s_posTuileTourActu; // Position temporaire de la tuile de ce tour
+        private Semaphore _s_posPionTourActu; // Position temporaire du pion de ce tour
 
         // Getters et setters
 
@@ -69,6 +77,11 @@ namespace system
         public ulong Get_Moderateur()
         {
             return this._id_moderateur;
+        }
+        
+        public ulong Get_ActualPlayerId()
+        {
+            return this._id_joueur_actuel;
         }
 
         public Tools.GameStatus Get_Status()
@@ -248,11 +261,17 @@ namespace system
             _s_id_joueur_actuel = new Semaphore(0, 1);
             _tuilesGame = new List<ulong>();
             _s_tuilesGame = new Semaphore(0, 1);
+            _s_tuilesEnvoyees = new Semaphore(0, 1);
 
+            _s_plateau = new Semaphore(0, 1);
+            _s_posPionTourActu = new Semaphore(0, 1);
+            _s_posTuileTourActu = new Semaphore(0, 1);
 
         }
 
-        // Méthodes
+        // ===================
+        // Méthodes settings
+        // ===================
 
         public Tools.PlayerStatus AddJoueur(ulong id_joueur, Socket? playerSocket)
         {
@@ -374,6 +393,9 @@ namespace system
         {
             _statut_partie = Tools.GameStatus.Running;
 
+            // Génération du plateau
+            _plateau = new Plateau();
+
             // Récupération de la liste de joueurs
             _s_dico_joueur.WaitOne();
             ulong[] idPlayer_array = _dico_joueur.Keys.ToArray();
@@ -414,6 +436,27 @@ namespace system
             return tuilesTirees.ToArray();
         }
 
+        public Tools.Errors TilePlacement(ulong idPlayer, ulong idTuile, int posX, int posY, int rotat)
+        {
+            _s_plateau.WaitOne();
+            // Si placement légal, on le sauvegarde
+            if ( _plateau.PlacementLegal(idTuile, posX, posY, rotat)){
+
+                _s_posTuileTourActu.WaitOne();
+                _posTuileTourActu = new Position(posX, posY, rotat);
+                _s_posTuileTourActu.Release();
+
+                return Tools.Errors.None;
+            }
+            else // Si non, renvoie l'erreur illegalPlay + envoi message cheat
+            {
+                // Le thread de com s'occupera d'appeller le setplayerstatus pour indiquer la triche
+
+                return Tools.Errors.IllegalPlay;
+            }
+            _s_plateau.Release();
+        }
+
         /// <summary>
         /// End the turn
         /// </summary>
@@ -451,6 +494,10 @@ namespace system
             // inc player timer count + check limit ?
             Round();
         }
+
+        // =================================
+        // Méthodes supplémentaires moteur
+        // =================================
 
         /// <summary>
         /// Get 3 tiles id in string format from a tile list

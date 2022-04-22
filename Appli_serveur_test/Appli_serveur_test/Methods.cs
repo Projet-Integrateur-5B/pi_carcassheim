@@ -736,9 +736,14 @@ public partial class Server
             return Tools.Errors.BadPort;
         }
 
-        _ = packetReceived;
-        // test si la tuile est bien a un emplacement valide
-        return Tools.Errors.Unknown; // remplacer par Permission si validation du joueur sinon par Success
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        // Vérification du coup
+        Tools.Errors errors = gestionnaire.CallVerifyPlacement(packetReceived.IdPlayer, socket, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4]);
+
+
+        return errors; 
     }
 
     /// <summary>
