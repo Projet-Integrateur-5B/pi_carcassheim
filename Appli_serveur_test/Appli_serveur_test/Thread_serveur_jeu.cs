@@ -116,6 +116,11 @@ namespace system
             return _posTuileTourActu;
         }
 
+        public string[] Get_posPionTourActu()
+        {
+            return _posPionTourActu;
+        }
+
 
         public uint NbJoueurs
         {
@@ -533,6 +538,13 @@ namespace system
         public bool isPionPlacementLegal(ulong idTuile, int idSlot, ulong idPlayer)
         {
             return _plateau.PionPosable(idTuile, (ulong)idSlot, idPlayer);
+        }
+
+        public void RetirerTuileTourActu()
+        {
+            _s_posTuileTourActu.WaitOne();
+            _posTuileTourActu.SetNonExistent();
+            _s_posTuileTourActu.Release();
         }
 
         /// <summary>

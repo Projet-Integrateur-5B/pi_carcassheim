@@ -424,6 +424,24 @@ namespace system
             return errors; // return valeur correcte
         }
 
+        public Tools.Errors CallCancelTuilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                {
+                    errors = thread_com_iterateur.CancelTuilePlacement(idPlayer, playerSocket, idRoom);
+                    break;
+                }
+
+            }
+            return errors; // return valeur correcte
+        }
 
         public void EndGame(string idRoom, ulong idPlayer)
         {

@@ -272,9 +272,21 @@ namespace system
                 if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
-                    // Vérification du placement
-                    errors = thread_serv_ite.TilePlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
-                    break; 
+                    // Vérification qu'une tuile n'a pas déjà été placée auparavant
+                    if (thread_serv_ite.Get_posTuileTourActu().IsExisting() == true)
+                    {
+                        // Permission refusée de poser une tuile
+                        errors = Tools.Errors.Permission;
+                        break;
+                    }
+                    else
+                    {
+                        // Vérification du placement
+                        errors = thread_serv_ite.TilePlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
+                        break;
+                    }
+
+                     
                 }
 
             }
@@ -299,15 +311,17 @@ namespace system
                 if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
-                    // Vérification qu'une tuile a bien été placée auparavant
-                    if(thread_serv_ite.Get_posTuileTourActu().IsExisting() == true)
+                    // Vérification qu'une tuile a bien été placée auparavant ET qu'aucun pion n'est pas déjà placé
+                    if(thread_serv_ite.Get_posTuileTourActu().IsExisting() == true && 
+                        thread_serv_ite.Get_posPionTourActu().Length == 0)
                     {
                         // Vérification du placement
                         errors = thread_serv_ite.PionPlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(idMeeple), Int32.Parse(slotPos));
                         break;
                     }
 
-                    // Dans le cas où aucune tuile n'a été placée auparavant, on renvoie une erreur Permission                 
+                    // Dans le cas où aucune tuile n'a pas été placée auparavant ou qu'un pion est déjà placé,
+                    // on renvoie une erreur Permission                 
                 }
 
             }
@@ -318,6 +332,37 @@ namespace system
             }
 
             return errors; // return valeur correcte
+        }
+
+        public Tools.Errors CancelTuilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de jeu pour trouver celui qui gère la partie cherchée
+
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
+                {
+                    // Vérification qu'une tuile a bien été placée auparavant ET qu'un pion n'y est pas déjà placé
+                    if (thread_serv_ite.Get_posTuileTourActu().IsExisting() == true &&
+                        thread_serv_ite.Get_posPionTourActu().Length == 0)
+                    {
+                        // Retrait de la position de tuile
+                        thread_serv_ite.RetirerTuileTourActu();
+                        errors = Tools.Errors.None;
+                        break;
+                    }
+
+                    // Dans le cas où aucune tuile n'a été placée auparavant ou qu'un pion est toujours placé,
+                    // on renvoie une erreur Permission                 
+                }
+
+            }
+
+            return errors; 
         }
 
         public void PlayerCheated(ulong idPlayer, Socket? playerSocket, string idRoom)
