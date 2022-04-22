@@ -368,7 +368,7 @@ namespace system
                         // Préviens tous les joueurs
                         thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
                         // Envoi des 3 tuiles de début de tour
-                        thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GenerateThreeTiles(), playerSocket);
+                        thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GenerateThreeTiles(), playerSocket, idRoom);
                     }                 
                     return; // return valeur correcte
                 }

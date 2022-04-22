@@ -39,7 +39,7 @@ public class ClientAsync
     public static ManualResetEvent connectDone =
         new ManualResetEvent(false);
 
-    public delegate void OnPacketReceivedHandler(object sender, Packet packet);
+    public delegate void OnPacketReceivedHandler(object sender, Packet packet, Socket? socket);
     public static event OnPacketReceivedHandler OnPacketReceived;
 
 
@@ -154,7 +154,7 @@ public class ClientAsync
 
                 state.Packet.Data = state.Data;
 
-                OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
+                OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet, client);
                 Receive(client);
                 // TODO: check if packet.IdMessage requires an answer for the client
 

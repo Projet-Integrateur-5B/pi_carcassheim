@@ -169,7 +169,7 @@ namespace system
             return playerParameters;
         }
 
-        public void SendTilesRoundStart(string[] tilesToSend, Socket? socket)
+        public void SendTilesRoundStart(string[] tilesToSend, Socket? socket, string idRoom)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.TuileDraw;
@@ -179,12 +179,86 @@ namespace system
 
             ClientAsync.Send(socket, packet);
 
-            // Lancement de l'écoute des réponse du client async
+            // Lancement de l'écoute de la réponse du joueur modérateur
             ClientAsync.OnPacketReceived += OnPacketReceived;
             ClientAsync.Receive(socket);
 
+            
+            // Envoi des tuiles à tous les autres joueurs
+            foreach(Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if(threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+
+                    foreach(var joueur in threadJeu.Get_Dico_Joueurs())
+                    {
+                        ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                        // Lancement de l'écoute de la réponse du joueur modérateur
+                        ClientAsync.OnPacketReceived += OnPacketReceived;
+                        ClientAsync.Receive(socket);
+                    }
+
+                    break;
+                }
+            }
+
         }
 
+        // La fonction du joueur dont c'est le tour
+        public void DrawAntiCheatPlayer(string idRoom, ulong idPlayer, Socket? playerSocket)
+        {
+            foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    threadJeu.SetACBarrier();
+
+                    // On attend que tous les autres joueurs aient exécuté leur rôle d'arbitre
+                    threadJeu.WaitACBarrier();
+
+                    // Vérification de la validité des tuiles piochées
+                    if (threadJeu.Get_AC_drawedTilesValid())
+                    {
+                        // Les tuiles s'avèrent valides, on a affaire à un tricheur
+                        PlayerCheated(idPlayer, playerSocket, idRoom);
+                    }
+                    else
+                    {
+                        // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
+                        SendTilesRoundStart(threadJeu.GenerateThreeTiles(), playerSocket, idRoom);
+                    }
+
+                    threadJeu.DisposeACBarrier();
+
+                    break;
+                }
+            }
+        }
+
+        // La fonction pour les autres joueurs, qui ne servent que d'arbitre
+        public void DrawAntiCheatVerif(string idRoom, bool isValid, ulong idTuile, Position pos)
+        {
+            foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    if (isValid)
+                    {
+                        bool isLegal = threadJeu.isTilePlacementLegal(idTuile, pos.X, pos.Y, pos.ROT);
+                        if (isLegal) // S'il s'avère que le coup est valide, on passe l'attribut à true
+                        {
+                            threadJeu.SetValid_AC_drawedTilesValid();
+                        }
+                    }
+
+                    // Signale que le rôle d'arbitre de ce joueur a été joué
+                    threadJeu.WaitACBarrier();
+
+                    break;
+                }
+            }
+        }
 
         public Tools.Errors VerifyPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
         {
@@ -252,19 +326,40 @@ namespace system
         // Méthode réseau de réception
         // ===============================
 
-        public void OnPacketReceived(object sender, Packet packet)
+        public void OnPacketReceived(object sender, Packet packet, Socket? socket)
         {
-            switch (packet.IdMessage)
+            if(packet.Error != Tools.Errors.None) // Gestion des erreurs
             {
-                // Cas où aucune des 3 tuiles n'est posable
-                case Tools.IdMessage.TuileDraw:
-                    // TODO
-                    break;
+                switch (packet.IdMessage)
+                {
+                    // Cas où aucune des 3 tuiles n'est posable
+                    case Tools.IdMessage.TuileDraw:
+                        DrawAntiCheatPlayer(packet.Data[0], packet.IdPlayer, socket);
+                        break;
 
-                case Tools.IdMessage.RoomStart:
-                    // TODO : Check s'il renvoit des erreurs
-                    break;
+                    // Réponse d'un autre joueur (anti cheat) -> pas posable
+                    case Tools.IdMessage.TuileVerification:
+                        DrawAntiCheatVerif(packet.Data[0], false, (ulong)0, new Position(-1,-1,-1));
+                        break;
+
+                    case Tools.IdMessage.RoomStart:
+                        // TODO : Check s'il renvoit des erreurs
+                        break;
+                }
             }
+            else // Gestion des réponses saines
+            {
+                switch (packet.IdMessage)
+                {
+                    // Réponse d'un autre joueur (anti cheat) -> posable
+                    case Tools.IdMessage.TuileVerification:
+                        Position posValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
+                        DrawAntiCheatVerif(packet.Data[0], true, UInt32.Parse(packet.Data[1]), posValid);
+                        break;
+
+                }
+            }
+
      
         }
 

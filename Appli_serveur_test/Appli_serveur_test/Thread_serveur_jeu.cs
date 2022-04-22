@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using ClassLibrary;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 using Server;
 
@@ -50,6 +51,11 @@ namespace system
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
         private Position _posPionTourActu; // Position temporaire du pion de ce tour
 
+        // Attributs anticheat
+        private bool _AC_drawedTilesValid;
+        private int _AC_tileVerificationReceived;
+        private Barrier _AC_barrierAllVerifDone;
+
         // Semaphores moteur
         private Semaphore _s_plateau;
         private Semaphore _s_id_joueur_actuel;
@@ -92,6 +98,17 @@ namespace system
         public bool Is_Private()
         {
             return this._privee;
+        }
+        public bool Get_AC_drawedTilesValid()
+        {
+            return _AC_drawedTilesValid;
+        }
+        public void SetValid_AC_drawedTilesValid()
+        {
+            if(_AC_drawedTilesValid != true)
+            {
+                _AC_drawedTilesValid = true;
+            }
         }
 
         public uint NbJoueurs
@@ -385,6 +402,19 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
+        public void SetACBarrier()
+        {
+            _AC_barrierAllVerifDone = new Barrier((int)_nombre_joueur);
+        }
+        public void WaitACBarrier()
+        {
+            _AC_barrierAllVerifDone.SignalAndWait(2000);
+        }
+        public void DisposeACBarrier()
+        {
+            _AC_barrierAllVerifDone.Dispose();
+        }
+
         // =======================
         // Méthodes moteur de jeu
         // =======================
@@ -410,6 +440,11 @@ namespace system
             _s_tuilesGame.WaitOne();
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
             _s_tuilesGame.Release();
+
+            // Génération des attributs d'anti cheat
+            _AC_drawedTilesValid = false;
+            _AC_tileVerificationReceived = 0;
+            
 
             // TODO :
             // synchronisation de la methode
@@ -440,7 +475,7 @@ namespace system
         {
             _s_plateau.WaitOne();
             // Si placement légal, on le sauvegarde
-            if ( _plateau.PlacementLegal(idTuile, posX, posY, rotat)){
+            if (isTilePlacementLegal(idTuile, posX, posY, rotat)){
 
                 _s_posTuileTourActu.WaitOne();
                 _posTuileTourActu = new Position(posX, posY, rotat);
@@ -455,6 +490,11 @@ namespace system
                 return Tools.Errors.IllegalPlay;
             }
             _s_plateau.Release();
+        }
+
+        public bool isTilePlacementLegal(ulong idTuile, int posX, int posY, int rotat)
+        {
+            return _plateau.PlacementLegal(idTuile, posX, posY, rotat);
         }
 
         /// <summary>
