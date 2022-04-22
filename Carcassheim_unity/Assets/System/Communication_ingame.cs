@@ -191,6 +191,7 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
+            /*
             // TODO ENVOYER AU !!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
             switch (action.state)
             {
@@ -210,6 +211,7 @@ namespace Assets.system
                     DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection) action;
                     break;
             }
+            */
             return;
         }
 
@@ -370,7 +372,7 @@ namespace Assets.system
                     return;
             }
 
-            
+            packet.Error = Tools.Errors.Data;
             ClientAsync.Send( packet);
         }
 
@@ -399,9 +401,9 @@ namespace Assets.system
         }
 
         public void SendPosition(ulong id_tuile, int X, int Y, int ROT, int id_meeple, int slot_pos)
-        {
+        {//ToDo Retirer Meeple et slot et le changer
             Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
+            packet.IdMessage = Tools.IdMessage.TuilePlacement;
             packet.IdPlayer = _mon_id;
 
             packet.Data = new string[7];

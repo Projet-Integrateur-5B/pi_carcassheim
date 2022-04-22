@@ -2,12 +2,20 @@ using UnityEngine;
 using UnityEngine.UI; /* using System.Text.RegularExpressions; // needed for Regex */
 using Assets.System;
 using ClassLibrary;
+using System.Collections.Generic;
+using System.Threading;
 
 public class AccountMenu : Miscellaneous
 {
 	private Transform accMenu, AMCI; // Account Menu Container InputField
 	private InputField pseudoCA, emailCA, passwordCA, confirmPwdCA;
 	private static bool boolCGU = false;
+
+	public List<bool> listAction;
+	public Semaphore s_listAction;
+
+	private GameObject tmpGO;
+	private Text tmpText;
 	void Start()
 	{
 		// INITIALISATION
@@ -21,6 +29,13 @@ public class AccountMenu : Miscellaneous
 		passwordCA = AMCI.Find("InputField Password CA").GetComponent<InputField>();
 		confirmPwdCA = AMCI.Find("InputField ConfirmPwd CA").GetComponent<InputField>();
 		passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password; // Hide password by default
+
+
+		listAction = new List<bool>();
+		s_listAction = new Semaphore(1, 1);
+
+		/* Commuication Async */
+		Communication.Instance.StartListening(OnPacketReceived);
 	}
 
 	public void ResetWarningTextAM()
@@ -36,6 +51,8 @@ public class AccountMenu : Miscellaneous
 		ResetWarningTextAM();
 		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "ConnectionMenu");
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void HideAccountConnected()
@@ -44,6 +61,8 @@ public class AccountMenu : Miscellaneous
 		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ToggleValueChangedAM(Toggle curT)
@@ -73,41 +92,80 @@ public class AccountMenu : Miscellaneous
 
 	public void CreateAccount()
 	{
-		//bool tmpBool = GameObject.Find("Toggle CA").GetComponent<Toggle>().isOn;
-		GameObject tmpGO = GameObject.Find("Create Account");
-		//Texte deborde sur formulaire. Rendre code portable et utilisable :
-		// Modification position texte en ajoutant a sa coordonne la moitie de sa hauteur.
-		Text tmpText = tmpGO.GetComponent<Text>();
-		bool res = false;
+		tmpGO = GameObject.Find("Create Account");
+		tmpText = tmpGO.GetComponent<Text>();
 
 		if (GetInputFields())
         {
-			string[] values = new[] {
-			RemoveLastSpace(pseudoCA.text),
-			RemoveLastSpace(passwordCA.text),
-			RemoveLastSpace(emailCA.text),
-			GameObject.Find("InputField Year CA").GetComponent<InputField>().text +"/"+
-			GameObject.Find("InputField Month CA").GetComponent<InputField>().text +"/"+
-			GameObject.Find("InputField Day CA").GetComponent<InputField>().text
+			Packet packet = new Packet();
+			packet.IdMessage = Tools.IdMessage.Signup;
+			packet.IdPlayer = 0;
+			packet.Data  = new[] {
+				RemoveLastSpace(pseudoCA.text),
+				RemoveLastSpace(passwordCA.text),
+				RemoveLastSpace(emailCA.text),
+				GameObject.Find("InputField Year CA").GetComponent<InputField>().text +"/"+
+				GameObject.Find("InputField Month CA").GetComponent<InputField>().text +"/"+
+				GameObject.Find("InputField Day CA").GetComponent<InputField>().text
 			};
-			res = Communication.Instance.CommunicationWithoutResult(Tools.IdMessage.Signup, values);
+
+			Communication.Instance.SendAsync(packet);
 		}
 
-		SetState(res);
-		if (GetState())
-		{
-			HideAccountConnected();
-			return;
-		}
-        else
-        {
-			tmpGO.GetComponent<Text>().color = Color.yellow;
-			tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
-		}
+		
 	}
 
 	public void CGU()
 	{
-		Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
+		//Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
+	}
+
+	public void OnPacketReceived(object sender, Packet packet)
+	{
+
+		bool res = false;
+		if (packet.IdMessage == Tools.IdMessage.Signup)
+		{
+			if (packet.Error == Tools.Errors.None)
+			{
+				res = true;
+			}
+
+			s_listAction.WaitOne();
+			listAction.Add(res);
+			s_listAction.Release();
+		}
+	}
+
+	private void Update()
+	{
+		s_listAction.WaitOne();
+		int taille = listAction.Count;
+		s_listAction.Release();
+
+		if (taille > 0)
+		{
+			for (int i = 0; i < taille; i++)
+			{
+				s_listAction.WaitOne();
+				SetState(listAction[i]);
+				s_listAction.Release();
+			}
+
+			s_listAction.WaitOne();
+			listAction.Clear();
+			s_listAction.Release();
+
+			if (GetState())
+			{
+				HideAccountConnected();
+				Connected();
+			}
+			else
+			{
+				tmpGO.GetComponent<Text>().color = Color.yellow;
+				tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
+			}
+		}
 	}
 }

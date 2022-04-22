@@ -4,6 +4,7 @@ using Assets.System;
 using System;
 using ClassLibrary;
 using System.Collections.Generic;
+using System.Threading;
 
 public class RoomSelectionMenu : Miscellaneous
 {
@@ -14,6 +15,9 @@ public class RoomSelectionMenu : Miscellaneous
 	private static int nombreRoom = 5;
 
 	List<List<GameObject>> List_of_Rooms;
+
+	public List<string> listAction;
+	public Semaphore s_listAction;
 
 	void Start()
 	{
@@ -44,30 +48,44 @@ public class RoomSelectionMenu : Miscellaneous
 				temp++;
 			}
 		}
+
+		listAction = new List<string>();
+		s_listAction = new Semaphore(1, 1);
+
+		/* Commuication Async */
+		Communication.Instance.StartListening(OnPacketReceived);
 	}
 
 	public void HideRoomSelection()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "HomeMenu");
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowJoinById()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "JoinByIdMenu");
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowJoinPublicRoom()
 	{
 		HidePopUpOptions();
-		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");	
+		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowCreateRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public string GetIDRoom(int index)
@@ -122,24 +140,52 @@ public class RoomSelectionMenu : Miscellaneous
 
 	public void LoadRoomInfo()
     {
-		//text_ID,text_Hosts, text_Players, text_MaxPlayers, text_Endgame
-		string[] values = Array.Empty<string>();
-		Packet packet = Communication.Instance.CommunicationWithResult(Tools.IdMessage.RoomList, values);
 
-		if (packet.Error != Tools.Errors.None)
-			return;
+		Packet packet = new Packet();
+		packet.IdMessage = Tools.IdMessage.RoomList;
+		packet.IdPlayer = Communication.Instance.idClient;
+		packet.Data = Array.Empty<string>();
 
-		// A modifier quand il y aura une liste
-		int taille_liste = packet.Data.Length;
-		int compteur = 0;
-		for (int i = 2; i < taille_liste; i += 5)
-        {
-			SetIDRoom(compteur, packet.Data[i]);
-			SetHostsRoom(compteur, packet.Data[i+1]);
-			SetPlayersRoom(compteur, packet.Data[i+2]);
-			SetMaxPlayersRoom(compteur, packet.Data[i+3]);
-			SetEndgameRoom(compteur, packet.Data[i+4]);
-			compteur++;
+		Communication.Instance.SendAsync(packet);
+	}
+
+	public void OnPacketReceived(object sender, Packet packet)
+	{
+		if (packet.IdMessage == Tools.IdMessage.RoomList)
+		{
+			if (packet.Error == Tools.Errors.None)
+			{
+				s_listAction.WaitOne();
+				listAction.AddRange(packet.Data);
+				s_listAction.Release();
+			}
+		}
+	}
+
+	private void Update()
+	{
+		s_listAction.WaitOne();
+		int taille = listAction.Count;
+		s_listAction.Release();
+
+		if (taille > 0)
+		{
+			// A modifier quand il y aura une liste
+			int compteur = 0;
+
+			s_listAction.WaitOne();
+			for (int i = 2; i < taille; i += 5)
+			{
+				SetIDRoom(compteur, listAction[i]);
+				SetHostsRoom(compteur, listAction[i + 1]);
+				SetPlayersRoom(compteur, listAction[i + 2]);
+				SetMaxPlayersRoom(compteur, listAction[i + 3]);
+				SetEndgameRoom(compteur, listAction[i + 4]);
+				compteur++;
+			}
+
+			listAction.Clear();
+			s_listAction.Release();
 		}
 	}
 }

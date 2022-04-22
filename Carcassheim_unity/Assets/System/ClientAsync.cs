@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using ClassLibrary;
+using UnityEngine;
 
 // State object for receiving data from remote device.
 public class StateObject
@@ -80,10 +81,35 @@ public class ClientAsync
         }
     }
 
+    public static void Disconnection(Socket clientSocket)
+    {
+        clientSocket.BeginDisconnect(true,
+            new AsyncCallback(DisconnectCallback), clientSocket);
+    }
+
+    public static void DisconnectCallback(IAsyncResult ar)
+    {
+        try
+        {
+            // Complete the disconnect request.
+            Socket client = (Socket)ar.AsyncState;
+            client.EndDisconnect(ar);
+
+            Console.WriteLine("Client is disconnected to {0}", client.RemoteEndPoint);
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }
+    }
+
     public static void Receive()
     {
         try
         {
+            Debug.Log("Received -----------------------------------------------------------------");
+
             // Create the state object.
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
@@ -228,6 +254,6 @@ public class ClientAsync
 
     public static void StopListening(Socket client)
     {
-        client.EndReceive(null);
+       //Todo
     }
 }

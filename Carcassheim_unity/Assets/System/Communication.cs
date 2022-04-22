@@ -1,14 +1,19 @@
 ﻿using UnityEngine;
 using System.Net.Sockets;
 using ClassLibrary;
+using Newtonsoft.Json;
 
 namespace Assets.System
 {
     public class Communication : MonoBehaviour
     {
-        private Socket Socket;
+        
         private static Communication _instance;
-        public static int port;
+
+        private Socket socket;
+        private bool isConnected = false;
+        private int port;
+        public ulong idClient = 0;
 
         public static Communication Instance
         {
@@ -20,7 +25,7 @@ namespace Assets.System
 
                     if (_instance == null)
                     {
-                        GameObject container = new GameObject("Bicycle");
+                        GameObject container = new GameObject("Communication");
                         _instance = container.AddComponent<Communication>();
                     }
                 }
@@ -34,135 +39,46 @@ namespace Assets.System
             _instance = this;
         }
 
-        public void ConnectedToServer()
+        public void LancementConnexion()
         {
-            var error_value = Client.Connection(ref Communication.Instance.Socket, 19000);
-            switch (error_value)
-            {
-                case Tools.Errors.None:
-                    break;
-                case Tools.Errors.ConfigFile:
-                    // TODO : handle case : config file is bad or issue while extracting the data
-                    Debug.Log(string.Format("Errors.ConfigFile"));
-                    break;
-                case Tools.Errors.Socket:
-                    // TODO : handle case : connection could not be established
-                    Debug.Log(string.Format("Errors.Socket"));
-                    break;
-                case Tools.Errors.ToBeDetermined:
-                    break;
-                case Tools.Errors.Unknown:
-                    break;
-                case Tools.Errors.Format:
-                    break;
-                case Tools.Errors.Receive:
-                    break;
-                case Tools.Errors.Data:
-                    break;
-                case Tools.Errors.Permission:
-                    break;
-                default:
-                    // TODO : handle case : default
-                    Debug.Log(string.Format("Errors.Unknown"));
-                    break;
-            }
+            TextAsset contents = Resources.Load<TextAsset>("network/config");
+            Parameters parameters = JsonConvert.DeserializeObject<Parameters>(contents.ToString());
+
+            ClientAsync.Connection(parameters);
+            ClientAsync.connectDone.WaitOne();
+
+            socket = ClientAsync.clientSocket;
+            isConnected = true;
         }
 
-        public void DisconnectToServer()
+        public void LancementDeconnexion()
         {
-            if (Communication.Instance.Socket == null)
-                return;
 
-            var error_value = Client.Disconnection(Communication.Instance.Socket);
-            switch (error_value)
-            {
-                case Tools.Errors.None:
-                    break;
-                case Tools.Errors.Socket:
-                    // TODO : handle case : connection could not be closed
-                    Debug.Log(string.Format("Errors.Socket"));
-                    break;
-                case Tools.Errors.Unknown:
-                    break;
-                case Tools.Errors.Format:
-                    break;
-                case Tools.Errors.ConfigFile:
-                    break;
-                case Tools.Errors.Receive:
-                    break;
-                case Tools.Errors.Data:
-                    break;
-                case Tools.Errors.ToBeDetermined:
-                    break;
-                case Tools.Errors.Permission:
-                    break;
-                default:
-                    // TODO : handle case : default
-                    Debug.Log(string.Format("Errors.Unknown"));
-                    break;
-            }
+            ClientAsync.Disconnection(socket);
+            ClientAsync.connectDone.WaitOne();
+
+            socket = null;
+            isConnected = false;
         }
 
-        public bool CommunicationWithoutResult(Tools.IdMessage typeMessage, string[] values)
+        public void StartListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
-            if (Communication.Instance.Socket == null)
-                 ConnectedToServer();
+            if(!isConnected)
+                LancementConnexion();
 
-            Packet original = new Packet();
-            var error_value = Communication.Instance.Socket.Communication(ref original, typeMessage, values);
-            bool res = false;
-
-            switch (error_value)
-            {
-                case Tools.Errors.None:
-                    if (original.Error == Tools.Errors.None)
-                        Debug.Log("None");
-                        res = true;
-                    break;
-                case Tools.Errors.Format: // == Errors.Receive ?
-                                          // TODO : handle case : wrong format
-                    Debug.Log(string.Format("Errors.Format"));
-                    break;
-                case Tools.Errors.Socket:
-                    // TODO : handle case : connection error
-                    Debug.Log(string.Format("Errors.Socket"));
-                    break;
-                case Tools.Errors.Data:
-                    // TODO : handle case : error while getting the packet ready
-                    Debug.Log(string.Format("Errors.Data"));
-                    break;
-                case Tools.Errors.Receive:
-                    // TODO : handle case : error while receiving an answer
-                    Debug.Log(string.Format("Errors.Receive"));
-                    break;
-                case Tools.Errors.Unknown:
-                    break;
-                case Tools.Errors.ConfigFile:
-                    break;
-                case Tools.Errors.ToBeDetermined:
-                    break;
-                case Tools.Errors.Permission:
-                    break;
-                default:
-                    // TODO : handle case : default
-                    Debug.Log(string.Format("Errors.Unknown"));
-                    break;
-            }
-
-            return res;
+            ClientAsync.OnPacketReceived += pointeurFonction;
+            ClientAsync.Receive();
+        }
+        public void StopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
+        {
+            ClientAsync.OnPacketReceived -= pointeurFonction;
+            ClientAsync.StopListening(socket);
         }
 
-        public Packet CommunicationWithResult(Tools.IdMessage typeMessage, string[] values)
+
+        public void SendAsync(Packet packet)
         {
-            if (Communication.Instance.Socket == null)
-                ConnectedToServer();
-
-            Packet original = new Packet();
-            Communication.Instance.Socket.Communication(ref original, typeMessage, values);
-
-            return original;
+            ClientAsync.Send(packet);
         }
-
     }
-
 }

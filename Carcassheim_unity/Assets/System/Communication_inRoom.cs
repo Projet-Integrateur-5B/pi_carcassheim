@@ -27,6 +27,7 @@ namespace system
         private int _timer; // En secondes
         private int _timer_max_joueur; // En secondes
         private int _meeples; // Nombre de meeples par joueur
+        private Socket? socket;
 
         private void ReceiveRoomSettings(Packet _packet)
         {
@@ -73,10 +74,6 @@ namespace system
             }
         }
 
-        private void OnPacketReceived(Packet packet)
-        {
-
-        }
 
         // Start is called before the first frame update
         void Start()
@@ -84,9 +81,9 @@ namespace system
             // ======================
             // ==== DANS LE MENU ====
             // ======================
-
+            /*
             Packet packet = new Packet();
-
+            
             var errorValue = Client.Communication(socket, ref packet, Tools.IdMessage.PlayerJoin, Array.Empty<string>());
             CheckErrorSocketConnect(errorValue);
             Client.Disconnection(socket);
@@ -101,7 +98,7 @@ namespace system
 
             ClientAsync.OnPacketReceived += OnPacketReceived;
             ClientAsync.Receive();
-
+            */
             
             /*
             Action listening = () =>

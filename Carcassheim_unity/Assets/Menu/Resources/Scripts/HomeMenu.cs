@@ -45,7 +45,7 @@ public class HomeMenu : Miscellaneous
 	{
 
 		//TODO il manque le changement de la view
-		Communication.Instance.DisconnectToServer();
+		Communication.Instance.LancementDeconnexion();
 		Application.Quit();
 	}
 }

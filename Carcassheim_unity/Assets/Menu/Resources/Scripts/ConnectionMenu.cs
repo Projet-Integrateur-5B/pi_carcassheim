@@ -2,11 +2,20 @@ using UnityEngine;
 using UnityEngine.UI;
 using Assets.System;
 using ClassLibrary;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Threading;
 
 public class ConnectionMenu : Miscellaneous
 {
 	private Transform coMenu, CMCI; // Account Menu Container InputField
 	private InputField loginCM, passwordCM;
+	private GameObject tmpGO;
+	private Text tmpText;
+
+	public List<bool> listAction;
+	public Semaphore s_listAction;
+	
 	void Start()
 	{
 		coMenu = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform;
@@ -14,6 +23,13 @@ public class ConnectionMenu : Miscellaneous
 		loginCM = CMCI.GetChild(0).GetComponent<InputField>();
 		passwordCM = CMCI.GetChild(1).GetComponent<InputField>();
 		passwordCM.inputType = InputField.InputType.Password; // Hide password by default
+
+		listAction = new List<bool>();
+		s_listAction = new Semaphore(1, 1);
+
+
+		/* Commuication Async */
+		Communication.Instance.StartListening(OnPacketReceived);
 	}
 
 	public void ResetWarningTextCM()
@@ -29,11 +45,14 @@ public class ConnectionMenu : Miscellaneous
 		HidePopUpOptions();
 		ResetWarningTextCM();
 		ChangeMenu("ConnectionMenu", "HomeMenu");
+
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ForgottenPwdUser()
 	{
-		Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
+		
 	}
 
 	public void ToggleValueChangedCM(Toggle curT)
@@ -57,6 +76,9 @@ public class ConnectionMenu : Miscellaneous
 		tmpText.text = "Connectez vous";
 		HidePopUpOptions();
 		ChangeMenu("ConnectionMenu", "AccountMenu");
+
+		/* Stop la reception dans cette class */
+		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void InputFieldEndEdit(InputField inp)
@@ -66,22 +88,65 @@ public class ConnectionMenu : Miscellaneous
 
 	public void Connect()
 	{
-		string[] values = new[] { RemoveLastSpace(loginCM.text), RemoveLastSpace(passwordCM.text) };
-		bool res = Communication.Instance.CommunicationWithoutResult(Tools.IdMessage.Login, values);
-		Debug.Log("res : " + res);
-		SetState(res);
-		Debug.Log("GetState() : " + GetState());
-		GameObject tmpGO = GameObject.Find("Instructions");
-		Text tmpText = tmpGO.GetComponent<Text>();
-		if (GetState())
-		{
-			HideConnection();
-			Connected();
-		}
-		else
-		{
-			tmpGO.GetComponent<Text>().color = Color.yellow;
-			tmpText.text = "Ressaisissez votre login et votre mot de passe !";
-		}
+
+		Packet packet = new Packet();
+		packet.IdMessage = Tools.IdMessage.Login;
+		packet.IdPlayer = 0;
+		packet.Data = new[] { RemoveLastSpace(loginCM.text), RemoveLastSpace(passwordCM.text) };
+
+		tmpGO = GameObject.Find("Instructions");
+		tmpText = tmpGO.GetComponent<Text>();
+
+		Communication.Instance.SendAsync(packet);
 	}
+
+	public void OnPacketReceived(object sender, Packet packet)
+    {
+
+		bool res = false;
+		if(packet.IdMessage == Tools.IdMessage.Login)
+        {
+			if(packet.Error == Tools.Errors.None)
+            {
+				Communication.Instance.idClient = packet.IdPlayer;
+				res = true;
+			}
+
+			s_listAction.WaitOne();
+			listAction.Add(res);
+			s_listAction.Release();
+		}
+    }
+
+    private void Update()
+    {
+		s_listAction.WaitOne();
+        int taille = listAction.Count;
+		s_listAction.Release();
+
+		if(taille > 0)
+        {
+			for (int i = 0; i < taille; i++)
+			{
+				s_listAction.WaitOne();
+				SetState(listAction[i]);
+				s_listAction.Release();
+			}
+
+			s_listAction.WaitOne();
+			listAction.Clear();
+			s_listAction.Release();
+
+			if (GetState())
+			{
+				HideConnection();
+				Connected();
+			}
+			else
+			{
+				tmpGO.GetComponent<Text>().color = Color.yellow;
+				tmpText.text = "Ressaisissez votre login et votre mot de passe !";
+			}
+		}
+    }
 }
