@@ -513,7 +513,7 @@ namespace system
             // Si placement légal, on le sauvegarde
             if (isPionPlacementLegal(idTuile, slotPos, idPlayer))
             {
-                string[] posPion = { idPlayer.ToString(), idTuile.ToString(), slotPos.ToString() };
+                string[] posPion = new string[] { idPlayer.ToString(), idTuile.ToString(), slotPos.ToString() };
                 _s_posPionTourActu.WaitOne();
                 _posPionTourActu = posPion;
                 _s_posPionTourActu.Release();
@@ -545,6 +545,13 @@ namespace system
             _s_posTuileTourActu.WaitOne();
             _posTuileTourActu.SetNonExistent();
             _s_posTuileTourActu.Release();
+        }
+
+        public void RetirerPionTourActu()
+        {
+            _s_posPionTourActu.WaitOne();
+            _posPionTourActu = new string[] { };
+            _s_posPionTourActu.Release();
         }
 
         /// <summary>

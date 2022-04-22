@@ -320,7 +320,7 @@ namespace system
                         break;
                     }
 
-                    // Dans le cas où aucune tuile n'a pas été placée auparavant ou qu'un pion est déjà placé,
+                    // Dans le cas où aucun pion n'a pas été placée auparavant ou qu'un pion est déjà placé,
                     // on renvoie une erreur Permission                 
                 }
 
@@ -364,6 +364,37 @@ namespace system
 
             return errors; 
         }
+
+        public Tools.Errors CancelPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de jeu pour trouver celui qui gère la partie cherchée
+
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
+                {
+                    // Vérification qu'un pion a bien été placée auparavant
+                    if (thread_serv_ite.Get_posPionTourActu().Length != 0)
+                    {
+                        // Retrait de la position du pion
+                        thread_serv_ite.RetirerPionTourActu();
+                        errors = Tools.Errors.None;
+                        break;
+                    }
+
+                    // Dans le cas où aucun pion n'a été placée auparavant ou qu'un pion est toujours placé,
+                    // on renvoie une erreur Permission                 
+                }
+
+            }
+
+            return errors;
+        }
+
 
         public void PlayerCheated(ulong idPlayer, Socket? playerSocket, string idRoom)
         {

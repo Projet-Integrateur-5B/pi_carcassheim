@@ -802,22 +802,22 @@ public partial class Server
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void CancelPionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
+    public static Tools.Errors CancelPionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                Error = Tools.Errors.BadPort
-            };
-            return;
+            return Tools.Errors.BadPort;
         }
 
-        _ = packetReceived;
-        // cancel le placement du pion qui avais été validé par le joueur
-        packet.Error = Tools.Errors.None; // remplacer par Permission si aucune erreur sinon par Unknown
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        // Vérification du coup
+        Tools.Errors errors = gestionnaire.CallCancelPionPlacement(packetReceived.IdPlayer, socket, packetReceived.Data[0]);
+
+        return errors;
     }
 }
