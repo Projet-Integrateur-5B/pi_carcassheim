@@ -105,10 +105,10 @@ public partial class Server
                 packet.Error = PionPlacement(state.Packet, socket);
                 break;
             case Tools.IdMessage.CancelTuilePlacement:
-                CancelTuilePlacement(state.Packet, ref packet, socket);
+                packet.Error = CancelTuilePlacement(state.Packet, ref packet, socket);
                 break;
             case Tools.IdMessage.CancelPionPlacement:
-                CancelPionPlacement(state.Packet, ref packet, socket);
+                packet.Error = CancelPionPlacement(state.Packet, ref packet, socket);
                 break;
 
             case Tools.IdMessage.Default:
