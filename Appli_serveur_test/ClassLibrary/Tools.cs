@@ -57,13 +57,14 @@ public static class Tools
         RoomStart = 15,
         TuileDraw = 16,
         TuilePlacement = 17,
-        PionPlacement = 18,
-        CancelTuilePlacement = 19,
-        CancelPionPlacement = 20,
-        TourValidation = 21,
-        TimerExpiration = 22,
-        PlayerCheat = 23,
-        EndGame = 24
+        TuileVerification = 18,
+        PionPlacement = 19,
+        CancelTuilePlacement = 20,
+        CancelPionPlacement = 21,
+        TourValidation = 22,
+        TimerExpiration = 23,
+        PlayerCheat = 24,
+        EndGame = 25
     }
 
     public enum PlayerStatus
