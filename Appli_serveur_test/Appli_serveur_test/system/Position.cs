@@ -15,6 +15,23 @@
             _rot = rot;
         }
 
+        public bool IsExisting()
+        {
+            if(_x == -1 && _y == -1 && _rot == -1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public void SetNonExistent()
+        {
+            _x = -1;
+            _y = -1;
+            _rot = -1;
+        }
+
         public override string ToString()
         {
             return _x.ToString() + _y.ToString() + _rot.ToString();
