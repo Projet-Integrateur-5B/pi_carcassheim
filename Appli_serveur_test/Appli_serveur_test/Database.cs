@@ -54,7 +54,7 @@ public class Database
         connection.Close();
     }
     
-    public async Task<string[]> ExecuteCommandeWithResult(string commande,object[] parametres)
+    public async Task<object[]> ExecuteCommandeWithResult(string commande,object[] parametres)
     {
         await using NpgsqlConnection connection = this.Connect();
         await connection.OpenAsync();
@@ -77,7 +77,7 @@ public class Database
                     int  j;
                     for ( j = 0; j < tailleRow; j++)
                     {
-                        res.Add(reader.GetString(j));
+                        res.Add(reader[j]);
                     }
                     
                 }
@@ -85,10 +85,10 @@ public class Database
         }
 
         connection.Close();
-        return (string[])res.ToArray(typeof(string));
+        return (object[])res.ToArray();
     }
     
-    public void IncrementeNbParties(ulong idu)
+    /*public void IncrementeNbParties(ulong idu)
     {
         string commande = "update Utilisateur set NbParties =  NbParties + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -127,7 +127,7 @@ public class Database
         string commande = "update Utilisateur set XP =  Defaites + 1 where IDU = @pIDU;";
         string[] parametres = new[] {"pCUREXP",CurExp.ToString(),"pLVL",lvl.ToString(), idu.ToString()};
         ExecuteCommandeModification(commande,parametres);
-    }
+    }*/
     
     int GetAge(string DateNaiss)
     {
@@ -137,7 +137,7 @@ public class Database
         return age;
     }
     
-    public int idPartieLibre()
+    /*public int idPartieLibre()
     {
         string commande = "select count(*) from table Partie;";
         string[] parametres = Array.Empty<string>();
@@ -150,24 +150,24 @@ public class Database
         }
         
         return 0;
-    }
+    }*/
     
     public string GetPseudo(ulong idu)
     {
         string commande = "select Pseudo from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
-        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+        Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
         
         int nbResult = res.Result.Length;
         if (nbResult > 0)
         {
-            return res.Result[0];
+            return res.Result[0].ToString();
         }
         
         return "";
     }
     
-    public string GetPhoto(ulong idu)
+    /*public string GetPhoto(ulong idu)
     {
         string commande = "select Photo from table Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
@@ -242,7 +242,7 @@ public class Database
         return 0;
     }
     
-    public void Drop(string tableName)
+    /*public void Drop(string tableName)
     {
         string commande = "DROP Table @pTABLENAME;";
         string[] parametres = new[] {"pTABLENAME", tableName};
@@ -253,17 +253,17 @@ public class Database
     {
         Drop("PartieExt");
         Drop("Partie");
-    }
+    }*/
     
     public long Identification(string login, string mdp)
     {
         string commande = "SELECT IDU FROM Utilisateur WHERE Pseudo = @pLOGIN AND MDP = @pMDP;";
         object[] parametres = new object[] {"pLOGIN", login, "pMDP", mdp};
-        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+        Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         if (res.Result.Length == 0)
             return -1;
-        return long.Parse(res.Result[1]);
+        return (long)res.Result[1];
     }
     
     public void Adduser(string Pseudo, string MDP, string Mail, int Xp, int Niveau, int Victoires, int Defaites, int Nbparties, string DateNaiss)
@@ -282,7 +282,7 @@ public class Database
         }
     }
     
-    public void AddExtension(string Nom)
+    /*public void AddExtension(string Nom)
     {
         string commande = "INSERT INTO Extension (Nom) VALUES( @pNOM);";
         string[] parametres = new[] {"pNOM", Nom};
@@ -315,13 +315,13 @@ public class Database
         if (res.Result.Length == 0)
             return -1;
         return long.Parse(res.Result[0]);
-    }
+    }*/
     
     public void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
         string commande = "SELECT T.IDT,M.Proba FROM Tuile T,Modele M where T.IDM = M.IDM;";
         string[] parametres = Array.Empty<string>();
-        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+        Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         int taille = res.Result.Length;
         int i;
@@ -344,9 +344,16 @@ public class Database
     {
         string commande = "select XP,Niveau,Victoires,Defaites,Nbparties, from Utilisateur where IDU = @pIDU;";
         string[] parametres = new[] {"pIDU", idu.ToString()};
-        Task<string[]> res = ExecuteCommandeWithResult(commande, parametres);
+        Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
         
-        return res.Result.Length == 0 ? Array.Empty<string>() : res.Result.ToArray();
+        return ToStringArray(res.Result);
     }
     
+    public static string[] ToStringArray(object[] array, bool includeNulls = false, string nullValue = "")
+    {
+        IEnumerable<object> enumerable = array;
+        if (!includeNulls)
+            enumerable = enumerable.Where(e => e != null);
+        return enumerable.Select(e => (e ?? nullValue).ToString()).ToArray();
+    }
 }
