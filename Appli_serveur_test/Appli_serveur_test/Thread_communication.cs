@@ -20,8 +20,6 @@ namespace system
         private List<int> _id_parties_gerees;
         private List<Thread_serveur_jeu> _lst_serveur_jeu;
 
-        private static int _compteur_id_thread_com;
-
         // Locks
 
         private readonly object _lock_nb_parties_gerees;
@@ -126,6 +124,31 @@ namespace system
 
         }
 
+        public void DeleteGame(string roomId)
+        {
+            int indexOfRoom = 0;
+            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
+            {
+                if (thread_serv_ite.Get_ID() == Int32.Parse(roomId))
+                {
+                    lock (_lock_nb_parties_gerees)
+                    {
+                        _nb_parties_gerees--;
+                    }
+                    lock (_lock_id_parties_gerees)
+                    {
+                        var idToRemove = _id_parties_gerees.Single(id => id.Equals(roomId));
+                        _id_parties_gerees.Remove(idToRemove);
+                    }
+                    break;
+                }
+
+                indexOfRoom++;
+            }
+
+            _lst_serveur_jeu.RemoveAt(indexOfRoom);
+        }
+
         public void TransmitStartToAll(int roomId)
         {
             Packet packet = new Packet();
@@ -196,7 +219,38 @@ namespace system
 
                         // Lancement de l'écoute de la réponse du joueur modérateur
                         ClientAsync.OnPacketReceived += OnPacketReceived;
-                        ClientAsync.Receive(socket);
+                        ClientAsync.Receive(joueur.Value._socket_of_player);
+                    }
+
+                    break;
+                }
+            }
+
+        }
+
+        public void SendEndGame(string idRoom, ulong idPlayerWinner)
+        {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.EndGame;
+            packet.Type = true;
+
+            packet.Data = new string[] { idPlayerWinner.ToString() };
+
+            // Envoi de l'information à tous les joueurs
+            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+
+                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
+                    {
+                        ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                        // Lancement de l'écoute de la réponse du joueur
+                        ClientAsync.OnPacketReceived += OnPacketReceived;
+                        ClientAsync.Receive(joueur.Value._socket_of_player);
+
+                        // TODO : Rajouter un disconnect ?
                     }
 
                     break;
@@ -449,10 +503,20 @@ namespace system
                     {
                         // Fin du tour actuel
                         Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
-                        // Envoie des 3 tuiles au suivant
-                        thread_serv_ite.ShuffleTilesGame();
-                        SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), nextPlayerSocket, idRoom);
-
+                        // Mise à jour du status de la game
+                        Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+                        if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
+                        {
+                            ulong idPlayerWinner = thread_serv_ite.GetWinner();
+                            SendEndGame(idRoom, idPlayerWinner);
+                            DeleteGame(idRoom);
+                        }
+                        else // Si la partie n'est pas terminée
+                        {
+                            // Envoie des 3 tuiles au suivant
+                            thread_serv_ite.ShuffleTilesGame();
+                            SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), nextPlayerSocket, idRoom);
+                        }
 
                         return Tools.Errors.None;
                     }

@@ -134,6 +134,25 @@ namespace system
             return _idTuileChoisie;
         }
 
+        public ulong GetWinner()
+        {
+            uint scoreMax = 0;
+            ulong winner = _id_moderateur;
+
+            _s_dico_joueur.WaitOne();
+            foreach(var player in _dico_joueur)
+            {
+                if(player.Value._score > scoreMax)
+                {
+                    winner = player.Key;
+                    scoreMax = player.Value._score;
+                }
+            }
+            _s_dico_joueur.Release();
+
+            return winner;
+        }
+
         public uint NbJoueurs
         {
             get { return this._nombre_joueur; }
@@ -612,6 +631,34 @@ namespace system
             _s_posPionTourActu.WaitOne();
             _posPionTourActu = new string[] { };
             _s_posPionTourActu.Release();
+        }
+
+        public Tools.GameStatus UpdateGameStatus()
+        {
+            Tools.GameStatus statutGame = Tools.GameStatus.Running;
+
+            // Update suivant le mode de jeu
+            switch (_mode)
+            {
+                case Tools.Mode.Default:
+                    if(_tuilesGame.Count == 0)
+                    {
+                        statutGame = Tools.GameStatus.Stopped;
+                    }
+                    break;
+                case Tools.Mode.TimeAttack:
+
+                    //TODO
+
+                    break;
+                case Tools.Mode.Score:
+
+                    //TODO
+
+                    break;
+            }
+
+            return statutGame;
         }
 
         public void RetirerTuileGame(ulong idTuile)
