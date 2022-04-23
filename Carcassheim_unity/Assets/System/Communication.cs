@@ -11,8 +11,9 @@ namespace Assets.System
         
         private static Communication _instance;
 
-        private int port;
+        private int port = -1;
         public ulong idClient = 0;
+        public int idRoom = -1;
 
         private Socket[] lesSockets = {null,null};
         private bool[] isConnected = {false,false};
@@ -47,10 +48,15 @@ namespace Assets.System
             TextAsset contents = Resources.Load<TextAsset>("network/config");
             Parameters parameters = JsonConvert.DeserializeObject<Parameters>(contents.ToString());
 
+            if (port != -1)
+                parameters.ServerPort = port;
+
             ClientAsync.Connection(parameters);
             ClientAsync.connectDone.WaitOne();
 
             isConnected[isInRoom] = true;
+
+            Debug.Log("Comm réussi : " + parameters.ServerPort);
         }
 
         public void LancementDeconnexion()
@@ -80,12 +86,34 @@ namespace Assets.System
 
         public void SendAsync(Packet packet)
         {
-            ClientAsync.Send(lesSockets[isInRoom],packet);
+            if (!isConnected[isInRoom])
+                LancementConnexion();
+            if(lesSockets[isInRoom] != null)
+                ClientAsync.Send(lesSockets[isInRoom],packet);
         }
 
         public void SetSocket(Socket socket)
         {
             lesSockets[isInRoom] = socket;
+        }
+
+        public void SetPort(int port)
+        {
+            if (port > 0)
+                this.port = port;
+
+        }
+
+        public void SetRoom(int idRoom)
+        {
+            if (idRoom > 0)
+                this.idRoom = idRoom;
+
+        }
+
+        public void SetIsInRoom(int isInRoom)
+        {
+            this.isInRoom = isInRoom;
         }
     }
 }

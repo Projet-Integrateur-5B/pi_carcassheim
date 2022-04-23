@@ -38,25 +38,26 @@ public class ClientAsync
     //public static Socket clientSocket { get; private set; }
 
     // ManualResetEvent instances signal completion.
-    public static ManualResetEvent connectDone =
-        new ManualResetEvent(false);
+    public static ManualResetEvent connectDone = new ManualResetEvent(false);
+
 
     public delegate void OnPacketReceivedHandler(object sender, Packet packet);
     public static event OnPacketReceivedHandler OnPacketReceived;
 
-
-
     public static void Connection(Parameters parameters)
     {
+        connectDone.Reset();
+
         //Version : Unity
         IPAddress ipAddress = IPAddress.Parse(parameters.ServerIP);
         var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);
-
+        Debug.Log("remoteEP : "+ parameters.ServerPort);
         // Create a TCP/IP socket.
         Socket clientSocket = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);
 
         Communication.Instance.SetSocket(clientSocket);
+        Debug.Log("OK SOCKET");
 
         // Connect to the remote endpoint.
         clientSocket.BeginConnect(remoteEP,

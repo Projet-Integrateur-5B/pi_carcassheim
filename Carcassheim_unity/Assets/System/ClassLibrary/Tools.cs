@@ -42,31 +42,36 @@ namespace ClassLibrary
         public enum IdMessage : byte
         {
             Default = 0,
-            Login = 1,
-            Logout = 2,
-            Signup = 3,
-            Statistics = 4,
-            RoomList = 5,
-            RoomCreate = 6,
-            PlayerJoin = 7,
-            PlayerLeave = 8,
-            PlayerReady = 9,
-            PlayerKick = 10,
-            PlayerList = 11,
-            PlayerNext = 12,
-            RoomSettingsGet = 13,
-            RoomSettingsSet = 14,
-            RoomStart = 15,
-            TuileDraw = 16,
-            TuilePlacement = 17,
-            TuileVerification = 18,
-            PionPlacement = 19,
-            CancelTuilePlacement = 20,
-            CancelPionPlacement = 21,
-            TourValidation = 22,
-            TimerExpiration = 23,
+
+            AccountSignup = 1,
+            AccountLogin = 2,
+            AccountLoginLogout = 3,
+            AccountStatistics = 4,
+
+            RoomList = 10,
+            RoomCreate = 11,
+            RoomSettingsGet = 12,
+            RoomSettingsSet = 13,
+
+            PlayerJoin = 20,
+            PlayerLeave = 21,
+            PlayerKick = 22,
+            PlayerReady = 23,
             PlayerCheat = 24,
-            EndGame = 25
+            PlayerList = 25,
+            PlayerNext = 26,
+
+            GameStart = 30,
+            EndGame = 31,
+            EndTurn = 32,
+            TimerPlayer = 33,
+
+            TuileDraw = 40,
+            TuilePlacement = 41,
+            TuileVerification = 42,
+            PionPlacement = 43,
+            CancelTuilePlacement = 44,
+            CancelPionPlacement = 45
         }
 
         public enum PlayerStatus

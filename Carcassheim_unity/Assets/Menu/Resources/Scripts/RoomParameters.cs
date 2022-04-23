@@ -20,7 +20,6 @@ public class RoomParameters : Miscellaneous
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomParametersMenu", "PublicRoomMenu");
-		Communication.Instance.isInRoom = 1;
 	}
 
 	public void ToggleValueChangedRPM(Toggle curT)
