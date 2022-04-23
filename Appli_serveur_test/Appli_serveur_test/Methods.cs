@@ -586,14 +586,15 @@ public partial class Server
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static Tools.Errors GameStart(Packet packetReceived, ref Packet packet, Socket socket)
+    public static void GameStart(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            return Tools.Errors.BadPort;
+            packet.Error = Tools.Errors.BadPort;
+            return;
         }
         
         // Récupération du singleton gestionnaire
@@ -602,7 +603,7 @@ public partial class Server
         // Attemp to start the game.
         Tools.Errors errors = gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer, socket);
 
-        return errors;
+        packet.Error = errors;
     }
     /// <summary>
     ///     Ends the game.
