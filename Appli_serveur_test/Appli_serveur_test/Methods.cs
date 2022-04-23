@@ -364,6 +364,11 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
+        
+        if (packetReceived.Data.Length < 8)
+        {
+            packet.Error = Tools.Errors.BadData;
+        }
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
