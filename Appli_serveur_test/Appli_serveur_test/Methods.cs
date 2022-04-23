@@ -327,6 +327,7 @@ public partial class Server
         if (packetReceived.Data.Length < 1)
         {
             packet.Error = Tools.Errors.BadData;
+            return;
         }
 
         // Récupération du singleton gestionnaire
@@ -368,6 +369,7 @@ public partial class Server
         if (packetReceived.Data.Length < 8)
         {
             packet.Error = Tools.Errors.BadData;
+            return;
         }
 
         // Récupération du singleton gestionnaire
@@ -400,6 +402,7 @@ public partial class Server
         if (packetReceived.Data.Length < 1)
         {
             packet.Error = Tools.Errors.BadData;
+            return;
         }
 
         // Récupération du singleton gestionnaire
@@ -442,6 +445,7 @@ public partial class Server
         if (packetReceived.Data.Length < 1)
         {
             packet.Error = Tools.Errors.BadData;
+            return;
         }
         
         // Récupération du singleton gestionnaire
@@ -479,6 +483,7 @@ public partial class Server
         if (packetReceived.Data.Length < 2)
         {
             packet.Error = Tools.Errors.BadData;
+            return;
         }
         
         // Récupération du singleton gestionnaire
@@ -529,6 +534,7 @@ public partial class Server
         if (packetReceived.Data.Length < 1)
         {
             packet.Error = Tools.Errors.BadData;
+            return;
         }
         
         // Récupération du singleton gestionnaire
