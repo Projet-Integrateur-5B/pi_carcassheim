@@ -150,7 +150,7 @@ namespace system
         public void TransmitStartToAll(int roomId)
         {
             Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.RoomStart;
+            packet.IdMessage = Tools.IdMessage.StartGame;
             packet.Type = true;
 
             foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
@@ -775,7 +775,7 @@ namespace system
                         DrawAntiCheatVerif(packet.Data[0], false, (ulong)0, new Position(-1,-1,-1));
                         break;
 
-                    case Tools.IdMessage.RoomStart:
+                    case Tools.IdMessage.StartGame:
                         // TODO : Check s'il renvoit des erreurs
                         break;
                 }

@@ -40,15 +40,15 @@ public partial class Server
 
         switch (state.Packet.IdMessage)
         {
-            case Tools.IdMessage.Signup:
+            case Tools.IdMessage.AccountSignup:
                 AccountSignup(state.Packet, ref packet, socket);
                 break;
-            case Tools.IdMessage.Login:
+            case Tools.IdMessage.AccountLogin:
                 AccountLogin(state.Packet, ref packet, socket);
                 break;
-            case Tools.IdMessage.Logout: // impossible
+            case Tools.IdMessage.AccountLogout: // impossible
                 break;
-            case Tools.IdMessage.Statistics:
+            case Tools.IdMessage.AccountStatistics:
                 AccountStatistics(state.Packet, ref packet, socket);
                 break;
 
@@ -81,17 +81,17 @@ public partial class Server
                 PlayerCheat(state.Packet, ref packet, socket);
                 break;
 
-            case Tools.IdMessage.RoomStart:
+            case Tools.IdMessage.StartGame:
                 GameStart(state.Packet, ref packet, socket);
                 break;
             case Tools.IdMessage.EndGame:
                 GameEnd(state.Packet, ref packet, socket);
                 break;
             
-            case Tools.IdMessage.TourValidation:
+            case Tools.IdMessage.EndTurn:
                 EndTurn(state.Packet, ref packet, socket);
                 break;
-            case Tools.IdMessage.TimerExpiration:
+            case Tools.IdMessage.TimerPlayer:
                 TimerPlayer(ref packet, socket, "0", 0); // TODO : fix param
                 break;
 
@@ -671,7 +671,7 @@ public partial class Server
         // Attempt to stop the timer and close the round.
         gestionnaire.PlayerTimer(idRoom, idPlayer);
         
-        packet.IdMessage = Tools.IdMessage.TimerExpiration;
+        packet.IdMessage = Tools.IdMessage.TimerPlayer;
     }
     
     

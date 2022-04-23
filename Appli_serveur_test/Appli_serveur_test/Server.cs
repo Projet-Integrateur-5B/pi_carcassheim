@@ -293,7 +293,7 @@ public static partial class Server
                     "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
 
         // The client asked for a disconnection.
-        if (state.Packet.IdMessage == Tools.IdMessage.Logout)
+        if (state.Packet.IdMessage == Tools.IdMessage.AccountLogout)
         {
             Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
             DisconnectFromClient(ar);

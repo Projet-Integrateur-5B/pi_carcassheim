@@ -44,7 +44,7 @@ public static class Tools
         
         AccountSignup = 1,
         AccountLogin = 2,
-        AccountLoginLogout = 3,
+        AccountLogout = 3,
         AccountStatistics = 4,
         
         RoomList = 10,
@@ -60,7 +60,7 @@ public static class Tools
         PlayerList = 25,
         PlayerNext = 26,
         
-        GameStart = 30,
+        StartGame = 30,
         EndGame = 31,
         EndTurn = 32,
         TimerPlayer = 33,
