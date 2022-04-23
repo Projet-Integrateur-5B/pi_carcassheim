@@ -30,7 +30,8 @@ public static class Tools
         RoomSettings = 12,
         PlayerReady = 20,
         BadPort = 21,
-        IllegalPlay = 22,
+        BadData = 22,
+        IllegalPlay = 23,
         ToBeDetermined = 999
     }
 

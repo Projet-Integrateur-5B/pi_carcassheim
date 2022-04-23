@@ -323,6 +323,11 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
+        
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
+        }
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
@@ -386,6 +391,11 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
+        
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
+        }
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
@@ -424,6 +434,11 @@ public partial class Server
             return;
         }
         
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
+        }
+        
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
@@ -454,6 +469,11 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
+        }
+        
+        if (packetReceived.Data.Length < 2)
+        {
+            packet.Error = Tools.Errors.BadData;
         }
         
         // Récupération du singleton gestionnaire
@@ -499,6 +519,11 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
+        }
+
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
         }
         
         // Récupération du singleton gestionnaire
