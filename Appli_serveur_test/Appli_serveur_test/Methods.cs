@@ -135,6 +135,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -152,6 +153,7 @@ public partial class Server
             Console.WriteLine("ERROR: Signup : " + ex);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.Database
             };
         }
@@ -171,6 +173,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -194,6 +197,7 @@ public partial class Server
             Console.WriteLine("ERROR: Login : " + ex);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.Database
             };
         }
@@ -213,6 +217,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -230,6 +235,7 @@ public partial class Server
             Console.WriteLine("ERROR: Statistics : " + ex);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.Database
             };
         }
@@ -252,6 +258,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -295,6 +302,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -334,6 +342,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -371,6 +380,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -400,6 +410,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -437,6 +448,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -452,6 +464,7 @@ public partial class Server
             // Something went wrong.
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.RoomLeave
             };
         }
@@ -473,6 +486,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -492,6 +506,7 @@ public partial class Server
             // Something went wrong.
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.RoomLeave
             };
             return;
@@ -504,6 +519,7 @@ public partial class Server
             // Something went wrong.
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.RoomLeave
             };
         }
@@ -524,6 +540,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -539,6 +556,7 @@ public partial class Server
             // Something went wrong.
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.RoomLeave
             };
         }
@@ -570,6 +588,7 @@ public partial class Server
             // Something went wrong.
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.ToBeDetermined
             };
         }
@@ -619,6 +638,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -650,6 +670,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
@@ -698,6 +719,7 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet = new Packet
             {
+                IdMessage = packet.IdMessage,
                 Error = Tools.Errors.BadPort
             };
             return;
