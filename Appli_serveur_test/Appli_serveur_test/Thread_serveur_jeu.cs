@@ -426,6 +426,25 @@ namespace system
             _AC_barrierAllVerifDone.Dispose();
         }
 
+        public bool EveryoneIsReady()
+        {
+            bool result = true;
+
+            _s_dico_joueur.WaitOne();
+            foreach(var player in _dico_joueur)
+            {
+                // Vérifie que tous les joueurs autres que le modérateur soient prêts
+                if(player.Value._is_ready == false && player.Value._id_player != _id_moderateur)
+                {
+                    result = false;
+                    break;
+                }
+            }
+            _s_dico_joueur.Release();
+
+            return result;
+        }
+
         // =======================
         // Méthodes moteur de jeu
         // =======================

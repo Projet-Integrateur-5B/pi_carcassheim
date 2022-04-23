@@ -353,8 +353,10 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
 
-        public void StartGame(string idRoom, ulong idPlayer, Socket? playerSocket)
+        public Tools.Errors StartGame(string idRoom, ulong idPlayer, Socket? playerSocket)
         {
+            Tools.Errors errors = Tools.Errors.Permission;
+
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
@@ -363,16 +365,25 @@ namespace system
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     if (idPlayer == thread_serv_ite.Get_Moderateur())
                     {
-                        // Lancement de la game
-                        thread_serv_ite.StartGame();
-                        // Préviens tous les joueurs
-                        thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
-                        // Envoi des 3 tuiles de début de tour
-                        thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GenerateThreeTiles(), playerSocket, idRoom);
-                    }                 
-                    return; // return valeur correcte
+                        if (thread_serv_ite.EveryoneIsReady())
+                        {
+                            // Lancement de la game
+                            thread_serv_ite.StartGame();
+                            // Préviens tous les joueurs
+                            thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
+                            // Envoi des 3 tuiles de début de tour
+                            thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GenerateThreeTiles(), playerSocket, idRoom);
+                            return Tools.Errors.None; // return valeur correcte
+                        }
+                        else // Des joueurs ne sont pas prêts
+                        {
+                            return Tools.Errors.PlayerReady;
+                        }  
+                    }                                 
                 }
             }
+
+            return errors;
         }
         
         /// <summary>
