@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0.42780313, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0.42770147, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1207,11 +1207,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 450522489}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7331606857bdf934d9d75b215200137e, type: 3}
+  m_Script: {fileID: 11500000, guid: 33d3560aa4cce334e9f8e871236c10a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   tile_number: 0
-  players: 
+  players_id: 
   players_names: []
   player_index: 0
   first: 1
