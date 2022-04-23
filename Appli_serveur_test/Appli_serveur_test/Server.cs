@@ -183,7 +183,7 @@ public static partial class Server
         // Accepts an asynchronous connection with a client.
         state.Listener = state.Listener.EndAccept(ar);
         Console.WriteLine("Connection with client is established : " +
-                          state.Listener.RemoteEndPoint);
+                          state.Listener.RemoteEndPoint + " on : " + state.Listener.LocalEndPoint);
 
         // Start listening.
         StartReading(ar, state.Listener, false);
