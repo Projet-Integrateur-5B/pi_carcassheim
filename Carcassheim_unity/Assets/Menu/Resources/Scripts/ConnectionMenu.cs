@@ -90,7 +90,7 @@ public class ConnectionMenu : Miscellaneous
 	{
 
 		Packet packet = new Packet();
-		packet.IdMessage = Tools.IdMessage.Login;
+		packet.IdMessage = Tools.IdMessage.AccountLogin;
 		packet.IdPlayer = 0;
 		packet.Data = new[] { RemoveLastSpace(loginCM.text), RemoveLastSpace(passwordCM.text) };
 
@@ -104,7 +104,7 @@ public class ConnectionMenu : Miscellaneous
     {
 
 		bool res = false;
-		if(packet.IdMessage == Tools.IdMessage.Login)
+		if(packet.IdMessage == Tools.IdMessage.AccountLogin)
         {
 			if(packet.Error == Tools.Errors.None)
             {

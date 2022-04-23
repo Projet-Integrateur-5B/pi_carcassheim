@@ -98,7 +98,7 @@ public class AccountMenu : Miscellaneous
 		if (GetInputFields())
         {
 			Packet packet = new Packet();
-			packet.IdMessage = Tools.IdMessage.Signup;
+			packet.IdMessage = Tools.IdMessage.AccountSignup;
 			packet.IdPlayer = 0;
 			packet.Data  = new[] {
 				RemoveLastSpace(pseudoCA.text),
@@ -124,7 +124,7 @@ public class AccountMenu : Miscellaneous
 	{
 
 		bool res = false;
-		if (packet.IdMessage == Tools.IdMessage.Signup)
+		if (packet.IdMessage == Tools.IdMessage.AccountLogin)
 		{
 			if (packet.Error == Tools.Errors.None)
 			{

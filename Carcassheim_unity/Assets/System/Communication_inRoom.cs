@@ -200,7 +200,7 @@ namespace system
 
         public void OnPacketReceived(object sender,Packet packet) 
         {
-            if (packet.IdMessage == Tools.IdMessage.RoomStart)
+            if (packet.IdMessage == Tools.IdMessage.StartGame)
                 //ToDo changement de page
 
             if (packet.IdMessage == Tools.IdMessage.RoomSettingsSet)

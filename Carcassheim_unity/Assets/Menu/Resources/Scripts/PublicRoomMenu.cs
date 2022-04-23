@@ -25,7 +25,7 @@ public class PublicRoomMenu : Miscellaneous
 	public void Ready(){
 		//Application.OpenURL("https://tinyurl.com/Kakyoin-and-Polnareff");
 		Packet packet = new Packet();
-		packet.IdMessage = Tools.IdMessage.RoomStart;
+		packet.IdMessage = Tools.IdMessage.StartGame;
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.Data = new[] {Communication.Instance.idRoom.ToString()};
 
