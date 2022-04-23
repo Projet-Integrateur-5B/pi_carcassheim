@@ -662,9 +662,9 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        gestionnaire.RoundGame(packetReceived.Data[0], packetReceived.IdPlayer);
-        
-        // TODO : check le retour de RoundGame
+        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.Data[0]);
+
+        packet.Error = errors;
     }
     /// <summary>
     ///     Player's timer has expired.

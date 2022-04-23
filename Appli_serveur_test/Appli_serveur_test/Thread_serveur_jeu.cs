@@ -45,20 +45,20 @@ namespace system
         // Attribut pour le bon fonctionnement du moteur de jeu
 
         private Plateau _plateau;
-        private ulong _id_joueur_actuel; 
+        private uint _offsetActualPlayer; // The offset of the actual player in the _dico_joueur 
         private List<ulong> _tuilesGame; // Totalité des tuiles de la game       
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
+        private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
         private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, idTuile, idSlot}
 
         // Attributs anticheat
         private bool _AC_drawedTilesValid;
-        private int _AC_tileVerificationReceived;
         private Barrier _AC_barrierAllVerifDone;
 
         // Semaphores moteur
         private Semaphore _s_plateau;
-        private Semaphore _s_id_joueur_actuel;
+        private Semaphore _s_offsetActualPlayer;
         private Semaphore _s_tuilesGame;
         private Semaphore _s_tuilesEnvoyees;
         private Semaphore _s_posTuileTourActu; // Position temporaire de la tuile de ce tour
@@ -87,7 +87,10 @@ namespace system
         
         public ulong Get_ActualPlayerId()
         {
-            return this._id_joueur_actuel;
+            _s_dico_joueur.WaitOne();
+            ulong[] idPlayer_array = _dico_joueur.Keys.ToArray();
+            _s_dico_joueur.Release();
+            return idPlayer_array[_offsetActualPlayer];
         }
 
         public Tools.GameStatus Get_Status()
@@ -121,6 +124,15 @@ namespace system
             return _posPionTourActu;
         }
 
+        public void Set_idTuileChoisie(ulong idTuile)
+        {
+            this._idTuileChoisie = idTuile;
+        }
+
+        public ulong Get_idTuileChoisie()
+        {
+            return _idTuileChoisie;
+        }
 
         public uint NbJoueurs
         {
@@ -256,8 +268,18 @@ namespace system
 
         public ulong Get_NextPlayer()
         {
-            // TODO :
-            return 0;
+            // Transforme le dico en array pour récupérer le n-ième joueur
+            _s_dico_joueur.WaitOne();
+            ulong[] idPlayer_array = _dico_joueur.Keys.ToArray();
+            _s_dico_joueur.Release();
+
+            // Incrémente le numéro du joueur actuel (modulo nb_joueurs) et récupère l'idPlayer du nouveau joueur
+            _s_offsetActualPlayer.WaitOne();
+            _offsetActualPlayer = (_offsetActualPlayer + 1) % _nombre_joueur;
+            ulong nextPlayer = idPlayer_array[_offsetActualPlayer];
+            _s_offsetActualPlayer.Release();
+
+            return nextPlayer;
         }
 
         // Constructeur
@@ -284,9 +306,8 @@ namespace system
             _timer_max_joueur = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
 
-            // Initialisation des attributs moteurs
-            _id_joueur_actuel = 0;
-            _s_id_joueur_actuel = new Semaphore(1, 1);
+            // Initialisation des semaphores d'attributs moteurs
+            _s_offsetActualPlayer = new Semaphore(1, 1);
             _tuilesGame = new List<ulong>();
             _s_tuilesGame = new Semaphore(1, 1);
             _s_tuilesEnvoyees = new Semaphore(1, 1);
@@ -461,10 +482,10 @@ namespace system
             ulong[] idPlayer_array = _dico_joueur.Keys.ToArray();
             _s_dico_joueur.Release();
 
-            // Indication du joueur actuel
-            _s_id_joueur_actuel.WaitOne();
-            _id_joueur_actuel = idPlayer_array[_id_joueur_actuel];
-            _s_id_joueur_actuel.Release();
+            // Indication du joueur actuel (commence toujours par le modérateur)
+            _s_offsetActualPlayer.WaitOne();
+            _offsetActualPlayer = 0;
+            _s_offsetActualPlayer.Release();
 
             // Génération des tuiles de la game
             _s_tuilesGame.WaitOne();
@@ -473,7 +494,6 @@ namespace system
 
             // Génération des attributs d'anti cheat
             _AC_drawedTilesValid = false;
-            _AC_tileVerificationReceived = 0;
 
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
@@ -492,7 +512,7 @@ namespace system
         /// Get three tiles' id from the game's list of tile
         /// </summary>
         /// <returns> A array of 3 tiles' id </returns>
-        public string[] GenerateThreeTiles()
+        public string[] GetThreeLastTiles()
         {
             // Génère les 3 tuiles à envoyer
             List<string> tuilesTirees = tirageTroisTuiles(_tuilesGame);
@@ -573,14 +593,67 @@ namespace system
             _s_posPionTourActu.Release();
         }
 
+        public void RetirerTuileGame(ulong idTuile)
+        {
+            _s_tuilesGame.WaitOne();
+            int indexOfTile = -1;
+            for(int i = 0; i<_tuilesGame.Count; i++)
+            {
+                if(_tuilesGame[i] == idTuile)
+                {
+                    indexOfTile = i;
+                }
+            }
+            _tuilesGame.RemoveAt(indexOfTile);
+            _s_tuilesGame.Release();
+        }
+
         /// <summary>
         /// End the turn
         /// </summary>
-        /// <returns> The ID of the next player to play </returns>
-        public ulong EndTurn()
+        /// <returns> The socket of the next player to play </returns>
+        public Socket? EndTurn(ulong idPlayer)
         {
 
-            return 0;
+            // Prise en compte du placement de la tuile et du pion (mise à jour structure de données)
+            _s_plateau.WaitOne();
+            _plateau.PoserTuile(_idTuileChoisie, _posTuileTourActu);
+            try
+            {
+                _plateau.PoserPion(idPlayer, _idTuileChoisie, UInt64.Parse(_posPionTourActu[2]));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: On PoserTuile : " + ex);
+            }          
+            _s_plateau.Release();
+
+
+            // Vérification des fermetures de chemins (mise à jour des points)
+
+
+
+            RetirerTuileGame(_idTuileChoisie);
+
+
+            // Remise à inexistant la tuilePosActu et pionPosActu
+            _s_posTuileTourActu.WaitOne();
+            _posTuileTourActu.SetNonExistent();
+            _s_posTuileTourActu.Release();
+
+            _s_posPionTourActu.WaitOne();
+            _posPionTourActu = new string[] { };
+            _s_posPionTourActu.Release();
+
+            // Passe au joueur suivant
+            ulong nextPlayer = Get_NextPlayer();
+
+            _s_dico_joueur.WaitOne();
+            Socket? nextPlayerSocket = _dico_joueur[nextPlayer]._socket_of_player;
+            _s_dico_joueur.Release();
+
+
+            return nextPlayerSocket;
         }
 
         public void EndGame()

@@ -372,7 +372,7 @@ namespace system
                             // Préviens tous les joueurs
                             thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
                             // Envoi des 3 tuiles de début de tour
-                            thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GenerateThreeTiles(), playerSocket, idRoom);
+                            thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), playerSocket, idRoom);
                             return Tools.Errors.None; // return valeur correcte
                         }
                         else // Des joueurs ne sont pas prêts
@@ -473,6 +473,25 @@ namespace system
             return errors; // return valeur correcte
         }
 
+        public Tools.Errors CallEndTurn(ulong idPlayer, string idRoom)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                {
+                    errors = thread_com_iterateur.Com_EndTurn(idPlayer, idRoom);
+                    break;
+                }
+
+            }
+            return errors; // return valeur correcte
+        }
+
         public void EndGame(string idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
@@ -482,21 +501,6 @@ namespace system
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     thread_serv_ite.EndGame();
-                    return; // return valeur correcte
-                }
-            }
-        }
-        
-        public void RoundGame(string idRoom, ulong idPlayer)
-        {
-            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
-            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
-            {
-                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
-                {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
-                    if (idPlayer == thread_serv_ite.Get_NextPlayer())
-                        thread_serv_ite.Round();
                     return; // return valeur correcte
                 }
             }

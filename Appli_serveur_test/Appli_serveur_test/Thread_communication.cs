@@ -206,7 +206,7 @@ namespace system
         }
 
         // La fonction du joueur dont c'est le tour
-        public void DrawAntiCheatPlayer(string idRoom, ulong idPlayer, Socket? playerSocket)
+        public void DrawAntiCheatPlayer(string idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
         {
             foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
             {
@@ -222,11 +222,15 @@ namespace system
                     {
                         // Les tuiles s'avèrent valides, on a affaire à un tricheur
                         PlayerCheated(idPlayer, playerSocket, idRoom);
+                        // On renvoie les 3 mêmes tuiles
+                        SendTilesRoundStart(tuilesEnvoyees, playerSocket, idRoom);
                     }
                     else
                     {
                         // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
-                        SendTilesRoundStart(threadJeu.GenerateThreeTiles(), playerSocket, idRoom);
+                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), playerSocket, idRoom);
+                        // TODO : remplacer par generateThreeNewtiles
+
                     }
 
                     threadJeu.DisposeACBarrier();
@@ -260,6 +264,34 @@ namespace system
             }
         }
 
+        public void ChooseIdTile(string idRoom, ulong idPlayer, ulong idTuile, Position exemplePos, Socket? playerSocket)
+        {
+            foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    // Vérifie que l'exemple de position est bon
+                    bool isLegal = threadJeu.isTilePlacementLegal(idTuile, exemplePos.X, exemplePos.Y, exemplePos.ROT);
+                    if (isLegal) // Si tuile en effet posable
+                    {
+                        // Sauvegarde de l'id de la tuile choisie
+                        threadJeu.Set_idTuileChoisie(idTuile);
+                    }
+                    else
+                    {
+                        // La tuile n'est pas vraiment posable
+                        PlayerCheated(idPlayer, playerSocket, idRoom);
+
+                        // Renvoie les 3 tuiles
+                        string[] tuilesAEnvoyer = threadJeu.GetThreeLastTiles();
+                        SendTilesRoundStart(tuilesAEnvoyer, playerSocket, idRoom);
+                    }
+
+                    break;
+                }
+            }
+        }
+
         public Tools.Errors VerifyTilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
@@ -272,11 +304,18 @@ namespace system
                 if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
-                    // Vérification qu'une tuile n'a pas déjà été placée auparavant
+                    // Vérification qu'une tuile n'a pas déjà été placée auparavant 
                     if (thread_serv_ite.Get_posTuileTourActu().IsExisting() == true)
                     {
                         // Permission refusée de poser une tuile
                         errors = Tools.Errors.Permission;
+                        break;
+                    }
+                    else if (thread_serv_ite.Get_idTuileChoisie() != UInt64.Parse(idTuile)) // Vérifie qu'il s'agit de la même qu'il essaie de poser
+                    {
+                        // Coup illégal : tentative de pose d'une autre tuile que celle choisie
+                        errors = Tools.Errors.IllegalPlay;
+                        PlayerCheated(idPlayer, playerSocket, idRoom);
                         break;
                     }
                     else
@@ -395,6 +434,38 @@ namespace system
             return errors;
         }
 
+        public Tools.Errors Com_EndTurn(ulong idPlayer, string idRoom)
+        {
+            // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
+            Tools.Errors errors = Tools.Errors.Permission;
+
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
+                {
+                    // Vérifie qu'il a au moins placé une tuile validée
+                    if(thread_serv_ite.Get_posTuileTourActu().IsExisting())
+                    {
+                        // Fin du tour actuel
+                        Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
+                        // Envoie des 3 tuiles au suivant
+                        SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), nextPlayerSocket, idRoom);
+                        //TODO : Remplacer getThree... par GenerateThree...
+
+
+                        return Tools.Errors.None;
+                    }
+
+                    // S'il n'a pas posé de tuile : erreur Permission
+
+                    
+                }
+
+            }
+
+            return errors;
+        }
 
         public void PlayerCheated(ulong idPlayer, Socket? playerSocket, string idRoom)
         {
@@ -443,7 +514,18 @@ namespace system
                 {
                     // Cas où aucune des 3 tuiles n'est posable
                     case Tools.IdMessage.TuileDraw:
-                        DrawAntiCheatPlayer(packet.Data[0], packet.IdPlayer, socket);
+                        // Récupère à part les 3 idTuiles dont il est question
+                        string[] tuilesEnvoyees = new string[3];
+                        try
+                        {
+                            Array.Copy(packet.Data, 1, tuilesEnvoyees, 0, 3);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("ERROR: Parsing the array representing the 3 tiles sended : " + ex);
+                        }
+                        
+                        DrawAntiCheatPlayer(packet.Data[0], packet.IdPlayer, socket, tuilesEnvoyees);
                         break;
 
                     // Réponse d'un autre joueur (anti cheat) -> pas posable
@@ -460,6 +542,13 @@ namespace system
             {
                 switch (packet.IdMessage)
                 {
+                    // Joueur choisi une des tuiles posables
+                    case Tools.IdMessage.TuileDraw:
+                        Position exemplePosValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
+                        ChooseIdTile(packet.Data[0], packet.IdPlayer, UInt32.Parse(packet.Data[1]), exemplePosValid, socket);
+                        break;
+
+
                     // Réponse d'un autre joueur (anti cheat) -> posable
                     case Tools.IdMessage.TuileVerification:
                         Position posValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
