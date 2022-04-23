@@ -631,6 +631,8 @@ namespace system
 
             Thread.Sleep(2000);
 
+            // Informations du thread
+
             Console.WriteLine(string.Format("[{0}] Je suis un thread !", _id_thread_com));
             Console.WriteLine(string.Format("[{0}] J'officie sur le port numéro {1} !", _id_thread_com, _numero_port));
             Console.WriteLine(string.Format("[{0}] Je gère actuellement {1} parties!", _id_thread_com, _nb_parties_gerees));
@@ -641,31 +643,6 @@ namespace system
 
             //Debug.Log(string.Format("Compteur d'id de strings : {0}", _compteur_id_thread_com));
 
-
-            int debug = 1;
-
-            if (debug != 1) // TEMPORAIRE - A retirer plus tard    // A REMPLACER - Par boucle de réception
-            {
-                // Types de messages qui peuvent être reçus:
-                //      • Création de partie
-                //      • Arrivée dans la partie
-                //      • Pose de tuile
-                //      • Pose de pion
-                //      • ? Fin de tour ?
-
-                // Types de message à envoyer spontanéement par le thread_com:
-                //      • Fin de partie
-                //      • Réaction à triche
-                //      • Réaction à afk
-                //      • Kick (afk ou triche)
-
-
-
-                //Thread.Sleep(20000);
-
-            }
-
-            //Server.Server.StartListening();
 
             
             // Lancement du serveur d'écoute du thread de com
