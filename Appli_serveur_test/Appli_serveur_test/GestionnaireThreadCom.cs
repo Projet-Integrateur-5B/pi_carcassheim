@@ -296,11 +296,8 @@ namespace system
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
-                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
-                {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
-                    return thread_serv_ite.RemoveJoueur(idPlayer);
-                }
+                Tools.PlayerStatus playerStatus = thread_com_iterateur.PlayerLeave(idPlayer, idRoom);
+                return playerStatus;
             }
 
             return Tools.PlayerStatus.NotFound;

@@ -57,6 +57,7 @@ namespace system
         private Barrier _AC_barrierAllVerifDone;
 
         // Semaphores moteur
+        private Semaphore _s_nombre_joueur;
         private Semaphore _s_plateau;
         private Semaphore _s_offsetActualPlayer;
         private Semaphore _s_tuilesGame;
@@ -285,6 +286,10 @@ namespace system
             }
         }
 
+        /// <summary>
+        /// Pass to the next player
+        /// </summary>
+        /// <returns> Returns the new actual player's id </returns>
         public ulong Get_NextPlayer()
         {
             // Transforme le dico en array pour récupérer le n-ième joueur
@@ -294,7 +299,9 @@ namespace system
 
             // Incrémente le numéro du joueur actuel (modulo nb_joueurs) et récupère l'idPlayer du nouveau joueur
             _s_offsetActualPlayer.WaitOne();
+            _s_nombre_joueur.WaitOne();
             _offsetActualPlayer = (_offsetActualPlayer + 1) % _nombre_joueur;
+            _s_nombre_joueur.Release();
             ulong nextPlayer = idPlayer_array[_offsetActualPlayer];
             _s_offsetActualPlayer.Release();
 
@@ -310,6 +317,7 @@ namespace system
             _dico_joueur = new Dictionary<ulong, Player>();
             _s_dico_joueur = new Semaphore(1, 1);
             _nombre_joueur = 1;
+            _s_nombre_joueur = new Semaphore(1, 1);
             _nombre_joueur_max = 8;
             _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur, playerSocket));
             _id_moderateur = id_joueur_createur;
@@ -344,11 +352,13 @@ namespace system
         public Tools.PlayerStatus AddJoueur(ulong id_joueur, Socket? playerSocket)
         {
             _s_dico_joueur.WaitOne();
+            _s_nombre_joueur.WaitOne();
             if (_nombre_joueur >= _nombre_joueur_max)
             {
                 _s_dico_joueur.Release();
                 return Tools.PlayerStatus.Full;
             }
+            _s_nombre_joueur.Release();
 
             if (_dico_joueur.ContainsKey(id_joueur))
             {
@@ -357,7 +367,9 @@ namespace system
             }
 
             _dico_joueur.Add(id_joueur, new Player(id_joueur, playerSocket));
+            _s_nombre_joueur.WaitOne();
             _nombre_joueur++;
+            _s_nombre_joueur.Release();
             _s_dico_joueur.Release();
 
             return Tools.PlayerStatus.Success;
@@ -370,7 +382,9 @@ namespace system
             bool res = _dico_joueur.Remove(id_joueur);
             if (res)
             {
+                _s_nombre_joueur.WaitOne();
                 _nombre_joueur--;
+                _s_nombre_joueur.Release();
                 if (id_joueur == _id_moderateur)
                 {
                     if (_dico_joueur.Count != 1)
@@ -384,6 +398,7 @@ namespace system
                 }
 
                 _s_dico_joueur.Release();
+                
 
                 return Tools.PlayerStatus.Success;
             }
@@ -455,7 +470,9 @@ namespace system
 
         public void SetACBarrier()
         {
+            _s_nombre_joueur.WaitOne();
             _AC_barrierAllVerifDone = new Barrier((int)_nombre_joueur);
+            _s_nombre_joueur.Release();
         }
         public void WaitACBarrier()
         {
@@ -674,6 +691,28 @@ namespace system
             }
             _tuilesGame.RemoveAt(indexOfTile);
             _s_tuilesGame.Release();
+        }
+
+        public Socket? CancelTurn(string idRoom)
+        {
+            // Remise à inexistant la tuilePosActu et pionPosActu
+            _s_posTuileTourActu.WaitOne();
+            _posTuileTourActu.SetNonExistent();
+            _s_posTuileTourActu.Release();
+
+            _s_posPionTourActu.WaitOne();
+            _posPionTourActu = new string[] { };
+            _s_posPionTourActu.Release();
+
+            // Passe au joueur suivant
+            ulong nextPlayer = Get_NextPlayer();
+
+            _s_dico_joueur.WaitOne();
+            Socket? nextPlayerSocket = _dico_joueur[nextPlayer]._socket_of_player;
+            _s_dico_joueur.Release();
+
+
+            return nextPlayerSocket;
         }
 
         /// <summary>

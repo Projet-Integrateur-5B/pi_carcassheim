@@ -563,6 +563,32 @@ namespace system
 
         }
 
+        public Tools.PlayerStatus PlayerLeave(ulong idPlayer, string idRoom)
+        {
+            // Recherche de la partie
+            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    // Retrait du joueur de la partie
+                    Tools.PlayerStatus playerStatus = threadJeu.RemoveJoueur(idPlayer);
+                    return playerStatus;
+
+                    // Si le joueur quitte durant son tour
+                    if(threadJeu.Get_ActualPlayerId() == idPlayer)
+                    {
+                        // On abandonne les informations du tour actuel
+                        Socket? nextPlayerSock = threadJeu.CancelTurn(idRoom);
+                        // On lui envoit les 3 tuiles
+                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), nextPlayerSock, idRoom);
+                    }
+
+                }
+            }
+
+            return Tools.PlayerStatus.NotFound;
+        }
+
         // ===============================
         // Méthode réseau de réception
         // ===============================
