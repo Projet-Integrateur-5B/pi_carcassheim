@@ -419,10 +419,7 @@ public partial class Server
         else
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                Error = Tools.Errors.RoomJoin
-            };
+            packet.Error = Tools.Errors.RoomJoin;
         }
     }
     /// <summary>
