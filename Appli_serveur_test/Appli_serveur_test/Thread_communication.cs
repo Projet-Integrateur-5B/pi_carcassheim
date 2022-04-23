@@ -16,7 +16,6 @@ namespace system
         private int _id_thread_com;
         private int _numero_port;
         private int _nb_parties_gerees;
-        private bool _statut;
 
         private List<int> _id_parties_gerees;
         private List<Thread_serveur_jeu> _lst_serveur_jeu;
@@ -36,7 +35,6 @@ namespace system
             _nb_parties_gerees = 0;
             _id_parties_gerees = new List<int>();
             _id_thread_com = id;
-            _statut = false;
             _lst_serveur_jeu = new List<Thread_serveur_jeu>();
             _lock_nb_parties_gerees = new object();
             _lock_id_parties_gerees = new object();
@@ -46,16 +44,6 @@ namespace system
         // Getters et setters
         // ==================
 
-        public bool Get_statut()
-        {
-            return _statut;
-        }
-        
-        public void Set_statut(bool statut)
-        {
-            _statut = statut;
-        }
-        
         public int Get_nb_parties_gerees()
         {
             return _nb_parties_gerees;
@@ -810,7 +798,7 @@ namespace system
 
             
             // Lancement du serveur d'écoute du thread de com
-            Server.Server.StartListening(_numero_port, this);
+            Server.Server.StartListening(_numero_port);
 
 
             
