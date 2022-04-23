@@ -35,9 +35,10 @@ namespace system
             _nb_parties_gerees = 0;
             _id_parties_gerees = new List<int>();
             _id_thread_com = id;
+            _lst_serveur_jeu = new List<Thread_serveur_jeu>();
             _lock_nb_parties_gerees = new object();
             _lock_id_parties_gerees = new object();
-    }
+        }
 
         // ==================
         // Getters et setters
