@@ -1,3 +1,5 @@
+using system;
+
 namespace Server;
 
 using System.ComponentModel;
@@ -11,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 /// </summary>
 public static partial class Server
 {
+    private static Thread_communication ThrCom { get; set; }
+    
     /// <summary>
     ///     Thread signal used to have each connected client on a different thread in <see cref="Server" />
     ///     .
@@ -113,8 +117,10 @@ public static partial class Server
     ///     Main server method which accepts incoming connections and starts an asynchronous communication.
     /// </summary>
     /// <param name="port">Server's local port.</param>
-    public static void StartListening(int port)
+    public static void StartListening(int port, Thread_communication thrCom)
     {
+        ThrCom = thrCom;
+        
         var error_value = Tools.Errors.None;
         Console.WriteLine("Server is setting up...");
 
@@ -135,6 +141,9 @@ public static partial class Server
             // TODO : GetSockets error
             return;
         }
+        
+        // Set thread com status
+        if(ThrCom is not null) ThrCom.Set_statut(true);
 
         // Catch : Something went wrong during an asynchronous communication.
         try

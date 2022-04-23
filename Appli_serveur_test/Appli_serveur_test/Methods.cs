@@ -304,6 +304,9 @@ public partial class Server
             packet.Data[0] = result[0].ToString();
             // Sending the new server's port (i.e. room port) back to the client.
             packet.Data[1] = result[1].ToString();
+            
+            while(ThrCom.Get_statut() == false)
+                Thread.Sleep(1000);
         }
     }
     /// <summary>
