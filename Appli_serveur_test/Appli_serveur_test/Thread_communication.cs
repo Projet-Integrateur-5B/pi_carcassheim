@@ -475,7 +475,7 @@ namespace system
                     else
                     {
                         // Vérification du placement
-                        errors = thread_serv_ite.TilePlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
+                        errors = thread_serv_ite.TilePlacement(idPlayer, UInt64.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
 
                         if (errors == Tools.Errors.None) // Si coup légal
                         {
@@ -516,7 +516,7 @@ namespace system
                         thread_serv_ite.Get_posPionTourActu().Length == 0)
                     {
                         // Vérification du placement
-                        errors = thread_serv_ite.PionPlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(idMeeple), Int32.Parse(slotPos));
+                        errors = thread_serv_ite.PionPlacement(idPlayer, UInt64.Parse(idTuile), Int32.Parse(idMeeple), Int32.Parse(slotPos));
                         
                         if(errors == Tools.Errors.None) // Si placement légal
                         {
@@ -757,14 +757,14 @@ namespace system
                     // Joueur choisi une des tuiles posables
                     case Tools.IdMessage.TuileDraw:
                         Position exemplePosValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
-                        ChooseIdTile(packet.Data[0], packet.IdPlayer, UInt32.Parse(packet.Data[1]), exemplePosValid, socket);
+                        ChooseIdTile(packet.Data[0], packet.IdPlayer, UInt64.Parse(packet.Data[1]), exemplePosValid, socket);
                         break;
 
 
                     // Réponse d'un autre joueur (anti cheat) -> posable
                     case Tools.IdMessage.TuileVerification:
                         Position posValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
-                        DrawAntiCheatVerif(packet.Data[0], true, UInt32.Parse(packet.Data[1]), posValid);
+                        DrawAntiCheatVerif(packet.Data[0], true, UInt64.Parse(packet.Data[1]), posValid);
                         break;
 
                 }
