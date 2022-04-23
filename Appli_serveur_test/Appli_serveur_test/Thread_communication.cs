@@ -781,8 +781,6 @@ namespace system
         public void Lancement_thread_com()
         {
 
-            Thread.Sleep(2000);
-
             // Informations du thread
 
             Console.WriteLine(string.Format("[{0}] Je suis un thread !", _id_thread_com));
