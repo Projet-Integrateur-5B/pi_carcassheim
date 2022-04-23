@@ -630,7 +630,10 @@ namespace system
 
 
             // Vérification des fermetures de chemins (mise à jour des points)
-
+            int pointsGagnes = CompteurPoints.CompterZoneFerme(_idTuileChoisie, Int32.Parse(_posPionTourActu[2]), idPlayer);
+            _s_dico_joueur.WaitOne();
+            _dico_joueur[idPlayer].AddPoints((uint)pointsGagnes);
+            _s_dico_joueur.Release();
 
 
             RetirerTuileGame(_idTuileChoisie);

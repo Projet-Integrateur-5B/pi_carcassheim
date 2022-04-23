@@ -18,6 +18,13 @@ namespace system
 
         public Semaphore _s_player;
 
+        public void AddPoints(uint points)
+        {
+            _s_player.WaitOne();
+            _score = _score + points;
+            _s_player.Release();
+        }
+
         public Player(ulong id_player, Socket? playerSocket)
         {
             _id_player = id_player;
