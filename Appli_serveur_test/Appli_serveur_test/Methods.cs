@@ -299,6 +299,7 @@ public partial class Server
         }
         else
         {
+            packet.Data = new string[2];
             // Sending the room's ID back to the client. 
             packet.Data[0] = result[0].ToString();
             // Sending the new server's port (i.e. room port) back to the client.
@@ -394,6 +395,7 @@ public partial class Server
 
         if (port != -1)
         {
+            packet.Data = new string[1];
             packet.Data[0] = port.ToString();
             // TODO : ensuite client switch port, thread serveur detecte nouveau joueur et broadcast
         }
