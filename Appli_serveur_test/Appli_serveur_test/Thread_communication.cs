@@ -225,6 +225,72 @@ namespace system
 
         }
 
+        public void SendTileDisplay(string idRoom, ulong idPlayer, string idTuile, string posX, string posY, string rotat)
+        {
+
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.TuilePlacement;
+            packet.Type = true;
+            packet.IdPlayer = idPlayer;
+
+            packet.Data = new string[] { idTuile, posX, posY, rotat };
+
+            // Récupération du bon thread de jeu
+            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    // Envoie de l'information à tous les joueurs
+                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
+                    {
+                        if(joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
+                        {
+                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                            // Lancement de l'écoute de la réponse du joueur 
+                            ClientAsync.OnPacketReceived += OnPacketReceived;
+                            ClientAsync.Receive(joueur.Value._socket_of_player);
+
+                        }                 
+                    }
+                    break;
+                }
+            }
+        }
+
+        public void SendPionDisplay(string idRoom, ulong idPlayer, string idTuile, string idMeeple, string slotPos)
+        {
+
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.PionPlacement;
+            packet.Type = true;
+            packet.IdPlayer = idPlayer;
+
+            packet.Data = new string[] { idTuile, idMeeple, slotPos };
+
+            // Récupération du bon thread de jeu
+            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    // Envoie de l'information à tous les joueurs
+                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
+                    {
+                        if (joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
+                        {
+                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                            // Lancement de l'écoute de la réponse du joueur 
+                            ClientAsync.OnPacketReceived += OnPacketReceived;
+                            ClientAsync.Receive(joueur.Value._socket_of_player);
+                        } 
+                    }
+                    break;
+                }
+            }
+        }
+
+
         public void SendEndGame(string idRoom, ulong idPlayerWinner)
         {
             Packet packet = new Packet();
@@ -373,6 +439,13 @@ namespace system
                     {
                         // Vérification du placement
                         errors = thread_serv_ite.TilePlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
+
+                        if (errors == Tools.Errors.None) // Si coup légal
+                        {
+                            // Envoi de l'information à tous pour l'affichage 
+                            SendTileDisplay(idRoom, idPlayer, idTuile, posX, posY, rotat);
+                        }
+                            
                         break;
                     }
 
@@ -407,6 +480,13 @@ namespace system
                     {
                         // Vérification du placement
                         errors = thread_serv_ite.PionPlacement(idPlayer, UInt32.Parse(idTuile), Int32.Parse(idMeeple), Int32.Parse(slotPos));
+                        
+                        if(errors == Tools.Errors.None) // Si placement légal
+                        {
+                            // Envoi de l'information à tous pour l'affichage 
+                            SendPionDisplay(idRoom, idPlayer, idTuile, idMeeple, slotPos);
+                        }
+                        
                         break;
                     }
 
