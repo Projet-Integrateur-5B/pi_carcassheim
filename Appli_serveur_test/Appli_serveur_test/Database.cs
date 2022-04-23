@@ -257,9 +257,8 @@ public class Database
     
     public long Identification(string login, string mdp)
     {
-        var ulogin = long.Parse(login);
         string commande = "SELECT IDU FROM Utilisateur WHERE Pseudo = @pLOGIN AND MDP = @pMDP;";
-        object[] parametres = new object[] {"pLOGIN", ulogin, "pMDP", mdp};
+        object[] parametres = new object[] {"pLOGIN", login, "pMDP", mdp};
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         if (res.Result.Length == 0)
