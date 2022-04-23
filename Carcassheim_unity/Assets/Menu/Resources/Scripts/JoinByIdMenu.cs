@@ -46,6 +46,8 @@ public class JoinByIdMenu : Miscellaneous
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.Data = new string[] { RemoveLastSpace(idCM.text) };
 
+		Communication.Instance.SetRoom(int.Parse(idCM.text));
+		Communication.Instance.SetIsInRoom(0);
 		Communication.Instance.SendAsync(packet);
 	}
 

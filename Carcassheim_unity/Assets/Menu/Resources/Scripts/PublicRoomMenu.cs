@@ -29,6 +29,7 @@ public class PublicRoomMenu : Miscellaneous
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.Data = new[] {Communication.Instance.idRoom.ToString()};
 
+		Communication.Instance.SetIsInRoom(1);
 		Communication.Instance.SendAsync(packet);
 	}
 

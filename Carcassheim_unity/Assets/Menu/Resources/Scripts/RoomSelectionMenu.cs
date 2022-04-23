@@ -140,12 +140,12 @@ public class RoomSelectionMenu : Miscellaneous
 
 	public void LoadRoomInfo()
     {
-
 		Packet packet = new Packet();
 		packet.IdMessage = Tools.IdMessage.RoomList;
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.Data = Array.Empty<string>();
 
+		Communication.Instance.SetRoom(0);
 		Communication.Instance.SendAsync(packet);
 	}
 
