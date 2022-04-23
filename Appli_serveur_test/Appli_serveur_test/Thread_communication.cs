@@ -190,6 +190,35 @@ namespace system
             return playerParameters;
         }
 
+        public void SendPlayerReadyDisplay(string idRoom, ulong idPlayer)
+        {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.PlayerReady;
+            packet.Type = true;
+
+            // Récupération du bon thread de jeu
+            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
+            {
+                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                {
+                    // Envoie de l'information à tous les joueurs
+                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
+                    {
+                        if (joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
+                        {
+                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                            // Lancement de l'écoute de la réponse du joueur 
+                            ClientAsync.OnPacketReceived += OnPacketReceived;
+                            ClientAsync.Receive(joueur.Value._socket_of_player);
+
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         public void SendTilesRoundStart(string[] tilesToSend, Socket? socket, string idRoom)
         {
             Packet packet = new Packet();

@@ -329,6 +329,7 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    thread_com_iterateur.SendPlayerReadyDisplay(idRoom, idPlayer); // Envoie de quoi afficher le player ready à tt le monde
                     return thread_serv_ite.SetPlayerStatus(idPlayer);
                 }
             }
