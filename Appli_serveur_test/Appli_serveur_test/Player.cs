@@ -32,7 +32,7 @@ namespace system
             _triche = 0;
             _is_ready = false;
             _socket_of_player = playerSocket;
-            _s_player = new Semaphore(0, 1);
+            _s_player = new Semaphore(1, 1);
         }
     }
 }
