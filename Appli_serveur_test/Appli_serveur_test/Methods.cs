@@ -133,11 +133,8 @@ public partial class Server
         if (portListening != 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -151,11 +148,8 @@ public partial class Server
         {
             // Something went wrong.
             Console.WriteLine("ERROR: Signup : " + ex);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.Database
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.Database;
         }
     }
     /// <summary>
@@ -171,11 +165,8 @@ public partial class Server
         if (portListening != 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -195,11 +186,8 @@ public partial class Server
         {
             // Something went wrong.
             Console.WriteLine("ERROR: Login : " + ex);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.Database
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.Database;
         }
     }
     /// <summary>
@@ -215,11 +203,8 @@ public partial class Server
         if (portListening != 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -233,11 +218,8 @@ public partial class Server
         {
             // Something went wrong.
             Console.WriteLine("ERROR: Statistics : " + ex);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.Database
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.Database;
         }
     }
 
@@ -256,11 +238,8 @@ public partial class Server
         if (portListening != 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -280,6 +259,7 @@ public partial class Server
         catch (Exception ex)
         {
             Console.WriteLine("ERROR: RoomList : " + ex);
+            packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.Database;
             return;
         }
@@ -300,11 +280,8 @@ public partial class Server
         if (portListening != 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -317,6 +294,7 @@ public partial class Server
         if (result[0] == -1 || result[1] == -1 || result.Count != 2)
         {
             // Something went wrong.
+            packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.RoomCreate;
         }
         else
@@ -340,11 +318,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -362,6 +337,7 @@ public partial class Server
         else
         {
             // Something went wrong.
+            packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.RoomSettings;
         }
     }
@@ -378,11 +354,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -408,11 +381,8 @@ public partial class Server
         if (portListening != 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
@@ -430,6 +400,7 @@ public partial class Server
         else
         {
             // Something went wrong.
+            packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.RoomJoin;
         }
     }
@@ -446,11 +417,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
         
@@ -462,11 +430,8 @@ public partial class Server
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.RoomLeave
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.RoomLeave;
         }
         // TODO : ensuite thread serveur detecte fin client et broadcast
     }
@@ -484,11 +449,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
         
@@ -504,11 +466,8 @@ public partial class Server
         catch (Exception e)
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.RoomLeave
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.RoomLeave;
             return;
         }
         
@@ -517,11 +476,8 @@ public partial class Server
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.RoomLeave
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.RoomLeave;
         }
         // TODO : ensuite thread serveur detecte fin client et broadcast
     }
@@ -538,11 +494,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
         
@@ -554,11 +507,8 @@ public partial class Server
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.RoomLeave
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.PlayerReady;
         }
         // TODO : ensuite thread serveur broadcast
     }
@@ -586,11 +536,8 @@ public partial class Server
         else if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.ToBeDetermined
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.IllegalPlay;
         }
     }
 
@@ -609,6 +556,7 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
         }
@@ -636,11 +584,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
         
@@ -668,11 +613,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
         
@@ -717,11 +659,8 @@ public partial class Server
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet = new Packet
-            {
-                IdMessage = packet.IdMessage,
-                Error = Tools.Errors.BadPort
-            };
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
             return;
         }
 
