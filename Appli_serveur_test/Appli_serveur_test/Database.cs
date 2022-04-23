@@ -257,13 +257,14 @@ public class Database
     
     public long Identification(string login, string mdp)
     {
+        var ulogin = long.Parse(login);
         string commande = "SELECT IDU FROM Utilisateur WHERE Pseudo = @pLOGIN AND MDP = @pMDP;";
-        object[] parametres = new object[] {"pLOGIN", login, "pMDP", mdp};
+        object[] parametres = new object[] {"pLOGIN", ulogin, "pMDP", mdp};
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         if (res.Result.Length == 0)
             return -1;
-        return (long)res.Result[1];
+        return Convert.ToInt64(res.Result[0]);
     }
     
     public void Adduser(string Pseudo, string MDP, string Mail, int Xp, int Niveau, int Victoires, int Defaites, int Nbparties, string DateNaiss)
