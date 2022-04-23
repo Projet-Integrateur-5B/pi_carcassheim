@@ -288,7 +288,7 @@ public static partial class Server
             }
         }
 
-        var debug = "Reading from : " + listener.RemoteEndPoint +
+        var debug = "Reading from : " + listener.RemoteEndPoint + " on : " + state.Listener.LocalEndPoint + 
                     "\n\t Read {0} bytes =>\t" + state.Packet +
                     "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
 
@@ -367,7 +367,7 @@ public static partial class Server
             }
 
             var size = bytes.Length;
-            Console.WriteLine("Sending back : " + state.Listener.RemoteEndPoint +
+            Console.WriteLine("Sending back : " + state.Listener.RemoteEndPoint + " on : " + state.Listener.LocalEndPoint + 
                               "\n\t Sent {0} bytes =>\t" + packet, size);
             // Send the packet through the socket.
             state.Listener.BeginSend(bytes, 0, size, 0, null, state);
