@@ -107,11 +107,8 @@ namespace system
             if (id_nouv_partie != -1) // Si la partie a pu être crée
             {
                 Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId, playerSocket);
-                Thread nouv_thread = new Thread(new ThreadStart(thread_serveur_jeu.Lancement_thread_serveur_jeu));
 
                 _lst_serveur_jeu.Add(thread_serveur_jeu);
-
-                nouv_thread.Start();
 
                 return id_nouv_partie;
 

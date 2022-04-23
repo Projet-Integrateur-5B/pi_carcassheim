@@ -848,16 +848,6 @@ namespace system
 
         }
 
-
-
-
-        public void Lancement_thread_serveur_jeu()
-        {
-
-
-
-            // A FAIRE - Fin/retour de la fonction pour libérer l'objet associé dans le thread_com à la fin de la partie et donc de ce thread
-        }
     }
 
 }
