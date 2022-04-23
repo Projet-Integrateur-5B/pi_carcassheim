@@ -210,7 +210,6 @@ namespace system
                         if (idNewRoom != -1)
                         {
                             portThreadCom = thread_com_iterateur.Get_port();
-                            portThreadCom += 9000;
                         }
 
                         break; // Sort du foreach
@@ -232,7 +231,6 @@ namespace system
                         if (idNewRoom != -1)
                         {
                             portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
-                            portThreadCom += 9000;
                         }
                     }
 
