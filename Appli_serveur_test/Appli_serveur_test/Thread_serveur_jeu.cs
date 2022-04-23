@@ -525,6 +525,27 @@ namespace system
             return tuilesTirees.ToArray();
         }
 
+        /// <summary>
+        /// Shuffles the list of game's tiles
+        /// </summary>
+        public void ShuffleTilesGame()
+        {
+            _s_tuilesGame.WaitOne();
+
+            List<ulong> tuilesGame_resultat = new List<ulong>();
+            var rnd = new System.Random();
+            var randomedList = _tuilesGame.OrderBy(item => rnd.Next());
+            foreach (var value in randomedList)
+            {
+                tuilesGame_resultat.Add(value);
+            }
+            
+            _tuilesGame = tuilesGame_resultat;
+            _s_tuilesGame.Release();
+
+        }
+
+
         public Tools.Errors TilePlacement(ulong idPlayer, ulong idTuile, int posX, int posY, int rotat)
         {
             _s_plateau.WaitOne();

@@ -228,8 +228,8 @@ namespace system
                     else
                     {
                         // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
+                        threadJeu.ShuffleTilesGame();
                         SendTilesRoundStart(threadJeu.GetThreeLastTiles(), playerSocket, idRoom);
-                        // TODO : remplacer par generateThreeNewtiles
 
                     }
 
@@ -450,8 +450,8 @@ namespace system
                         // Fin du tour actuel
                         Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                         // Envoie des 3 tuiles au suivant
+                        thread_serv_ite.ShuffleTilesGame();
                         SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), nextPlayerSocket, idRoom);
-                        //TODO : Remplacer getThree... par GenerateThree...
 
 
                         return Tools.Errors.None;
