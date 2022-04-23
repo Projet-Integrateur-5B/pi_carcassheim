@@ -288,7 +288,7 @@ namespace system
                     var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
                     if (playerStatus != Tools.PlayerStatus.Success)
                         return -1;
-                    return thread_com_iterateur.Get_port();
+                    return thread_com_iterateur.Get_port() + 9000; 
                 }
             }
 
