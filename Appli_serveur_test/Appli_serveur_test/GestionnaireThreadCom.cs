@@ -244,7 +244,6 @@ namespace system
 
             return listReturn;
         }
-
         
         
         public void UpdateRoom(string idRoom, ulong idPlayer, string[] settings)
@@ -355,6 +354,25 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
 
+        public Tools.PlayerStatus LogoutPlayer(ulong idPlayer)
+        {
+            Tools.PlayerStatus playerStatus = Tools.PlayerStatus.Default;
+            // Parcours des threads de communication pour trouver ceux qui contiennent le joueur.
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if(thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
+                    if (playerStatus == Tools.PlayerStatus.Success)
+                        thread_serv_ite.RemoveJoueur(idPlayer);
+                    else
+                        playerStatus = thread_serv_ite.RemoveJoueur(idPlayer);
+
+                }
+            }
+            return playerStatus;
+        }
+        
         public Tools.Errors StartGame(string idRoom, ulong idPlayer, Socket? playerSocket)
         {
             Tools.Errors errors = Tools.Errors.Permission;

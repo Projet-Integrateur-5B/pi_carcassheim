@@ -296,6 +296,7 @@ public static partial class Server
         if (state.Packet.IdMessage == Tools.IdMessage.AccountLogout)
         {
             Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
+            GetFromDatabase(ar, listener);
             DisconnectFromClient(ar);
         }
         // Final packet of the series has been received.

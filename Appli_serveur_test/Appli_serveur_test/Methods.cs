@@ -46,7 +46,8 @@ public partial class Server
             case Tools.IdMessage.AccountLogin:
                 AccountLogin(state.Packet, ref packet, socket);
                 break;
-            case Tools.IdMessage.AccountLogout: // impossible
+            case Tools.IdMessage.AccountLogout:
+                AccountLogout(state.Packet, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountStatistics:
                 AccountStatistics(state.Packet, ref packet, socket);
@@ -189,6 +190,30 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.Database;
         }
+    }
+    /// <summary>
+    ///     Player is attempting to logout.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    /// <param name="socket">Socket <see cref="Socket" />.</param>
+    public static void AccountLogout(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par le serveur main
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening != 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        // Attempt to remove a player from all the rooms.
+        gestionnaire.LogoutPlayer(packetReceived.IdPlayer);
     }
     /// <summary>
     ///     Get the player's statistics from the database.
