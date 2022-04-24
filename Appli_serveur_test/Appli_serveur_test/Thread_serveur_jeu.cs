@@ -352,6 +352,13 @@ namespace system
         public Tools.PlayerStatus AddJoueur(ulong id_joueur, Socket? playerSocket)
         {
             _s_dico_joueur.WaitOne();
+
+            if (_dico_joueur.ContainsKey(id_joueur))
+            {
+                _s_dico_joueur.Release();
+                return Tools.PlayerStatus.Found;
+            }
+
             _s_nombre_joueur.WaitOne();
             if (_nombre_joueur >= _nombre_joueur_max)
             {
@@ -360,11 +367,7 @@ namespace system
             }
             _s_nombre_joueur.Release();
 
-            if (_dico_joueur.ContainsKey(id_joueur))
-            {
-                _s_dico_joueur.Release();
-                return Tools.PlayerStatus.Found;
-            }
+            
 
             _dico_joueur.Add(id_joueur, new Player(id_joueur, playerSocket));
             _s_nombre_joueur.WaitOne();
