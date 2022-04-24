@@ -34,8 +34,8 @@ public class ConnectionMenu : Miscellaneous
 
 	public void ResetWarningTextCM()
 	{
-		GameObject tmpGO = GameObject.Find("Instructions");
-		Text tmpText = tmpGO.GetComponent<Text>();
+		tmpGO = GameObject.Find("Instructions");
+		tmpText = tmpGO.GetComponent<Text>();
 		tmpText.color = Color.white;
 		tmpText.text = "Connectez vous";
 	}

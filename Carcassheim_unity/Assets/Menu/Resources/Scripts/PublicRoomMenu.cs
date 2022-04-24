@@ -12,6 +12,14 @@ public class PublicRoomMenu : Miscellaneous
 
 	public void HideRoom()
 	{
+		Packet packet = new Packet();
+		packet.IdMessage = Tools.IdMessage.PlayerLeave;
+		packet.IdPlayer = Communication.Instance.idClient;
+		packet.Data = new[] { Communication.Instance.idRoom.ToString() };
+
+		Communication.Instance.SetIsInRoom(1);
+		Communication.Instance.SendAsync(packet);
+
 		HidePopUpOptions();
 		ChangeMenu("PublicRoomMenu", "RoomSelectionMenu");
 	}

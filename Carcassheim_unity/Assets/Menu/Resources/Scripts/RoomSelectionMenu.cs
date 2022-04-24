@@ -145,7 +145,7 @@ public class RoomSelectionMenu : Miscellaneous
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.Data = Array.Empty<string>();
 
-		Communication.Instance.SetRoom(0);
+		Communication.Instance.SetIsInRoom(0);
 		Communication.Instance.SendAsync(packet);
 	}
 
@@ -162,7 +162,7 @@ public class RoomSelectionMenu : Miscellaneous
 		}
 	}
 
-	private void Update()
+	void Update()
 	{
 		s_listAction.WaitOne();
 		int taille = listAction.Count;
@@ -174,7 +174,7 @@ public class RoomSelectionMenu : Miscellaneous
 			int compteur = 0;
 
 			s_listAction.WaitOne();
-			for (int i = 2; i < taille; i += 5)
+			for (int i = 0; i < taille; i += 5)
 			{
 				SetIDRoom(compteur, listAction[i]);
 				SetHostsRoom(compteur, listAction[i + 1]);
@@ -187,5 +187,16 @@ public class RoomSelectionMenu : Miscellaneous
 			listAction.Clear();
 			s_listAction.Release();
 		}
+	}
+
+    void OnEnable()
+    {
+		LoadRoomInfo();
+		Debug.Log("OnEnable");
+	}
+
+    void OnDisable()
+    {
+		Debug.Log("OnDisable");
 	}
 }

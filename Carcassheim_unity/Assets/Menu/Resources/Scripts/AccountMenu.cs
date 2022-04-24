@@ -30,20 +30,23 @@ public class AccountMenu : Miscellaneous
 		confirmPwdCA = AMCI.Find("InputField ConfirmPwd CA").GetComponent<InputField>();
 		passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password; // Hide password by default
 
-
 		listAction = new List<bool>();
 		s_listAction = new Semaphore(1, 1);
 
+		/*
+		tmpGO = GameObject.Find("Create Account");
+		tmpText = tmpGO.GetComponent<Text>();
+		*/
 		/* Commuication Async */
 		Communication.Instance.StartListening(OnPacketReceived);
 	}
 
 	public void ResetWarningTextAM()
 	{
-		GameObject tmpGO = GameObject.Find("Create Account");
-		Text tmpText = tmpGO.GetComponent<Text>();
+		/*
 		tmpText.color = Color.white;
 		tmpText.text = "Creez votre compte";
+		*/
 	}
 
 	public void HideAccount()
@@ -92,9 +95,6 @@ public class AccountMenu : Miscellaneous
 
 	public void CreateAccount()
 	{
-		tmpGO = GameObject.Find("Create Account");
-		tmpText = tmpGO.GetComponent<Text>();
-
 		if (GetInputFields())
         {
 			Packet packet = new Packet();
@@ -163,8 +163,10 @@ public class AccountMenu : Miscellaneous
 			}
 			else
 			{
+				/*
 				tmpGO.GetComponent<Text>().color = Color.yellow;
 				tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
+				*/
 			}
 		}
 	}
