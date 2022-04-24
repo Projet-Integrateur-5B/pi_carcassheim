@@ -10,7 +10,7 @@ public class TestSwitch : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             // Use a coroutine to load the Scene in the background
-            StartCoroutine(LoadYourAsyncScene());
+            //StartCoroutine(LoadYourAsyncScene());
         }
     }
 

@@ -4,11 +4,14 @@ using Assets.System;
 using ClassLibrary;
 using System.Collections.Generic;
 using System.Threading;
+using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class JoinByIdMenu : Miscellaneous
 {
 	private Transform idMenu, IMCI; 
 	private InputField idCM;
+
 	public List<bool> listAction;
 	public Semaphore s_listAction;
 
@@ -20,9 +23,25 @@ public class JoinByIdMenu : Miscellaneous
 
 		listAction = new List<bool>();
 		s_listAction = new Semaphore(1, 1);
-		/* Commuication Async */
-		Communication.Instance.StartListening(OnPacketReceived);
 
+		OnMenuChange += OnStart;
+	}
+
+	public void OnStart(string pageName)
+	{
+		switch (pageName)
+		{
+			case "JoinByIdMenu":
+				/* Commuication Async */
+				Communication.Instance.StartListening(OnPacketReceived);
+				break;
+
+			default:
+				/* Ce n'est pas la bonne page */
+				/* Stop la reception dans cette class */
+				Communication.Instance.StopListening(OnPacketReceived);
+				break;
+		}
 	}
 
 	public void InputFieldEndEdit(InputField inp)

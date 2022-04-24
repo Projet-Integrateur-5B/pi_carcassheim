@@ -52,40 +52,48 @@ public class RoomSelectionMenu : Miscellaneous
 		listAction = new List<string>();
 		s_listAction = new Semaphore(1, 1);
 
-		/* Commuication Async */
-		Communication.Instance.StartListening(OnPacketReceived);
+		OnMenuChange += OnStart;
+	}
+
+	public void OnStart(string pageName)
+	{
+		switch (pageName)
+		{
+			case "RoomSelectionMenu":
+				/* Commuication Async */
+				Communication.Instance.StartListening(OnPacketReceived);
+				break;
+
+			default:
+				/* Ce n'est pas la bonne page */
+				/* Stop la reception dans cette class */
+				Communication.Instance.StopListening(OnPacketReceived);
+				break;
+		}
 	}
 
 	public void HideRoomSelection()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "HomeMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowJoinById()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "JoinByIdMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowJoinPublicRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowCreateRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public string GetIDRoom(int index)
@@ -187,16 +195,5 @@ public class RoomSelectionMenu : Miscellaneous
 			listAction.Clear();
 			s_listAction.Release();
 		}
-	}
-
-    void OnEnable()
-    {
-		LoadRoomInfo();
-		Debug.Log("OnEnable");
-	}
-
-    void OnDisable()
-    {
-		Debug.Log("OnDisable");
 	}
 }

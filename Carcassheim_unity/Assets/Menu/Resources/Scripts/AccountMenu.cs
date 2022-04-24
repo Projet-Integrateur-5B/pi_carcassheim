@@ -37,9 +37,25 @@ public class AccountMenu : Miscellaneous
 		tmpGO = GameObject.Find("Create Account");
 		tmpText = tmpGO.GetComponent<Text>();
 		*/
-		/* Commuication Async */
-		Communication.Instance.StartListening(OnPacketReceived);
+		OnMenuChange += OnStart;
 	}
+
+	public void OnStart(string pageName)
+    {
+		switch (pageName)
+		{
+			case "AccountMenu":
+				/* Commuication Async */
+				Communication.Instance.StartListening(OnPacketReceived);
+				break;
+
+			default:
+				/* Ce n'est pas la bonne page */
+				/* Stop la reception dans cette class */
+				Communication.Instance.StopListening(OnPacketReceived);
+				break;
+		}
+	}	
 
 	public void ResetWarningTextAM()
 	{
@@ -54,8 +70,6 @@ public class AccountMenu : Miscellaneous
 		ResetWarningTextAM();
 		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "ConnectionMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void HideAccountConnected()
@@ -64,8 +78,6 @@ public class AccountMenu : Miscellaneous
 		HidePopUpOptions();
 		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ToggleValueChangedAM(Toggle curT)

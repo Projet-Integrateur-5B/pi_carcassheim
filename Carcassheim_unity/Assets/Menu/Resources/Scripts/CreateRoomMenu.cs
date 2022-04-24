@@ -18,11 +18,28 @@ public class CreateRoomMenu : Miscellaneous
 
 		listAction = new List<bool>();
 		s_listAction = new Semaphore(1, 1);
-		/* Commuication Async */
-		Communication.Instance.StartListening(OnPacketReceived);
+
+		OnMenuChange += OnStart;
 	}
 
-    public void HideCreateRoom()
+	public void OnStart(string pageName)
+	{
+		switch (pageName)
+		{
+			case "CreateRoomMenu":
+				/* Commuication Async */
+				Communication.Instance.StartListening(OnPacketReceived);
+				break;
+
+			default:
+				/* Ce n'est pas la bonne page */
+				/* Stop la reception dans cette class */
+				Communication.Instance.StopListening(OnPacketReceived);
+				break;
+		}
+	}
+
+	public void HideCreateRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("CreateRoomMenu", "RoomSelectionMenu");
@@ -85,13 +102,6 @@ public class CreateRoomMenu : Miscellaneous
 			if (res)
 			{
 				ChangeMenu("CreateRoomMenu", "RoomIsCreatedMenu");
-
-				Packet packet = new Packet();
-				packet.IdMessage = Tools.IdMessage.PlayerReady;
-				packet.IdPlayer = Communication.Instance.idClient;
-				packet.Data = new string[] {Communication.Instance.idRoom.ToString() };
-				
-				Communication.Instance.SendAsync(packet);
 			}
 
 			s_listAction.WaitOne();
