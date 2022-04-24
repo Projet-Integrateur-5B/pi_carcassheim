@@ -116,7 +116,7 @@ namespace system
                 {
                     if (thread_serv_ite.Is_Private() == true)
                     {
-                        Console.WriteLine(thread_serv_ite.Get_ID());
+                        Console.WriteLine("id=" + thread_serv_ite.Get_ID() + " & mod=" + thread_serv_ite.Get_Moderateur());
                         room_list.Add(thread_serv_ite.Get_ID().ToString());
                         room_list.Add(thread_serv_ite.Get_Moderateur().ToString());
                         room_list.Add(thread_serv_ite.NbJoueurs.ToString());
@@ -126,7 +126,7 @@ namespace system
                 }
             }
 
-            Console.WriteLine(room_list.Count);
+            Console.WriteLine("count=" + room_list.Count);
             return room_list.ToArray();
         }
 
