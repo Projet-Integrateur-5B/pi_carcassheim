@@ -51,13 +51,12 @@ public class ClientAsync
         //Version : Unity
         IPAddress ipAddress = IPAddress.Parse(parameters.ServerIP);
         var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);
-        Debug.Log("remoteEP : "+ parameters.ServerPort);
+
         // Create a TCP/IP socket.
         Socket clientSocket = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);
 
         Communication.Instance.SetSocket(clientSocket);
-        Debug.Log("OK SOCKET");
 
         // Connect to the remote endpoint.
         clientSocket.BeginConnect(remoteEP,
@@ -112,7 +111,7 @@ public class ClientAsync
     {
         try
         {
-            Debug.Log("Received -----------------------------------------------------------------");
+            Debug.Log("------------------------- Lancement Ecoute -------------------------");
 
             // Create the state object.
             StateObject state = new StateObject();

@@ -77,6 +77,14 @@ namespace Assets.System
             ClientAsync.OnPacketReceived += pointeurFonction;
             ClientAsync.Receive(lesSockets[isInRoom]);
         }
+        public void NewReceive()
+        {
+            if (!isConnected[isInRoom])
+                LancementConnexion();
+
+            ClientAsync.Receive(lesSockets[isInRoom]);
+        }
+
         public void StopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
             ClientAsync.OnPacketReceived -= pointeurFonction;

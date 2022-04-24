@@ -27,7 +27,16 @@ public class PublicRoomMenu : Miscellaneous
 		{
 			case "PublicRoomMenu":
 				/* Commuication Async */
+				Communication.Instance.SetIsInRoom(1);
 				Communication.Instance.StartListening(OnPacketReceived);
+
+				/* Communication pour que le serveur set le port */
+				Packet packet = new Packet();
+				packet.IdMessage = Tools.IdMessage.PlayerJoin;
+				packet.IdPlayer = Communication.Instance.idClient;
+				packet.Data = new[] { Communication.Instance.idRoom.ToString() };
+
+				Communication.Instance.SendAsync(packet);
 				break;
 
 			default:
@@ -53,7 +62,6 @@ public class PublicRoomMenu : Miscellaneous
 	}
 
 	public void ShowRoomParameters(){
-		//Application.OpenURL("https://tinyurl.com/SlapDance");
 		HidePopUpOptions();
 		ChangeMenu("PublicRoomMenu", "RoomParametersMenu");
 	}
@@ -82,13 +90,15 @@ public class PublicRoomMenu : Miscellaneous
 				s_listAction.WaitOne();
 				listAction.Add("loadScene");
 				s_listAction.Release();
+
+				Debug.Log("AXEL EST UNE MERDE");
 			}
 		}
-        else if(packet.IdMessage == Tools.IdMessage.PlayerReady)
+        else
         {
-			
+			Communication.Instance.NewReceive();
 		}
-
+		Debug.Log("AXEL a bien fait son travail, enfin je suis pas sur, id : "+ packet.IdMessage);
     }
 
 	IEnumerator LoadYourAsyncScene()
