@@ -286,10 +286,13 @@ namespace system
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
                     if (playerStatus != Tools.PlayerStatus.Success) // Le joueur n'a pas pu être ajouté
-                        if(playerStatus == Tools.PlayerStatus.Found) // Le joueur est déjà dans la partie
+                    {
+                        if (playerStatus == Tools.PlayerStatus.Found) // Le joueur est déjà dans la partie
                             return thread_com_iterateur.Get_port() + 9000;
                         else // Tous les autres cas
                             return -1;
+                    }
+                        
 
                     return thread_com_iterateur.Get_port() + 9000; 
                 }
