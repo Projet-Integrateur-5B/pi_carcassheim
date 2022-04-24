@@ -33,6 +33,10 @@ namespace ClassLibrary
             RoomSettings = 12,
             PlayerReady = 20,
             BadPort = 21,
+            BadData = 22,
+            IllegalPlay = 23,
+            NbPlayers = 24,
+            NotFound = 404,
             ToBeDetermined = 999
         }
 

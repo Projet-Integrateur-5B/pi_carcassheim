@@ -124,7 +124,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Debug.Log(e.ToString());
         }
     }
 
