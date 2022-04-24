@@ -11196,7 +11196,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 667, y: -430}
+  m_AnchoredPosition: {x: 582, y: -386}
   m_SizeDelta: {x: 303.2909, y: 136.446}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &765975833
@@ -14149,7 +14149,7 @@ GameObject:
   - component: {fileID: 1025843100}
   - component: {fileID: 1025843099}
   m_Layer: 0
-  m_Name: 'Etat de connexion Room '
+  m_Name: preparation
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14171,8 +14171,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 635, y: -503}
-  m_SizeDelta: {x: 472.926, y: 132.1519}
+  m_AnchoredPosition: {x: 593, y: -478}
+  m_SizeDelta: {x: 565.8795, y: 132.1519}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1025843099
 MonoBehaviour:
@@ -14216,13 +14216,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 50
-    m_Alignment: 2
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Deconnecte
+  m_Text: NON PRET
 --- !u!222 &1025843101
 CanvasRenderer:
   m_ObjectHideFlags: 0

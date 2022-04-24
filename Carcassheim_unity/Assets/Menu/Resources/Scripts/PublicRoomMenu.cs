@@ -36,7 +36,7 @@ public class PublicRoomMenu : Miscellaneous
 		packet.IdMessage = Tools.IdMessage.StartGame;
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.Data = new[] {Communication.Instance.idRoom.ToString()};
-
+        Miscellaneous.FindObject(absolute_parent, "preparation").GetComponent<Text>().text = "PRET A JOUER !";
 		Communication.Instance.SetIsInRoom(1);
 		Communication.Instance.SendAsync(packet);
 	}

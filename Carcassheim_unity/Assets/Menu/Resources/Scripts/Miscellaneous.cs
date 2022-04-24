@@ -110,8 +110,6 @@ public abstract class Miscellaneous : MonoBehaviour
         Button tmpJouer = Miscellaneous.FindObject(absolute_parent, "ShowRoomSelection").GetComponent<Button>();
         Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().color = colState;
         Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().text = "Connecte";
-        Miscellaneous.FindObject(absolute_parent, "Etat de connexion Room").GetComponent<Text>().color = colState;
-        Miscellaneous.FindObject(absolute_parent, "Etat de connexion Room").GetComponent<Text>().text = "Connecte";
         Miscellaneous.FindObject(absolute_parent, "ShowConnection").SetActive(false);
         tmpJouer.interactable = tmpStat.interactable = true;
         tmpJouer.GetComponentInChildren<Text>().color = tmpStat.GetComponentInChildren<Text>().color = Color.white;
