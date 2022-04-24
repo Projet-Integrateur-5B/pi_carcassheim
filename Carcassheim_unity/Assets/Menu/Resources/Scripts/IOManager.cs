@@ -65,6 +65,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         _croom.absolute_parent = absolute_parent;
         _rcreated = gameObject.AddComponent(typeof(RoomIsCreated)) as RoomIsCreated;
         _rcreated.absolute_parent = absolute_parent;
+
+        absolute_parent_ref = null;
         // ---------------------------------- FIN PATCH : --------------------------------
         //Cursor Texture :
         _cursorTexture = Resources.Load("Miscellaneous/Cursors/BlueCursor") as Texture2D; // Texture Type = Cursor
@@ -101,6 +103,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                             MethodCall(menu.Find("InputField").transform.GetChild(0).name, null, inp.GetComponent<InputField>());
                         });
         }
+        OnMenuChange += test;
+    }
+
+    public void test(string name)
+    {
+        Debug.Log("CHNGE " + name);
     }
 
     public void Update()
