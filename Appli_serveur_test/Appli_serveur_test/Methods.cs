@@ -581,7 +581,9 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.PlayerReady;
         }
-        // TODO : ensuite thread serveur broadcast
+        
+        // Check if everyone is ready and starts the game.
+        packet.Error = gestionnaire.StartGame(packetReceived.Data[0], socket);
     }
     /// <summary>
     ///     Player cheated.
@@ -614,6 +616,7 @@ public partial class Server
 
 
 
+    // useless
     /// <summary>
     ///     Starts a room.
     /// </summary>
@@ -636,7 +639,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        Tools.Errors errors = gestionnaire.StartGame(packetReceived.Data[0], packetReceived.IdPlayer, socket);
+        Tools.Errors errors = gestionnaire.StartGame(packetReceived.Data[0], socket);
 
         packet.Error = errors;
     }

@@ -397,9 +397,9 @@ namespace system
             return playerStatus;
         }
         
-        public Tools.Errors StartGame(string idRoom, ulong idPlayer, Socket? playerSocket)
+        public Tools.Errors StartGame(string idRoom, Socket? playerSocket)
         {
-            Tools.Errors errors = Tools.Errors.Permission;
+            Tools.Errors errors = Tools.Errors.NotFound;
 
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
@@ -407,23 +407,22 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
-                    if (idPlayer == thread_serv_ite.Get_Moderateur())
+                    if (thread_serv_ite.NbJoueurs < 2)
+                        return Tools.Errors.NbPlayers;
+                    if (thread_serv_ite.EveryoneIsReady())
                     {
-                        if (thread_serv_ite.EveryoneIsReady())
-                        {
-                            // Lancement de la game
-                            thread_serv_ite.StartGame();
-                            // Préviens tous les joueurs
-                            thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
-                            // Envoi des 3 tuiles de début de tour
-                            thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), playerSocket, idRoom);
-                            return Tools.Errors.None; // return valeur correcte
-                        }
-                        else // Des joueurs ne sont pas prêts
-                        {
-                            return Tools.Errors.PlayerReady;
-                        }  
-                    }                                 
+                        // Lancement de la game
+                        thread_serv_ite.StartGame();
+                        // Préviens tous les joueurs
+                        thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
+                        // Envoi des 3 tuiles de début de tour
+                        thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), playerSocket, idRoom);
+                        return Tools.Errors.None; // return valeur correcte
+                    }
+                    else // Des joueurs ne sont pas prêts
+                    {
+                        return Tools.Errors.PlayerReady;
+                    }
                 }
             }
 
