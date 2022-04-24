@@ -11,7 +11,7 @@ namespace Assets.system
     public class Communication_inGame : CarcasheimBack
     {
 
-        // Paramètres de la partie 
+        // Paramï¿½tres de la partie 
         private readonly ulong _id_partie;
 
         private ulong _mon_id;
@@ -37,7 +37,7 @@ namespace Assets.system
         [SerializeField] DisplaySystem system_display = null;
         //====================================================================================================
         // COMM AFFICHAGE
-        // => Display; indique que la fonction est utilisé pour communiquer avec l'affichage
+        // => Display; indique que la fonction est utilisï¿½ pour communiquer avec l'affichage
         // => Serveur; indique qu'il faut communiqyer avec le serveur
         // UNE FOIS QUE LES DONNES DE DEBUT DE PARTIE SONT DISPONNIBLE :
         //      APPELER gameBegin()
@@ -52,7 +52,7 @@ namespace Assets.system
         //  SINON SI NOUVEAU TOUR : turnStart
         //  SINON SI FIN DE PARTIE : endOfGame
         //      )
-        // !!! le cas de l'explorateur n'est pas encore fait (après getTile)
+        // !!! le cas de l'explorateur n'est pas encore fait (aprï¿½s getTile)
 
         //=======================================================
         // ATTRIBUTES
@@ -60,19 +60,20 @@ namespace Assets.system
 
         //=======================================================
         // END TURN
-        override public void sendTile(int tile_id, PositionRepre tile_pos, int id_meeple, int slot_pos)
+        override public void sendTile(TurnPlayParam param)
         {
-            //TODO ENVOYER !!AU SERVEUR!! LE COUP validé PAR LE JOUEUR ELU => Serveur
-            SendPosition((ulong)tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation,  id_meeple,  slot_pos);
+            //TODO ENVOYER !!AU SERVEUR!! LE COUP validï¿½ PAR LE JOUEUR ELU => Serveur
+            int tile_id = param.id_tile;
+            PositionRepre tile_pos = param.tile_pos;
+            int id_meeple = param.id_meeple;
+            int slot_pos = param.slot_pos;
+            SendPosition((ulong)tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation, id_meeple, slot_pos);
         }
 
-        override public void getTile(out int tile_id, out PositionRepre pos, out int id_meeple, out int slot_pos)
+        override public void getTile(out TurnPlayParam param)
         {
-            //TODO PARTAGER LE COUP validé PAR LE JOUEUR ELU => Display
-            tile_id = -1;
-            pos = null;
-            id_meeple = -1;
-            slot_pos = -1;
+            //TODO PARTAGER LE COUP validï¿½ PAR LE JOUEUR ELU => Display
+            param = new TurnPlayParam(-1, null, -1, -1);
         }
 
         //=======================================================
@@ -94,10 +95,10 @@ namespace Assets.system
             return 1;
             // (| f) (| f) (| f) (| f) >>(| t)
         }
-        
+
         override public void askMeeplesInit(List<MeepleInitParam> meeples)
         {
-            //TODO PARTAGER LA LISTE DES ID DES MEEPLES POSABLES ET LE NOMBRE DISPÖNIBLE => Display
+            //TODO PARTAGER LA LISTE DES ID DES MEEPLES POSABLES ET LE NOMBRE DISPï¿½NIBLE => Display
             // Id meeple, nb de meeple d'id Id disponible
         }
 
@@ -117,10 +118,10 @@ namespace Assets.system
                     ));
             }
         }
-        
+
         //=======================================================
         // SCORE
-        override public void askScores(List<PlayerScore> players_scores)
+        override public void askScores(List<PlayerScoreParam> players_scores)
         {
             //TODO PARTAGER LES NOUVEAUX SCORES POUR CHAQUE JOUEUR => Display
             // Id du joueur dont le score change, Nouveau score, Zone provoquant le changement de score
@@ -128,13 +129,13 @@ namespace Assets.system
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
-                players_scores.Add(new PlayerScore(
+                players_scores.Add(new PlayerScoreParam(
                     (int)playerList[j].id,
                     (int)playerList[j].score,
-                    Array.Empty<Zone>())) ;//JUSTIN si tu ne n'as pas fait, je te tuerais
+                    Array.Empty<Zone>()));//JUSTIN si tu ne n'as pas fait, je te tuerais
             }
         }
-        
+
         //=======================================================
         // GAME BEGIN
         override public void askPlayersInit(List<PlayerInitParam> players)
@@ -162,24 +163,24 @@ namespace Assets.system
             min = 0;
             sec = 0;
         }
-        
+
         override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
         {
             // TODO PARTAGER CONDITION DE VICTOIRE => Display
             // TUILE => nb de tuile
-            // SCORE => score à atteindre
+            // SCORE => score ï¿½ atteindre
             // TEMPS => nb de min, puis nb de sec
             win_cond = WinCondition.WinByTile;
             parameters.Add(100);
         }
-            
+
         override public int getMyPlayer()
         {
             // TODO PARTAGER ID DU JOUEUR SUR CE CLIENT => Display
-            return (int) _mon_id;
+            return (int)_mon_id;
         }
 
-        
+
         //=======================================================
         // PLEASE NEVER CALL ME
 
@@ -275,30 +276,30 @@ namespace Assets.system
 
 
 
-            // Boucle d'écoute du serveur
+            // Boucle d'ï¿½coute du serveur
 
-            // Type de réceptions :
-            //          - mise à jour affichage (coup d'un autre joueur, même non validé)
-            //          - réception d'un WarningCheat
+            // Type de rï¿½ceptions :
+            //          - mise ï¿½ jour affichage (coup d'un autre joueur, mï¿½me non validï¿½)
+            //          - rï¿½ception d'un WarningCheat
             //          - indication de la part du serveur que c'est au client de jouer
-            //                  -> début de la phase d'interactions entres placements du joueur et le serveur
-            //                  -> se base sur des fonctions d'attente personnalisées, où le script attend que le joueur place ses tuiles/pions
+            //                  -> dï¿½but de la phase d'interactions entres placements du joueur et le serveur
+            //                  -> se base sur des fonctions d'attente personnalisï¿½es, oï¿½ le script attend que le joueur place ses tuiles/pions
 
 
             // Description de la phase d'interaction  :
-            //      - Réception des 3 tuiles 
-            //      - Vérification qu'une des 3 est posable, si ce n'est pas le cas on prévient le serveur et on demande d'autres tuiles
-            //      - Affichage de la tuile ainsi choisie par le client (la première à être posable)
+            //      - Rï¿½ception des 3 tuiles 
+            //      - Vï¿½rification qu'une des 3 est posable, si ce n'est pas le cas on prï¿½vient le serveur et on demande d'autres tuiles
+            //      - Affichage de la tuile ainsi choisie par le client (la premiï¿½re ï¿½ ï¿½tre posable)
             //          -> MaJ graphique (tuile choisie)
             //      - (Attente d'une action du joueur : pose d'une tuile)
-            //      - Envoie la pose de tuile au serveur et observe sa réponse (si le coup est illégal par exemple)
-            //          -> MaJ graphique (tuile posée)
+            //      - Envoie la pose de tuile au serveur et observe sa rï¿½ponse (si le coup est illï¿½gal par exemple)
+            //          -> MaJ graphique (tuile posï¿½e)
             //      - (Attente d'une action du joueur : pose d'un pion)
-            //      - Envoie la pose de pion au serveur et observe sa réponse (si le coup est illégal par exemple)
-            //          -> MaJ graphique (pion posé)
+            //      - Envoie la pose de pion au serveur et observe sa rï¿½ponse (si le coup est illï¿½gal par exemple)
+            //          -> MaJ graphique (pion posï¿½)
             //      - (Attente d'une action du joueur : validation de son tour)
-            //      - Envoie la validation du tour au serveur et observe sa réponse (si le coup est illégal par exemple)
-            //          -> MaJ graphique (tour terminé)
+            //      - Envoie la validation du tour au serveur et observe sa rï¿½ponse (si le coup est illï¿½gal par exemple)
+            //          -> MaJ graphique (tour terminï¿½)
 
 
 
@@ -325,7 +326,7 @@ namespace Assets.system
             {
                 OnTuileReceived(packet);
             }
-            else if(packet.IdMessage == Tools.IdMessage.PlayerList)
+            else if (packet.IdMessage == Tools.IdMessage.PlayerList)
             {
                 OnPlayerListReceive(packet);
             }
@@ -360,7 +361,7 @@ namespace Assets.system
                 {
                     if (position.Length >= 0)
                     {
-                        Debug.Log("Les positions de la " + i + "ème tuile : " + position);
+                        Debug.Log("Les positions de la " + i + "ï¿½me tuile : " + position);
                         SendAllPosition(position, id_tuile);
                         tileParam.tile_flags = true;
                         allposition = position;
@@ -376,24 +377,24 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        private void SendAllPosition(Position[] position,ulong id_tuile)
+        private void SendAllPosition(Position[] position, ulong id_tuile)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
             packet.IdPlayer = _mon_id;
 
             int i, taille = position.Length;
-            int taille_data = 2 + taille*3;
+            int taille_data = 2 + taille * 3;
             packet.Data = new string[taille_data];
 
             packet.Data[0] = _id_partie.ToString();
             packet.Data[1] = id_tuile.ToString();
 
-            for (i= 2; i < taille_data - 2; i+=3)
+            for (i = 2; i < taille_data - 2; i += 3)
             {
                 packet.Data[i] = position[taille_data / 3].X.ToString();
-                packet.Data[i+1] = position[(taille_data / 3)].Y.ToString();
-                packet.Data[i+2] = position[(taille_data / 3)].ROT.ToString();
+                packet.Data[i + 1] = position[(taille_data / 3)].Y.ToString();
+                packet.Data[i + 2] = position[(taille_data / 3)].ROT.ToString();
 
             }
 
@@ -407,7 +408,7 @@ namespace Assets.system
             packet.IdPlayer = _mon_id;
 
             packet.Data = new string[7];
-            
+
             packet.Data[0] = _id_partie.ToString();
             packet.Data[1] = id_tuile.ToString();
             packet.Data[2] = X.ToString();
@@ -421,10 +422,10 @@ namespace Assets.system
 
         public void OnPlayerListReceive(Packet packet)
         {
-            int i,compteur = 0, taille_data = packet.Data.Length;
-            playerList = new Player[taille_data/3];
+            int i, compteur = 0, taille_data = packet.Data.Length;
+            playerList = new Player[taille_data / 3];
 
-            for(i = 0; i < taille_data; i+=3)
+            for (i = 0; i < taille_data; i += 3)
             {
                 playerList[compteur] = new Player(Convert.ToUInt64(packet.Data[i]), packet.Data[i + 1], Convert.ToUInt32(packet.Data[i + 2]), Convert.ToUInt32(packet.Data[i + 3]));
             }
