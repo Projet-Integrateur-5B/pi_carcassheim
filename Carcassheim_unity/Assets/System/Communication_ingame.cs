@@ -273,6 +273,7 @@ namespace Assets.system
             dico_tuile = reader.ReadXml();
 
             Communication.Instance.StartListening(OnPacketReceived);
+            Debug.Log("On est dans la game");
 
             /*
             Action listening = () =>

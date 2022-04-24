@@ -90,15 +90,14 @@ public class PublicRoomMenu : Miscellaneous
 				s_listAction.WaitOne();
 				listAction.Add("loadScene");
 				s_listAction.Release();
-
-				Debug.Log("AXEL EST UNE MERDE");
 			}
 		}
         else
         {
-			Communication.Instance.NewReceive();
+			Communication.Instance.NewListening();
+
 		}
-		Debug.Log("AXEL a bien fait son travail, enfin je suis pas sur, id : "+ packet.IdMessage);
+		Debug.Log("Packet id : "+ packet.IdMessage);
     }
 
 	IEnumerator LoadYourAsyncScene()

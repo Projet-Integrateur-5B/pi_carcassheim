@@ -185,7 +185,8 @@ public class ClientAsync
                 state.Packet.Data = state.Data;
 
                 OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
-                Receive(client);
+
+                //Receive(client);
                 // TODO: check if packet.IdMessage requires an answer for the client
 
                 // Start listening again.
@@ -196,8 +197,11 @@ public class ClientAsync
             else
             {
                 // Get the rest of the data.
+
+                
                 client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReceiveCallback), state);
+                
             }
         }
         catch (Exception e)

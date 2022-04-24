@@ -100,7 +100,7 @@ public class CreateRoomMenu : Miscellaneous
 
 			if (res)
 			{
-				ChangeMenu("CreateRoomMenu", "RoomIsCreatedMenu");
+				ChangeMenu("CreateRoomMenu", "PublicRoomMenu");
 			}
 
 			s_listAction.WaitOne();
