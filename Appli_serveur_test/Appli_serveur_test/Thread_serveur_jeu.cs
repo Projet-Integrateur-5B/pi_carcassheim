@@ -316,10 +316,9 @@ namespace system
             /* Zone  du Dictionary Score */
             _dico_joueur = new Dictionary<ulong, Player>();
             _s_dico_joueur = new Semaphore(1, 1);
-            _nombre_joueur = 1;
+            _nombre_joueur = 0;
             _s_nombre_joueur = new Semaphore(1, 1);
             _nombre_joueur_max = 8;
-            _dico_joueur.Add(id_joueur_createur, new Player(id_joueur_createur, playerSocket));
             _id_moderateur = id_joueur_createur;
 
             _statut_partie = Tools.GameStatus.Room;
