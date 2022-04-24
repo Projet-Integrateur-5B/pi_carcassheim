@@ -202,7 +202,7 @@ public class ClientAsync
 
             // Begin sending the data to the remote device.
             var size = bytes.Length;
-            Console.WriteLine("Sent {0} bytes to =>\t" + packet, size, client.RemoteEndPoint);
+            Console.WriteLine("Sent {0} bytes to {1} =>\t" + packet, size, client.RemoteEndPoint);
             client.BeginSend(bytes, 0, size, 0,
                 null, client);
         }
