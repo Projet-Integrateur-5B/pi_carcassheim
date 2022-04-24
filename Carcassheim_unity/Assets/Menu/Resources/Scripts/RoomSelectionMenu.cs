@@ -5,6 +5,7 @@ using System;
 using ClassLibrary;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 public class RoomSelectionMenu : Miscellaneous
 {
@@ -24,8 +25,25 @@ public class RoomSelectionMenu : Miscellaneous
 		roomSelectMenu = GameObject.Find("SubMenus").transform.Find("RoomSelectionMenu").transform;
 		panelRooms = roomSelectMenu.Find("Canvas").transform.Find("ListOfRoom").transform.Find("PanelRooms").transform;
 
+		listAction = new List<string>();
+		s_listAction = new Semaphore(1, 1);
+
+		OnMenuChange += OnStart;
+	}
+
+	private void TableauRoom()
+    {
 		List_of_Rooms = new List<List<GameObject>>();
-		for(int i = 0; i < nombreRoom; i++)
+
+		int compteur = 0;
+		nombreRoom = 0;
+
+		s_listAction.WaitOne();
+		int taille = listAction.Count;
+		s_listAction.Release();
+
+		int nbLigne = taille / 5;
+		for(int i = 0; i < nbLigne; i++)
         {
 			List_of_Rooms.Add(new List<GameObject>() { new GameObject("ID_Test " + i), new GameObject("Hosts_Test " + i), new GameObject("Endgame_Test " + i), new GameObject("Players_Test " + i), new GameObject("Max players_Test " + i) });
 		}
@@ -49,10 +67,21 @@ public class RoomSelectionMenu : Miscellaneous
 			}
 		}
 
-		listAction = new List<string>();
-		s_listAction = new Semaphore(1, 1);
+		s_listAction.WaitOne();
+		for (int i = 0; i < taille; i += 5)
+		{
+			
+			SetIDRoom(compteur, listAction[i]);
+			SetHostsRoom(compteur, listAction[i + 1]);
+			SetPlayersRoom(compteur, listAction[i + 2]);
+			SetMaxPlayersRoom(compteur, listAction[i + 3]);
+			SetEndgameRoom(compteur, listAction[i + 4]);
+			compteur++;
+			nombreRoom++;
+		}
 
-		OnMenuChange += OnStart;
+		listAction.Clear();
+		s_listAction.Release();
 	}
 
 	public void OnStart(string pageName)
@@ -62,6 +91,7 @@ public class RoomSelectionMenu : Miscellaneous
 			case "RoomSelectionMenu":
 				/* Commuication Async */
 				Communication.Instance.StartListening(OnPacketReceived);
+				LoadRoomInfo();
 				break;
 
 			default:
@@ -176,24 +206,9 @@ public class RoomSelectionMenu : Miscellaneous
 		int taille = listAction.Count;
 		s_listAction.Release();
 
-		if (taille > 0)
+		if ((taille > 0) && ( taille%5 == 0))
 		{
-			// A modifier quand il y aura une liste
-			int compteur = 0;
-
-			s_listAction.WaitOne();
-			for (int i = 0; i < taille; i += 5)
-			{
-				SetIDRoom(compteur, listAction[i]);
-				SetHostsRoom(compteur, listAction[i + 1]);
-				SetPlayersRoom(compteur, listAction[i + 2]);
-				SetMaxPlayersRoom(compteur, listAction[i + 3]);
-				SetEndgameRoom(compteur, listAction[i + 4]);
-				compteur++;
-			}
-
-			listAction.Clear();
-			s_listAction.Release();
+			TableauRoom();
 		}
 	}
 }
