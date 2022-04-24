@@ -112,12 +112,13 @@ namespace Assets.system
 
         private static void ReadTerrain(XmlReader xmlReader)
         {
-            while (xmlReader.Read())
+            bool readingId = false;
+            bool readingNom = false;
+            int currentId = 0;
+            string currentNom = "";
+            bool finish = false;
+            while (!finish && xmlReader.Read())
             {
-                bool readingId = false;
-                bool readingNom = false;
-                int currentId = 0;
-                string currentNom = "";
                 switch (xmlReader.NodeType)
                 {
                     case XmlNodeType.Element:
@@ -128,6 +129,9 @@ namespace Assets.system
                                 break;
                             case "nom":
                                 readingNom = true;
+                                break;
+                            case "tuile":
+                                finish = true;
                                 break;
                             default:
                                 break;
