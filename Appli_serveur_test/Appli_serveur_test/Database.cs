@@ -155,11 +155,10 @@ public class Database
     public string GetPseudo(ulong idu)
     {
         string commande = "select Pseudo from table Utilisateur where IDU = @pIDU;";
-        string[] parametres = new[] {"pIDU", idu.ToString()};
+        object[] parametres = new[] {"pIDU", idu.ToString()};
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
         
-        int nbResult = res.Result.Length;
-        if (nbResult > 0)
+        if (res.Result.Length > 0)
         {
             return res.Result[0].ToString();
         }
