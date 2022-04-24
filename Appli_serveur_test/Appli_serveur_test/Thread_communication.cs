@@ -14,7 +14,8 @@ namespace system
         // Attributs
 
         private int _id_thread_com;
-        private int _numero_port;
+        private int _numero_localPort;
+        private int _numero_remotePort;
         private int _nb_parties_gerees;
 
         private List<int> _id_parties_gerees;
@@ -29,9 +30,10 @@ namespace system
         // Constructeur
         // =============
 
-        public Thread_communication(int num_port, int id)
+        public Thread_communication(int num_localPort, int num_remotePort, int id)
         {
-            _numero_port = num_port;
+            _numero_localPort = num_localPort;
+            _numero_remotePort = num_remotePort;
             _nb_parties_gerees = 0;
             _id_parties_gerees = new List<int>();
             _id_thread_com = id;
@@ -64,9 +66,14 @@ namespace system
             return _lock_id_parties_gerees;
         }
 
-        public int Get_port()
+        public int Get_localPort()
         {
-            return _numero_port;
+            return _numero_localPort;
+        }
+        
+        public int Get_remotePort()
+        {
+            return _numero_remotePort;
         }
 
         public List<Thread_serveur_jeu> Get_list_server_thread()
@@ -844,7 +851,7 @@ namespace system
             // Informations du thread
 
             Console.WriteLine(string.Format("[{0}] Je suis un thread !", _id_thread_com));
-            Console.WriteLine(string.Format("[{0}] J'officie sur le port numéro {1} !", _id_thread_com, _numero_port));
+            Console.WriteLine(string.Format("[{0}] J'officie sur le port numéro {1} !", _id_thread_com, _numero_localPort));
             Console.WriteLine(string.Format("[{0}] Je gère actuellement {1} parties!", _id_thread_com, _nb_parties_gerees));
             foreach (int id_ite in _id_parties_gerees)
             {
@@ -856,7 +863,7 @@ namespace system
 
             
             // Lancement du serveur d'écoute du thread de com
-            Server.Server.StartListening(_numero_port);
+            Server.Server.StartListening(_id_thread_com + 1);
 
 
             

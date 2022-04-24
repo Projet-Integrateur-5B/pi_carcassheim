@@ -25,53 +25,13 @@ public static partial class Server
     private static ServerParameters Settings { get; set; } = new();
 
     /// <summary>
-    ///     Stores the config file of the <see cref="Server" /> into <see cref="Settings" />.
-    /// </summary>
-    /// <param name="error">Stores the <see cref="Tools.Errors" /> value.</param>
-    /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static void GetConfig(ref Tools.Errors error)
-    {
-        Settings = new ServerParameters(); // default
-
-        // Check if enum "Errors" do exist.
-        if (!Enum.IsDefined(typeof(Tools.Errors), error))
-        {
-            throw new InvalidEnumArgumentException(nameof(error), (int)error,
-                typeof(Tools.Errors));
-        }
-
-        // Catch : config file could not be imported nor serialized into ServerParameters.
-        try
-        {
-            // Import the config file.
-            IConfiguration config = new ConfigurationBuilder()
-                .AddJsonFile("config.json")
-                .AddEnvironmentVariables()
-                .Build();
-
-            // Config into ServerParameters.
-            Settings = config.GetRequiredSection("Settings").Get<ServerParameters>() ??
-                       new ServerParameters();
-
-            // No error has occured.
-            error = Tools.Errors.None;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            // Setting the error value.
-            error = Tools.Errors.ConfigFile;
-        }
-    }
-
-    /// <summary>
     ///     Setup a listening socket for the <see cref="Server" /> from <see cref="Settings" />.
     /// </summary>
     /// <param name="error">Stores the <see cref="Tools.Errors" /> value.</param>
     /// <param name="port">Server's local port.</param>
     /// <returns>The listening socket.</returns>
     /// <exception cref="InvalidEnumArgumentException"></exception>
-    public static Socket GetListenerSocket(ref Tools.Errors error, int port)
+    public static Socket GetListenerSocket(ref Tools.Errors error, int offset)
     {
         // Check if enum "Errors" do exist.
         if (!Enum.IsDefined(typeof(Tools.Errors), error))
@@ -90,7 +50,7 @@ public static partial class Server
             Console.WriteLine("Server is preparing to listen...");
             var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             var ipAddress = ipHostInfo.AddressList[0];
-            var localEndPoint = new IPEndPoint(ipAddress, port == 0 ? Settings.ServerPort : port);
+            var localEndPoint = new IPEndPoint(ipAddress, Settings.LocalPort + offset);
 
             // Create a TCP/IP socket and Bind to the local endpoint and listen for incoming connections.
             listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -115,13 +75,13 @@ public static partial class Server
     ///     Main server method which accepts incoming connections and starts an asynchronous communication.
     /// </summary>
     /// <param name="port">Server's local port.</param>
-    public static void StartListening(int port)
+    public static void StartListening(int offset)
     {
         var error_value = Tools.Errors.None;
         Console.WriteLine("Server is setting up...");
 
         // Getting the server settings from the config file.
-        GetConfig(ref error_value);
+        Settings = ServerParameters.GetConfig(ref error_value);
         if (error_value != Tools.Errors.None) // Checking for errors.
         {
             // Setting the error value.
@@ -129,8 +89,11 @@ public static partial class Server
             return;
         }
 
+        if (offset > Settings.MaxNbPorts - 1)
+            return;
+
         // Getting the listening socket from the server settings.
-        var listener = GetListenerSocket(ref error_value, port);
+        var listener = GetListenerSocket(ref error_value, offset);
         if (error_value != Tools.Errors.None) // Checking for errors.
         {
             // Setting the error value.
@@ -403,23 +366,6 @@ public static partial class Server
     }
 
     /// <summary>
-    ///     Object used to store the parameters of the <see cref="Server" />.
-    /// </summary>
-    [Serializable]
-    public class ServerParameters
-    {
-        /// <summary>
-        ///     The local port on which the server is running.
-        /// </summary>
-        public int ServerPort { get; set; }
-
-        /// <summary>
-        ///     Time left (without any communication) to a async listening socket until timeout.
-        /// </summary>
-        public int Timeout { get; set; }
-    }
-
-    /// <summary>
     ///     State object for storing useful data asynchronously in <see cref="Server" />.
     /// </summary>
     public class StateObject
@@ -461,5 +407,74 @@ public static partial class Server
         ///     Used to check if <see cref="Listener" /> has timed out in <see cref="StateObject" />.
         /// </summary>
         public ManualResetEvent ReceiveDone { get; set; } = new(false);
+    }
+}
+
+/// <summary>
+///     Object used to store the parameters of the <see cref="Server" />.
+/// </summary>
+[Serializable]
+public class ServerParameters
+{
+    /// <summary>
+    ///     The local port on which the server is running.
+    /// </summary>
+    public int LocalPort { get; set; }
+        
+    /// <summary>
+    ///     The remote port on which the server is running.
+    /// </summary>
+    public int RemotePort { get; set; }
+        
+    /// <summary>
+    ///     The number max of ports.
+    /// </summary>
+    public int MaxNbPorts { get; set; }
+
+    /// <summary>
+    ///     Time left (without any communication) to a async listening socket until timeout.
+    /// </summary>
+    public int Timeout { get; set; }
+    
+    /// <summary>
+    ///     Stores the config file of the <see cref="Server" /> into <see cref="Settings" />.
+    /// </summary>
+    /// <param name="error">Stores the <see cref="Tools.Errors" /> value.</param>
+    /// <exception cref="InvalidEnumArgumentException"></exception>
+    public static ServerParameters GetConfig(ref Tools.Errors error)
+    {
+        var settings = new ServerParameters(); // default
+
+        // Check if enum "Errors" do exist.
+        if (!Enum.IsDefined(typeof(Tools.Errors), error))
+        {
+            throw new InvalidEnumArgumentException(nameof(error), (int)error,
+                typeof(Tools.Errors));
+        }
+
+        // Catch : config file could not be imported nor serialized into ServerParameters.
+        try
+        {
+            // Import the config file.
+            IConfiguration config = new ConfigurationBuilder()
+                .AddJsonFile("config.json")
+                .AddEnvironmentVariables()
+                .Build();
+
+            // Config into ServerParameters.
+            settings = config.GetRequiredSection("Settings").Get<ServerParameters>() ??
+                       new ServerParameters();
+
+            // No error has occured.
+            error = Tools.Errors.None;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            // Setting the error value.
+            error = Tools.Errors.ConfigFile;
+        }
+
+        return settings;
     }
 }

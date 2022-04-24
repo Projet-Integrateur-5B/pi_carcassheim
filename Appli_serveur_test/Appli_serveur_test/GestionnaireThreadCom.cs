@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using ClassLibrary;
+using Server;
 
 namespace system
 {
@@ -14,7 +15,8 @@ namespace system
 
         public List<Thread_communication> _lst_obj_threads_com { get; set; }
         public List<Thread> _lst_threads_com { get; set; }
-        private List<int> _lst_port_dispo;
+        private List<int> _lst_localPort_dispo;
+        private List<int> _lst_remotePort_dispo;
         private int _compteur_id_thread_com;
 
         private GestionnaireThreadCom() { }
@@ -47,9 +49,25 @@ namespace system
                         _instance = new GestionnaireThreadCom();
                         _instance._lst_obj_threads_com = new List<Thread_communication>();
                         _instance._lst_threads_com = new List<Thread>();
-                        int[] portsDispos = { 10001, 10002, 10003, 10004, 10005, 10006, 10007 };
-                        _instance._lst_port_dispo = new List<int>(portsDispos);
+                        // int[] portsDispos = { 10001, 10002, 10003, 10004, 10005, 10006, 10007 };
+                        _instance._lst_localPort_dispo = new List<int>();
+                        _instance._lst_remotePort_dispo = new List<int>();
                         _instance._compteur_id_thread_com = 0;
+
+                        var error_value = Tools.Errors.None;
+                        var test = ServerParameters.GetConfig(ref error_value);
+                        if (error_value != Tools.Errors.None) // Checking for errors.
+                        {
+                            // Setting the error value.
+                            // TODO : GetConfig error
+                            return null;
+                        }
+
+                        for (var i = 1; i < test.MaxNbPorts; i++)
+                        {
+                            _instance._lst_localPort_dispo.Add(test.LocalPort + i);
+                            _instance._lst_remotePort_dispo.Add(test.RemotePort + i);
+                        }
                     }
                 }
             }
@@ -69,18 +87,20 @@ namespace system
 
             lock (_lock)
             {
-                if (_instance._lst_port_dispo.Count != 0)
+                if (_instance._lst_localPort_dispo.Count != 0 && _instance._lst_remotePort_dispo.Count != 0)
                 {
-                    int port_choisi = _instance._lst_port_dispo[0];
+                    int localPort_choisi = _instance._lst_localPort_dispo[0];
+                    int remotePort_choisi = _instance._lst_remotePort_dispo[0];
 
-                    Thread_communication thread_com = new Thread_communication(port_choisi, _instance._compteur_id_thread_com);
+                    Thread_communication thread_com = new Thread_communication(localPort_choisi, remotePort_choisi, _instance._compteur_id_thread_com);
                     _instance._compteur_id_thread_com++;
                     Thread nouv_thread = new Thread(new ThreadStart(thread_com.Lancement_thread_com));
 
                     _instance._lst_obj_threads_com.Add(thread_com);
                     _instance._lst_threads_com.Add(nouv_thread);
 
-                    _instance._lst_port_dispo.RemoveAt(0);
+                    _instance._lst_localPort_dispo.RemoveAt(0);
+                    _instance._lst_remotePort_dispo.RemoveAt(0);
 
                     nouv_thread.Start();
 
@@ -148,7 +168,7 @@ namespace system
                     {
 
                         // Port du thread de com
-                        port = thread_com_iterateur.Get_port();
+                        port = thread_com_iterateur.Get_localPort();
 
 
                         break; // Sortie du foreach
@@ -184,8 +204,7 @@ namespace system
                     idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket);
                     if(idNewRoom != -1)
                     {
-                        portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
-                        portThreadCom += 9000;
+                        portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_remotePort();
                     }
                 }            
             }
@@ -209,8 +228,7 @@ namespace system
                         idNewRoom = thread_com_iterateur.AddNewGame(idPlayer, socket);
                         if (idNewRoom != -1)
                         {
-                            portThreadCom = thread_com_iterateur.Get_port();
-                            portThreadCom += 9000;
+                            portThreadCom = thread_com_iterateur.Get_remotePort();
                         }
 
                         break; // Sort du foreach
@@ -231,8 +249,7 @@ namespace system
                         idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket);
                         if (idNewRoom != -1)
                         {
-                            portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_port();
-                            portThreadCom += 9000;
+                            portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_remotePort();
                         }
                     }
 
@@ -288,13 +305,13 @@ namespace system
                     if (playerStatus != Tools.PlayerStatus.Success) // Le joueur n'a pas pu être ajouté
                     {
                         if (playerStatus == Tools.PlayerStatus.Found) // Le joueur est déjà dans la partie
-                            return thread_com_iterateur.Get_port() + 9000;
+                            return thread_com_iterateur.Get_remotePort();
                         else // Tous les autres cas
                             return -1;
                     }
                         
 
-                    return thread_com_iterateur.Get_port() + 9000; 
+                    return thread_com_iterateur.Get_remotePort(); 
                 }
             }
 
