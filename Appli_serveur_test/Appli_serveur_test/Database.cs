@@ -155,7 +155,7 @@ public class Database
     public string GetPseudo(ulong idu)
     {
         string commande = "SELECT Pseudo FROM Utilisateur WHERE IDU = @pIDU;";
-        object[] parametres = new[] {"pIDU", idu.ToString()};
+        object[] parametres = new object[] {"pIDU", idu};
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
         
         if (res.Result.Length > 0)
