@@ -269,8 +269,7 @@ namespace Assets.system
             // ==== DANS LA GAME ====
             // ======================
             lePlateau = new Plateau();
-            LireXml reader = new LireXml("config_back.xml");
-            dico_tuile = reader.ReadXml();
+            dico_tuile = LireXML2.Read("config_back.xml");
 
             Communication.Instance.StartListening(OnPacketReceived);
 

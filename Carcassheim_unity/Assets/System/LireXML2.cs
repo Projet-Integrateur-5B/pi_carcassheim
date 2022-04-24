@@ -18,7 +18,7 @@ namespace Assets.system
         {
             Positions = new Dictionary<string, int>
             {
-                {"nno", 0 },
+                {"nnw", 0 },
                 {"n", 1 },
                 {"nne", 2 },
                 {"nee", 3 },
@@ -26,10 +26,10 @@ namespace Assets.system
                 {"see", 5 },
                 {"sse", 6 },
                 {"s", 7 },
-                {"sso", 8 },
-                {"soo", 9 },
-                {"o", 10 },
-                {"noo", 11 }
+                {"ssw", 8 },
+                {"sww", 9 },
+                {"w", 10 },
+                {"nww", 11 }
             };
 
             IdVersTerrain = new Dictionary<int, TypeTerrain>();
@@ -44,52 +44,52 @@ namespace Assets.system
                 { "riviere", TypeTerrain.Riviere }
             };
         }
-        public static Dictionary<int, Tuile> Read(string file)
+        public static Dictionary<ulong, Tuile> Read(string file)
         {
-            var result = new Dictionary<int, Tuile>();
+            var result = new Dictionary<ulong, Tuile>();
 
             using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + @file))
             {
                 ReadTerrain(reader);
+                bool readingId = false;
+                int currentId = 0;
+                List<List<int>> lien = new List<List<int>>();
+                List<Slot> slots = new List<Slot>();
+                Tuile current;
+                int lienPtr = 0;
                 while (reader.Read())
                 {
-                    bool readingId = false;
-                    int currentId = 0;
-                    List<List<int>> lien = new List<List<int>>();
-                    List<Slot> slots = new List<Slot>();
-                    Tuile current;
-                    int lienPtr = 0;
                     switch (reader.NodeType)
                     {
                         case XmlNodeType.Element:
-                        switch (reader.Name)
-                        {
-                            case "tuile":
-                                lien = new List<List<int>>();
-                                slots = new List<Slot>();
-                                lienPtr = 0;
-
-                                
-                                break;
-                            case "id":
+                            switch (reader.Name)
+                            {
+                                case "tuile":
+                                    lien = new List<List<int>>();
+                                    slots = new List<Slot>();
+                                    lienPtr = 0;
+                                    break;
+                                case "id":
                                     readingId = true;
-                                break;
-                            case "slot":
-                                Slot tempSlot;
-                                var tempLien = ReadSlot(reader, out tempSlot);
-                                lien.Add(tempLien);
-                                slots.Add(tempSlot);
-                                lienPtr++;
-                                break;
-                            default:
-                                break;
-                        }
+                                    break;
+                                case "slot":
+                                    Slot tempSlot;
+                                    var tempLien = ReadSlot(reader, out tempSlot);
+                                    lien.Add(tempLien);
+                                    slots.Add(tempSlot);
+                                    lienPtr++;
+                                    break;
+                                default:
+                                    readingId = false;
+                                    break;
+                            }
                             break;
                         case XmlNodeType.Text:
                             if (readingId)
                                 currentId = int.Parse(reader.Value);
                             break;
                         case XmlNodeType.EndElement:
+                            readingId = false;
                             if (reader.Name == "tuile")
                             {
                                 var temp = new List<int[]>();
@@ -97,8 +97,9 @@ namespace Assets.system
                                 {
                                     temp.Add(item.ToArray());
                                 }
+                                Debug.Log("ADDING " + currentId.ToString());
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
-                                result.Add(currentId, current);
+                                result.Add((ulong)currentId, current);
                             }
                             break;
                         default:
@@ -178,14 +179,13 @@ namespace Assets.system
                                 nodeName = "id";
                                 break;
                             case "slot":
-                                stop = true;
                                 break;
                             case "terrain":
                                 nodeName = "terrain";
                                 break;
                             default:
+                                Debug.Log(xmlReader.Name);
                                 result.Add(Positions[xmlReader.Name]);
-                                goNext = true;
                                 break;
                         }
                         break;
