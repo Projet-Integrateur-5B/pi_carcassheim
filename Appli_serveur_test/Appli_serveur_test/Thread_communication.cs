@@ -166,6 +166,7 @@ namespace system
                 {
                     foreach(var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
+                        packet.IdPlayer = joueur.Value._id_player;
                         ClientAsync.Send(joueur.Value._socket_of_player, packet);
 
                         // Lancement de l'écoute des réponse du client async
@@ -280,6 +281,7 @@ namespace system
 
                     foreach(var joueur in threadJeu.Get_Dico_Joueurs())
                     {
+                        packet.IdPlayer = joueur.Value._id_player;
                         ClientAsync.Send(joueur.Value._socket_of_player, packet);
 
                         // Lancement de l'écoute de la réponse du joueur modérateur
