@@ -51,39 +51,39 @@ namespace Assets.system
             using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + @file))
             {
                 ReadTerrain(reader);
+                bool readingId = false;
+                int currentId = 0;
+                List<List<int>> lien = new List<List<int>>();
+                List<Slot> slots = new List<Slot>();
+                Tuile current;
+                int lienPtr = 0;
                 while (reader.Read())
                 {
-                    bool readingId = false;
-                    int currentId = 0;
-                    List<List<int>> lien = new List<List<int>>();
-                    List<Slot> slots = new List<Slot>();
-                    Tuile current;
-                    int lienPtr = 0;
                     switch (reader.NodeType)
                     {
                         case XmlNodeType.Element:
-                        switch (reader.Name)
-                        {
-                            case "tuile":
-                                lien = new List<List<int>>();
-                                slots = new List<Slot>();
-                                lienPtr = 0;
+                            switch (reader.Name)
+                            {
+                                case "tuile":
+                                    lien = new List<List<int>>();
+                                    slots = new List<Slot>();
+                                    lienPtr = 0;
 
                                 
-                                break;
-                            case "id":
-                                    readingId = true;
-                                break;
-                            case "slot":
-                                Slot tempSlot;
-                                var tempLien = ReadSlot(reader, out tempSlot);
-                                lien.Add(tempLien);
-                                slots.Add(tempSlot);
-                                lienPtr++;
-                                break;
-                            default:
-                                break;
-                        }
+                                    break;
+                                case "id":
+                                        readingId = true;
+                                    break;
+                                case "slot":
+                                    Slot tempSlot;
+                                    var tempLien = ReadSlot(reader, out tempSlot);
+                                    lien.Add(tempLien);
+                                    slots.Add(tempSlot);
+                                    lienPtr++;
+                                    break;
+                                default:
+                                    break;
+                            }
                             break;
                         case XmlNodeType.Text:
                             if (readingId)
@@ -178,10 +178,12 @@ namespace Assets.system
                                 nodeName = "id";
                                 break;
                             case "slot":
-                                stop = true;
                                 break;
                             case "terrain":
                                 nodeName = "terrain";
+                                break;
+                            case "link":
+                                nodeName = "link";
                                 break;
                             default:
                                 result.Add(Positions[xmlReader.Name]);
@@ -196,6 +198,8 @@ namespace Assets.system
                                 break;
                             case "terrain":
                                 idTerrain = int.Parse(xmlReader.Value);
+                                break;
+                            case "link":
                                 break;
                             default:
                                 break;
