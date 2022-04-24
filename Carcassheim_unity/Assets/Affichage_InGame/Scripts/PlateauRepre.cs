@@ -61,7 +61,6 @@ public class PlateauRepre : MonoBehaviour
         bool res = false;
         if (pos == null)
         {
-            Debug.Log("WHAT ARE YOU DOIN");
             tile_found = tile.Pos != null && tiles_on_board.TryGetValue(tile.Pos, out act_tile);
             if (tile_found && act_tile == tile)
             {
@@ -72,7 +71,6 @@ public class PlateauRepre : MonoBehaviour
         }
         else
         {
-            Debug.Log("IS ANYOINE HERE");
             tile_found = tiles_on_board.TryGetValue(pos, out act_tile);
             if (!tile_found)
             {
@@ -82,7 +80,6 @@ public class PlateauRepre : MonoBehaviour
                 {
                     if (act_tile == tile)
                     {
-                        Debug.Log("DISPLACED");
                         tiles_on_board.Remove(tile.Pos);
                     }
                     else
@@ -90,12 +87,12 @@ public class PlateauRepre : MonoBehaviour
                 }
                 if (res)
                 {
-                    Debug.Log("WHERE IS MY MIND");
                     tiles_on_board.Add(pos, tile);
                     tile.Pos = pos;
+                    tile.transform.position = rep_O.position + (rep_u.position - rep_O.position) * pos.X + (rep_v.position - rep_O.position) * pos.Y;
                 }
             }
-            else if (tile_found == tile)
+            else if (act_tile == tile)
             {
                 if (tile.Pos.X == pos.X && tile.Pos.Y == pos.Y && tile.Pos.Rotation != pos.Rotation)
                 {
@@ -152,23 +149,28 @@ public class PlateauRepre : MonoBehaviour
         }
     }
 
-    void cleanTilePossibilities()
+    void cleanTilePossibilities(PositionRepre final_pos)
     {
         for (int i = 0; i < act_tile_indicator.Count; i++)
         {
             switch (act_tile_indicator[i].state)
             {
                 case TileIndicatorState.TilePosed:
-                    act_tile_indicator[i].state = TileIndicatorState.LastTile;
-                    break;
                 case TileIndicatorState.TilePossibilitie:
-                    Destroy(act_tile_indicator[i].gameObject);
-                    if (act_tile_indicator.Count > 1)
+                    if (final_pos != null && act_tile_indicator[i].position.X == final_pos.X && act_tile_indicator[i].position.Y == final_pos.Y)
                     {
-                        act_tile_indicator[i] = act_tile_indicator[act_tile_indicator.Count - 1];
-                        i--;
+                        act_tile_indicator[i].state = TileIndicatorState.LastTile;
                     }
-                    act_tile_indicator.RemoveAt(act_tile_indicator.Count - 1);
+                    else
+                    {
+                        Destroy(act_tile_indicator[i].gameObject);
+                        if (act_tile_indicator.Count > 1)
+                        {
+                            act_tile_indicator[i] = act_tile_indicator[act_tile_indicator.Count - 1];
+                            i--;
+                        }
+                        act_tile_indicator.RemoveAt(act_tile_indicator.Count - 1);
+                    }
                     break;
             }
         }
@@ -243,12 +245,15 @@ public class PlateauRepre : MonoBehaviour
         // Fin de tour
         // Ajouter la position finale de la tuile au dictionnaire contenant les tuiles présentes sur le tableau
         setTileAt(pos, tile);
-        cleanTilePossibilities();
+        cleanTilePossibilities(pos);
 
 
         // On regarde si board radius a changé
-        float new_radius = pos.X * pos.X + pos.Y * pos.Y;
-        if (new_radius > BoardRadius)
-            BoardRadius = new_radius;
+        if (pos != null)
+        {
+            float new_radius = pos.X * pos.X + pos.Y * pos.Y;
+            if (new_radius > BoardRadius)
+                BoardRadius = new_radius;
+        }
     }
 }

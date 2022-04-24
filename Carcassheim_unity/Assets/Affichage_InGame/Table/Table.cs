@@ -169,6 +169,7 @@ public class Table : MonoBehaviour
 
     void cleanHand()
     {
+        Debug.Log("HAND CLEANED");
         int L = meeple_zone.transform.childCount;
         Transform c;
         for (int i = L - 1; i >= 0; i--)
@@ -239,7 +240,7 @@ public class Table : MonoBehaviour
         }
         else
         {
-            Debug.Log("Change from state " + old_state.ToString() + " " + new_state.ToString());
+            //Debug.Log("End change from state " + old_state.ToString() + " " + new_state.ToString());
         }
     }
 
@@ -282,8 +283,6 @@ public class Table : MonoBehaviour
         {
             old_tile.pivotPoint.rotation = unselected_angle;
         }
-        Debug.Log(old_tile);
-        Debug.Log(new_tile);
         new_tile.pivotPoint.rotation = Quaternion.identity;
     }
 
