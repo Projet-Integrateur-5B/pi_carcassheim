@@ -190,6 +190,14 @@ namespace Assets.system
         }
 
         //=======================================================
+        // END GAME
+
+        override public void askFinalScore(List<PlayerScoreParam> playerScores)
+        {
+            //TODO Pareil que askScore
+        }
+
+        //=======================================================
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {

@@ -27,24 +27,14 @@ public class ScoreBoard : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (end_of_game)
-        {
-            gameObject.SetActive(true);
-
-        }
-    }
-
-
-    public void setEndOfGame(PlayerRepre player)
+    public void setEndOfGame(PlayerRepre player, int rank)
     {
         playerName.text = player.Name;
         playerScore.text = "Score : " + player.Score.ToString();
-        playerRank.text = "Rank : 0";
+        playerRank.text = "Rank : " + rank.ToString();
 
         end_of_game = true;
+        gameObject.SetActive(true);
     }
     public void Quit()
     {

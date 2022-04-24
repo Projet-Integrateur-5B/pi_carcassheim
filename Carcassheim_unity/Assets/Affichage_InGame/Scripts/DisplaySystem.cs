@@ -197,10 +197,6 @@ public class DisplaySystem : MonoBehaviour
                 table.setBaseState(TableState.TileState);
                 banner.timerTour.resetStop();
                 break;
-            case DisplaySystemState.endOfGame:
-                score_board.setEndOfGame(my_player);
-                break;
-
         }
 
         switch (old_state)
@@ -321,6 +317,22 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
+                List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
+                system_back.askFinalScore(scores_final);
+                foreach (PlayerScoreParam score in scores_final)
+                {
+                    players_mapping[score.id_player].Score = score.points_gagnes;
+                    Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
+                }
+                int n_sup = 0;
+                foreach (PlayerRepre player in players_mapping.Values)
+                {
+                    if (player.Id != my_player.Id && my_player.Score < player.Score)
+                    {
+                        n_sup += 1;
+                    }
+                }
+                score_board.setEndOfGame(my_player, 1 + n_sup);
                 break;
         }
         act_system_state = new_state;
