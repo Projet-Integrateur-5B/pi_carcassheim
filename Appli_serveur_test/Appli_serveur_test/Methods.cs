@@ -279,7 +279,7 @@ public partial class Server
         {
             // Retrieve the hosts pseudo's from the database.
             for(var i=0; i < result.Length; i+=5)
-                result[i+1] = db.GetPseudo(ulong.Parse(result[i+1]));
+                result[i+1] = db.GetPseudo(int.Parse(result[i+1]));
         }
         catch (Exception ex)
         {

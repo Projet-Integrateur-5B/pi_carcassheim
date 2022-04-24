@@ -152,7 +152,7 @@ public class Database
         return 0;
     }*/
     
-    public string GetPseudo(ulong idu)
+    public string GetPseudo(int idu)
     {
         string commande = "SELECT Pseudo FROM Utilisateur WHERE IDU = @pIDU;";
         object[] parametres = new object[] {"pIDU", idu};
