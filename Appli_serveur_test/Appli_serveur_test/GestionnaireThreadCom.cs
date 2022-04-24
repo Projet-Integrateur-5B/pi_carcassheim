@@ -134,7 +134,7 @@ namespace system
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (thread_serv_ite.Is_Private() == false)
+                    if (thread_serv_ite.Is_Private() == false && thread_serv_ite.Get_Status() != Tools.GameStatus.Stopped)
                     {
                         room_list.Add(thread_serv_ite.Get_ID().ToString());
                         room_list.Add(thread_serv_ite.Get_Moderateur().ToString());
