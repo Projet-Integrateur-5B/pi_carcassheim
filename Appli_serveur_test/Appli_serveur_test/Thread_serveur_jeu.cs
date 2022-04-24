@@ -396,7 +396,7 @@ namespace system
                     }
                     else
                     {/* Il n'y a plus personne dans la room */
-                        EndGame();
+                        _statut_partie = Tools.GameStatus.Stopped;
                     }
                 }
 
@@ -655,7 +655,7 @@ namespace system
 
         public Tools.GameStatus UpdateGameStatus()
         {
-            Tools.GameStatus statutGame = Tools.GameStatus.Running;
+            Tools.GameStatus statutGame = _statut_partie;
 
             // Update suivant le mode de jeu
             switch (_mode)
@@ -677,6 +677,8 @@ namespace system
 
                     break;
             }
+
+            _statut_partie = statutGame;
 
             return statutGame;
         }

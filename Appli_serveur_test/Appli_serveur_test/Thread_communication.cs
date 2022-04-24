@@ -778,6 +778,13 @@ namespace system
                         SendTilesRoundStart(threadJeu.GetThreeLastTiles(), nextPlayerSock, idRoom);
                     }
 
+                    // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)
+                    if(threadJeu.Get_Status() == Tools.GameStatus.Stopped)
+                    {
+                        DeleteGame(idRoom);
+                    }
+
+                    break;
                 }
             }
 
