@@ -90,8 +90,6 @@ namespace Assets.system
                                 currentId = int.Parse(reader.Value);
                             break;
                         case XmlNodeType.EndElement:
-                            break;
-                        default:
                             if (reader.Name == "tuile")
                             {
                                 var temp = new List<int[]>();
@@ -102,6 +100,8 @@ namespace Assets.system
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
                                 result.Add(currentId, current);
                             }
+                            break;
+                        default:
                             break;
                     }
                 }
