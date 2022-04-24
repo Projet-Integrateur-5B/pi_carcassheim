@@ -293,7 +293,22 @@ namespace system
             return Array.Empty<string>();
         }
 
-        public int JoinPlayer(string idRoom, ulong idPlayer, Socket? playerSocket)
+        public int CallAskPort(string idRoom)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    return thread_com_iterateur.Get_remotePort();
+                }
+            }
+
+            return -1;
+        }
+
+        public Tools.Errors JoinPlayer(string idRoom, ulong idPlayer, Socket? playerSocket)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
@@ -302,20 +317,17 @@ namespace system
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
-                    if (playerStatus != Tools.PlayerStatus.Success) // Le joueur n'a pas pu être ajouté
+                    if (playerStatus == Tools.PlayerStatus.Full) // La room est pleine
                     {
-                        if (playerStatus == Tools.PlayerStatus.Found) // Le joueur est déjà dans la partie
-                            return thread_com_iterateur.Get_remotePort();
-                        else // Tous les autres cas
-                            return -1;
+                        return Tools.Errors.RoomJoin;
                     }
-                        
 
-                    return thread_com_iterateur.Get_remotePort(); 
+                    return Tools.Errors.None;
+
                 }
             }
 
-            return -1;
+            return Tools.Errors.None;
         }
 
         public Tools.PlayerStatus RemovePlayer(string idRoom, ulong idPlayer)

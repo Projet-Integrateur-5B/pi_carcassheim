@@ -65,6 +65,9 @@ public partial class Server
             case Tools.IdMessage.RoomSettingsSet:
                 RoomSettingsSet(state.Packet, ref packet, socket);
                 break;
+            case Tools.IdMessage.AskPort:
+                AskPort(state.Packet, ref packet, socket);
+                break;
 
             case Tools.IdMessage.PlayerJoin:
                 PlayerJoin(state.Packet, ref packet, socket);
@@ -411,6 +414,49 @@ public partial class Server
         // Attempt to update a room.
         gestionnaire.UpdateRoom(packetReceived.Data[0], packetReceived.IdPlayer, packetReceived.Data.Skip(0).ToArray());
     }
+    /// <summary>
+    ///     Client is asking the port of a room
+    /// </summary>
+    /// <param name="packetReceived"></param>
+    /// <param name="packet"></param>
+    /// <param name="socket"></param>
+    public static void AskPort(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par le serveur main
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening != 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur main, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        // Attempt to add a player to the room.
+        var port = gestionnaire.CallAskPort(packetReceived.Data[0]);
+
+        if (port != -1)
+        {
+            packet.Data = new string[1];
+            packet.Data[0] = port.ToString();
+            // TODO : ensuite client switch port, thread serveur detecte nouveau joueur et broadcast
+        }
+        else
+        {
+            // Something went wrong.
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.RoomJoin;
+        }
+    }
 
 
 
@@ -422,11 +468,11 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void PlayerJoin(Packet packetReceived, ref Packet packet, Socket socket)
     {
-        // Vérification que la communication est reçue par le serveur main
+        // Vérification que la communication est reçue par le thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening != 10000)
+        if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
@@ -442,20 +488,9 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to add a player to the room.
-        var port = gestionnaire.JoinPlayer(packetReceived.Data[0], packetReceived.IdPlayer, socket);
+        Tools.Errors errors = gestionnaire.JoinPlayer(packetReceived.Data[0], packetReceived.IdPlayer, socket);
 
-        if (port != -1)
-        {
-            packet.Data = new string[1];
-            packet.Data[0] = port.ToString();
-            // TODO : ensuite client switch port, thread serveur detecte nouveau joueur et broadcast
-        }
-        else
-        {
-            // Something went wrong.
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.RoomJoin;
-        }
+        packet.Error = errors;
     }
     /// <summary>
     ///     Player is leaving the room/game.
