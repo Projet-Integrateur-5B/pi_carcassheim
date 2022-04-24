@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
@@ -16,7 +17,9 @@ public abstract class Miscellaneous : MonoBehaviour
 {
     [SerializeField] public GameObject absolute_parent;
     static protected GameObject absolute_parent_ref;
-    static bool initialized = false;
+
+    public static event Action<string> OnMenuChange;
+
     private static bool s_state = false;
     private static bool s_menuHasChanged = false;
     private static GameObject previousMenu = null;
@@ -154,8 +157,9 @@ public abstract class Miscellaneous : MonoBehaviour
 
         previousMenu = Miscellaneous.FindObject(absolute_parent, close).gameObject;
         nextMenu = Miscellaneous.FindObject(absolute_parent, goTo).gameObject;
-        if (nextMenu == null)
-            Debug.Log("next not found");
+
+        OnMenuChange?.Invoke(goTo);
+
         previousMenu.SetActive(false);
         nextMenu.SetActive(true);
     }
