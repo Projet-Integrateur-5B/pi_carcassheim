@@ -57,6 +57,7 @@ namespace Assets.system
                 List<Slot> slots = new List<Slot>();
                 Tuile current;
                 int lienPtr = 0;
+                Debug.Log("START TILES");
                 while (reader.Read())
                 {
                     switch (reader.NodeType)
@@ -97,7 +98,7 @@ namespace Assets.system
                                 {
                                     temp.Add(item.ToArray());
                                 }
-                                Debug.Log("ADDING " + currentId.ToString());
+                                Debug.Log("TUILE " + currentId.ToString());
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
                                 result.Add((ulong)currentId, current);
                             }
@@ -113,6 +114,7 @@ namespace Assets.system
 
         private static void ReadTerrain(XmlReader xmlReader)
         {
+            //Debug.Log("TERAAIN");
             bool readingId = false;
             bool readingNom = false;
             int currentId = 0;
@@ -142,7 +144,10 @@ namespace Assets.system
                         readingId = false;
                         readingNom = false;
                         if (xmlReader.Name == "terrain")
+                        {
+                            Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
                             IdVersTerrain.Add(currentId, DictionaireTemp[currentNom]);
+                        }
                         break;
                     case XmlNodeType.Text:
                         if (readingId)
@@ -158,10 +163,12 @@ namespace Assets.system
 
         private static List<int> ReadSlot(XmlReader xmlReader, out Slot slot)
         {
+            // Debug.Log("SLOT");
             var result = new List<int>();
             bool stop = false;
             int idTerrain = 0;
             string nodeName = "";
+            string pos_debug = "";
             bool goNext = false;
             while (!stop && xmlReader.Read())
             {
@@ -184,7 +191,7 @@ namespace Assets.system
                                 nodeName = "terrain";
                                 break;
                             default:
-                                Debug.Log(xmlReader.Name);
+                                pos_debug += xmlReader.Name + "; ";
                                 result.Add(Positions[xmlReader.Name]);
                                 break;
                         }
@@ -211,7 +218,7 @@ namespace Assets.system
             }
 
             slot = new Slot((ulong)idTerrain);
-
+            Debug.Log("END SLOT OF" + idTerrain.ToString() + " of " + pos_debug);
             return result;
         }
     }
