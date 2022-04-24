@@ -328,7 +328,7 @@ namespace system
             _mode = Tools.Mode.Default;
             _nb_tuiles = 60;
             _score_max = -1;
-            _privee = true; // Une partie est par défaut privée
+            _privee = false; // Une partie est par défaut privée
             _timer = Tools.Timer.Heure; // Une heure par défaut
             _timer_max_joueur = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
