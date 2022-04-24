@@ -44,9 +44,9 @@ public partial class Server
                 AccountSignup(state.Packet, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountLogin:
-                AccountLogin(state.Packet, ref packet, socket);
+                AccountLogin(ar, state.Packet, ref packet, socket);
                 break;
-            case Tools.IdMessage.AccountLogout:
+            case Tools.IdMessage.AccountLogout: // impossible
                 AccountLogout(state.Packet, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountStatistics:
@@ -159,7 +159,7 @@ public partial class Server
     /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void AccountLogin(Packet packetReceived, ref Packet packet, Socket socket)
+    public static void AccountLogin(IAsyncResult ar, Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par le serveur main
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
@@ -168,6 +168,14 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+        
+        var state = (StateObject?)ar.AsyncState;
+        if (state?.Packet is null) // Checking for errors.
+        {
+            // Setting the error value.
+            // TODO : state is null
             return;
         }
 
@@ -181,7 +189,7 @@ public partial class Server
                 packet.Error = Tools.Errors.Database;
             // Data does correspond : return the user's IdPlayer.
             else
-                packet.IdPlayer = (ulong)result;
+                state.IdPlayer = packet.IdPlayer = (ulong)result;
         }
         catch (Exception ex)
         {

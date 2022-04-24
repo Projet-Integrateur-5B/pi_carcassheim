@@ -1,3 +1,5 @@
+using system;
+
 namespace Server;
 
 using System.ComponentModel;
@@ -296,7 +298,6 @@ public static partial class Server
         if (state.Packet.IdMessage == Tools.IdMessage.AccountLogout)
         {
             Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
-            GetFromDatabase(ar, listener);
             DisconnectFromClient(ar);
         }
         // Final packet of the series has been received.
@@ -390,6 +391,9 @@ public static partial class Server
             // TODO : state is null
             return;
         }
+        
+        // Récupération du singleton gestionnaire + Attempt to remove a player from all the rooms.
+        GestionnaireThreadCom.GetInstance().LogoutPlayer(state.IdPlayer);
 
         // Ending client connection.
         Console.WriteLine(state.Listener.RemoteEndPoint + "\t => Closing client connection...");
@@ -420,6 +424,8 @@ public static partial class Server
     /// </summary>
     public class StateObject
     {
+        public ulong IdPlayer { get; set; }
+        
         /// <summary>
         ///     Received data size related to <see cref="Packet" /> in <see cref="StateObject" />.
         /// </summary>
