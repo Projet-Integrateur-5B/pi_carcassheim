@@ -194,6 +194,7 @@ namespace system
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.PlayerReady;
             packet.Type = true;
+            packet.IdPlayer = idPlayer;
 
             // Récupération du bon thread de jeu
             foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
