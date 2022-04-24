@@ -165,7 +165,6 @@ namespace system
                         ClientAsync.OnPacketReceived += OnPacketReceived;
                         ClientAsync.Receive(joueur.Value._socket_of_player);
 
-                        break;
                     }
                 }
             }
