@@ -62,7 +62,8 @@ public class DisplaySystem : MonoBehaviour
     // * PLAYERS **********************************************
 
     private Dictionary<int, PlayerRepre> players_mapping;
-    private PlayerRepre my_player, act_player;
+    private PlayerRepre my_player;
+    public PlayerRepre act_player;
 
     [SerializeField] private List<Color> players_color;
 
@@ -191,7 +192,6 @@ public class DisplaySystem : MonoBehaviour
                     else
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, -1, -1));
                 }
-                act_player = null;
                 break;
             case DisplaySystemState.turnStart:
                 table.setBaseState(TableState.TileState);
@@ -274,6 +274,7 @@ public class DisplaySystem : MonoBehaviour
                         table.meeplePositionChanged(act_meeple);
                     }
                 }
+                act_player = null;
                 break;
             case DisplaySystemState.tilePosing:
                 board.hideTilePossibilities();
@@ -308,6 +309,15 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.meeplePosing:
                 act_tile.showPossibilities(act_player);
+                break;
+            case DisplaySystemState.scoreChange:
+                List<PlayerScoreParam> scores = new List<PlayerScoreParam>();
+                system_back.askScores(scores);
+                foreach (PlayerScoreParam score in scores)
+                {
+                    players_mapping[score.id_player].Score = score.points_gagnes;
+                    Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
+                }
                 break;
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
@@ -544,7 +554,7 @@ public class DisplaySystem : MonoBehaviour
             lifespan_tiles_drawned.Enqueue(tiles_init[i].tile_flags);
         }
 
-        table.resetHandSize(final_count, meeples_hand);
+        table.resetHandSize(final_count, meeples_hand, meeple_distrib);
     }
 
     public void askPlayerOrder(LinkedList<PlayerRepre> players)

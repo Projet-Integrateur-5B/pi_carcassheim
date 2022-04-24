@@ -536,7 +536,7 @@ public class FalseBack : CarcasheimBack
 
     override public void sendTile(TurnPlayParam play)
     {
-        Debug.Log("Am i  lokking likethis");
+        Debug.Log("Am i looking likethis");
         if (num_turn + 1 >= nb_turn)
         {
             Debug.Log("Merde");
@@ -553,7 +553,6 @@ public class FalseBack : CarcasheimBack
     override public void getTile(out TurnPlayParam play)
     {
         play = my_plays[num_turn];
-        num_turn += 1;
     }
 
     override public void askMeeplesInit(List<MeepleInitParam> meeples)

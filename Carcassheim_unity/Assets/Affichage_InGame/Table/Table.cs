@@ -134,7 +134,7 @@ public class Table : MonoBehaviour
         }
     }
 
-    public void resetHandSize(int hand_size, List<MeepleRepre> meeples)
+    public void resetHandSize(int hand_size, List<MeepleRepre> meeples, Dictionary<int, int> meeple_distrib)
     {
         planned_tile_count = hand_size;
 
@@ -152,6 +152,7 @@ public class Table : MonoBehaviour
             MeepleColliderStat mps = Instantiate<MeepleColliderStat>(meeple_collider_model, meeple_zone.transform);
             mps.transform.localPosition = meeple_origin + meeple_step * i;
             mps.Index = i;
+            mps.meeple_num.Value = meeple_distrib[mpl.Id];
 
             mpl.transform.parent = meeple_zone.transform;
             mpl.transform.localPosition = mps.transform.localPosition - mpl.pivotPoint.localPosition;
@@ -323,10 +324,15 @@ public class Table : MonoBehaviour
             meeple.model.layer = DisplaySystem.TableLayer;
             if (meeple != display_system.act_meeple)
                 meeple.pivotPoint.rotation = unselected_angle;
+            mps.meeple_num.Value += 1;
+            display_system.act_player.NbMeeple += 1;
         }
         else
         {
+            MeepleColliderStat mps = meeple_mapping[meeple];
             meeple.model.layer = DisplaySystem.BoardLayer;
+            mps.meeple_num.Value -= 1;
+            display_system.act_player.NbMeeple -= 1;
         }
     }
 }
