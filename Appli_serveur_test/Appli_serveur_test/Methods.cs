@@ -616,8 +616,6 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.PlayerReady;
         }
-
-        Thread.Sleep(1000);
         
         // Check if everyone is ready and starts the game.
         packet.Error = gestionnaire.StartGame(packetReceived.Data[0]);
