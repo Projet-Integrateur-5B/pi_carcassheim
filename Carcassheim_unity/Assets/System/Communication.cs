@@ -89,6 +89,12 @@ namespace Assets.System
             ClientAsync.Receive(lesSockets[isInRoom]);
         }
 
+        public void StartLoopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
+        {
+            ClientAsync.OnPacketReceived += pointeurFonction;
+            ClientAsync.ReceiveLoop(lesSockets[isInRoom]);
+        }
+
         public void StopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
             ClientAsync.OnPacketReceived -= pointeurFonction;

@@ -1,8 +1,10 @@
 ﻿using Assets.System;
 using ClassLibrary;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -28,7 +30,13 @@ public class PublicRoomMenu : Miscellaneous
 			case "PublicRoomMenu":
 				/* Commuication Async */
 				Communication.Instance.SetIsInRoom(1);
-				Communication.Instance.StartListening(OnPacketReceived);
+
+				Action listening = () =>
+				{
+					Communication.Instance.StartLoopListening(OnPacketReceived);
+				};
+				Task.Run(listening);
+				
 
 				/* Communication pour que le serveur set le port */
 				Packet packet = new Packet();
@@ -92,11 +100,7 @@ public class PublicRoomMenu : Miscellaneous
 				s_listAction.Release();
 			}
 		}
-        else
-        {
-			Communication.Instance.NewListening();
-
-		}
+       
 		Debug.Log("Packet id : "+ packet.IdMessage);
     }
 

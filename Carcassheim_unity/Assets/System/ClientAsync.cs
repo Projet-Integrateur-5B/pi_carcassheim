@@ -8,6 +8,7 @@ using System.Linq;
 using ClassLibrary;
 using UnityEngine;
 using Assets.System;
+using System.Threading.Tasks;
 
 // State object for receiving data from remote device.
 public class StateObject
@@ -39,6 +40,7 @@ public class ClientAsync
 
     // ManualResetEvent instances signal completion.
     public static ManualResetEvent connectDone = new ManualResetEvent(false);
+    private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
 
     public delegate void OnPacketReceivedHandler(object sender, Packet packet);
@@ -202,6 +204,115 @@ public class ClientAsync
                 client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                     new AsyncCallback(ReceiveCallback), state);
                 
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }
+    }
+
+    public static void ReceiveLoop(Socket clientSocket)
+    {
+        try
+        {
+            // Create the state object.
+            StateObject state = new StateObject();
+            state.workSocket = clientSocket;
+
+            while (true)
+            {
+                Debug.Log("------------------------- Lancement Ecoute Infini -------------------------");
+                receiveDone.Reset();
+                // Begin receiving the data from the remote device.
+                clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveLoopCallback), state);
+                receiveDone.WaitOne();
+            }
+            
+        }
+        catch (Exception e)
+        {
+            Debug.Log(e.ToString());
+        }
+    }
+
+    private static void ReceiveLoopCallback(IAsyncResult ar)
+    {
+        receiveDone.Set();
+        try
+        {
+            // Retrieve the state object and the client socket
+            // from the asynchronous state object.
+            StateObject state = (StateObject)ar.AsyncState;
+            Socket client = state.workSocket;
+
+            // Read data from the remote device.
+            int bytesRead = client.EndReceive(ar);
+
+            // Nothing to read here.
+            if (bytesRead <= 0)
+            {
+                return;
+            }
+
+            // Get the last received bytes.
+            var packetAsBytes = new byte[bytesRead];
+            Array.Copy(state.buffer, packetAsBytes, bytesRead);
+            var error_value = Tools.Errors.None;
+
+            // Deserialize the byte array
+            state.Packet = packetAsBytes.ByteArrayToPacket(ref error_value);
+            if (error_value != Tools.Errors.None) // Checking for errors.
+            {
+                // Setting the error value.
+                // TODO : ByteArrayToPacket => handle error
+                return;
+            }
+
+            var dataLength = state.Data.Length;
+            state.Data = state.Data.Concat(state.Packet.Data).ToArray();
+            if (dataLength > 0)
+            {
+                if (state.Data[dataLength] == "")
+                {
+                    state.Data = state.Data.Where((source, index) => index != dataLength)
+                        .ToArray();
+                    state.Data[dataLength - 1] += state.Data[dataLength];
+                    state.Data = state.Data.Where((source, index) => index != dataLength)
+                        .ToArray();
+                }
+            }
+
+            var debug = "Reading from : " + client.RemoteEndPoint +
+                        "\n\t Read {0} bytes =>\t" + state.Packet +
+                        "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
+
+            if (state.Packet.Final)
+            {
+                Console.WriteLine(debug + "\n\t => Every packet has been received !",
+                    bytesRead);
+
+                state.Packet.Data = state.Data;
+
+                OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
+
+                //Receive(client);
+                // TODO: check if packet.IdMessage requires an answer for the client
+
+                // Start listening again.
+                // StartReading(ar, listener, true);
+
+            }
+            // More packets to receive in this series.
+            else
+            {
+                // Get the rest of the data.
+
+
+                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
+                    new AsyncCallback(ReceiveCallback), state);
+
             }
         }
         catch (Exception e)
