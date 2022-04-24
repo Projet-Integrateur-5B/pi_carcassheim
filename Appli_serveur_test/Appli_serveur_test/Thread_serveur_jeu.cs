@@ -390,7 +390,7 @@ namespace system
                 _s_nombre_joueur.Release();
                 if (id_joueur == _id_moderateur)
                 {
-                    if (_dico_joueur.Count != 1)
+                    if (_dico_joueur.Count != 0)
                     {
                         _id_moderateur = _dico_joueur.First().Key;
                     }
