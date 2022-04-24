@@ -258,19 +258,13 @@ namespace system
             }
         }
 
-        public void SendTilesRoundStart(string[] tilesToSend, Socket? socket, string idRoom)
+        public void SendTilesRoundStart(string[] tilesToSend, string idRoom)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.TuileDraw;
             packet.Type = true;
 
             packet.Data = tilesToSend;
-
-            ClientAsync.Send(socket, packet);
-
-            // Lancement de l'écoute de la réponse du joueur modérateur
-            ClientAsync.OnPacketReceived += OnPacketReceived;
-            ClientAsync.Receive(socket);
 
             
             // Envoi des tuiles à tous les autres joueurs
@@ -447,13 +441,13 @@ namespace system
                         // Les tuiles s'avèrent valides, on a affaire à un tricheur
                         PlayerCheated(idPlayer, playerSocket, idRoom);
                         // On renvoie les 3 mêmes tuiles
-                        SendTilesRoundStart(tuilesEnvoyees, playerSocket, idRoom);
+                        SendTilesRoundStart(tuilesEnvoyees, idRoom);
                     }
                     else
                     {
                         // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
                         threadJeu.ShuffleTilesGame();
-                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), playerSocket, idRoom);
+                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), idRoom);
 
                     }
 
@@ -508,7 +502,7 @@ namespace system
 
                         // Renvoie les 3 tuiles
                         string[] tuilesAEnvoyer = threadJeu.GetThreeLastTiles();
-                        SendTilesRoundStart(tuilesAEnvoyer, playerSocket, idRoom);
+                        SendTilesRoundStart(tuilesAEnvoyer, idRoom);
                     }
 
                     break;
@@ -707,7 +701,7 @@ namespace system
                         {
                             // Envoie des 3 tuiles au suivant
                             thread_serv_ite.ShuffleTilesGame();
-                            SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), nextPlayerSocket, idRoom);
+                            SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), idRoom);
                         }
 
                         return Tools.Errors.None;
@@ -775,7 +769,7 @@ namespace system
                         // On abandonne les informations du tour actuel
                         Socket? nextPlayerSock = threadJeu.CancelTurn(idRoom);
                         // On lui envoit les 3 tuiles
-                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), nextPlayerSock, idRoom);
+                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), idRoom);
                     }
 
                     // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)

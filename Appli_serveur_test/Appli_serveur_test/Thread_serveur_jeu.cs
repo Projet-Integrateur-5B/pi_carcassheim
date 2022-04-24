@@ -492,8 +492,8 @@ namespace system
             _s_dico_joueur.WaitOne();
             foreach(var player in _dico_joueur)
             {
-                // Vérifie que tous les joueurs autres que le modérateur soient prêts
-                if(player.Value._is_ready == false && player.Value._id_player != _id_moderateur)
+                // Vérifie que tous les joueurs
+                if(player.Value._is_ready == false)
                 {
                     result = false;
                     break;
