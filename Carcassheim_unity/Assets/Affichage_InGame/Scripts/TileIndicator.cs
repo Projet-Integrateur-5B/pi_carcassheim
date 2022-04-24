@@ -23,6 +23,8 @@ public class TileIndicator : MonoBehaviour
                 tile_collider.enabled = true;
             else
                 tile_collider.enabled = false;
+            if (value == TileIndicatorState.LastTile)
+                model_renderer.enabled = true;
         }
         get => _state;
     }

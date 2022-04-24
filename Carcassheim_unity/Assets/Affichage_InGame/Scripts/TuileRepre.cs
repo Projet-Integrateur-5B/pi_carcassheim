@@ -33,11 +33,11 @@ public class TuileRepre : MonoBehaviour
     {
         set
         {
-            Debug.Log("Setting position " + (_pos == null ? "nothing" : _pos.ToString()) + " to " + (value == null ? "nothing" : value.ToString()));
+            // Debug.Log("Setting position " + (_pos == null ? "nothing" : _pos.ToString()) + " to " + (value == null ? "nothing" : value.ToString()));
             _pos = value;
             body_collider.enabled = _pos != null;
             int rotation = _pos != null ? _pos.Rotation : 0;
-            transform.localRotation = Quaternion.Euler(0, 0, rotation * 90);
+            transform.localRotation = Quaternion.Euler(0, 0, rotation * -90);
         }
         get => _pos;
     }
@@ -48,7 +48,6 @@ public class TuileRepre : MonoBehaviour
         slots_mapping = new Dictionary<int, SlotIndic>();
         foreach (SlotIndic slot in slots)
         {
-            Debug.Log(slot.Id);
             slots_mapping.Add(slot.Id, slot);
         }
     }
@@ -117,7 +116,6 @@ public class TuileRepre : MonoBehaviour
 
     public bool nextRotation(out PositionRepre npos)
     {
-        Debug.Log("Rotation from " + (Pos == null ? "nothing" : Pos.ToString()));
         npos = null;
         if (Pos == null)
             return false;
@@ -137,10 +135,7 @@ public class TuileRepre : MonoBehaviour
         if (found)
         {
             npos = new PositionRepre(x, y, rotation);
-            Debug.Log("Rotation to " + (npos == null ? "nothing" : npos.ToString()));
         }
-        else
-            Debug.Log("No rotation");
         return found;
     }
 

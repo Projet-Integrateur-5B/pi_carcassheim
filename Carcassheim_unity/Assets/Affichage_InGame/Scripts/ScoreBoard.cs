@@ -33,7 +33,7 @@ public class ScoreBoard : MonoBehaviour
         if (end_of_game)
         {
             gameObject.SetActive(true);
-            
+
         }
     }
 
@@ -48,7 +48,7 @@ public class ScoreBoard : MonoBehaviour
     }
     public void Quit()
     {
-        Debug.Log("Call system state");
+        // Debug.Log("Call system state");
         Application.Quit(0);
     }
 }

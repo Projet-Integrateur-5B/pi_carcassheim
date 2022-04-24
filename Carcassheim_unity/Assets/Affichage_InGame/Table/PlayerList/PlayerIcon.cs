@@ -13,7 +13,7 @@ public class PlayerIcon : MonoBehaviour
     public PlayerRepre Player { get => _player; private set => setPlayer(value); }
     private PlayerRepre _player;
 
-    public void Start()
+    public void Awake()
     {
         player_score.text = "0";
         player_meeple.text = "0";

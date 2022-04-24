@@ -59,9 +59,9 @@ public struct Zone
     public int id_slot;
 };
 
-public struct PlayerScore
+public struct PlayerScoreParam
 {
-    public PlayerScore(int id_player, int points_gagnes, Zone[] zone)
+    public PlayerScoreParam(int id_player, int points_gagnes, Zone[] zone)
     {
         this.id_player = id_player;
         this.points_gagnes = points_gagnes;
@@ -72,11 +72,27 @@ public struct PlayerScore
     public Zone[] zone;
 };
 
+public struct TurnPlayParam
+{
+    public TurnPlayParam(int id_tile, PositionRepre tile_pos, int id_meeple, int slot_pos)
+    {
+        this.id_tile = id_tile;
+        this.tile_pos = tile_pos;
+        this.id_meeple = id_meeple;
+        this.slot_pos = slot_pos;
+    }
+
+    public int id_tile;
+    public PositionRepre tile_pos;
+    public int id_meeple;
+    public int slot_pos;
+}
+
 public abstract class CarcasheimBack : MonoBehaviour
 {
-    public abstract void sendTile(int tile_id, PositionRepre tile_pos, int id_meeple, int slot_pos);
+    public abstract void sendTile(TurnPlayParam play);
 
-    public abstract void getTile(out int tile_id, out PositionRepre pos, out int id_meeple, out int slot_pos);
+    public abstract void getTile(out TurnPlayParam play);
 
     public abstract void askMeeplesInit(List<MeepleInitParam> meeples);
 
@@ -92,7 +108,7 @@ public abstract class CarcasheimBack : MonoBehaviour
 
     public abstract int getMyPlayer();
 
-    public abstract void askScores(List<PlayerScore> players_scores);
+    public abstract void askScores(List<PlayerScoreParam> players_scores);
 
     public abstract void askTimerTour(out int min, out int sec);
 

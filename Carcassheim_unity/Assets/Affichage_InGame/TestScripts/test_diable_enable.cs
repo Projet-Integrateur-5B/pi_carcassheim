@@ -1,11 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
-public class BannerWinPoint : BannerWinCondition
+public class test_diable_enable : MonoBehaviour
 {
-    public TMP_Text point_text;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,8 +16,13 @@ public class BannerWinPoint : BannerWinCondition
 
     }
 
-    override public void setWinParameters(List<int> param)
+    void OnDisable()
     {
-        point_text.text = param[0].ToString();
+        Debug.Log("Teka");
+    }
+
+    void OnEnable()
+    {
+        Debug.Log("Vopila");
     }
 }
