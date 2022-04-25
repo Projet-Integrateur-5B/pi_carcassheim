@@ -272,6 +272,7 @@ namespace Assets.system
             dico_tuile = LireXML2.Read("config_back.xml");
 
             Communication.Instance.StartListening(OnPacketReceived);
+            Debug.Log("On est dans la game");
 
             /*
             Action listening = () =>

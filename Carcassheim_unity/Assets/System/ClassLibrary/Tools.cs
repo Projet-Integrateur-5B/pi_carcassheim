@@ -56,6 +56,7 @@ namespace ClassLibrary
             RoomCreate = 11,
             RoomSettingsGet = 12,
             RoomSettingsSet = 13,
+            AskPort = 14,
 
             PlayerJoin = 20,
             PlayerLeave = 21,

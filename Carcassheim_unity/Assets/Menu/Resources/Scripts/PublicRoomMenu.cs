@@ -1,8 +1,10 @@
 ﻿using Assets.System;
 using ClassLibrary;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -27,7 +29,22 @@ public class PublicRoomMenu : Miscellaneous
 		{
 			case "PublicRoomMenu":
 				/* Commuication Async */
-				Communication.Instance.StartListening(OnPacketReceived);
+				Communication.Instance.SetIsInRoom(1);
+
+				Action listening = () =>
+				{
+					Communication.Instance.StartLoopListening(OnPacketReceived);
+				};
+				Task.Run(listening);
+				
+
+				/* Communication pour que le serveur set le port */
+				Packet packet = new Packet();
+				packet.IdMessage = Tools.IdMessage.PlayerJoin;
+				packet.IdPlayer = Communication.Instance.idClient;
+				packet.Data = new[] { Communication.Instance.idRoom.ToString() };
+
+				Communication.Instance.SendAsync(packet);
 				break;
 
 			default:
@@ -53,7 +70,6 @@ public class PublicRoomMenu : Miscellaneous
 	}
 
 	public void ShowRoomParameters(){
-		//Application.OpenURL("https://tinyurl.com/SlapDance");
 		HidePopUpOptions();
 		ChangeMenu("PublicRoomMenu", "RoomParametersMenu");
 	}
@@ -84,11 +100,8 @@ public class PublicRoomMenu : Miscellaneous
 				s_listAction.Release();
 			}
 		}
-        else if(packet.IdMessage == Tools.IdMessage.PlayerReady)
-        {
-			
-		}
-
+       
+		Debug.Log("Packet id : "+ packet.IdMessage);
     }
 
 	IEnumerator LoadYourAsyncScene()

@@ -57,7 +57,6 @@ namespace Assets.system
                 List<Slot> slots = new List<Slot>();
                 Tuile current;
                 int lienPtr = 0;
-                Debug.Log("START TILES");
                 while (reader.Read())
                 {
                     switch (reader.NodeType)
@@ -190,6 +189,9 @@ namespace Assets.system
                             case "terrain":
                                 nodeName = "terrain";
                                 break;
+                            case "link":
+                                nodeName = "link";
+                                break;
                             default:
                                 pos_debug += xmlReader.Name + "; ";
                                 result.Add(Positions[xmlReader.Name]);
@@ -203,6 +205,8 @@ namespace Assets.system
                                 break;
                             case "terrain":
                                 idTerrain = int.Parse(xmlReader.Value);
+                                break;
+                            case "link":
                                 break;
                             default:
                                 break;

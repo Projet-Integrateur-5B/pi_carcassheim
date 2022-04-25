@@ -74,9 +74,8 @@ public class CreateRoomMenu : Miscellaneous
 				Communication.Instance.SetRoom(int.Parse(packet.Data[0]));
 				Communication.Instance.SetPort(int.Parse(packet.Data[1]));
 				Communication.Instance.SetIsInRoom(1);
-
 			}
-			Debug.Log("Bouff mes couils Axell");
+
 			s_listAction.WaitOne();
 			listAction.Add(res);
 			s_listAction.Release();
@@ -101,7 +100,7 @@ public class CreateRoomMenu : Miscellaneous
 
 			if (res)
 			{
-				ChangeMenu("CreateRoomMenu", "RoomIsCreatedMenu");
+				ChangeMenu("CreateRoomMenu", "PublicRoomMenu");
 			}
 
 			s_listAction.WaitOne();

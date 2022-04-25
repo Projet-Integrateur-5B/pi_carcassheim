@@ -23,6 +23,7 @@ namespace Assets.System
         {
             get
             {
+                
                 if (_instance == null)
                 {
                     _instance = GameObject.FindObjectOfType<Communication>();
@@ -33,14 +34,24 @@ namespace Assets.System
                         _instance = container.AddComponent<Communication>();
                     }
                 }
-
+                
                 return _instance;
+                
             }
         }
 
         void Awake()
         {
-            _instance = this;
+            //_instance = this;
+            if(_instance != null)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                DontDestroyOnLoad(gameObject);
+                _instance = this;
+            }
         }
 
         public void LancementConnexion()
@@ -77,10 +88,22 @@ namespace Assets.System
             ClientAsync.OnPacketReceived += pointeurFonction;
             ClientAsync.Receive(lesSockets[isInRoom]);
         }
+
+        public void StartLoopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
+        {
+            ClientAsync.OnPacketReceived += pointeurFonction;
+            ClientAsync.ReceiveLoop(lesSockets[isInRoom]);
+        }
+
         public void StopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
             ClientAsync.OnPacketReceived -= pointeurFonction;
             ClientAsync.StopListening(lesSockets[isInRoom]);
+        }
+
+        public void NewListening()
+        {
+            ClientAsync.Receive(lesSockets[isInRoom]);
         }
 
 

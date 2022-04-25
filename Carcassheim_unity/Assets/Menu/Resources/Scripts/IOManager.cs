@@ -103,12 +103,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                             MethodCall(menu.Find("InputField").transform.GetChild(0).name, null, inp.GetComponent<InputField>());
                         });
         }
-        OnMenuChange += test;
-    }
-
-    public void test(string name)
-    {
-        Debug.Log("CHNGE " + name);
     }
 
     public void Update()
