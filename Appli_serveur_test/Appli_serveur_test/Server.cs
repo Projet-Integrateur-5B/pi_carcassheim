@@ -54,7 +54,6 @@ public static partial class Server
 
             // Create a TCP/IP socket and Bind to the local endpoint and listen for incoming connections.
             listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.NoDelay, true);
             listener.Bind(localEndPoint);
             listener.Listen(100);
             Console.WriteLine("Server is listening : " + listener.LocalEndPoint);
