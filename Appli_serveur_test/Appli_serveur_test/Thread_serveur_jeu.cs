@@ -38,6 +38,8 @@ namespace system
         private Tools.Timer _timer_max_joueur; // En secondes
         private Tools.Meeple _meeples; // Nombre de meeples par joueur
 
+        private ulong _idTuileInit; // Id de la tuile initiale : soit le chemin soit la rivière suivant si le dlc est choisi
+
         // Locks
 
         private readonly object _lock_settings;
@@ -152,6 +154,11 @@ namespace system
             _s_dico_joueur.Release();
 
             return winner;
+        }
+
+        public ulong Get_idTuileInit()
+        {
+            return this._idTuileInit;
         }
 
         public uint NbJoueurs
@@ -331,6 +338,7 @@ namespace system
             _timer = Tools.Timer.Heure; // Une heure par défaut
             _timer_max_joueur = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
+            _idTuileInit = 22; // Initialise sans dlc rivière
 
             // Initialisation des semaphores d'attributs moteurs
             _s_offsetActualPlayer = new Semaphore(1, 1);
