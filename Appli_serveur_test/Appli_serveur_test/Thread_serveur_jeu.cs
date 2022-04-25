@@ -584,18 +584,22 @@ namespace system
         
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
-            var diff = DateTime.Now.Subtract(_DateTime_game).Seconds;
-            if (diff <= (int) _timer_game_value) return;
+            var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
+            if (diff < (int) _timer_game_value / 3600) return;
+            
             Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
+            _timer_game.Stop();
             EndGame();
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
-            var diff = DateTime.Now.Subtract(_DateTime_player).Seconds;
-            if (diff <= (int) _timer_player_value) return;
+            var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
+            if (diff < (int) _timer_player_value / 60) return;
+            
             var idPlayer = Get_ActualPlayerId();
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
+            _timer_player.Stop();
             EndTurn(idPlayer);
         }
 
@@ -778,7 +782,8 @@ namespace system
         /// <returns> The socket of the next player to play </returns>
         public Socket? EndTurn(ulong idPlayer)
         {
-
+            _timer_player.Stop();
+            
             // Prise en compte du placement de la tuile et du pion (mise à jour structure de données)
             _s_plateau.WaitOne();
             _plateau.PoserTuile(_idTuileChoisie, _posTuileTourActu);
