@@ -2,7 +2,6 @@
 using System.Net.Sockets;
 using ClassLibrary;
 using Newtonsoft.Json;
-using System;
 
 namespace Assets.System
 {

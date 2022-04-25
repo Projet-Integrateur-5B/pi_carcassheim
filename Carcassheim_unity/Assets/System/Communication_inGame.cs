@@ -249,40 +249,6 @@ namespace Assets.system
         //====================================================================================================
 
 
-        private void CheckErrorSocketConnect(Tools.Errors error_value)
-        {
-            switch (error_value)
-            {
-                case Tools.Errors.None:
-                    break;
-                case Tools.Errors.ConfigFile:
-                    // TODO : handle case : config file is bad or issue while extracting the data
-                    Debug.Log(string.Format("Errors.ConfigFile"));
-                    break;
-                case Tools.Errors.Socket:
-                    // TODO : handle case : connection could not be established
-                    Debug.Log(string.Format("Errors.Socket"));
-                    break;
-                case Tools.Errors.ToBeDetermined:
-                    break;
-                case Tools.Errors.Unknown:
-                    break;
-                case Tools.Errors.Format:
-                    break;
-                case Tools.Errors.Receive:
-                    break;
-                case Tools.Errors.Data:
-                    break;
-                case Tools.Errors.Permission:
-                    break;
-                default:
-                    // TODO : handle case : default
-                    Debug.Log(string.Format("Errors.Unknown"));
-                    break;
-            }
-        }
-
-
         // Start is called before the first frame update
         void Start()
         {
@@ -292,7 +258,6 @@ namespace Assets.system
             lePlateau = new Plateau();
             dico_tuile = LireXML2.Read("config_back.xml");
 
-            Communication.Instance.StartListening(OnPacketReceived);
             Debug.Log("On est dans la game");
 
             /*
@@ -341,7 +306,6 @@ namespace Assets.system
 
         public void Disconnection(Socket socket)
         {
-            ClientAsync.StopListening(socket);
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
 
@@ -443,8 +407,8 @@ namespace Assets.system
             packet.Data[2] = X.ToString();
             packet.Data[3] = Y.ToString();
             packet.Data[4] = ROT.ToString();
-            packet.Data[5] = id_meeple.ToString();
-            packet.Data[6] = slot_pos.ToString();
+            //packet.Data[5] = id_meeple.ToString();
+            //packet.Data[6] = slot_pos.ToString();
 
             Communication.Instance.SendAsync(packet);
         }
