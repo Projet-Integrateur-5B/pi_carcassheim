@@ -117,4 +117,6 @@ public abstract class CarcasheimBack : MonoBehaviour
     public abstract void sendAction(DisplaySystemAction action);
 
     public abstract void askWinCondition(ref WinCondition win_cond, List<int> parameters);
+
+    public abstract void askFinalScore(List<PlayerScoreParam> playerScores);
 }
