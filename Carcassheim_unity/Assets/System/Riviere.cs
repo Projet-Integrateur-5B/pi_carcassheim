@@ -38,7 +38,7 @@ namespace Assets.system
                 throw new Exception("tuiles riviere extremes introuvable");
 
             (tuilesRiviere[0], tuilesRiviere[i1]) = (tuilesRiviere[i1], tuilesRiviere[0]);
-            (tuilesRiviere[length - 1], tuilesRiviere[i1]) = (tuilesRiviere[i1], tuilesRiviere[length - 1]);
+            (tuilesRiviere[length - 1], tuilesRiviere[i2]) = (tuilesRiviere[i2], tuilesRiviere[length - 1]);
             obj.InitialiserRiviere(tuilesRiviere);
         }
 
@@ -69,6 +69,11 @@ namespace Assets.system
                 int rot = tuilesRiviere[i].LienSlotPosition[slotR][randI] / 3;
                 rot += ((lastDirection + 2) % 4);
 
+                /*
+                Position = _plateau.PlacementLegal(current)[randI];
+                
+                _plateau.PoserTuile(current, Position);
+                */
                 _plateau.PoserTuile(current, x, y, rot);
                 lastDirection = 1 - current.LienSlotPosition[slotR][1 - randI] / 3;
             }

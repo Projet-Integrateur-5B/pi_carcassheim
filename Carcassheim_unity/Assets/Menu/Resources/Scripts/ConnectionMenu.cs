@@ -28,8 +28,24 @@ public class ConnectionMenu : Miscellaneous
 		s_listAction = new Semaphore(1, 1);
 
 
-		/* Commuication Async */
-		Communication.Instance.StartListening(OnPacketReceived);
+		OnMenuChange += OnStart;
+	}
+
+	public void OnStart(string pageName)
+	{
+		switch (pageName)
+		{
+			case "ConnectionMenu":
+				/* Commuication Async */
+				Communication.Instance.StartListening(OnPacketReceived);
+				break;
+
+			default:
+				/* Ce n'est pas la bonne page */
+				/* Stop la reception dans cette class */
+				Communication.Instance.StopListening(OnPacketReceived);
+				break;
+		}
 	}
 
 	public void ResetWarningTextCM()
@@ -45,9 +61,6 @@ public class ConnectionMenu : Miscellaneous
 		HidePopUpOptions();
 		ResetWarningTextCM();
 		ChangeMenu("ConnectionMenu", "HomeMenu");
-
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ForgottenPwdUser()
@@ -76,9 +89,6 @@ public class ConnectionMenu : Miscellaneous
 		tmpText.text = "Connectez vous";
 		HidePopUpOptions();
 		ChangeMenu("ConnectionMenu", "AccountMenu");
-
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void InputFieldEndEdit(InputField inp)

@@ -14,6 +14,7 @@ namespace Assets.system
         {
             _file = file;
         }
+
         public Dictionary<ulong, Tuile> ReadXml()
         {
             ulong idTu = 0, idTe = 0, idSl = 0;
@@ -29,7 +30,7 @@ namespace Assets.system
             List<int> tab = new List<int>();
             string nomTe = "", tmp = "";
 
-            using (XmlReader reader = XmlReader.Create(@_file))
+            using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + @_file))
             {
                 while (reader.Read())
                 {
@@ -38,9 +39,11 @@ namespace Assets.system
                         switch (reader.Name.ToString())
                         {
                             case "terrain":
-                                reader.ReadToFollowing("idTe");
-                                idTe = Convert.ToUInt64(reader.ReadString());
-                                reader.ReadToFollowing("nomTe"); //depend de l'écriture dans le fichier xml
+                                reader.ReadToFollowing("id");
+                                string readed = reader.ReadString();
+                                Debug.Log("terrain" + readed);
+                                idTe = Convert.ToUInt64(readed);
+                                reader.ReadToFollowing("nom"); //depend de l'écriture dans le fichier xml
                                 nomTe = reader.ReadString();
                                 //Debug.Log("Terrain : ");
                                 //Debug.Log(idTe);

@@ -5,6 +5,8 @@ namespace Assets.system
     public class Slot
     {
         private readonly TypeTerrain _terrain;
+        private readonly ulong[] _linkOtherSlots;
+        public ulong[] LinkOtherSlots => _linkOtherSlots;
         public TypeTerrain Terrain => _terrain;
         public ulong IdJoueur { get; set; }
 
@@ -16,11 +18,14 @@ namespace Assets.system
             IdJoueur = 0;
         }
 
-        public Slot(ulong idTerrain)
+        public Slot(ulong idTerrain, ulong[] link)
         {
+            _linkOtherSlots = link;
             _terrain = TerrainFromId[idTerrain];
             IdJoueur = 0;
         }
+
+        public Slot(ulong idTerrain) { }
 
         static Slot()
         {

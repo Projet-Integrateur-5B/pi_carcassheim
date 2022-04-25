@@ -41,7 +41,7 @@ namespace system
             _timer_max_joueur = int.Parse(_packet.Data[6]);
             _score_max = int.Parse(_packet.Data[7]);
         }
-
+        /*
         private void CheckErrorSocketConnect(Tools.Errors error_value)
         {
             switch (error_value)
@@ -74,7 +74,7 @@ namespace system
                     break;
             }
         }
-
+        */
 
         // Start is called before the first frame update
         void Start()
@@ -155,7 +155,7 @@ namespace system
         public void Update()
         {
         }
-
+        /*
         public void Disconnection(Socket socket)
         {
             ClientAsync.StopListening(socket);
@@ -164,7 +164,8 @@ namespace system
 
             //TODO reload l'ancien socket
         }
-
+        */
+        /*
         public void ImReady(Socket socket)
         {
             Packet packet = new Packet();
@@ -173,7 +174,7 @@ namespace system
             packet.Data = Array.Empty<string>();
             Communication.Instance.SendAsync(packet);
         }
-
+        */
         public void SendModification(Socket socket)
         {
             if (_id_moderateur != _mon_id)

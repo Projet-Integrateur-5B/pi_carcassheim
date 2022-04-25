@@ -622,4 +622,10 @@ public class FalseBack : CarcasheimBack
         win_cond = my_win_condition;
         parameters.AddRange(win_param);
     }
+
+    override public void askFinalScore(List<PlayerScoreParam> playerScores)
+    {
+        //TODO Pareil que askScore
+    }
+
 }

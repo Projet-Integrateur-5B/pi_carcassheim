@@ -5,6 +5,7 @@ using System;
 using ClassLibrary;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 
 public class RoomSelectionMenu : Miscellaneous
 {
@@ -24,8 +25,25 @@ public class RoomSelectionMenu : Miscellaneous
 		roomSelectMenu = GameObject.Find("SubMenus").transform.Find("RoomSelectionMenu").transform;
 		panelRooms = roomSelectMenu.Find("Canvas").transform.Find("ListOfRoom").transform.Find("PanelRooms").transform;
 
+		listAction = new List<string>();
+		s_listAction = new Semaphore(1, 1);
+
+		OnMenuChange += OnStart;
+	}
+
+	private void TableauRoom()
+    {
 		List_of_Rooms = new List<List<GameObject>>();
-		for(int i = 0; i < nombreRoom; i++)
+
+		int compteur = 0;
+		nombreRoom = 0;
+
+		s_listAction.WaitOne();
+		int taille = listAction.Count;
+		s_listAction.Release();
+
+		int nbLigne = taille / 5;
+		for(int i = 0; i < nbLigne; i++)
         {
 			List_of_Rooms.Add(new List<GameObject>() { new GameObject("ID_Test " + i), new GameObject("Hosts_Test " + i), new GameObject("Endgame_Test " + i), new GameObject("Players_Test " + i), new GameObject("Max players_Test " + i) });
 		}
@@ -49,43 +67,63 @@ public class RoomSelectionMenu : Miscellaneous
 			}
 		}
 
-		listAction = new List<string>();
-		s_listAction = new Semaphore(1, 1);
+		s_listAction.WaitOne();
+		for (int i = 0; i < taille; i += 5)
+		{
+			
+			SetIDRoom(compteur, listAction[i]);
+			SetHostsRoom(compteur, listAction[i + 1]);
+			SetPlayersRoom(compteur, listAction[i + 2]);
+			SetMaxPlayersRoom(compteur, listAction[i + 3]);
+			SetEndgameRoom(compteur, listAction[i + 4]);
+			compteur++;
+			nombreRoom++;
+		}
 
-		/* Commuication Async */
-		Communication.Instance.StartListening(OnPacketReceived);
+		listAction.Clear();
+		s_listAction.Release();
+	}
+
+	public void OnStart(string pageName)
+	{
+		switch (pageName)
+		{
+			case "RoomSelectionMenu":
+				/* Commuication Async */
+				Communication.Instance.StartListening(OnPacketReceived);
+				LoadRoomInfo();
+				break;
+
+			default:
+				/* Ce n'est pas la bonne page */
+				/* Stop la reception dans cette class */
+				Communication.Instance.StopListening(OnPacketReceived);
+				break;
+		}
 	}
 
 	public void HideRoomSelection()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "HomeMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowJoinById()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "JoinByIdMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowJoinPublicRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public void ShowCreateRoom()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomSelectionMenu", "CreateRoomMenu");
-		/* Stop la reception dans cette class */
-		Communication.Instance.StopListening(OnPacketReceived);
 	}
 
 	public string GetIDRoom(int index)
@@ -168,35 +206,9 @@ public class RoomSelectionMenu : Miscellaneous
 		int taille = listAction.Count;
 		s_listAction.Release();
 
-		if (taille > 0)
+		if ((taille > 0) && ( taille%5 == 0))
 		{
-			// A modifier quand il y aura une liste
-			int compteur = 0;
-
-			s_listAction.WaitOne();
-			for (int i = 0; i < taille; i += 5)
-			{
-				SetIDRoom(compteur, listAction[i]);
-				SetHostsRoom(compteur, listAction[i + 1]);
-				SetPlayersRoom(compteur, listAction[i + 2]);
-				SetMaxPlayersRoom(compteur, listAction[i + 3]);
-				SetEndgameRoom(compteur, listAction[i + 4]);
-				compteur++;
-			}
-
-			listAction.Clear();
-			s_listAction.Release();
+			TableauRoom();
 		}
-	}
-
-    void OnEnable()
-    {
-		LoadRoomInfo();
-		Debug.Log("OnEnable");
-	}
-
-    void OnDisable()
-    {
-		Debug.Log("OnDisable");
 	}
 }
