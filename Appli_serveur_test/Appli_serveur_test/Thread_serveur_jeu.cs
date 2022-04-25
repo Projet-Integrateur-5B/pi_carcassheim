@@ -544,7 +544,11 @@ namespace system
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
             _posTuileTourActu.SetNonExistent();
-            
+
+            // Pose la première tuile de la partie
+            _s_plateau.WaitOne();
+            _plateau.PoserTuile(_idTuileInit, new Position(0, 0, 0));
+            _s_plateau.Release();
 
             // TODO :
             // synchronisation de la methode

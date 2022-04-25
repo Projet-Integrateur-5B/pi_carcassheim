@@ -441,6 +441,9 @@ namespace system
                     {
                         // Lancement de la game
                         thread_serv_ite.StartGame();
+                        // Broadcast tuile initiale
+                        thread_com_iterateur.SendTileDisplay(idRoom, (ulong)0, thread_serv_ite.Get_idTuileInit().ToString(),
+                            0.ToString(), 0.ToString(), 0.ToString());
                         // Préviens tous les joueurs
                         thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
                         // Envoi des 3 tuiles de début de tour
