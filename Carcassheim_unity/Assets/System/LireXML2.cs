@@ -32,7 +32,6 @@ namespace Assets.system
                 {"nww", 11 }
             };
 
-            IdVersTerrain = new Dictionary<int, TypeTerrain>();
 
             DictionaireTemp = new Dictionary<string, TypeTerrain>()
             {
@@ -47,6 +46,7 @@ namespace Assets.system
         public static Dictionary<ulong, Tuile> Read(string file)
         {
             var result = new Dictionary<ulong, Tuile>();
+            IdVersTerrain = new Dictionary<int, TypeTerrain>();
 
             using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + @file))
             {
@@ -213,6 +213,7 @@ namespace Assets.system
                         }
                         break;
                     case XmlNodeType.EndElement:
+                        nodeName = "";
                         if (xmlReader.Name == "slot")
                             stop = true;
                         break;
