@@ -81,78 +81,9 @@ namespace system
             return this._lst_serveur_jeu;
         }
 
-        // =================
-        // Méthodes moteur
-        // =================
-
-        /// <summary>
-        /// Add a new game (room)
-        /// </summary>
-        /// <param name="playerId"> Id of the moderator </param>
-        /// <param name="socket"> Socket of the moderator (first player) </param>
-        /// <returns> The id of the game (-1 if error occurs) </returns>
-        public int AddNewGame(ulong playerId, Socket? playerSocket)
-        {
-
-            int id_nouv_partie = -1;
-
-            lock (this._lock_nb_parties_gerees)
-            {
-                if (_nb_parties_gerees < 5)
-                {
-                    // Dixaine : numéro de thread, unité : numéro de partie
-                    id_nouv_partie = _id_thread_com * 10 + (_nb_parties_gerees+1) ;
-
-                    lock (this._lock_id_parties_gerees)
-                    {
-                        _id_parties_gerees.Add(id_nouv_partie);
-                    }
-
-                    _nb_parties_gerees++;
-                }
-            }
-
-            if (id_nouv_partie != -1) // Si la partie a pu être crée
-            {
-                Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId, playerSocket);
-
-                _lst_serveur_jeu.Add(thread_serveur_jeu);
-
-                return id_nouv_partie;
-
-            }
-            else // La partie n'a pas pu être créée
-            {
-                return id_nouv_partie;
-            }
-
-
-        }
-
-        public void DeleteGame(string roomId)
-        {
-            int indexOfRoom = 0;
-            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
-            {
-                if (thread_serv_ite.Get_ID() == Int32.Parse(roomId))
-                {
-                    lock (_lock_nb_parties_gerees)
-                    {
-                        _nb_parties_gerees--;
-                    }
-                    lock (_lock_id_parties_gerees)
-                    {
-                        var idToRemove = _id_parties_gerees.Single(id => id.Equals(roomId));
-                        _id_parties_gerees.Remove(idToRemove);
-                    }
-                    break;
-                }
-
-                indexOfRoom++;
-            }
-
-            _lst_serveur_jeu.RemoveAt(indexOfRoom);
-        }
+        // ========================
+        // Méthodes communication
+        // ========================
 
         public void TransmitStartToAll(int roomId)
         {
@@ -178,25 +109,7 @@ namespace system
             }
         }
 
-        /// <summary>
-        /// Get the parameters needed to communicate with a client
-        /// </summary>
-        /// <param name="socket"> The listening socket that has received communications from player </param>
-        /// <param name="idPlayer"> Id of the player </param>
-        /// <returns> The parameters of the player's socket </returns>
-        public Parameters GetPlayerSocketParameters(Socket? socket, ulong idPlayer)
-        {
-            Parameters playerParameters = new Parameters();
-
-            IPAddress playerIpAddress = ((IPEndPoint)socket.RemoteEndPoint).Address;
-            int playerPort = ((IPEndPoint)socket.RemoteEndPoint).Port;
-
-            playerParameters.ServerIP = playerIpAddress.ToString();
-            playerParameters.ServerPort = playerPort;
-
-            return playerParameters;
-        }
-
+        
         public void SendPlayerReadyDisplay(string idRoom, ulong idPlayer)
         {
             Packet packet = new Packet();
@@ -422,6 +335,99 @@ namespace system
             }
 
         }
+
+        // =================
+        // Méthodes moteur
+        // =================
+
+        /// <summary>
+        /// Add a new game (room)
+        /// </summary>
+        /// <param name="playerId"> Id of the moderator </param>
+        /// <param name="socket"> Socket of the moderator (first player) </param>
+        /// <returns> The id of the game (-1 if error occurs) </returns>
+        public int AddNewGame(ulong playerId, Socket? playerSocket)
+        {
+
+            int id_nouv_partie = -1;
+
+            lock (this._lock_nb_parties_gerees)
+            {
+                if (_nb_parties_gerees < 5)
+                {
+                    // Dixaine : numéro de thread, unité : numéro de partie
+                    id_nouv_partie = _id_thread_com * 10 + (_nb_parties_gerees + 1);
+
+                    lock (this._lock_id_parties_gerees)
+                    {
+                        _id_parties_gerees.Add(id_nouv_partie);
+                    }
+
+                    _nb_parties_gerees++;
+                }
+            }
+
+            if (id_nouv_partie != -1) // Si la partie a pu être crée
+            {
+                Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId, playerSocket);
+
+                _lst_serveur_jeu.Add(thread_serveur_jeu);
+
+                return id_nouv_partie;
+
+            }
+            else // La partie n'a pas pu être créée
+            {
+                return id_nouv_partie;
+            }
+
+
+        }
+
+        public void DeleteGame(string roomId)
+        {
+            int indexOfRoom = 0;
+            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
+            {
+                if (thread_serv_ite.Get_ID() == Int32.Parse(roomId))
+                {
+                    lock (_lock_nb_parties_gerees)
+                    {
+                        _nb_parties_gerees--;
+                    }
+                    lock (_lock_id_parties_gerees)
+                    {
+                        var idToRemove = _id_parties_gerees.Single(id => id.Equals(roomId));
+                        _id_parties_gerees.Remove(idToRemove);
+                    }
+                    break;
+                }
+
+                indexOfRoom++;
+            }
+
+            _lst_serveur_jeu.RemoveAt(indexOfRoom);
+        }
+
+        /// <summary>
+        /// Get the parameters needed to communicate with a client
+        /// </summary>
+        /// <param name="socket"> The listening socket that has received communications from player </param>
+        /// <param name="idPlayer"> Id of the player </param>
+        /// <returns> The parameters of the player's socket </returns>
+        public Parameters GetPlayerSocketParameters(Socket? socket, ulong idPlayer)
+        {
+            Parameters playerParameters = new Parameters();
+
+            IPAddress playerIpAddress = ((IPEndPoint)socket.RemoteEndPoint).Address;
+            int playerPort = ((IPEndPoint)socket.RemoteEndPoint).Port;
+
+            playerParameters.ServerIP = playerIpAddress.ToString();
+            playerParameters.ServerPort = playerPort;
+
+            return playerParameters;
+        }
+
 
         // La fonction du joueur dont c'est le tour
         public void DrawAntiCheatPlayer(string idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
