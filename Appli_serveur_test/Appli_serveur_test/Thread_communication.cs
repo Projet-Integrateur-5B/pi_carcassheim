@@ -516,9 +516,10 @@ namespace system
                         }
                         else // Si la partie n'est pas terminée
                         {
+                            ulong idPlayerActu = thread_serv_ite.Get_ActualPlayerId();
                             // Envoie des 3 tuiles au suivant
                             thread_serv_ite.ShuffleTilesGame();
-                            SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, thread_serv_ite.GetThreeLastTiles());
+                            SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, idPlayerActu, thread_serv_ite.GetThreeLastTiles());
                         }
 
                         return Tools.Errors.None;
