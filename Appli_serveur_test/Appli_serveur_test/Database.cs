@@ -318,7 +318,7 @@ public class Database
     
     public void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
-        string commande = "SELECT T.IDT,M.Proba FROM Tuile T,Modele M where T.IDM = M.IDM;";
+        string commande = "SELECT idm,proba FROM Modele;";
         string[] parametres = Array.Empty<string>();
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
