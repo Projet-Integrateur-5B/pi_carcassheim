@@ -14,6 +14,8 @@ public class PlayerRepre
 
     public int Id { get => _id; private set => _id = value; }
     public string Name { get => _name; private set => _name = value; }
+
+    public bool is_my_player;
     public int Score
     {
         get => _score;
