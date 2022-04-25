@@ -45,6 +45,8 @@ namespace system
         private System.Timers.Timer _timer_player;
         private Tools.Timer _timer_player_value; // En secondes
 
+        private ulong _idTuileInit; // Id de la tuile initiale : soit le chemin soit la rivière suivant si le dlc est choisi
+
         // Locks
 
         private readonly object _lock_settings;
@@ -159,6 +161,11 @@ namespace system
             _s_dico_joueur.Release();
 
             return winner;
+        }
+
+        public ulong Get_idTuileInit()
+        {
+            return this._idTuileInit;
         }
 
         public uint NbJoueurs
@@ -338,6 +345,7 @@ namespace system
             _timer_game_value = Tools.Timer.Heure; // Une heure par défaut
             _timer_player_value = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
+            _idTuileInit = 22; // Initialise sans dlc rivière
 
             // Initialisation des semaphores d'attributs moteurs
             _s_offsetActualPlayer = new Semaphore(1, 1);
@@ -544,6 +552,11 @@ namespace system
             _posTuileTourActu = new Position();
             _posTuileTourActu.SetNonExistent();
 
+            // Pose la première tuile de la partie
+            _s_plateau.WaitOne();
+            _plateau.PoserTuile(_idTuileInit, new Position(0, 0, 0));
+            _s_plateau.Release();
+
             _timer_game = new System.Timers.Timer();
             _timer_game.Interval = 1000;
             _timer_game.Elapsed += OnTimedEventGame;
@@ -557,8 +570,7 @@ namespace system
             _DateTime_player = DateTime.Now;
             _timer_player.AutoReset = true;
             _timer_player.Enabled = true;
-
-
+            
             // TODO :
             // synchronisation de la methode
             // genere les tuiles

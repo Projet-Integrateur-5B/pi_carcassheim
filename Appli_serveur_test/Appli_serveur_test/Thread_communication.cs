@@ -81,6 +81,69 @@ namespace system
             return this._lst_serveur_jeu;
         }
 
+        // ========================
+        // Méthodes communication
+        // ========================
+
+        /// <summary>
+        /// Broadcasts a message to all except the player initiating the request
+        /// </summary>
+        /// <param name="roomId"></param>
+        /// <param name="idMessage"></param>
+        /// <param name="idPlayer"> Player originating the broadcast </param>
+        /// <param name="data"></param>
+        public void SendBroadcast(string roomId, Tools.IdMessage idMessage, ulong idPlayer, string[] data)
+        {
+            // Generate packet
+            Packet packet = new Packet();
+            packet.IdMessage = idMessage;
+            packet.Type = true;
+
+            packet.IdPlayer = idPlayer;
+
+            packet.Data = data;
+
+            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
+            {
+                if (thread_serv_ite.Get_ID() == Int32.Parse(roomId))
+                {
+                    // Envoi à chaque joueur
+                    foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
+                    {
+                        // On envoie le display à tous sauf au joueur dont c'est l'action (si tuileDrawn on envoit à tous)
+                        if (joueur.Key != idPlayer || idMessage == Tools.IdMessage.TuileDraw) 
+                        {
+                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
+
+                            // Lancement de l'écoute de la réponse du joueur 
+                            ClientAsync.OnPacketReceived += OnPacketReceived;
+                            ClientAsync.Receive(joueur.Value._socket_of_player);
+
+                        }
+                    }
+                }
+            }
+        }
+
+        // -----------------------------------------
+        // Surcharges de la méthode de communication
+        // -----------------------------------------
+
+        public void SendBroadcast(string roomId, Tools.IdMessage idMessage)
+        {
+            SendBroadcast(roomId, idMessage, 0, Array.Empty<string>());
+        }
+
+        public void SendBroadcast(string roomId, Tools.IdMessage idMessage, ulong idPlayer)
+        {
+            SendBroadcast(roomId, idMessage, idPlayer, Array.Empty<string>());
+        }
+
+        public void SendBroadcast(string roomId, Tools.IdMessage idMessage, string[] data)
+        {
+            SendBroadcast(roomId, idMessage, 0, data);
+        }
+
         // =================
         // Méthodes moteur
         // =================
@@ -101,7 +164,7 @@ namespace system
                 if (_nb_parties_gerees < 5)
                 {
                     // Dixaine : numéro de thread, unité : numéro de partie
-                    id_nouv_partie = _id_thread_com * 10 + (_nb_parties_gerees+1) ;
+                    id_nouv_partie = _id_thread_com * 10 + (_nb_parties_gerees + 1);
 
                     lock (this._lock_id_parties_gerees)
                     {
@@ -154,30 +217,6 @@ namespace system
             _lst_serveur_jeu.RemoveAt(indexOfRoom);
         }
 
-        public void TransmitStartToAll(int roomId)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.StartGame;
-            packet.Type = true;
-
-            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
-            {
-                if(thread_serv_ite.Get_ID() == roomId)
-                {
-                    foreach(var joueur in thread_serv_ite.Get_Dico_Joueurs())
-                    {
-                        packet.IdPlayer = joueur.Value._id_player;
-                        ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                        // Lancement de l'écoute des réponse du client async
-                        ClientAsync.OnPacketReceived += OnPacketReceived;
-                        ClientAsync.Receive(joueur.Value._socket_of_player);
-
-                    }
-                }
-            }
-        }
-
         /// <summary>
         /// Get the parameters needed to communicate with a client
         /// </summary>
@@ -197,231 +236,6 @@ namespace system
             return playerParameters;
         }
 
-        public void SendPlayerReadyDisplay(string idRoom, ulong idPlayer)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.PlayerReady;
-            packet.Type = true;
-            packet.IdPlayer = idPlayer;
-
-            // Récupération du bon thread de jeu
-            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-                    // Envoie de l'information à tous les joueurs
-                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        if (joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
-                        {
-                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                            // Lancement de l'écoute de la réponse du joueur 
-                            ClientAsync.OnPacketReceived += OnPacketReceived;
-                            ClientAsync.Receive(joueur.Value._socket_of_player);
-
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        public void SendSettingsDisplay(string idRoom, ulong idPlayer, string[] settings)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
-            packet.Type = true;
-
-            packet.Data = settings;
-
-            // Récupération du bon thread de jeu
-            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-                    // Envoie de l'information à tous les joueurs
-                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        if (joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
-                        {
-                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                            // Lancement de l'écoute de la réponse du joueur 
-                            ClientAsync.OnPacketReceived += OnPacketReceived;
-                            ClientAsync.Receive(joueur.Value._socket_of_player);
-
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        public void SendTilesRoundStart(string[] tilesToSend, string idRoom)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.TuileDraw;
-            packet.Type = true;
-
-            packet.Data = tilesToSend;
-
-            
-            // Envoi des tuiles à tous les autres joueurs
-            foreach(Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if(threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-
-                    foreach(var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        packet.IdPlayer = joueur.Value._id_player;
-                        ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                        // Lancement de l'écoute de la réponse du joueur modérateur
-                        ClientAsync.OnPacketReceived += OnPacketReceived;
-                        ClientAsync.Receive(joueur.Value._socket_of_player);
-                    }
-
-                    break;
-                }
-            }
-
-        }
-
-        public void SendTileDisplay(string idRoom, ulong idPlayer, string idTuile, string posX, string posY, string rotat)
-        {
-
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.TuilePlacement;
-            packet.Type = true;
-            packet.IdPlayer = idPlayer;
-
-            packet.Data = new string[] { idTuile, posX, posY, rotat };
-
-            // Récupération du bon thread de jeu
-            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-                    // Envoie de l'information à tous les joueurs
-                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        if(joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
-                        {
-                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                            // Lancement de l'écoute de la réponse du joueur 
-                            ClientAsync.OnPacketReceived += OnPacketReceived;
-                            ClientAsync.Receive(joueur.Value._socket_of_player);
-
-                        }                 
-                    }
-                    break;
-                }
-            }
-        }
-
-        public void SendPionDisplay(string idRoom, ulong idPlayer, string idTuile, string idMeeple, string slotPos)
-        {
-
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.PionPlacement;
-            packet.Type = true;
-            packet.IdPlayer = idPlayer;
-
-            packet.Data = new string[] { idTuile, idMeeple, slotPos };
-
-            // Récupération du bon thread de jeu
-            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-                    // Envoie de l'information à tous les joueurs
-                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        if (joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
-                        {
-                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                            // Lancement de l'écoute de la réponse du joueur 
-                            ClientAsync.OnPacketReceived += OnPacketReceived;
-                            ClientAsync.Receive(joueur.Value._socket_of_player);
-                        } 
-                    }
-                    break;
-                }
-            }
-        }
-
-        public void SendCancel(string idRoom, ulong idPlayer, Tools.IdMessage typeCancel)
-        {
-            if(typeCancel != Tools.IdMessage.CancelTuilePlacement && typeCancel != Tools.IdMessage.CancelPionPlacement)
-            {
-                Console.WriteLine("Error : Tried to SendCancel an idMessage wich isn't a cancel");
-                return;
-            }
-
-
-            Packet packet = new Packet();
-            packet.IdMessage = typeCancel;
-            packet.Type = true;
-            packet.IdPlayer = idPlayer;
-
-            packet.Data = new string[] { };
-
-            // Récupération du bon thread de jeu
-            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-                    // Envoie de l'information à tous les joueurs
-                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        if (joueur.Key != idPlayer) // On envoie le display à tous sauf au joueur dont c'est l'action
-                        {
-                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                            // Lancement de l'écoute de la réponse du joueur 
-                            ClientAsync.OnPacketReceived += OnPacketReceived;
-                            ClientAsync.Receive(joueur.Value._socket_of_player);
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        public void SendEndGame(string idRoom, ulong idPlayerWinner)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.EndGame;
-            packet.Type = true;
-
-            packet.Data = new string[] { idPlayerWinner.ToString() };
-
-            // Envoi de l'information à tous les joueurs
-            foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
-            {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
-                {
-
-                    foreach (var joueur in threadJeu.Get_Dico_Joueurs())
-                    {
-                        ClientAsync.Send(joueur.Value._socket_of_player, packet);
-
-                        // Lancement de l'écoute de la réponse du joueur
-                        ClientAsync.OnPacketReceived += OnPacketReceived;
-                        ClientAsync.Receive(joueur.Value._socket_of_player);
-
-                        // TODO : Rajouter un disconnect ?
-                    }
-
-                    break;
-                }
-            }
-
-        }
 
         // La fonction du joueur dont c'est le tour
         public void DrawAntiCheatPlayer(string idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
@@ -441,13 +255,13 @@ namespace system
                         // Les tuiles s'avèrent valides, on a affaire à un tricheur
                         PlayerCheated(idPlayer, playerSocket, idRoom);
                         // On renvoie les 3 mêmes tuiles
-                        SendTilesRoundStart(tuilesEnvoyees, idRoom);
+                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
                     }
                     else
                     {
                         // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
                         threadJeu.ShuffleTilesGame();
-                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), idRoom);
+                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
 
                     }
 
@@ -502,7 +316,7 @@ namespace system
 
                         // Renvoie les 3 tuiles
                         string[] tuilesAEnvoyer = threadJeu.GetThreeLastTiles();
-                        SendTilesRoundStart(tuilesAEnvoyer, idRoom);
+                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
                     }
 
                     break;
@@ -543,8 +357,9 @@ namespace system
 
                         if (errors == Tools.Errors.None) // Si coup légal
                         {
-                            // Envoi de l'information à tous pour l'affichage 
-                            SendTileDisplay(idRoom, idPlayer, idTuile, posX, posY, rotat);
+                            // Envoi de l'information à tous pour l'affichage
+                            string[] dataToSend = new string[] { idTuile, posX, posY, rotat };
+                            SendBroadcast(idRoom, Tools.IdMessage.TuilePlacement, idPlayer, dataToSend);
                         }
                             
                         break;
@@ -585,7 +400,8 @@ namespace system
                         if(errors == Tools.Errors.None) // Si placement légal
                         {
                             // Envoi de l'information à tous pour l'affichage 
-                            SendPionDisplay(idRoom, idPlayer, idTuile, idMeeple, slotPos);
+                            string[] dataToSend = new string[] { idTuile, idMeeple, slotPos };
+                            SendBroadcast(idRoom, Tools.IdMessage.PionPlacement, idPlayer, dataToSend);
                         }
                         
                         break;
@@ -625,7 +441,7 @@ namespace system
                         thread_serv_ite.RetirerTuileTourActu();
 
                         // Envoie l'information display
-                        SendCancel(idRoom, idPlayer, Tools.IdMessage.CancelTuilePlacement);
+                        SendBroadcast(idRoom, Tools.IdMessage.CancelTuilePlacement, idPlayer);
 
                         errors = Tools.Errors.None;
                         break;
@@ -659,7 +475,7 @@ namespace system
                         thread_serv_ite.RetirerPionTourActu();
 
                         // Envoie l'information display
-                        SendCancel(idRoom, idPlayer, Tools.IdMessage.CancelPionPlacement);
+                        SendBroadcast(idRoom, Tools.IdMessage.CancelPionPlacement, idPlayer);
 
                         errors = Tools.Errors.None;
                         break;
@@ -694,14 +510,15 @@ namespace system
                         if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                         {
                             ulong idPlayerWinner = thread_serv_ite.GetWinner();
-                            SendEndGame(idRoom, idPlayerWinner);
+                            string[] dataToSend = new string[] { idPlayerWinner.ToString() };
+                            SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
                             DeleteGame(idRoom);
                         }
                         else // Si la partie n'est pas terminée
                         {
                             // Envoie des 3 tuiles au suivant
                             thread_serv_ite.ShuffleTilesGame();
-                            SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), idRoom);
+                            SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, thread_serv_ite.GetThreeLastTiles());
                         }
 
                         return Tools.Errors.None;
@@ -769,7 +586,7 @@ namespace system
                         // On abandonne les informations du tour actuel
                         Socket? nextPlayerSock = threadJeu.CancelTurn(idRoom);
                         // On lui envoit les 3 tuiles
-                        SendTilesRoundStart(threadJeu.GetThreeLastTiles(), idRoom);
+                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
                     }
 
                     // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)
