@@ -400,6 +400,50 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
 
+        public string[] CallPlayerList(string idRoom)
+        {
+            List<string> listPlayerAndName = new List<string>();
+
+            var db = new Database();
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
+                    {
+                        string playerName = db.GetPseudo((int)joueur.Key);
+                        listPlayerAndName.Add(joueur.Key.ToString());
+                        listPlayerAndName.Add(playerName);
+                    }
+
+                    return listPlayerAndName.ToArray();
+                }
+            }
+
+            return listPlayerAndName.ToArray();
+        }
+
+        public ulong CallPlayerNext(string idRoom)
+        {
+            ulong idActualPlayer = 0;
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    idActualPlayer = thread_serv_ite.Get_ActualPlayerId();
+                    return idActualPlayer;
+                }
+            }
+
+            return idActualPlayer;
+        }
+
         public Tools.PlayerStatus LogoutPlayer(ulong idPlayer)
         {
             Tools.PlayerStatus playerStatus = Tools.PlayerStatus.Default;

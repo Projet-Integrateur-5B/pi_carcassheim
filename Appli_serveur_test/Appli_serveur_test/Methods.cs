@@ -84,6 +84,12 @@ public partial class Server
             case Tools.IdMessage.PlayerCheat:
                 PlayerCheat(state.Packet, ref packet, socket);
                 break;
+            case Tools.IdMessage.PlayerList:
+                PlayerList(state.Packet, ref packet, socket);
+                break;
+            case Tools.IdMessage.PlayerNext:
+                PlayerNext(state.Packet, ref packet, socket);
+                break;
 
             case Tools.IdMessage.StartGame:
                 GameStart(state.Packet, ref packet, socket);
@@ -648,6 +654,90 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.IllegalPlay;
         }
+    }
+
+    /// <summary>
+    /// Lists the id's of each player in the game and its name
+    /// </summary>
+    /// <param name="packetReceived"></param>
+    /// <param name="packet"></param>
+    /// <param name="socket"></param>
+    public static void PlayerList(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par le thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        string[] listOfPlayers = gestionnaire.CallPlayerList(packetReceived.Data[0]);
+
+        if(listOfPlayers.Length == 0)
+        {
+            packet.Error = Tools.Errors.NotFound;
+            return;
+        }
+        else
+        {
+            packet.Data = listOfPlayers;
+            packet.Error = Tools.Errors.None;
+        }
+
+    }
+
+    /// <summary>
+    /// Asks the idPlayer of the actual player
+    /// </summary>
+    /// <param name="packetReceived"></param>
+    /// <param name="packet"></param>
+    /// <param name="socket"></param>
+    public static void PlayerNext(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par le thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+
+        if (packetReceived.Data.Length < 1)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+
+        Tools.Errors error = Tools.Errors.Unknown;
+
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        // Get the actual player
+        ulong idActualPlayer = gestionnaire.CallPlayerNext(packetReceived.Data[0]);
+
+        if(idActualPlayer != 0)
+        {
+            packet.IdPlayer = idActualPlayer;
+            error = Tools.Errors.None;
+        }
+
+        packet.Error = error;
+        
     }
 
 
