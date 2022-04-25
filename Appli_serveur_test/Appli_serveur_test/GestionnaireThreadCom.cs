@@ -441,14 +441,14 @@ namespace system
                     {
                         // Lancement de la game
                         thread_serv_ite.StartGame();
+                        // Préviens tous les joueurs (broadcast start)
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame);
+                        Thread.Sleep(200);
                         // Broadcast tuile initiale
                         string[] dataToSend = new string[] { thread_serv_ite.Get_idTuileInit().ToString(), 0.ToString(),
                             0.ToString(), 0.ToString() };
                         thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuilePlacement, dataToSend);
-                        Thread.Sleep(200);
-                        // Préviens tous les joueurs (broadcast start)
-                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame);
-                        Thread.Sleep(200);
+                        Thread.Sleep(200);                    
                         // Envoi des 3 tuiles de début de tour
                         thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, thread_serv_ite.GetThreeLastTiles());
                         return Tools.Errors.None; // return valeur correcte
