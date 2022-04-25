@@ -272,7 +272,7 @@ namespace system
                 {
                     if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
                     thread_serv_ite.Set_Settings(idPlayer, settings);
-                    thread_com_iterateur.SendSettingsDisplay(idRoom, idPlayer, settings);
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.RoomSettingsSet, idPlayer, settings);
                     return;
                 }
             }
@@ -372,8 +372,8 @@ namespace system
                     {
                         if (thread_serv_ite.EveryoneIsReady() != true)
                         {
-                            // Envoie de quoi afficher le player ready à tt le monde
-                            thread_com_iterateur.SendPlayerReadyDisplay(idRoom, idPlayer);
+                            // Envoie de quoi afficher le player ready à tt le mondes
+                            thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerReady, idPlayer);
                         }
                         // Si tout le monde est prêt, inutile de broadcast le ready : la game va se lancer presque immédiatement
                         
@@ -442,12 +442,13 @@ namespace system
                         // Lancement de la game
                         thread_serv_ite.StartGame();
                         // Broadcast tuile initiale
-                        thread_com_iterateur.SendTileDisplay(idRoom, (ulong)0, thread_serv_ite.Get_idTuileInit().ToString(),
-                            0.ToString(), 0.ToString(), 0.ToString());
-                        // Préviens tous les joueurs
-                        thread_com_iterateur.TransmitStartToAll(Int32.Parse(idRoom));
+                        string[] dataToSend = new string[] { thread_serv_ite.Get_idTuileInit().ToString(), 0.ToString(),
+                            0.ToString(), 0.ToString() };
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuilePlacement, dataToSend);
+                        // Préviens tous les joueurs (broadcast start)
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame);
                         // Envoi des 3 tuiles de début de tour
-                        thread_com_iterateur.SendTilesRoundStart(thread_serv_ite.GetThreeLastTiles(), idRoom);
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, thread_serv_ite.GetThreeLastTiles());
                         return Tools.Errors.None; // return valeur correcte
                     }
                     else // Des joueurs ne sont pas prêts
