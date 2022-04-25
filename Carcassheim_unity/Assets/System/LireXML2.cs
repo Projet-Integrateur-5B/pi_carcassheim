@@ -93,6 +93,7 @@ namespace Assets.system
                             if (reader.Name == "tuile")
                             {
                                 var temp = new List<int[]>();
+
                                 foreach (var item in lien)
                                 {
                                     temp.Add(item.ToArray());
@@ -169,6 +170,8 @@ namespace Assets.system
             string nodeName = "";
             string pos_debug = "";
             bool goNext = false;
+            List<ulong> tempSlotLink = new List<ulong>();
+
             while (!stop && xmlReader.Read())
             {
                 if (goNext)
@@ -207,6 +210,7 @@ namespace Assets.system
                                 idTerrain = int.Parse(xmlReader.Value);
                                 break;
                             case "link":
+                                tempSlotLink.Add(ulong.Parse(xmlReader.Value));
                                 break;
                             default:
                                 break;
@@ -222,7 +226,7 @@ namespace Assets.system
                 }
             }
 
-            slot = new Slot((ulong)idTerrain);
+            slot = new Slot((ulong)idTerrain, tempSlotLink.ToArray());
             Debug.Log("END SLOT OF" + idTerrain.ToString() + " of " + pos_debug);
             return result;
         }
