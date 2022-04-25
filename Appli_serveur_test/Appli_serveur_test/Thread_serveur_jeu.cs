@@ -304,7 +304,7 @@ namespace system
         /// Pass to the next player
         /// </summary>
         /// <returns> Returns the new actual player's id </returns>
-        public ulong Get_NextPlayer()
+        public ulong PassToAndGet_NextPlayer()
         {
             // Transforme le dico en array pour récupérer le n-ième joueur
             _s_dico_joueur.WaitOne();
@@ -766,7 +766,7 @@ namespace system
             _s_posPionTourActu.Release();
 
             // Passe au joueur suivant
-            ulong nextPlayer = Get_NextPlayer();
+            ulong nextPlayer = PassToAndGet_NextPlayer();
 
             _s_dico_joueur.WaitOne();
             Socket? nextPlayerSocket = _dico_joueur[nextPlayer]._socket_of_player;
@@ -818,7 +818,7 @@ namespace system
             _s_posPionTourActu.Release();
 
             // Passe au joueur suivant
-            ulong nextPlayer = Get_NextPlayer();
+            ulong nextPlayer = PassToAndGet_NextPlayer();
 
             _s_dico_joueur.WaitOne();
             Socket? nextPlayerSocket = _dico_joueur[nextPlayer]._socket_of_player;
