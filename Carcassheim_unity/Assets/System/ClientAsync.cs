@@ -295,11 +295,15 @@ public class ClientAsync
                     bytesRead);
             if (state.Packet.Final)
             {
-                
-
                 state.Packet.Data = state.Data;
 
-                OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet);
+                Packet packet2 = new Packet();
+                packet2.IdMessage = state.Packet.IdMessage;
+                packet2.Error = state.Packet.Error;
+                int taille = state.Packet.Data.Length;
+                packet2.Data = new string[taille];
+                Array.Copy(packet2.Data, state.Packet.Data, taille);
+                OnPacketReceived?.Invoke(typeof(ClientAsync), packet2);
 
                 //Receive(client);
                 // TODO: check if packet.IdMessage requires an answer for the client
