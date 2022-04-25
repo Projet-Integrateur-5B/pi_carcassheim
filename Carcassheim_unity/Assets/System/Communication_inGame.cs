@@ -17,20 +17,26 @@ namespace Assets.system
 
         private ulong _mon_id;
 
-        private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
-        private int _nb_tuiles;
-        private int _score_max;
+        private int id_tile_init;
+        bool id_tile_init_received = false;
+
+        private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
+        private int _nb_tuiles = -1;
+        private int _score_max = -1;
+        private int _timer_max_joueur = -1; // En secondes
+        bool win_cond_received = false;
 
         private int _nb_joueur_max;
         private int _timer; // En secondes
-        private int _timer_max_joueur; // En secondes
+        bool timer_tour_received = false;
         private int _meeples; // Nombre de meeples par joueur
 
         private Dictionary<ulong, Tuile> dico_tuile;
         private Plateau lePlateau;
 
         private Player[] playerList;
+        bool player_received = false;
         private ulong nextPlayer;
         private Position[] allposition;
 
@@ -155,24 +161,38 @@ namespace Assets.system
         override public int askIdTileInitial()
         {
             // TODO PARTAGER ID DE LA TUILE INITIAL EN POSITION (0, 0) => Display
-            return 0;
+            return id_tile_init;
         }
 
         override public void askTimerTour(out int min, out int sec)
         {
             // TODO PARTAGER LE TEMPS DISPONIBLE PAR TOUR => Display
-            min = 0;
-            sec = 0;
+            min = _timer / 60;
+            sec = _timer % 60;
         }
 
         override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
         {
             // TODO PARTAGER CONDITION DE VICTOIRE => Display
-            // TUILE => nb de tuile
-            // SCORE => score � atteindre
-            // TEMPS => nb de min, puis nb de sec
-            win_cond = WinCondition.WinByTile;
-            parameters.Add(100);
+            // 0 TUILE => nb de tuile
+            // 1 TEMPS => nb de min, puis nb de sec
+            // 2 SCORE => score � atteindre
+            switch (_mode)
+            {
+                case 1:
+                    win_cond = WinCondition.WinByTime;
+                    parameters.Add(_timer_max_joueur / 60);
+                    parameters.Add(_timer_max_joueur % 60);
+                    break;
+                case 2:
+                    win_cond = WinCondition.WinByPoint;
+                    parameters.Add(_score_max);
+                    break;
+                default:
+                    win_cond = WinCondition.WinByTile;
+                    parameters.Add(_nb_tuiles);
+                    break;
+            }
         }
 
         override public int getMyPlayer()
@@ -438,11 +458,21 @@ namespace Assets.system
             {
                 playerList[compteur] = new Player(Convert.ToUInt64(packet.Data[i]), packet.Data[i + 1], Convert.ToUInt32(packet.Data[i + 2]), Convert.ToUInt32(packet.Data[i + 3]));
             }
+            player_received = true;
+            checkGameBegin();
         }
 
         public void OnPlayerNextReceive(Packet packet)
         {
             nextPlayer = Convert.ToUInt64(packet.Data[0]);
+        }
+
+        public void checkGameBegin()
+        {
+            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received)
+            {
+                system_display.gameBegin();
+            }
         }
     }
 }
