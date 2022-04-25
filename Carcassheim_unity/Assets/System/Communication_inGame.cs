@@ -13,7 +13,7 @@ namespace Assets.system
     {
 
         // Param�tres de la partie 
-        private readonly ulong _id_partie;
+        private ulong _id_partie;
 
         private ulong _mon_id;
 
@@ -258,6 +258,20 @@ namespace Assets.system
             lePlateau = new Plateau();
             dico_tuile = LireXML2.Read("config_back.xml");
 
+            _id_partie = (ulong)Communication.Instance.idRoom;
+            _mon_id = Communication.Instance.idClient;
+
+            _mode = (int)RoomInfo.Instance.mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
+            _nb_tuiles = -1;
+            _score_max = RoomInfo.Instance.scoreMax;
+            _timer_max_joueur = (int)RoomInfo.Instance.timerJoueur; // En secondes
+            win_cond_received = true;
+
+            _nb_joueur_max = RoomInfo.Instance.nbJoueurMax;
+            _timer = (int)RoomInfo.Instance.timerPartie; // En secondes
+            timer_tour_received = true;
+            _meeples = RoomInfo.Instance.meeples; // Nombre de meeples par joueur
+
             Debug.Log("On est dans la game");
 
             /*
@@ -326,6 +340,13 @@ namespace Assets.system
             else if (packet.IdMessage == Tools.IdMessage.PlayerNext)
             {
                 OnPlayerNextReceive(packet);
+            }
+            else if(packet.IdMessage == Tools.IdMessage.TuilePlacement)
+            {
+                id_tile_init = int.Parse(packet.Data[0]);
+                id_tile_init_received = true;
+
+                /* TODO placement */
             }
         }
 
@@ -436,6 +457,7 @@ namespace Assets.system
             if (player_received && win_cond_received && id_tile_init_received && timer_tour_received)
             {
                 system_display.gameBegin();
+                Debug.Log("Game commence");
             }
         }
     }

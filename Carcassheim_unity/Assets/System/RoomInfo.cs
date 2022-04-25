@@ -34,17 +34,19 @@ namespace Assets.System
 
 
         /* Les Informations de la Room */
-        private ulong idPartie { get; set; }
+        public ulong idPartie { get; set; }
 
-        private ulong idModerateur { get; set; }
-        private int nbJoueur { get; set; }
-        private int nbJoueurMax { get; set; }
+        public ulong idModerateur { get; set; }
+        public int nbJoueur { get; set; }
+        public int nbJoueurMax { get; set; }
 
-        private int meeples { get; set; }
-        private int scoreMax { get; set; }
+        public int meeples { get; set; }
+        public int scoreMax { get; set; }
 
-        private Tools.Timer timerJoueur { get; set; }
-        private Tools.Timer timerPartie { get; set; }
+        public Tools.Mode mode { get; set; }
+
+        public Tools.Timer timerJoueur { get; set; }
+        public Tools.Timer timerPartie { get; set; }
 
         private Dictionary<ulong,Player> Players;
 
@@ -71,25 +73,26 @@ namespace Assets.System
                 _instance = this;
             }
         }
-        /*
+        
         public Player[] GetPlayes()
         {
             int taille = Players.Count;
             Player[] result = new Player[taille];
-            return Players.Values.CopyTo(result,0);
+            Players.Values.CopyTo(result,0);
+            return result;
         }
 
-        public void AddPlayer(Player player)
+        public void AddPlayer(ulong idPlayer,Player player)
         {
-            if (!Players.Contains(player))
+            if (!Players.ContainsKey(idPlayer))
             {
-                Players.Add(player);
+                Players.Add(idPlayer, player);
                 nbJoueur++;
             }
         }
-        public void RemovePlayer(Player player)
+        public void RemovePlayer(ulong idPlayer)
         {
-            if(Players.Remove(player))
+            if(Players.Remove(idPlayer))
                 nbJoueur--;
         }
 
@@ -102,7 +105,7 @@ namespace Assets.System
                 nbJoueur = int.Parse(values[1]);
                 nbJoueurMax = int.Parse(values[2]);
                 //privé 3
-                //mode 4
+                mode = (Tools.Mode)int.Parse(values[4]);
                 //nbtuile 5
                 meeples = int.Parse(values[6]);
                 timerPartie = (Tools.Timer)int.Parse(values[7]);
@@ -116,7 +119,7 @@ namespace Assets.System
                 Debug.LogException(ex);
             }
         }
-        */
+        
     }
 }
 

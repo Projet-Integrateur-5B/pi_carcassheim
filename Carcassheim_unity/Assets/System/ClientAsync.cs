@@ -269,9 +269,11 @@ public class ClientAsync
                 // TODO : ByteArrayToPacket => handle error
                 return;
             }
-
+            Debug.Log("/////////////////////////////////////// bytesRead : " + bytesRead + " ////////////////////////////////////////");
             var dataLength = state.Data.Length;
             state.Data = state.Data.Concat(state.Packet.Data).ToArray();
+            
+            /*
             if (dataLength > 0)
             {
                 if (state.Data[dataLength] == "")
@@ -283,15 +285,17 @@ public class ClientAsync
                         .ToArray();
                 }
             }
-
+            */
+            
             var debug = "Reading from : " + client.RemoteEndPoint +
                         "\n\t Read {0} bytes =>\t" + state.Packet +
                         "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
 
+            Debug.Log(debug + "\n\t => Every packet has been received !" +
+                    bytesRead);
             if (state.Packet.Final)
             {
-                Debug.Log(debug + "\n\t => Every packet has been received !" + 
-                    bytesRead);
+                
 
                 state.Packet.Data = state.Data;
 

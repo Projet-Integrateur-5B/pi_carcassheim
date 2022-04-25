@@ -100,15 +100,22 @@ public class PublicRoomMenu : Miscellaneous
 				s_listAction.Release();
 			}
 		}
+		else if(packet.IdMessage == Tools.IdMessage.PlayerJoin)
+        {
+			Packet packet1 = new Packet();
+			packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
+			packet1.IdPlayer = Communication.Instance.idClient;
+			packet1.Data = new[] { Communication.Instance.idRoom.ToString() };
+
+			Communication.Instance.SendAsync(packet1);
+		}
 		else if(packet.IdMessage == Tools.IdMessage.RoomSettingsGet)
         {
 			if (packet.Error == Tools.Errors.None)
 			{
-				
+				RoomInfo.Instance.SetValues(packet.Data);
 			}
 		}
-       
-		Debug.Log("Packet id : "+ packet.IdMessage);
     }
 
 	IEnumerator LoadYourAsyncScene()
