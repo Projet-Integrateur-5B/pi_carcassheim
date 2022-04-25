@@ -4,6 +4,7 @@ using ClassLibrary;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using System.Timers;
 
 using Server;
 
@@ -34,9 +35,15 @@ namespace system
         private int _score_max;
 
         private bool _privee;
-        private Tools.Timer _timer; // En secondes
-        private Tools.Timer _timer_max_joueur; // En secondes
         private Tools.Meeple _meeples; // Nombre de meeples par joueur
+        
+        // Timer
+        private DateTime _DateTime_game;
+        private System.Timers.Timer _timer_game;
+        private Tools.Timer _timer_game_value; // En secondes
+        private DateTime _DateTime_player;
+        private System.Timers.Timer _timer_player;
+        private Tools.Timer _timer_player_value; // En secondes
 
         // Locks
 
@@ -182,8 +189,8 @@ namespace system
             settingsList.Add(_mode.ToString());
             settingsList.Add(_nb_tuiles.ToString());
             settingsList.Add(_meeples.ToString());
-            settingsList.Add(_timer.ToString());
-            settingsList.Add(_timer_max_joueur.ToString());
+            settingsList.Add(_timer_game_value.ToString());
+            settingsList.Add(_timer_player_value.ToString());
             settingsList.Add(_score_max.ToString());
 
             return settingsList.ToArray();
@@ -242,16 +249,16 @@ namespace system
                         switch (int.Parse(settings[5]))
                         {
                             case 60:
-                                _timer = Tools.Timer.Minute;
+                                _timer_game_value = Tools.Timer.Minute;
                                 break;
                             case 1800:
-                                _timer = Tools.Timer.DemiHeure;
+                                _timer_game_value = Tools.Timer.DemiHeure;
                                 break;
                             case 3600:
-                                _timer = Tools.Timer.Heure;
+                                _timer_game_value = Tools.Timer.Heure;
                                 break;
                             default:
-                                _timer = Tools.Timer.DemiHeure;
+                                _timer_game_value = Tools.Timer.DemiHeure;
                                 break;
 
                         }
@@ -259,16 +266,16 @@ namespace system
                         switch (int.Parse(settings[6]))
                         {
                             case 10:
-                                _timer = Tools.Timer.DixSecondes;
+                                _timer_player_value = Tools.Timer.DixSecondes;
                                 break;
                             case 30:
-                                _timer = Tools.Timer.DemiMinute;
+                                _timer_player_value = Tools.Timer.DemiMinute;
                                 break;
                             case 60:
-                                _timer = Tools.Timer.Minute;
+                                _timer_player_value = Tools.Timer.Minute;
                                 break;
                             default:
-                                _timer = Tools.Timer.DemiMinute;
+                                _timer_player_value = Tools.Timer.DemiMinute;
                                 break;
 
                         }
@@ -328,8 +335,8 @@ namespace system
             _nb_tuiles = 60;
             _score_max = -1;
             _privee = false; // Une partie est par défaut privée
-            _timer = Tools.Timer.Heure; // Une heure par défaut
-            _timer_max_joueur = Tools.Timer.Minute;
+            _timer_game_value = Tools.Timer.Heure; // Une heure par défaut
+            _timer_player_value = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
 
             // Initialisation des semaphores d'attributs moteurs
@@ -536,7 +543,21 @@ namespace system
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
             _posTuileTourActu.SetNonExistent();
+
+            _timer_game = new System.Timers.Timer();
+            _timer_game.Interval = 1000;
+            _timer_game.Elapsed += OnTimedEventGame;
+            _DateTime_game = DateTime.Now;
+            _timer_game.AutoReset = true;
+            _timer_game.Enabled = true;
             
+            _timer_player = new System.Timers.Timer();
+            _timer_player.Interval = 1000;
+            _timer_player.Elapsed += OnTimedEventPlayer;
+            _DateTime_player = DateTime.Now;
+            _timer_player.AutoReset = true;
+            _timer_player.Enabled = true;
+
 
             // TODO :
             // synchronisation de la methode
@@ -544,6 +565,22 @@ namespace system
             // envoie 3 tuiles au player 1
             // start timer
             // return valeur d'erreur pour la méthode parent
+        }
+        
+        private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            var diff = DateTime.Now.Subtract(_DateTime_game).Seconds;
+            if(diff > (int) _timer_game_value)
+                EndGame();
+            Console.WriteLine("The Game Elapsed event was raised at {0}", e.SignalTime);
+        }
+        
+        private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            var diff = DateTime.Now.Subtract(_DateTime_player).Seconds;
+            if(diff > (int) _timer_player_value)
+                EndTurn(Get_ActualPlayerId());
+            Console.WriteLine("The Player Elapsed event was raised at {0}", e.SignalTime);
         }
 
         /// <summary>
@@ -765,7 +802,9 @@ namespace system
             _s_dico_joueur.WaitOne();
             Socket? nextPlayerSocket = _dico_joueur[nextPlayer]._socket_of_player;
             _s_dico_joueur.Release();
-
+            
+            // reset player timer
+            _DateTime_player = DateTime.Now;
 
             return nextPlayerSocket;
         }
@@ -780,22 +819,10 @@ namespace system
             // return valeur d'erreur pour la méthode parent
         }
 
-        public void Round()
-        {
-            // TODO :
-            // synchronisation de la methode
-            // check que c'est bien au tour du joueur
-            // calcul des points
-            // envoie 3 tuiles au player suivant
-            // update timer
-            // return valeur d'erreur pour la méthode parent
-        }
-
         public void TimerPlayer(ulong idPlayer)
         {
             // TODO :
             // inc player timer count + check limit ?
-            Round();
         }
 
         // =================================
