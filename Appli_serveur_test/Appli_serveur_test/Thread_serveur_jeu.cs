@@ -549,7 +549,7 @@ namespace system
             _AC_drawedTilesValid = false;
 
             // Génération du dicoTuile de la classe tuile
-            Tuile.DicoTuiles = LireXML2.Read("config_back.xml");
+            Tuile.DicoTuiles = LireXML2.Read("system/config_back.xml");
 
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
@@ -585,17 +585,18 @@ namespace system
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_game).Seconds;
-            if(diff > (int) _timer_game_value)
-                EndGame();
-            Console.WriteLine("The Game Elapsed event was raised at {0}", e.SignalTime);
+            if (diff <= (int) _timer_game_value) return;
+            Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
+            EndGame();
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Seconds;
-            if(diff > (int) _timer_player_value)
-                EndTurn(Get_ActualPlayerId());
-            Console.WriteLine("The Player Elapsed event was raised at {0}", e.SignalTime);
+            if (diff <= (int) _timer_player_value) return;
+            var idPlayer = Get_ActualPlayerId();
+            Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
+            EndTurn(idPlayer);
         }
 
         /// <summary>
