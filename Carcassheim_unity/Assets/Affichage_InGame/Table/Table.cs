@@ -57,14 +57,14 @@ public class Table : MonoBehaviour
     private int planned_tile_count;
 
     private Vector3 tile_origin, tile_step;
-    private Dictionary<Tuile, ColliderStat> tile_mapping;
+    private Dictionary<TuileRepre, ColliderStat> tile_mapping;
 
     // * MEEPLE ***********************************************
     [SerializeField] private GameObject meeple_zone;
     [SerializeField] private MeepleColliderStat meeple_collider_model;
 
     private Vector3 meeple_origin, meeple_step;
-    private Dictionary<Meeple, MeepleColliderStat> meeple_mapping;
+    private Dictionary<MeepleRepre, MeepleColliderStat> meeple_mapping;
 
     // * INFO *************************************************
     [SerializeField] private GameObject info_zone;
@@ -73,8 +73,8 @@ public class Table : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        tile_mapping = new Dictionary<Tuile, ColliderStat>();
-        meeple_mapping = new Dictionary<Meeple, MeepleColliderStat>();
+        tile_mapping = new Dictionary<TuileRepre, ColliderStat>();
+        meeple_mapping = new Dictionary<MeepleRepre, MeepleColliderStat>();
         state_transition = new Queue<TableState>();
 
         balise1 = balise1_model.position;
@@ -103,9 +103,9 @@ public class Table : MonoBehaviour
 
     IEnumerator RawDrawTile()
     {
-        Tuile last_tile = null;
+        TuileRepre last_tile = null;
         bool perma_tile, last_perma_tile = true;
-        Tuile tile = null;
+        TuileRepre tile = null;
         while ((tile = display_system.getNextTile(out perma_tile)) != null)
         {
             tile_pack.Value--;
@@ -117,12 +117,12 @@ public class Table : MonoBehaviour
             tile.transform.parent = tile_zone.transform;
             tile.model.layer = DisplaySystem.TableLayer;
             tile.pivotPoint.rotation = unselected_angle;
-            tile.transform.localPosition = tile_origin + tile_step * act_tile_count;
+            tile.transform.localPosition = tile_origin + tile_step * act_tile_count - tile.pivotPoint.localPosition;
 
             if (perma_tile)
             {
                 ColliderStat collider = Instantiate<ColliderStat>(tile_collider_model, tile_zone.transform);
-                collider.transform.position = tile.transform.position;
+                collider.transform.position = tile.transform.position + tile.pivotPoint.localPosition;
                 collider.Index = act_tile_count;
                 tile_mapping.Add(tile, collider);
                 act_tile_count += 1;
@@ -134,7 +134,7 @@ public class Table : MonoBehaviour
         }
     }
 
-    public void resetHandSize(int hand_size, List<Meeple> meeples)
+    public void resetHandSize(int hand_size, List<MeepleRepre> meeples, Dictionary<int, int> meeple_distrib)
     {
         planned_tile_count = hand_size;
 
@@ -147,14 +147,15 @@ public class Table : MonoBehaviour
         cleanHand();
 
         int i = 0;
-        foreach (Meeple mpl in meeples)
+        foreach (MeepleRepre mpl in meeples)
         {
             MeepleColliderStat mps = Instantiate<MeepleColliderStat>(meeple_collider_model, meeple_zone.transform);
             mps.transform.localPosition = meeple_origin + meeple_step * i;
             mps.Index = i;
+            mps.meeple_num.Value = meeple_distrib[mpl.Id];
 
             mpl.transform.parent = meeple_zone.transform;
-            mpl.transform.localPosition = mps.transform.localPosition;
+            mpl.transform.localPosition = mps.transform.localPosition - mpl.pivotPoint.localPosition;
             mpl.model.layer = DisplaySystem.TableLayer;
             mpl.pivotPoint.rotation = unselected_angle;
 
@@ -169,6 +170,7 @@ public class Table : MonoBehaviour
 
     void cleanHand()
     {
+        Debug.Log("HAND CLEANED");
         int L = meeple_zone.transform.childCount;
         Transform c;
         for (int i = L - 1; i >= 0; i--)
@@ -239,7 +241,7 @@ public class Table : MonoBehaviour
         }
         else
         {
-            Debug.Log("Change from state " + old_state.ToString() + " " + new_state.ToString());
+            //Debug.Log("End change from state " + old_state.ToString() + " " + new_state.ToString());
         }
     }
 
@@ -276,35 +278,31 @@ public class Table : MonoBehaviour
         return true;
     }
 
-    public void activeTileChanged(Tuile old_tile, Tuile new_tile)
+    public void activeTileChanged(TuileRepre old_tile, TuileRepre new_tile)
     {
         if (old_tile != null)
         {
             old_tile.pivotPoint.rotation = unselected_angle;
         }
-        Debug.Log(old_tile);
-        Debug.Log(new_tile);
         new_tile.pivotPoint.rotation = Quaternion.identity;
     }
 
-    public void activeMeepleChanged(Meeple old_meeple, Meeple new_meeple)
+    public void activeMeepleChanged(MeepleRepre old_meeple, MeepleRepre new_meeple)
     {
         if (old_meeple != null)
         {
             old_meeple.pivotPoint.rotation = unselected_angle;
         }
-        Debug.Log(old_meeple);
-        Debug.Log(new_meeple);
         new_meeple.pivotPoint.rotation = Quaternion.identity;
     }
 
-    public void tilePositionChanged(Tuile tile)
+    public void tilePositionChanged(TuileRepre tile)
     {
         if (tile.Pos == null)
         {
             ColliderStat tst = tile_mapping[tile];
             tile.transform.parent = tile_zone.transform;
-            tile.transform.position = tst.transform.position;
+            tile.transform.localPosition = tst.transform.localPosition - tile.pivotPoint.localPosition;
             tile.model.layer = DisplaySystem.TableLayer;
             if (tile != display_system.act_tile)
                 tile.pivotPoint.rotation = unselected_angle;
@@ -316,21 +314,25 @@ public class Table : MonoBehaviour
         }
     }
 
-    public void meeplePositionChanged(Meeple meeple)
+    public void meeplePositionChanged(MeepleRepre meeple)
     {
         if (meeple.ParentTile == null)
         {
             MeepleColliderStat mps = meeple_mapping[meeple];
-            meeple.transform.position = mps.transform.position;
             meeple.transform.parent = meeple_zone.transform;
+            meeple.transform.localPosition = mps.transform.localPosition - meeple.pivotPoint.localPosition;
             meeple.model.layer = DisplaySystem.TableLayer;
             if (meeple != display_system.act_meeple)
                 meeple.pivotPoint.rotation = unselected_angle;
+            mps.meeple_num.Value += 1;
+            display_system.act_player.NbMeeple += 1;
         }
         else
         {
-            meeple.transform.parent = null;
+            MeepleColliderStat mps = meeple_mapping[meeple];
             meeple.model.layer = DisplaySystem.BoardLayer;
+            mps.meeple_num.Value -= 1;
+            display_system.act_player.NbMeeple -= 1;
         }
     }
 }

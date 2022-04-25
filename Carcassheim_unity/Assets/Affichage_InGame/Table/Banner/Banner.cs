@@ -23,7 +23,7 @@ public class Banner : MonoBehaviour
     int _nb_player = 0;
     // Start is called before the first frame update
 
-    void Start()
+    void Awake()
     {
         nbPlayerTMP.text = "0";
         nbMeepleTMP.text = "0";
@@ -36,6 +36,8 @@ public class Banner : MonoBehaviour
         {
             _player.OnMeepleUpdate += meepleUpdated;
             _player.OnScoreUpdate += scoreUpdated;
+            nbMeepleTMP.text = _player.NbMeeple.ToString();
+            nbPointsTMP.text = _player.Score.ToString();
         }
         if (timerTour != null)
         {
@@ -77,6 +79,9 @@ public class Banner : MonoBehaviour
         {
             _player.OnMeepleUpdate += meepleUpdated;
             _player.OnScoreUpdate += scoreUpdated;
+            Debug.Log("HERE NB PLAYER " + player.NbMeeple + " " + player.Score);
+            nbMeepleTMP.text = player.NbMeeple.ToString();
+            nbPointsTMP.text = player.Score.ToString();
         }
     }
 
@@ -93,12 +98,12 @@ public class Banner : MonoBehaviour
         timerTourTMP.text = timerTour.ToString();
     }
 
-    void scoreUpdated(uint old_score, uint new_score)
+    void scoreUpdated(int old_score, int new_score)
     {
         nbPointsTMP.text = new_score.ToString();
     }
 
-    void meepleUpdated(uint meeple)
+    void meepleUpdated(int meeple)
     {
         nbMeepleTMP.text = meeple.ToString();
     }

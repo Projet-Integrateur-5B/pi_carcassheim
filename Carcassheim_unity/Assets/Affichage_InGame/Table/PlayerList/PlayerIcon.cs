@@ -13,7 +13,7 @@ public class PlayerIcon : MonoBehaviour
     public PlayerRepre Player { get => _player; private set => setPlayer(value); }
     private PlayerRepre _player;
 
-    public void Start()
+    public void Awake()
     {
         player_score.text = "0";
         player_meeple.text = "0";
@@ -44,12 +44,12 @@ public class PlayerIcon : MonoBehaviour
         }
     }
 
-    public void meepleUpdated(uint nb_meeple)
+    public void meepleUpdated(int nb_meeple)
     {
         player_meeple.text = nb_meeple.ToString();
     }
 
-    public void scoreUpdated(uint old_score, uint new_score)
+    public void scoreUpdated(int old_score, int new_score)
     {
         player_score.text = new_score.ToString();
     }

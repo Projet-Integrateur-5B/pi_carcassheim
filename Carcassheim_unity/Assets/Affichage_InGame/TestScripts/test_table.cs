@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class test_table : MonoBehaviour
 {
-    public List<Tuile> tuiles;
-    public List<Meeple> meeples;
+    public List<TuileRepre> tuiles;
+    public List<MeepleRepre> meeples;
     public List<Transform> tile_colliders;
     public List<Transform> meeple_colliders;
 
@@ -45,7 +45,7 @@ public class test_table : MonoBehaviour
             if (mode == 0)
             {
                 GameObject ntuile = Instantiate<GameObject>(tuile_model);
-                tuiles.Add(ntuile.GetComponent<Tuile>());
+                tuiles.Add(ntuile.GetComponent<TuileRepre>());
                 tuiles[tuiles.Count - 1].model.layer = LayerMask.NameToLayer("Table");
                 tuiles[tuiles.Count - 1].transform.parent = tuile_zone;
 
@@ -69,7 +69,7 @@ public class test_table : MonoBehaviour
             else
             {
                 GameObject ntuile = Instantiate<GameObject>(meeple_model);
-                meeples.Add(ntuile.GetComponent<Meeple>());
+                meeples.Add(ntuile.GetComponent<MeepleRepre>());
                 meeples[meeples.Count - 1].model.layer = LayerMask.NameToLayer("Table");
                 meeples[meeples.Count - 1].transform.parent = meeple_zone;
 

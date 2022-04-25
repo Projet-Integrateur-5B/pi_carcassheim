@@ -20,7 +20,6 @@ public class BannerWinPoint : BannerWinCondition
 
     override public void setWinParameters(List<int> param)
     {
-        Debug.Log(param.Count);
         point_text.text = param[0].ToString();
     }
 }

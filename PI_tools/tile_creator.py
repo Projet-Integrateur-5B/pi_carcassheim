@@ -1941,13 +1941,13 @@ if __name__ == "__main__":
         def changeSprite(self):
             if self.tl_master.selected_tile is not None:
                 self.tl_master.selected_tile.setSpriteName(
-                    relpath(filedialog.askopenfilename())
+                    relpath(filedialog.askopenfilename(filetypes=[("image", "*.png")]))
                 )
 
         def changeMask(self):
             if self.tl_master.selected_slot is not None:
                 self.tl_master.selected_slot.slot.setMask(
-                    relpath(filedialog.askopenfilename())
+                    relpath(filedialog.askopenfilename(filetypes=[("image", "*.png")]))
                 )
                 self.maskSelected()
 
@@ -2357,7 +2357,7 @@ if __name__ == "__main__":
         def newTile(self):
             self.tile_zone.unbind("<ButtonPress-1>", self.pressid)
             try:
-                tile = Tile(self.tiles, relpath(filedialog.askopenfilename()))
+                tile = Tile(self.tiles, relpath(filedialog.askopenfilename(filetypes=[("image", "*.png")])))
             except FailedCreation:
                 print("Failed creation of tile", file=ERR_OUT)
                 self.pressid = self.tile_zone.bind(

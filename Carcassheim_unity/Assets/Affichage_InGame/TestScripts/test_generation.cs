@@ -5,7 +5,7 @@ using UnityEngine;
 public class test_generation : MonoBehaviour
 {
 
-    public Tuile model;
+    public TuileRepre model;
     public Texture textu;
     // Start is called before the first frame update
     void Start()
@@ -24,7 +24,7 @@ public class test_generation : MonoBehaviour
 
     private void generate()
     {
-        Tuile mod = Instantiate<Tuile>(model);
+        TuileRepre mod = Instantiate<TuileRepre>(model);
         Renderer red = mod.model.GetComponent<Renderer>();
         Material mat = red.materials[2];
         mod.Id = -1;

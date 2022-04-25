@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3876558489678625087}
   - component: {fileID: 4047624736909329430}
-  m_Layer: 7
+  m_Layer: 6
   m_Name: slot_indic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5011962541927717422}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0202, y: 0.0269, z: 0.003700018}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.6831381, y: 0.6831381, z: 0.1366074}
   m_Children:
   - {fileID: 5627706617835084518}
@@ -44,7 +44,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0006fe3715887b947b4f0359551b2dc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  material: {fileID: 2100000, guid: 0be2491e07a990a42a8189dc530cd218, type: 2}
+  model_renderer: {fileID: 6796650396672795017}
+  front: {fileID: 0}
+  _xf: 0
+  _yf: 0
+  _id: 0
+  meeple_collider: {fileID: 8864210986714651835}
+  alpha_ref: 0.2
+  alpha_front_ref: 0.7
 --- !u!1001 &5301607743714606349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -113,6 +120,10 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: a8f7814e5c1fc5c4996617f2ff2988c7, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: a8f7814e5c1fc5c4996617f2ff2988c7, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 0be2491e07a990a42a8189dc530cd218, type: 2}
@@ -150,7 +161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a8f7814e5c1fc5c4996617f2ff2988c7, type: 3}
       propertyPath: m_Layer
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a8f7814e5c1fc5c4996617f2ff2988c7, type: 3}
       propertyPath: m_TagString
@@ -204,6 +215,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a8f7814e5c1fc5c4996617f2ff2988c7, type: 3}
   m_PrefabInstance: {fileID: 5301607743714606349}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &6796650396672795017 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: a8f7814e5c1fc5c4996617f2ff2988c7, type: 3}
+  m_PrefabInstance: {fileID: 5301607743714606349}
+  m_PrefabAsset: {fileID: 0}
 --- !u!65 &8864210986714651835
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -213,7 +229,7 @@ BoxCollider:
   m_GameObject: {fileID: 4995180241214013532}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.058833692, y: 0.058833692, z: 0.07683707}
   m_Center: {x: 0.0000000037252903, y: 0, z: -0.023257652}

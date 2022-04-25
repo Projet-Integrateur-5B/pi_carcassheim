@@ -9,202 +9,112 @@ public enum WinCondition
     WinByPoint,
     WinByTile
 };
-public class CarcasheimBack : MonoBehaviour
+
+public struct PlayerInitParam
 {
-
-    public int tile_number;
-
-    public List<int> players;
-    public List<string> players_names;
-    public int player_index;
-    public bool first = true;
-
-    // Start is called before the first frame update
-    string randomStrong(int nb_char)
+    public PlayerInitParam(int id_player, int nb_meeple, string player_name)
     {
-        var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var stringChars = new char[nb_char];
-
-        for (int i = 0; i < stringChars.Length; i++)
-        {
-            stringChars[i] = chars[Random.Range(0, nb_char - 1)];
-        }
-
-        return new string(stringChars);
+        this.id_player = id_player;
+        this.nb_meeple = nb_meeple;
+        this.player_name = player_name;
     }
 
-    void Start()
+    public int id_player;
+    public int nb_meeple;
+    public string player_name;
+};
+
+public struct MeepleInitParam
+{
+    public MeepleInitParam(int id_meeple, int nb_meeple)
     {
-        tile_number = Random.Range(29, 119);
-        int L = Random.Range(2, 6);
-        for (int j = 0; j < L; j++)
-        {
-            int id;
-            do
-            {
-                id = Random.Range(0, 500);
-            } while (players.Contains(id));
-            players.Add(id);
-            players_names.Add(randomStrong(Random.Range(8, 20)));
-        }
-        foreach (string name in players_names)
-            Debug.Log(name);
+        this.id_meeple = id_meeple;
+        this.nb_meeple = nb_meeple;
+    }
+    public int id_meeple;
+    public int nb_meeple;
+};
+
+public struct TileInitParam
+{
+    public TileInitParam(int id_tile, bool tile_flags)
+    {
+        this.id_tile = id_tile;
+        this.tile_flags = tile_flags;
+    }
+    public int id_tile;
+    public bool tile_flags;
+};
+
+public struct Zone
+{
+    public Zone(PositionRepre pos, int id_tuile, int id_slot)
+    {
+        this.pos = pos;
+        this.id_tuile = id_tuile;
+        this.id_slot = id_slot;
+    }
+    public PositionRepre pos;
+    public int id_tuile;
+    public int id_slot;
+};
+
+public struct PlayerScoreParam
+{
+    public PlayerScoreParam(int id_player, int points_gagnes, Zone[] zone)
+    {
+        this.id_player = id_player;
+        this.points_gagnes = points_gagnes;
+        this.zone = zone;
+    }
+    public int id_player;
+    public int points_gagnes;
+    public Zone[] zone;
+};
+
+public struct TurnPlayParam
+{
+    public TurnPlayParam(int id_tile, PositionRepre tile_pos, int id_meeple, int slot_pos)
+    {
+        this.id_tile = id_tile;
+        this.tile_pos = tile_pos;
+        this.id_meeple = id_meeple;
+        this.slot_pos = slot_pos;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    public int id_tile;
+    public PositionRepre tile_pos;
+    public int id_meeple;
+    public int slot_pos;
+}
 
-    }
+public abstract class CarcasheimBack : MonoBehaviour
+{
+    public abstract void sendTile(TurnPlayParam play);
 
-    public void sendTile(int tile_id, Position tile_pos, int id_meeple, int slot_pos)
-    {
+    public abstract void getTile(out TurnPlayParam play);
 
-    }
+    public abstract void askMeeplesInit(List<MeepleInitParam> meeples);
 
-    public void getTile(out int tile_id, out Position pos, out int id_meeple, out int slot_pos)
-    {
-        tile_id = -1;
-        pos = null;
-        id_meeple = -1;
-        slot_pos = -1;
-    }
+    public abstract int askTilesInit(List<TileInitParam> tiles);
 
-    public void getActionTileSetCoord(out Position pos)
-    {
-        pos = null;
-    }
+    public abstract void askPlayersInit(List<PlayerInitParam> players);
 
-    public void getActionTileSelection(out int index, out int id)
-    {
-        index = 0;
-        id = 0;
-    }
+    public abstract void getTilePossibilities(int tile_id, List<PositionRepre> positions);
 
-    public void getActionMeepleSelection(out int index, out int id, out Position pos, out int id_tile)
-    {
-        index = 0;
-        id = 0;
-        id_tile = 0;
-        pos = null;
-    }
+    public abstract void askPlayerOrder(List<int> player_ids);
 
-    public void getActionNextState(out DisplaySystemState state)
-    {
-        state = DisplaySystemState.noState;
-    }
+    public abstract int getNextPlayer();
 
-    public void askMeeples(IList<MeepleType> meeples, IList<int> meeple_number)
-    {
-        do
-        {
-            foreach (MeepleType mt in System.Enum.GetValues(typeof(MeepleType)))
-            {
-                if (Random.Range(0f, 1f) < 0.3f)
-                {
-                    meeples.Add(mt);
-                    meeple_number.Add(Random.Range(1, 24));
-                }
-            }
-        } while (meeples.Count <= 0);
-    }
+    public abstract int getMyPlayer();
 
-    public int askTiles(IList<int> tile_ids, IList<bool> tile_flags)
-    {
-        int total = Random.Range(1, 10);
-        int true_total = 0;
-        do
-        {
-            for (int i = 0; i < total; i++)
-            {
-                tile_ids.Add(Random.Range(1, 100));
-                bool tile_flag = (i == total - 1) || (true_total < 4 && Random.Range(0f, 1f) < 0.4);
-                tile_flags.Add(tile_flag);
-                if (tile_flag)
-                {
-                    true_total++;
-                }
-            }
-        } while (true_total < 0);
-        return true_total;
-    }
+    public abstract void askScores(List<PlayerScoreParam> players_scores);
 
-    public void askPlayers(List<int> player_ids, List<string> players_name)
-    {
-        player_ids.AddRange(players);
-        players_name.AddRange(players_names);
-    }
+    public abstract void askTimerTour(out int min, out int sec);
 
-    public void getTilePossibilities(int tile_id, List<Position> positions)
-    {
-        
-    }
+    public abstract int askIdTileInitial();
 
-    public void askPlayers(List<int> player_ids)
-    {
-        player_ids.AddRange(players);
-    }
+    public abstract void sendAction(DisplaySystemAction action);
 
-    public void askPlayerOrder(List<int> player_ids)
-    {
-        player_ids.AddRange(players);
-    }
-
-    public int getNextPlayer()
-    {
-        if (!first)
-        {
-            player_index = (player_index + 1) % players.Count;
-            return players[player_index];
-        }
-        else
-        {
-            first = false;
-            return players[player_index];
-        }
-    }
-
-    public int getMyPlayer()
-    {
-        return players[Random.Range(0, players.Count)];
-    }
-
-    public void askTimerTour(out int min, out int sec)
-    {
-        min = 1;
-        sec = 0;
-    }
-
-    public void sendAction(DisplaySystemAction action, int index, int id)
-    {
-
-    }
-    public void sendAction(DisplaySystemAction action, int index, int id, Position tile_pos, int tile_id)
-    {
-
-    }
-
-
-    public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
-    {
-        var r = Random.Range(0, 3);
-        switch (r)
-        {
-            case 0:
-                win_cond = WinCondition.WinByPoint;
-                parameters.Add(Random.Range(100, 1000));
-                break;
-            case 1:
-                win_cond = WinCondition.WinByTime;
-                parameters.Add(Random.Range(0, 10));
-                parameters.Add(Random.Range(30, 50));
-                break;
-            case 2:
-                win_cond = WinCondition.WinByTile;
-                parameters.Add(Random.Range(20, 500));
-                break;
-        }
-    }
-
-
+    public abstract void askWinCondition(ref WinCondition win_cond, List<int> parameters);
 }
