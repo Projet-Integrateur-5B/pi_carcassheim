@@ -243,7 +243,7 @@ public static partial class Server
         state.Data = state.Data.Concat(state.Packet.Data).ToArray();
         if (dataLength > 0)
         {
-            if (state.Data[dataLength] == "")
+            if (state.Data[dataLength] == "" && state.Final == false)
             {
                 state.Data = state.Data.Where((source, index) => index != dataLength)
                     .ToArray();
