@@ -249,7 +249,7 @@ public class ClientAsync
 
             // Read data from the remote device.
             int bytesRead = client.EndReceive(ar);
-
+            Debug.Log("************************************* bytesRead : " + bytesRead + " *************************************");
             // Nothing to read here.
             if (bytesRead <= 0)
             {
@@ -290,7 +290,7 @@ public class ClientAsync
 
             if (state.Packet.Final)
             {
-                Console.WriteLine(debug + "\n\t => Every packet has been received !",
+                Debug.Log(debug + "\n\t => Every packet has been received !" + 
                     bytesRead);
 
                 state.Packet.Data = state.Data;

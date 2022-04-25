@@ -100,6 +100,13 @@ public class PublicRoomMenu : Miscellaneous
 				s_listAction.Release();
 			}
 		}
+		else if(packet.IdMessage == Tools.IdMessage.RoomSettingsGet)
+        {
+			if (packet.Error == Tools.Errors.None)
+			{
+				
+			}
+		}
        
 		Debug.Log("Packet id : "+ packet.IdMessage);
     }

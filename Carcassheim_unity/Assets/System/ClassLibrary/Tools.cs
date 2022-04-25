@@ -36,6 +36,7 @@ namespace ClassLibrary
             BadData = 22,
             IllegalPlay = 23,
             NbPlayers = 24,
+            Ack = 99,
             NotFound = 404,
             ToBeDetermined = 999
         }
