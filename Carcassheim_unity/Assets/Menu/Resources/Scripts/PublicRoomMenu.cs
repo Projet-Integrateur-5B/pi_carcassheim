@@ -155,6 +155,10 @@ public class PublicRoomMenu : Miscellaneous
 					/* Update l'affichage */
 					break;
             }
-        }
+
+			s_listAction.WaitOne();
+			listAction.Clear();
+			s_listAction.Release();
+		}
 	}
 }

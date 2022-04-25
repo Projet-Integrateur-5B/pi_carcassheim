@@ -289,7 +289,7 @@ public class ClientAsync
             
             var debug = "Reading from : " + client.RemoteEndPoint +
                         "\n\t Read {0} bytes =>\t" + state.Packet +
-                        "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
+                        "\n\t Data buffer =>\t\t" + string.Join(" ", state.Packet.Data);
 
             Debug.Log(debug + "\n\t => Every packet has been received !" +
                     bytesRead);
@@ -321,13 +321,13 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Debug.Log(e.ToString());
         }
     }
 
     public static void Send(Socket clientSocket, Packet original)
     {
-
+        Debug.Log("/////////////////////////////////////// original.IdMessage : " + original.IdMessage + " ////////////////////////////////////////");
         byte[]? bytes = null;
         var error_value = Tools.Errors.None;
         var packets = new List<Packet>();

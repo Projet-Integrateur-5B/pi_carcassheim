@@ -5,6 +5,7 @@ using ClassLibrary;
 using System.Collections.Generic;
 using Assert.system;
 using Assets.System;
+using System.Threading;
 
 namespace Assets.system
 {
@@ -74,6 +75,7 @@ namespace Assets.system
             PositionRepre tile_pos = param.tile_pos;
             int id_meeple = param.id_meeple;
             int slot_pos = param.slot_pos;
+            
             SendPosition((ulong)tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation, id_meeple, slot_pos);
         }
 
@@ -208,6 +210,11 @@ namespace Assets.system
         override public void askPlayerOrder(List<int> player_ids)
         {
             // TODO PARTAGER LES IDS DES JOUEURS DANS L'ORDRE DU TOUR => Display
+            int taille = playerList.Length;
+            for (int j = 0; j < taille; j++)
+            {
+                player_ids.Add((int)playerList[j].id);
+            }
         }
 
         //=======================================================
@@ -216,6 +223,14 @@ namespace Assets.system
         override public void askFinalScore(List<PlayerScoreParam> playerScores)
         {
             //TODO Pareil que askScore
+            int taille = playerList.Length;
+            for (int j = 0; j < taille; j++)
+            {
+                playerScores.Add(new PlayerScoreParam(
+                    (int)playerList[j].id,
+                    (int)playerList[j].score,
+                    Array.Empty<Zone>()));//JUSTIN si tu ne n'as pas fait, je te tuerais
+            }
         }
 
         //=======================================================
@@ -257,6 +272,9 @@ namespace Assets.system
             // ======================
             lePlateau = new Plateau();
             dico_tuile = LireXML2.Read("config_back.xml");
+            tiles_drawed = new List<TileInitParam>();
+
+            Communication.Instance.StartListening(OnPacketReceived);
 
             _id_partie = (ulong)Communication.Instance.idRoom;
             _mon_id = Communication.Instance.idClient;
@@ -272,6 +290,15 @@ namespace Assets.system
             timer_tour_received = true;
             _meeples = RoomInfo.Instance.meeples; // Nombre de meeples par joueur
 
+            Packet packet = new Packet();
+            packet.IdPlayer = Communication.Instance.idClient;
+            packet.Data = new string[] { Communication.Instance.idRoom.ToString() };
+            packet.IdMessage = Tools.IdMessage.PlayerList;
+            
+            Communication.Instance.SendAsync(packet);
+            Thread.Sleep(500);
+            packet.IdMessage = Tools.IdMessage.PlayerCurrent;
+            Communication.Instance.SendAsync(packet);
             Debug.Log("On est dans la game");
 
             /*
@@ -328,7 +355,7 @@ namespace Assets.system
 
         public void OnPacketReceived(object sender, Packet packet)
         {
-
+            Debug.Log("lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 OnTuileReceived(packet);
@@ -337,15 +364,20 @@ namespace Assets.system
             {
                 OnPlayerListReceive(packet);
             }
-            else if (packet.IdMessage == Tools.IdMessage.PlayerNext)
+            else if (packet.IdMessage == Tools.IdMessage.PlayerCurrent)
             {
-                OnPlayerNextReceive(packet);
+                OnPlayerCurrentReceive(packet);
             }
             else if(packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
-                id_tile_init = int.Parse(packet.Data[0]);
+                id_tile_init = Convert.ToInt32(packet.Data[0]);
                 id_tile_init_received = true;
 
+                Debug.Log("packet.Data[1]) = " + packet.Data[1] + " (packet.Data[2]) = " + packet.Data[2] + "(packet.Data[3])) = " + packet.Data[3]);
+                lePlateau.PoserTuile(dico_tuile[(ulong)id_tile_init],
+                    Convert.ToInt32(packet.Data[1]),
+                    Convert.ToInt32(packet.Data[2]),
+                    Convert.ToInt32(packet.Data[3]));
                 /* TODO placement */
             }
         }
@@ -394,7 +426,7 @@ namespace Assets.system
         private void SendAllPosition(Position[] position, ulong id_tuile)
         {
             Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
+            packet.IdMessage = Tools.IdMessage.TuileVerification;
             packet.IdPlayer = _mon_id;
 
             int i, taille = position.Length;
@@ -436,20 +468,22 @@ namespace Assets.system
 
         public void OnPlayerListReceive(Packet packet)
         {
+            Debug.Log("132156456156456156156126156451261594561549456");
             int i, compteur = 0, taille_data = packet.Data.Length;
-            playerList = new Player[taille_data / 3];
+            playerList = new Player[taille_data / 2];
 
-            for (i = 0; i < taille_data; i += 3)
+            for (i = 0; i < taille_data; i += 2)
             {
-                playerList[compteur] = new Player(Convert.ToUInt64(packet.Data[i]), packet.Data[i + 1], Convert.ToUInt32(packet.Data[i + 2]), Convert.ToUInt32(packet.Data[i + 3]));
+                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
             }
             player_received = true;
+            
             checkGameBegin();
         }
 
-        public void OnPlayerNextReceive(Packet packet)
+        public void OnPlayerCurrentReceive(Packet packet)
         {
-            nextPlayer = Convert.ToUInt64(packet.Data[0]);
+            nextPlayer = packet.IdPlayer;
         }
 
         public void checkGameBegin()
