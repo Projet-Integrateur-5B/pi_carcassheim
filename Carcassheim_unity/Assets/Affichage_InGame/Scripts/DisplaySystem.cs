@@ -313,6 +313,18 @@ public class DisplaySystem : MonoBehaviour
                 {
                     players_mapping[score.id_player].Score = score.points_gagnes;
                     Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
+                    foreach (Zone z in score.zone)
+                    {
+                        TuileRepre tl = board.getTileAt(z.pos);
+                        if (tl != null && tl.Id == z.id_tuile)
+                        {
+                            SlotIndic slt = tl.getSlotAt(z.id_slot);
+                            if (slt != null)
+                            {
+                                slt.clean();
+                            }
+                        }
+                    }
                 }
                 break;
             case DisplaySystemState.endOfGame:
@@ -491,11 +503,16 @@ public class DisplaySystem : MonoBehaviour
 
         List<PlayerInitParam> players_init = new List<PlayerInitParam>();
         system_back.askPlayersInit(players_init);
+        my_player = null;
+        int my_player_id = system_back.getMyPlayer();
 
         int L = players_init.Count;
         for (int i = 0; i < L; i++)
         {
             PlayerRepre pl = new PlayerRepre(players_init[i], players_color[i]);
+            pl.is_my_player = pl.Id == my_player_id;
+            if (pl.is_my_player)
+                my_player = pl;
             players_mapping.Add(pl.Id, pl);
             player_list.addPlayer(pl);
         }
@@ -508,7 +525,6 @@ public class DisplaySystem : MonoBehaviour
         system_back.askTimerTour(out min, out sec);
         banner.setTimerTour(min, sec);
         banner.setPlayerNumber(L);
-        my_player = players_mapping[system_back.getMyPlayer()];
         banner.setPlayer(my_player);
 
         banner.setWinCondition(win, table, param);

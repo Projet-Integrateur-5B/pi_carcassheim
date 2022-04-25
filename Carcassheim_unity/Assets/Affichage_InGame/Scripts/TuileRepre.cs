@@ -18,6 +18,8 @@ public class TuileRepre : MonoBehaviour
 
     Dictionary<int, SlotIndic> slots_mapping;
 
+
+
     // * STAT *************************************************
     private int _id = 0;
 
@@ -149,6 +151,13 @@ public class TuileRepre : MonoBehaviour
         slots.Add(slot);
     }
 
+    public SlotIndic getSlotAt(int id_slot)
+    {
+        if (slots_mapping.ContainsKey(id_slot))
+            return slots_mapping[id_slot];
+        return null;
+    }
+
     public bool setMeeplePos(MeepleRepre meeple, int id_slot)
     {
         if (id_slot == -1)
@@ -171,6 +180,7 @@ public class TuileRepre : MonoBehaviour
         meeple.SlotPos = slot_indic.Id;
         meeple.transform.parent = slot_indic.transform;
         meeple.transform.localPosition = new Vector3(0, 0, 0);
+        slot_indic.meeple_at = meeple;
         return true;
     }
 }

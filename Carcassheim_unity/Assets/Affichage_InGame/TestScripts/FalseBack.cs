@@ -442,6 +442,7 @@ public class FalseBack : CarcasheimBack
                     break;
             }
         }
+        score.zone = new Zone[0];
         scores.Add(score);
     }
 

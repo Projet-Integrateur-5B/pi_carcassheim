@@ -30,7 +30,10 @@ public class PlayerIcon : MonoBehaviour
         player.OnMeepleUpdate += meepleUpdated;
         player.OnScoreUpdate += scoreUpdated;
         player_color.color = player.color;
-        player_name.text = player.Name;
+        if (player.is_my_player)
+            player_name.text = "●" + player.Name;
+        else
+            player_name.text = player.Name;
         player_meeple.text = player.NbMeeple.ToString();
         player_score.text = player.Score.ToString();
     }

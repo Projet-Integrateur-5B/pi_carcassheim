@@ -19,6 +19,7 @@ public class SlotIndic : MonoBehaviour
 
     [SerializeField] private float alpha_ref = 0.2f;
     [SerializeField] private float alpha_front_ref = 0.7f;
+    public MeepleRepre meeple_at = null;
 
     public string Maskname
     {
@@ -49,6 +50,12 @@ public class SlotIndic : MonoBehaviour
     {
         model_renderer.enabled = false;
         meeple_collider.enabled = false;
+    }
+
+    public void clean()
+    {
+        if (meeple_at != null)
+            Destroy(meeple_at);
     }
 
     public void highlightFace(PlayerRepre player)
