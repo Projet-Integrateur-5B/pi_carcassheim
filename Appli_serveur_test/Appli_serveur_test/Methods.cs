@@ -87,8 +87,8 @@ public partial class Server
             case Tools.IdMessage.PlayerList:
                 PlayerList(state.Packet, ref packet, socket);
                 break;
-            case Tools.IdMessage.PlayerNext:
-                PlayerNext(state.Packet, ref packet, socket);
+            case Tools.IdMessage.PlayerCurrent:
+                PlayerCurrent(state.Packet, ref packet, socket);
                 break;
 
             case Tools.IdMessage.StartGame:
@@ -704,7 +704,7 @@ public partial class Server
     /// <param name="packetReceived"></param>
     /// <param name="packet"></param>
     /// <param name="socket"></param>
-    public static void PlayerNext(Packet packetReceived, ref Packet packet, Socket socket)
+    public static void PlayerCurrent(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par le thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
@@ -728,7 +728,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        ulong idActualPlayer = gestionnaire.CallPlayerNext(packetReceived.Data[0]);
+        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.Data[0]);
 
         if(idActualPlayer != 0)
         {

@@ -61,7 +61,7 @@ public static class Tools
         PlayerReady = 23,
         PlayerCheat = 24,
         PlayerList = 25,
-        PlayerNext = 26,
+        PlayerCurrent = 26,
         
         StartGame = 30,
         EndGame = 31,

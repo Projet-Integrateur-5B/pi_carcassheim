@@ -426,7 +426,7 @@ namespace system
             return listPlayerAndName.ToArray();
         }
 
-        public ulong CallPlayerNext(string idRoom)
+        public ulong CallPlayerCurrent(string idRoom)
         {
             ulong idActualPlayer = 0;
 
