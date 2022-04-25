@@ -6,5 +6,6 @@ public enum TypeTerrain
     Abbaye,
     Auberge,
     Cathedrale,
-    Riviere
+    Riviere,
+    VilleBlason
 }

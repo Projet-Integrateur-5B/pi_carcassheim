@@ -548,6 +548,9 @@ namespace system
             // Génération des attributs d'anti cheat
             _AC_drawedTilesValid = false;
 
+            // Génération du dicoTuile de la classe tuile
+            Tuile.DicoTuiles = LireXML2.Read("config_back.xml");
+
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
             _posTuileTourActu.SetNonExistent();
