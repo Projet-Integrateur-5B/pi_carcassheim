@@ -38,7 +38,7 @@ public class RoomParameters : Miscellaneous
 	// Update is called once per frame
 	void Update()
 	{
-		Debug.Log("PUBLIC ? : " + is_public + " FIN TEMPS ? : " + fin_temps + " FIN POINTS ? : " + fin_points + " FIN TUILES ? : " + fin_tuiles + " RIVIERE ? : " + ext_riviere + " ABBAYE ? : " + ext_abbaye + " CATHEDRALE ? : " + ext_cathedrale + " DUREE ? : " + duree_round);
+		//Debug.Log("PUBLIC ? : " + is_public + " FIN TEMPS ? : " + fin_temps + " FIN POINTS ? : " + fin_points + " FIN TUILES ? : " + fin_tuiles + " RIVIERE ? : " + ext_riviere + " ABBAYE ? : " + ext_abbaye + " CATHEDRALE ? : " + ext_cathedrale + " DUREE ? : " + duree_round);
 	}
 
 	//fonction pour predefinir les valeurs du slider
