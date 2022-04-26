@@ -97,7 +97,7 @@ namespace system
                                 {
                                     temp.Add(item.ToArray());
                                 }
-                                // Debug.Log("TUILE " + currentId.ToString());
+                                Console.WriteLine("TUILE " + currentId.ToString());
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
                                 result.Add((ulong)currentId, current);
                             }
