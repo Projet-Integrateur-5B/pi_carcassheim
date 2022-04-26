@@ -185,7 +185,7 @@ public class DisplaySystem : MonoBehaviour
                     banner.timerTour.startTimer();
                 break;
             case DisplaySystemState.idleState:
-                if ((DEBUG || my_player == act_player) && (old_state == DisplaySystemState.tilePosing || old_state == DisplaySystemState.meeplePosing))
+                if ((DEBUG || act_player.is_my_player) && (old_state == DisplaySystemState.tilePosing || old_state == DisplaySystemState.meeplePosing))
                 {
                     if (act_meeple != null)
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
@@ -290,7 +290,9 @@ public class DisplaySystem : MonoBehaviour
                 Debug.Log("Tour de " + act_player.Name + " " + act_player.Id.ToString());
                 if (old_state != DisplaySystemState.noState)
                     player_list.nextPlayer(act_player);
-                table.Focus = (my_player.Id == player_list.getActPlayer().Id);
+                // if (my_player == null && act_player.is_my_player)
+                //     banner.setPlayer(my_player);
+                table.Focus = act_player.is_my_player;
                 turnBegin();
                 break;
             case DisplaySystemState.tilePosing:
@@ -329,22 +331,22 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
-                List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
-                system_back.askFinalScore(scores_final);
-                foreach (PlayerScoreParam score in scores_final)
-                {
-                    players_mapping[score.id_player].Score = score.points_gagnes;
-                    Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
-                }
-                int n_sup = 0;
-                foreach (PlayerRepre player in players_mapping.Values)
-                {
-                    if (player.Id != my_player.Id && my_player.Score < player.Score)
-                    {
-                        n_sup += 1;
-                    }
-                }
-                score_board.setEndOfGame(my_player, 1 + n_sup);
+                // List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
+                // system_back.askFinalScore(scores_final);
+                // foreach (PlayerScoreParam score in scores_final)
+                // {
+                //     players_mapping[score.id_player].Score = score.points_gagnes;
+                //     Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
+                // }
+                // int n_sup = 0;
+                // foreach (PlayerRepre player in players_mapping.Values)
+                // {
+                //     if (player.Id != my_player.Id && my_player.Score < player.Score)
+                //     {
+                //         n_sup += 1;
+                //     }
+                // }
+                // score_board.setEndOfGame(my_player, 1 + n_sup);
                 break;
         }
         act_system_state = new_state;
@@ -353,7 +355,7 @@ public class DisplaySystem : MonoBehaviour
     void tableCheck(Ray ray, ref bool consumed)
     {
         RaycastHit hit;
-        if ((true || act_player == my_player) && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << TableLayer)))
+        if ((true || act_player.is_my_player) && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << TableLayer)))
         {
             consumed = table.colliderHit(hit.transform);
         }
@@ -370,7 +372,7 @@ public class DisplaySystem : MonoBehaviour
             tableCheck(ray, ref mouse_consumed);
 
             RaycastHit hit = new RaycastHit();
-            bool hit_valid = (DEBUG || act_player == my_player) && !mouse_consumed && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << BoardLayer));
+            bool hit_valid = (DEBUG || act_player.is_my_player) && !mouse_consumed && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << BoardLayer));
             /*
                         float enter;
                         if (!hit_valid && !mouse_consumed && board_plane.Raycast(ray, out enter))
@@ -449,7 +451,7 @@ public class DisplaySystem : MonoBehaviour
         switch (act_system_state)
         {
             case DisplaySystemState.meeplePosing:
-                if (act_player == my_player || DEBUG)
+                if (act_player.is_my_player || DEBUG)
                 {
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
@@ -464,7 +466,7 @@ public class DisplaySystem : MonoBehaviour
                 }
                 break;
             case DisplaySystemState.tilePosing:
-                if ((act_player == my_player || DEBUG) &&
+                if ((act_player.is_my_player || DEBUG) &&
                     Input.GetKeyDown(KeyCode.Return) &&
                     act_tile != null &&
                     act_tile.Pos != null)
@@ -506,12 +508,13 @@ public class DisplaySystem : MonoBehaviour
         my_player = null;
         int my_player_id = system_back.getMyPlayer();
 
+
         int L = players_init.Count;
         for (int i = 0; i < L; i++)
         {
             PlayerRepre pl = new PlayerRepre(players_init[i], players_color[i]);
-            pl.is_my_player = pl.Id == my_player_id;
-            if (pl.is_my_player)
+            pl.is_my_player = pl.Id == my_player_id || my_player_id == -1;
+            if (pl.is_my_player && my_player_id != -1)
                 my_player = pl;
             players_mapping.Add(pl.Id, pl);
             player_list.addPlayer(pl);
@@ -525,7 +528,8 @@ public class DisplaySystem : MonoBehaviour
         system_back.askTimerTour(out min, out sec);
         banner.setTimerTour(min, sec);
         banner.setPlayerNumber(L);
-        banner.setPlayer(my_player);
+        if (my_player != null)
+            banner.setPlayer(my_player);
 
         banner.setWinCondition(win, table, param);
         setNextState(DisplaySystemState.turnStart);
@@ -638,7 +642,7 @@ public class DisplaySystem : MonoBehaviour
             act_tile = n_tuile;
             if (act_system_state == DisplaySystemState.tilePosing)
                 board.setTilePossibilities(act_player, act_tile);
-            if (act_player == my_player)
+            if (act_player.is_my_player)
                 system_back.sendAction(new DisplaySystemActionTileSelection(act_tile.Id, index));
         }
         else
@@ -662,7 +666,7 @@ public class DisplaySystem : MonoBehaviour
             }
             table.activeMeepleChanged(act_meeple, n_meeple);
             act_meeple = n_meeple;
-            if (act_player == my_player)
+            if (act_player.is_my_player)
                 system_back.sendAction(new DisplaySystemActionMeepleSelection(act_meeple.Id, index));
         }
         else

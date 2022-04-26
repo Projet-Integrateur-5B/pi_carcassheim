@@ -145,7 +145,7 @@ namespace Assets.system
                         readingNom = false;
                         if (xmlReader.Name == "terrain")
                         {
-                            // Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
+                            //Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
                             IdVersTerrain.Add(currentId, DictionaireTemp[currentNom]);
                         }
                         break;
@@ -226,8 +226,8 @@ namespace Assets.system
                 }
             }
 
-            slot = new Slot((ulong)idTerrain, tempSlotLink.ToArray());
-            // Debug.Log("END SLOT OF" + idTerrain.ToString() + " of " + pos_// Debug);
+            slot = new Slot(IdVersTerrain[idTerrain], tempSlotLink.ToArray());
+            //Debug.Log("END SLOT OF" + IdVersTerrain[idTerrain].ToString() + " of " + pos_// Debug);
             return result;
         }
     }

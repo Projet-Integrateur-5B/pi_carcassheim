@@ -1,11 +1,11 @@
 public enum TypeTerrain
 {
     Ville,
-    Route,
+    VilleBlason,
     Pre,
     Abbaye,
     Auberge,
     Cathedrale,
     Riviere,
-    VilleBlason
+    Route
 }

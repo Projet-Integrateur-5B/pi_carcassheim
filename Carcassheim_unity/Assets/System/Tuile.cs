@@ -60,7 +60,7 @@ namespace Assets.system
             int s = 0;
             for (int i = 0; i < nombreSlot; i++)
             {
-                _slots[i] = new Slot(terrains[i]);
+                _slots[i] = new Slot(terrains[i], new ulong[0]);
                 s += lien[i].Length;
             }
             if (nombreSlot != terrains.Length || lien.Length != nombreSlot || s != 12)

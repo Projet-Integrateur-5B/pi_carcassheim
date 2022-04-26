@@ -101,7 +101,7 @@ namespace Assets.system
 
             int x, y, rot;
 
-            List<int> checkedX = new List<int>(), checkedY = new List<int>();
+            List <Position> checked_pos = new List<Position>();
             foreach (var t in _tuiles)
             {
                 for (int i = 0; i < 4; i++)
@@ -109,11 +109,10 @@ namespace Assets.system
                     x = t.X + PositionAdjacentes[i, 0];
                     y = t.Y + PositionAdjacentes[i, 1];
 
-                    if (checkedX.Contains(x) && checkedY.Contains(y))
+                    if (checked_pos.Contains(new Position(x, y, 0)))
                         continue;
 
-                    checkedX.Add(x);
-                    checkedY.Add(y);
+                    checked_pos.Add(new Position(x, y, 0));
 
                     for (rot = 0; rot < 4; rot++)
                     {
@@ -149,7 +148,7 @@ namespace Assets.system
 
             Tuile[] tuilesAdjacentes = TuilesAdjacentes(x, y);
 
-            bool auMoinsUne = false;
+            bool auMoinsUne = true;
             for (int i = 0; i < 4; i++)
             {
                 Tuile t = tuilesAdjacentes[i];
@@ -158,7 +157,6 @@ namespace Assets.system
                 {
                     continue;
                 }
-                auMoinsUne = true;
 
                 TypeTerrain[] faceTuile1 = tuile.TerrainSurFace((rotation + i) % 4);
                 TypeTerrain[] faceTuile2 = t.TerrainSurFace((t.Rotation + i + 2) % 4);
@@ -179,13 +177,21 @@ namespace Assets.system
         {
             for (int i = 0; i < 3; i++)
             {
-                TypeTerrain tt1 = t1[i], tt2 = t2[2 - i];
-                if (!(tt1 == tt2 || 
-                    (tt1 == TypeTerrain.Ville && tt2 == TypeTerrain.VilleBlason) ||
-                    tt1 == TypeTerrain.VilleBlason && tt2 == TypeTerrain.Ville))
+                if (!(TerrainCompatible(t1[i], t2[2 - i])))
                     return false;
             }
             return true;
+        }
+
+        private bool TerrainCompatible(TypeTerrain t1, TypeTerrain t2)
+        {
+            if (t1 == t2)
+                return true;
+            if (t1 == TypeTerrain.VilleBlason && t2 == TypeTerrain.Ville)
+                return true;
+            if (t1 == TypeTerrain.Ville && t2 == TypeTerrain.VilleBlason)
+                return true;
+            return false;
         }
 
         private Tuile[] TuilesAdjacentes(int x, int y)
@@ -217,9 +223,9 @@ namespace Assets.system
                 return false;
 
             List<Tuile> tuilesFormantZone = new List<Tuile>
-        {
-            tuile
-        };
+            {
+                tuile
+            };
 
             return ZoneFermeeAux(tuile, idSlot, tuilesFormantZone);
         }
