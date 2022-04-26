@@ -5,6 +5,7 @@ namespace system
     public class Plateau
     {
         public static readonly int[,] PositionAdjacentes;
+        private Dictionary<ulong, Tuile> _dicoTuile;
 
         private List<Tuile> _tuiles;
         public List<Tuile> Tuiles
@@ -13,10 +14,17 @@ namespace system
             set { _tuiles = value; }
         }
 
+        public Plateau(Dictionary<ulong, Tuile> dicoTuiles)
+        {
+            _tuiles = new List<Tuile>();
+            _dicoTuile = dicoTuiles;
+        }
+
         public Plateau()
         {
             _tuiles = new List<Tuile>();
             //CompteurPoints.Init(this);
+            _dicoTuile = new Dictionary<ulong, Tuile>();
         }
 
         static Plateau()
@@ -48,7 +56,7 @@ namespace system
         {
             List<Tuile> riviere = new List<Tuile>();
 
-            foreach (var item in Tuile.DicoTuiles.Values)
+            foreach (var item in _dicoTuile.Values)
             {
                 if (item.Riviere)
                     riviere.Add(item);
@@ -66,7 +74,7 @@ namespace system
 
         public void PoserTuile(ulong idTuile, int x, int y, int rot)
         {
-            PoserTuile(Tuile.DicoTuiles[idTuile], x, y, rot);
+            PoserTuile(_dicoTuile[idTuile], x, y, rot);
         }
         public void PoserTuile(Tuile tuile, int x, int y, int rot)
         {
@@ -78,7 +86,7 @@ namespace system
 
         public Position[] PositionPlacementPossible(ulong idTuile)
         {
-            return PositionsPlacementPossible(Tuile.DicoTuiles[idTuile]);
+            return PositionsPlacementPossible(_dicoTuile[idTuile]);
         }
 
         public Position[] PositionsPlacementPossible(Tuile tuile)
@@ -117,7 +125,7 @@ namespace system
 
         public bool PlacementLegal(ulong idTuile, int x, int y, int rotation)
         {
-            return PlacementLegal(Tuile.DicoTuiles[idTuile], x, y, rotation);
+            return PlacementLegal(_dicoTuile[idTuile], x, y, rotation);
         }
 
         public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
@@ -185,7 +193,7 @@ namespace system
 
         public bool ZoneFermee(ulong idTuile, ulong idSlot)
         {
-            return ZoneFermee(Tuile.DicoTuiles[idTuile], idSlot);
+            return ZoneFermee(_dicoTuile[idTuile], idSlot);
         }
 
         public bool ZoneFermee(Tuile tuile, ulong idSlot)
@@ -261,7 +269,7 @@ namespace system
 
         public void PoserPion(ulong idJoueur, ulong idTuile, ulong idSlot)
         {
-            PoserPion(idJoueur, Tuile.DicoTuiles[idTuile], idSlot);
+            PoserPion(idJoueur, _dicoTuile[idTuile], idSlot);
         }
 
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
@@ -271,7 +279,7 @@ namespace system
 
         public int[] EmplacementPionPossible(ulong idTuile, ulong idJoueur)
         {
-            return EmplacementPionPossible(Tuile.DicoTuiles[idTuile], idJoueur);
+            return EmplacementPionPossible(_dicoTuile[idTuile], idJoueur);
         }
         public int[] EmplacementPionPossible(Tuile tuile, ulong idJoueur)
         {
@@ -317,7 +325,7 @@ namespace system
 
         public bool PionPosable(ulong idTuile, ulong idSlot, ulong idJoueur)
         {
-            Tuile tuile = Tuile.DicoTuiles[idTuile];
+            Tuile tuile = _dicoTuile[idTuile];
 
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;

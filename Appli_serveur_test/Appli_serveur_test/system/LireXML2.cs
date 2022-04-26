@@ -97,7 +97,7 @@ namespace system
                                 {
                                     temp.Add(item.ToArray());
                                 }
-                                Console.WriteLine("TUILE " + currentId.ToString());
+                                // Debug.Log("TUILE " + currentId.ToString());
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
                                 result.Add((ulong)currentId, current);
                             }
@@ -113,7 +113,7 @@ namespace system
 
         private static void ReadTerrain(XmlReader xmlReader)
         {
-            //Debug.Log("TERAAIN");
+            //// Debug.Log("TERAAIN");
             bool readingId = false;
             bool readingNom = false;
             int currentId = 0;
@@ -144,7 +144,7 @@ namespace system
                         readingNom = false;
                         if (xmlReader.Name == "terrain")
                         {
-                            Console.WriteLine("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
+                            // Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
                             IdVersTerrain.Add(currentId, DictionaireTemp[currentNom]);
                         }
                         break;
@@ -162,7 +162,7 @@ namespace system
 
         private static List<int> ReadSlot(XmlReader xmlReader, out Slot slot)
         {
-            // Debug.Log("SLOT");
+            // // Debug.Log("SLOT");
             var result = new List<int>();
             bool stop = false;
             int idTerrain = 0;
@@ -226,7 +226,7 @@ namespace system
             }
 
             slot = new Slot((ulong)idTerrain, tempSlotLink.ToArray());
-            Console.WriteLine("END SLOT OF" + idTerrain.ToString() + " of " + pos_debug);
+            // Debug.Log("END SLOT OF" + idTerrain.ToString() + " of " + pos_// Debug);
             return result;
         }
     }

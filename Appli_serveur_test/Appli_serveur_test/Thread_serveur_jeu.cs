@@ -537,8 +537,11 @@ namespace system
         {
             _statut_partie = Tools.GameStatus.Running;
 
+            // Génération du dicoTuile de la classe tuile
+            Dictionary<ulong, Tuile> dicoTuiles = LireXML2.Read("system/config_back.xml");
+
             // Génération du plateau
-            _plateau = new Plateau();
+            _plateau = new Plateau(dicoTuiles);
 
             // Récupération de la liste de joueurs
             _s_dico_joueur.WaitOne();
@@ -558,8 +561,7 @@ namespace system
             // Génération des attributs d'anti cheat
             _AC_drawedTilesValid = false;
 
-            // Génération du dicoTuile de la classe tuile
-            Tuile.DicoTuiles = LireXML2.Read("system/config_back.xml");
+            
 
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();

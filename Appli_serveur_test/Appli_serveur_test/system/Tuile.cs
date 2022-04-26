@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 namespace system
 {
@@ -8,6 +9,7 @@ namespace system
         private readonly int _nombreSlot;
         private readonly int[][] _lienSlotPosition;
         private readonly ulong _id;
+        private readonly int[,] _lienEntreSlots;
         public bool Riviere
         {
             get
@@ -32,22 +34,23 @@ namespace system
         public int Rotation { get; set; }
 
         public static Dictionary<string, int> PointsCardPos = new Dictionary<string, int>()
-    {
-        {"NNO", 0},
-        {"N", 1},
-        {"NNE", 2},
-        {"NEE", 3},
-        {"E", 4},
-        {"SEE", 5},
-        {"SSE", 6},
-        {"S", 7},
-        {"SSO", 8},
-        {"SOO", 9},
-        {"O", 10},
-        {"NOO", 11}
-    };
+        {
+            {"NNO", 0},
+            {"N", 1},
+            {"NNE", 2},
+            {"NEE", 3},
+            {"E", 4},
+            {"SEE", 5},
+            {"SSE", 6},
+            {"S", 7},
+            {"SSO", 8},
+            {"SOO", 9},
+            {"O", 10},
+            {"NOO", 11}
+        };
 
         public static Dictionary<ulong, Tuile> DicoTuiles { get; set; }
+
         public Tuile(ulong id, int nombreSlot, int[][] lien, TypeTerrain[] terrains)
         {
             _nombreSlot = nombreSlot;
@@ -64,6 +67,12 @@ namespace system
 
 
             _lienSlotPosition = lien;
+        }
+
+        public Tuile(ulong id, Slot[] slots, int[][] lien, int[,] lienEntreSlots = null) : this(id, slots, lien)
+        {
+            if (lienEntreSlots != null)
+                _lienEntreSlots = lienEntreSlots;
         }
 
         public Tuile(ulong id, Slot[] slots, int[][] lien)
