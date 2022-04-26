@@ -355,7 +355,6 @@ namespace Assets.system
 
         public void OnPacketReceived(object sender, Packet packet)
         {
-            Debug.Log("lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll");
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 OnTuileReceived(packet);
@@ -407,7 +406,7 @@ namespace Assets.system
                 {
                     if (position.Length >= 0)
                     {
-                        Debug.Log("Les positions de la " + i + "�me tuile : " + position);
+                        Debug.Log("Les positions de la " + i + "�me tuile : " + position.ToString());
                         SendAllPosition(position, id_tuile);
                         tileParam.tile_flags = true;
                         allposition = position;
