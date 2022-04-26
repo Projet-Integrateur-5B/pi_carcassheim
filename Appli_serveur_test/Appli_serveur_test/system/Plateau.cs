@@ -18,6 +18,10 @@ namespace system
         {
             _tuiles = new List<Tuile>();
             _dicoTuile = dicoTuiles;
+            foreach(var tuile in dicoTuiles)
+            {
+                Console.WriteLine("Tuile ID :" + tuile.Key);
+            }
         }
 
         public Plateau()
