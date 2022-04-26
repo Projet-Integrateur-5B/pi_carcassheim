@@ -29,6 +29,7 @@ public class backLocal : CarcasheimBack
     long time_start_of_game = 0;
     
     int win_tile_nb = 70;
+    int nb_tile_drawn = 0;
     int win_point_nb;
     
     private int nb_meeple = 10;
@@ -189,7 +190,8 @@ public class backLocal : CarcasheimBack
                 int index = UnityEngine.Random.Range(0, dicoTuile.Count);
                 tile_drawn.Add((ulong) index);
                 possibilities_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
-            }while(possibilities_act_turn.Count <= 0);
+                nb_tile_drawn += 1;
+            }while(possibilities_act_turn.Count <= 0 && nb_tile_drawn < win_tile_nb);
             last_generated_tile_tour = compteur_de_tour;
         }
     }
@@ -235,12 +237,12 @@ public class backLocal : CarcasheimBack
 
     override public int getNextPlayer()
     {
-        return 0;
+        return players[index_player].id_player;
     }
 
     override public int getMyPlayer()
     {
-        return 0;
+        return -1;
     }
 
     override public void askTimerTour(out int min, out int sec)
