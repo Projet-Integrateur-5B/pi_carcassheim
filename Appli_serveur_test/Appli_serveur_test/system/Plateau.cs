@@ -7,6 +7,8 @@ namespace system
         public static readonly int[,] PositionAdjacentes;
         private Dictionary<ulong, Tuile> _dicoTuile;
 
+        public Dictionary<ulong, Tuile> DicoTuile => _dicoTuile;
+
         private List<Tuile> _tuiles;
         public List<Tuile> Tuiles
         {

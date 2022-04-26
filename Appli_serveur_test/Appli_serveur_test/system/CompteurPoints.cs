@@ -22,7 +22,7 @@ namespace system
 
         public static int CompterZoneFerme(ulong idTuile, int idSlot, ulong idJoueur)
         {
-            Tuile tuile = idTuile;
+            Tuile tuile = instance._plateau.DicoTuile[idTuile];
             if (tuile.NombreSlot <= idSlot)
                 throw new ArgumentException("idSlot trop grand");
 
