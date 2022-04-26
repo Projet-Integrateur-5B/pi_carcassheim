@@ -14,7 +14,7 @@ public class PlayerList : MonoBehaviour
     private bool _ignore_first = false;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         _players = new LinkedList<PlayerRepre>();
         _players_repre = new LinkedList<GameObject>();

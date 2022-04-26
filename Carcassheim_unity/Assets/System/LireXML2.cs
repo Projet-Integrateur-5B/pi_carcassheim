@@ -48,7 +48,7 @@ namespace Assets.system
             var result = new Dictionary<ulong, Tuile>();
             IdVersTerrain = new Dictionary<int, TypeTerrain>();
 
-            using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + @file))
+            using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + file))
             {
                 ReadTerrain(reader);
                 bool readingId = false;

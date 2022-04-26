@@ -89,7 +89,7 @@ public class PlateauRepre : MonoBehaviour
                 {
                     tiles_on_board.Add(pos, tile);
                     tile.Pos = pos;
-                    tile.transform.position = rep_O.position + (rep_u.position - rep_O.position) * pos.X + (rep_v.position - rep_O.position) * pos.Y;
+                    tile.transform.position = rep_O.position + (rep_u.position - rep_O.position) * pos.X - (rep_v.position - rep_O.position) * pos.Y;
                 }
             }
             else if (act_tile == tile)
@@ -127,7 +127,7 @@ public class PlateauRepre : MonoBehaviour
             return;
         TileIndicator new_tileInd = Instantiate<TileIndicator>(tile_indic_model);
         new_tileInd.setAttributes(player, pos);
-        new_tileInd.transform.position = rep_O.position + (rep_u.position - rep_O.position) * pos.X + (rep_v.position - rep_O.position) * pos.Y;
+        new_tileInd.transform.position = rep_O.position + (rep_u.position - rep_O.position) * pos.X - (rep_v.position - rep_O.position) * pos.Y;
         new_tileInd.display();
         act_tile_indicator.Add(new_tileInd);
     }
