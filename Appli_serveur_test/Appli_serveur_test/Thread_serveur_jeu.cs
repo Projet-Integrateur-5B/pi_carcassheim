@@ -193,11 +193,11 @@ namespace system
             settingsList.Add(_nombre_joueur.ToString());
             settingsList.Add(_nombre_joueur_max.ToString());
             settingsList.Add(_privee.ToString());
-            settingsList.Add(_mode.ToString());
+            settingsList.Add(((int)_mode).ToString());
             settingsList.Add(_nb_tuiles.ToString());
-            settingsList.Add(_meeples.ToString());
-            settingsList.Add(_timer_game_value.ToString());
-            settingsList.Add(_timer_player_value.ToString());
+            settingsList.Add(((int)_meeples).ToString());
+            settingsList.Add(((int)_timer_game_value).ToString());
+            settingsList.Add(((int)_timer_player_value).ToString());
             settingsList.Add(_score_max.ToString());
 
             return settingsList.ToArray();
