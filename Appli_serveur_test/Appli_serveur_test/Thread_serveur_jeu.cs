@@ -519,6 +519,16 @@ namespace system
             return result;
         }
 
+        public void InitializePlayerMeeples()
+        {
+            _s_dico_joueur.WaitOne();
+            foreach(var player in _dico_joueur)
+            {
+                player.Value._nbMeeples = ((int)_meeples);
+            }
+            _s_dico_joueur.Release();
+        }
+
         // =======================
         // Méthodes moteur de jeu
         // =======================
@@ -559,6 +569,9 @@ namespace system
             _s_plateau.WaitOne();
             _plateau.PoserTuile(_idTuileInit, new Position(0, 0, 0));
             _s_plateau.Release();
+
+            // Initialise les meeples de tt le monde
+            InitializePlayerMeeples();
 
             _timer_game = new System.Timers.Timer();
             _timer_game.Interval = 1000;

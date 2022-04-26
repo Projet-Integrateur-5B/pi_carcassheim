@@ -16,6 +16,8 @@ namespace system
         public bool _is_ready { get; set; }
         public Socket? _socket_of_player { get; set; }
 
+        public int _nbMeeples { get; set; }
+
         public Semaphore _s_player;
 
         public void AddPoints(uint points)
@@ -32,7 +34,20 @@ namespace system
             _triche = 0;
             _is_ready = false;
             _socket_of_player = playerSocket;
+            _nbMeeples = 0;
             _s_player = new Semaphore(1, 1);
         }
+
+        public Player(ulong id_player, Socket? playerSocket, int nbMeeples)
+        {
+            _id_player = id_player;
+            _score = 0;
+            _triche = 0;
+            _is_ready = false;
+            _socket_of_player = playerSocket;
+            _nbMeeples = nbMeeples;
+            _s_player = new Semaphore(1, 1);
+        }
+
     }
 }
