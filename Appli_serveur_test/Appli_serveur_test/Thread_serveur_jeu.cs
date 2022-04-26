@@ -801,10 +801,21 @@ namespace system
             
             // Prise en compte du placement de la tuile et du pion (mise à jour structure de données)
             _s_plateau.WaitOne();
-            _plateau.PoserTuile(_idTuileChoisie, _posTuileTourActu);
+            
             try
             {
-                _plateau.PoserPion(idPlayer, _idTuileChoisie, UInt64.Parse(_posPionTourActu[2]));
+                _plateau.PoserTuile(_idTuileChoisie, _posTuileTourActu);
+
+                if (_posPionTourActu.Length != 0) // Si un pion a été posé durant le tour
+                {
+                    _plateau.PoserPion(idPlayer, _idTuileChoisie, UInt64.Parse(_posPionTourActu[2]));
+
+                    // Retrait d'un pion au joueur
+                    _s_dico_joueur.WaitOne();
+                    _dico_joueur[idPlayer]._nbMeeples = _dico_joueur[idPlayer]._nbMeeples - 1;
+                    _s_dico_joueur.Release();
+                }
+      
             }
             catch (Exception ex)
             {

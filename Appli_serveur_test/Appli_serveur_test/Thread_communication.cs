@@ -394,6 +394,12 @@ namespace system
                     if(thread_serv_ite.Get_posTuileTourActu().IsExisting() == true && 
                         thread_serv_ite.Get_posPionTourActu().Length == 0)
                     {
+                        // Vérification qu'il lui reste un pion
+                        if(thread_serv_ite.Get_Dico_Joueurs()[idPlayer]._nbMeeples < 1)
+                        {
+                            return Tools.Errors.Permission;
+                        }
+
                         // Vérification du placement
                         errors = thread_serv_ite.PionPlacement(idPlayer, UInt64.Parse(idTuile), Int32.Parse(idMeeple), Int32.Parse(slotPos));
                         
