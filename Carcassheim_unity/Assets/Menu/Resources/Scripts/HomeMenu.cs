@@ -18,6 +18,11 @@ public class HomeMenu : Miscellaneous
 		HCB.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = btnInactivColor;
 	}
 
+	public void ShowSolo()
+	{
+		ChangeMenu("HomeMenu", "HomeMenu"); // FAIT RIEN
+	}
+
 	public void ShowConnection()
 	{
 		ChangeMenu("HomeMenu", "ConnectionMenu");

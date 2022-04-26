@@ -119,6 +119,7 @@ public abstract class Miscellaneous : MonoBehaviour
         // buttons.GetChild(1).transform.position = buttons.GetChild(1).transform.position + new Vector3(0, 150, 0);
         // buttons.GetChild(2).transform.position = buttons.GetChild(2).transform.position + new Vector3(0, 150, 0);
         // buttons.GetChild(3).transform.position = buttons.GetChild(3).transform.position + new Vector3(0, 150, 0);
+        // buttons.GetChild(4).transform.position = buttons.GetChild(4).transform.position + new Vector3(0, 150, 0);
     }
 
     public void SetMenuChanged(bool b)
