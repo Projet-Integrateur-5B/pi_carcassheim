@@ -70,7 +70,10 @@ namespace Assets.system
             PoserTuile(tuile, pos.X, pos.Y, pos.ROT);
         }
 
-
+        public void PoserTuile(ulong idTuile, Position pos)
+        {
+            PoserTuile(_dicoTuile[idTuile], pos.X, pos.Y, pos.ROT);
+        }
 
         public void PoserTuile(ulong idTuile, int x, int y, int rot)
         {
@@ -91,9 +94,13 @@ namespace Assets.system
 
         public Position[] PositionsPlacementPossible(Tuile tuile)
         {
+            if (_tuiles.Count == 0)
+                return new Position[] { new Position(0, 0, 0) };
+
             List<Position> resultat = new List<Position>();
 
             int x, y, rot;
+
             List<int> checkedX = new List<int>(), checkedY = new List<int>();
             foreach (var t in _tuiles)
             {
@@ -134,6 +141,11 @@ namespace Assets.system
             {
                 return false;
             }
+            foreach (var item in _tuiles)
+            {
+                if (item.X == x && item.Y == y)
+                    return false;
+            }
 
             Tuile[] tuilesAdjacentes = TuilesAdjacentes(x, y);
 
@@ -167,7 +179,10 @@ namespace Assets.system
         {
             for (int i = 0; i < 3; i++)
             {
-                if (t1[i] != t2[2 - i])
+                TypeTerrain tt1 = t1[i], tt2 = t2[2 - i];
+                if (!(tt1 == tt2 || 
+                    (tt1 == TypeTerrain.Ville && tt2 == TypeTerrain.VilleBlason) ||
+                    tt1 == TypeTerrain.VilleBlason && tt2 == TypeTerrain.Ville))
                     return false;
             }
             return true;
@@ -277,9 +292,9 @@ namespace Assets.system
             tuile.Slots[idSlot].IdJoueur = idJoueur;
         }
 
-        public int[] EmplacementPionPossible(ulong idTuile, ulong idJoueur)
+        public int[] EmplacementPionPossible(ulong idtuile, ulong idJoueur)
         {
-            return EmplacementPionPossible(_dicoTuile[idTuile], idJoueur);
+            return EmplacementPionPossible(_dicoTuile[idtuile], idJoueur);
         }
         public int[] EmplacementPionPossible(Tuile tuile, ulong idJoueur)
         {
@@ -338,5 +353,29 @@ namespace Assets.system
             }
             return false;
         }
+
+        //public void RemoveAllPawnInZone(ulong idTuile, ulong idSlot)
+        //{
+        //    List<Tuile> parcourues = new List<Tuile>();
+        //    RemoveAllPawnInZoneAux(idTuile, idSlot, parcourues);
+        //}
+        //private void RemoveAllPawnInZoneAux(ulong idTuile, ulong idSlot, List<Tuile> parcourues)
+        //{
+        //    bool vide;
+        //    int[] positionsInternesProchainesTuiles;
+        //    Tuile tuile = _dicoTuile[idTuile];
+        //    parcourues.Add(tuile);
+        //    Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
+
+        //    tuile.Slots[idSlot].IdJoueur = (unchecked ulong) -1;
+        //    for (int i = 0; i++; i < adj.Length)
+        //    {
+        //        Tuile currentTuile = adj[i];
+        //        if (currentTuile == null || parcourue.Contains(currentTuile))
+        //            continue;
+        //        RemoveAllPawnInZoneAux(currentTuile,
+        //            currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]), parcourues);
+        //    }
+        //}
     }
 }

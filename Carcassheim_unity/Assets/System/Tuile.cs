@@ -167,7 +167,7 @@ namespace Assets.system
             DicoTuiles = new Dictionary<ulong, Tuile>();
         }
 
-        public static implicit operator Tuile(ulong id) => DicoTuiles[id];
+        //public static implicit operator Tuile(ulong id) => DicoTuiles[id];
     }
 
 }

@@ -568,6 +568,9 @@ public class DisplaySystem : MonoBehaviour
             mp.Id = meeples_init[i].id_meeple;
             meeples_hand.Add(mp);
             meeple_distrib[mp.Id] = meeples_init[i].nb_meeple;
+
+            mp.slot_possible.Clear();
+            
         }
 
         int final_count = system_back.askTilesInit(tiles_init);
