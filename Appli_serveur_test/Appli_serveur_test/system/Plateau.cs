@@ -74,6 +74,10 @@ namespace system
             PoserTuile(tuile, pos.X, pos.Y, pos.ROT);
         }
 
+        public void PoserTuile(ulong idTuile, Position pos)
+        {
+            PoserTuile(_dicoTuile[idTuile], pos.X, pos.Y, pos.ROT);
+        }
 
 
         public void PoserTuile(ulong idTuile, int x, int y, int rot)
