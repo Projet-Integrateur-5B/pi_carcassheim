@@ -23,7 +23,7 @@ namespace Assets.system
         {
             _linkOtherSlots = link;
             _terrain = TerrainFromId[idTerrain];
-            IdJoueur = 0;
+            IdJoueur = ulong.MaxValue;
         }
 
         public Slot(ulong idTerrain) { }

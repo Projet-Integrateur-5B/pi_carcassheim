@@ -103,6 +103,12 @@ namespace Assets.system
             _lienSlotPosition = actualLink;
         }
 
+        public static Tuile Copy(Tuile tuile)
+        {
+            Tuile result = new Tuile(tuile._id, tuile._slots, tuile._lienSlotPosition, tuile._lienEntreSlots);
+            return result;
+        }
+
         public ulong IdSlotFromPositionInterne(int pos)
         {
             for (ulong i = 0; i < (ulong)_nombreSlot; i++)

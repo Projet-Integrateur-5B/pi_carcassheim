@@ -64,7 +64,7 @@ public class Partie
 
         _plateau.PoserTuile(tuile, placementJoueur);
 
-        int[] pion = _plateau.EmplacementPionPossible(tuile, _idCurrentJoueur);
+        int[] pion;// = _plateau.EmplacementPionPossible(tuile, _idCurrentJoueur);
 
         // ENVOYER pion AU FRONT
 

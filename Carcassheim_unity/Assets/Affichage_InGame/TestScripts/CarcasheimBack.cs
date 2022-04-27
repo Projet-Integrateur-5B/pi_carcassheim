@@ -72,6 +72,22 @@ public struct PlayerScoreParam
     public Zone[] zone;
 };
 
+public struct MeeplePosParam
+{
+    public MeeplePosParam(int id_tile, PositionRepre pos_tile, int id_meeple)
+    {
+        this.id_tile = id_tile;
+        this.id_meeple = id_meeple;
+        this.pos_tile = pos_tile;
+    }
+
+    public int id_meeple;
+
+    public int id_tile;
+
+    public PositionRepre pos_tile;
+}
+
 public struct TurnPlayParam
 {
     public TurnPlayParam(int id_tile, PositionRepre tile_pos, int id_meeple, int slot_pos)
@@ -119,4 +135,6 @@ public abstract class CarcasheimBack : MonoBehaviour
     public abstract void askWinCondition(ref WinCondition win_cond, List<int> parameters);
 
     public abstract void askFinalScore(List<PlayerScoreParam> playerScores);
+
+    public abstract void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos);
 }

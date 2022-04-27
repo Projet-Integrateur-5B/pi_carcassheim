@@ -306,6 +306,11 @@ public class DisplaySystem : MonoBehaviour
                 board.displayTilePossibilities();
                 break;
             case DisplaySystemState.meeplePosing:
+                // foreach (MeepleRepre mp in meeples_hand)
+                // {
+                //     mp.slot_possible.Clear();
+                //     system_back.askMeeplePosition(new MeeplePosParam(act_tile.Id, act_tile.Pos, mp.Id) ,mp.slot_possible);
+                // }
                 act_tile.showPossibilities(act_player);
                 break;
             case DisplaySystemState.scoreChange:
@@ -331,22 +336,41 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
-                // List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
-                // system_back.askFinalScore(scores_final);
-                // foreach (PlayerScoreParam score in scores_final)
-                // {
-                //     players_mapping[score.id_player].Score = score.points_gagnes;
-                //     Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
-                // }
-                // int n_sup = 0;
-                // foreach (PlayerRepre player in players_mapping.Values)
-                // {
-                //     if (player.Id != my_player.Id && my_player.Score < player.Score)
-                //     {
-                //         n_sup += 1;
-                //     }
-                // }
-                // score_board.setEndOfGame(my_player, 1 + n_sup);
+                List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
+                system_back.askFinalScore(scores_final);
+
+                if (my_player != null)
+                {
+                    foreach (PlayerScoreParam score in scores_final)
+                    {
+                        players_mapping[score.id_player].Score = score.points_gagnes;
+                        Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
+                    }
+
+                    int n_sup = 0;
+                    foreach (PlayerRepre player in players_mapping.Values)
+                    {
+                        if (player.Id != my_player.Id && my_player.Score < player.Score)
+                        {
+                            n_sup += 1;
+                        }
+                    
+                    }
+                    score_board.setEndOfGame(my_player, 1 + n_sup);
+                }
+                else
+                {
+                    PlayerRepre max_player = null;
+
+                    foreach (PlayerRepre pl in players_mapping.Values)
+                    {
+                        if (max_player == null || max_player.Score < pl.Score)
+                            max_player = pl;
+                    }
+
+                    score_board.setEndOfGame(max_player, 1);
+                }
+
                 break;
         }
         act_system_state = new_state;
@@ -666,6 +690,10 @@ public class DisplaySystem : MonoBehaviour
             }
             table.activeMeepleChanged(act_meeple, n_meeple);
             act_meeple = n_meeple;
+            // if (act_system_state == DisplaySystemState.meeplePosing)
+            // {
+            //     act_tile.showPossibilities(act_player, act_meeple.slot_possible);
+            // }
             if (act_player.is_my_player)
                 system_back.sendAction(new DisplaySystemActionMeepleSelection(act_meeple.Id, index));
         }

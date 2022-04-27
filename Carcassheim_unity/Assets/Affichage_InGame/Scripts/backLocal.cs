@@ -46,8 +46,11 @@ public class backLocal : CarcasheimBack
 
     void Start()
     {
+        Debug.Log("first 1");
         dicoTuile = LireXML2.Read(XML_PATH);
+        Debug.Log("first 2");
         _plateau = new Plateau(dicoTuile);
+        Debug.Log("first 3");
         gameStart();
     }
 
@@ -86,6 +89,7 @@ public class backLocal : CarcasheimBack
 
     public void gameStart()
     {
+        Debug.Log("Cakked");
         if (validate_start())
         {
             _plateau.PoserTuile((ulong) askIdTileInitial(), 0, 0, 0);
@@ -117,6 +121,7 @@ public class backLocal : CarcasheimBack
     override public void sendTile(TurnPlayParam play)
     {
         Debug.Log("Am i looking likethis "+play.id_tile+" "+play.tile_pos+" "+play.id_meeple+" "+play.slot_pos);
+        Debug.Log("Meeple at "+play.id_meeple+" "+play.slot_pos);
         bool tuile_valide = false;
         bool meeple_valide = false;
         ulong player_act = (ulong) players[index_player].id_player;
@@ -125,7 +130,8 @@ public class backLocal : CarcasheimBack
             _plateau.PoserTuile((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
-        if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable((ulong) play.id_meeple, (ulong) play.slot_pos, player_act))
+        Debug.Log("Meeple at "+play.id_meeple+" "+play.slot_pos);
+        if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong) play.slot_pos, player_act, (ulong) play.id_meeple))
         {
             _plateau.PoserPion(player_act, (ulong)play.id_tile, (ulong)play.slot_pos);
             meeple_valide = true;
@@ -174,6 +180,8 @@ public class backLocal : CarcasheimBack
 
     override public void askMeeplesInit(List<MeepleInitParam> meeples)
     {
+        if (players[index_player].nb_meeple > 0)
+            meeples.Add(new MeepleInitParam(0, players[index_player].nb_meeple));
     }
 
     private void generateTile()
@@ -191,7 +199,7 @@ public class backLocal : CarcasheimBack
                 tile_drawn.Add((ulong) index);
                 possibilities_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
                 nb_tile_drawn += 1;
-            }while(possibilities_act_turn.Count <= 0 && nb_tile_drawn < win_tile_nb);
+            }while(possibilities_act_turn.Count <= 0);// && nb_tile_drawn < win_tile_nb);
             last_generated_tile_tour = compteur_de_tour;
         }
     }
@@ -276,5 +284,10 @@ public class backLocal : CarcasheimBack
     override public void askFinalScore(List<PlayerScoreParam> playerScores)
     {
         //TODO Pareil que askScore
+    }
+
+    override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
+    {
+
     }
 }

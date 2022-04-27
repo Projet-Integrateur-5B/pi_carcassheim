@@ -87,6 +87,11 @@ namespace Assets.system
 
         //=======================================================
         // START TURN
+
+        override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
+        {
+
+        }
         override public int getNextPlayer()
         {
             //TODO PARTAGER L'ID DU JOUEUR ELU => Display
