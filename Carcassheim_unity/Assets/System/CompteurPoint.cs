@@ -118,8 +118,19 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 4);
+                    var trucComplique = ((position + 3 * elem.Rotation) + 18 - 3 * tuile.Rotation) % 12;
+                    switch (trucComplique % 3)
+                    {
+                        case 0:
+                            trucComplique += 2;
+                            break;
+                        case 2:
+                            trucComplique -= 2;
+                            break;
+                        default:
+                            break;
+                    }
+                    positionsInternesProchainesTuilesTemp.Add(trucComplique);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();

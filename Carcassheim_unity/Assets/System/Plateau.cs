@@ -217,21 +217,6 @@ namespace Assets.system
                 return false;
             }
 
-            var listTuiles = new List<Tuile>();
-
-            foreach (var item in _tuiles)
-            {
-                if (item.TuileFantome)
-                    continue;
-                listTuiles.Add(item);
-            }
-
-            foreach (var item in listTuiles)
-            {
-                if (item.X == x && item.Y == y)
-                    return false;
-            }
-
             Tuile[] tuilesAdjacentes = TuilesAdjacentes(x, y);
 
             bool auMoinsUne = true;
@@ -376,8 +361,20 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 4);
+                    var trucComplique = ((position + 3 * elem.Rotation) + 18 - 3 * tuile.Rotation) % 12;
+                    switch (trucComplique % 3)
+                    {
+                        case 0:
+                            trucComplique += 2;
+                            break;
+                        case 2:
+                            trucComplique -= 2;
+                            break;
+                        default:
+                            break;
+                    }
+                    positionsInternesProchainesTuilesTemp.Add(trucComplique);
+                    //positionsInternesProchainesTuilesTemp.Add((((direction + 2) % 4) * 3 + (position % 3) + 3 * elem.Rotation) % 12);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();
