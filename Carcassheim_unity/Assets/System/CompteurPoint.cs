@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Assets.system
-{/*
+{
     internal class CompteurPoints
     {
         Plateau _plateau;
@@ -20,22 +20,39 @@ namespace Assets.system
             instance = new CompteurPoints(plateau);
         }
 
-        public static int CompterZoneFerme(int x, int y, int idSlot, ref ulong idJoueur)
+        public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur)
         {
-            Tuile tuile = instance._plateau.DicoTuile[idTuile];
+            Tuile tuile = instance._plateau.GetTuile(x, y);
             if (tuile.NombreSlot <= idSlot)
                 throw new ArgumentException("idSlot trop grand");
 
-            idJoueur = tuile.Slots[idSlot].IdJoueur;
+            //idJoueur = tuile.Slots[idSlot].IdJoueur;
 
             List<Tuile> parcourue = new List<Tuile> { tuile };
             int result = 0;
-            instance.PointsZone(tuile, idSlot, parcourue, ref result);
+            Dictionary<ulong, int> pionParJoueur = new Dictionary<ulong, int>();
+            instance.PointsZone(tuile, idSlot, parcourue, ref result, pionParJoueur);
 
-            return 0;
+            ulong playerWithMostPawn = ulong.MaxValue;
+            int mostPawn = -1;
+            List<ulong> playerGainingPoints = new List<ulong>();
+            foreach (var item in pionParJoueur)
+            {
+                if (item.Value > mostPawn)
+                    playerWithMostPawn = item.Key;
+            }
+            foreach (var item in pionParJoueur)
+            {
+                if (item.Value == mostPawn)
+                    playerGainingPoints.Add(item.Key);
+            }
+            idJoueur = playerGainingPoints.ToArray();
+
+            return result;
         }
 
-        private void PointsZone(Tuile tuile, int idSlot, List<Tuile> parcourue, ref int result)
+        private void PointsZone(Tuile tuile, int idSlot,
+            List<Tuile> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
         {
             bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
@@ -53,11 +70,11 @@ namespace Assets.system
 
 
                 int pos = positionsInternesProchainesTuiles[c++];
-                int nextSlot = item.IdSlotFromPositionInterne(pos);
-                int idJ = item.Slots[nextSlot].IdJoueur;
+                int nextSlot = (int)item.IdSlotFromPositionInterne(pos);
+                int idJ = (int)item.Slots[nextSlot].IdJoueur;
 
                 result += PointTerrain(item.Slots[nextSlot].Terrain);
-                PointsZone(item, nextSlot, parcourue, ref result);
+                PointsZone(item, nextSlot, parcourue, ref result, pionParJoueur);
             }
         }
 
@@ -145,5 +162,5 @@ namespace Assets.system
 
             return resultat;
         }*/
-    //}
+    }
 }

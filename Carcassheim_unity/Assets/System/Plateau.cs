@@ -68,27 +68,85 @@ namespace Assets.system
             Riviere.Init(this, riviere.ToArray());
         }
 
-        public void PoserTuile(Tuile tuile, Position pos)
+        public void Poser1ereTuile(ulong idTuile)
+        {
+            var t = tuileDeModelId(idTuile);
+            t.X = 0; t.Y = 0; t.Rotation = 0;
+            _tuiles = new List<Tuile> { t };
+        }
+
+        private void PoserTuile(Tuile tuile, Position pos)
         {
             PoserTuile(tuile, pos.X, pos.Y, pos.ROT);
         }
 
-        public void PoserTuile(ulong idTuile, Position pos)
+        private void PoserTuile(ulong idTuile, Position pos)
         {
             PoserTuile(tuileDeModelId(idTuile), pos.X, pos.Y, pos.ROT);
         }
 
-        public void PoserTuile(ulong idTuile, int x, int y, int rot)
+        private void PoserTuile(ulong idTuile, int x, int y, int rot)
         {
             PoserTuile(tuileDeModelId(idTuile), x, y, rot);
         }
-        public void PoserTuile(Tuile tuile, int x, int y, int rot)
+        private void PoserTuile(Tuile tuile, int x, int y, int rot)
         {
             tuile.X = x;
             tuile.Y = y;
             tuile.Rotation = rot;
             _tuiles.Add(tuile);
         }
+
+        public void PoserTuileFantome(ulong idTuile, Position pos)
+        {
+            PoserTuileFantome(idTuile, pos.X, pos.Y, pos.ROT);
+        }
+
+        public void PoserTuileFantome(ulong idTuile, int x, int y, int rot)
+        {
+            var t = tuileDeModelId(idTuile);
+            if (!t.Riviere)
+                t.TuileFantome = true;
+            _tuiles.Remove(FindTuileFantome);
+            PoserTuile(t, x, y, rot);
+        }
+
+        public void ValiderTour()
+        {
+            FindTuileFantome.TuileFantome = false;
+        }
+
+        private Tuile FindTuileFantome
+        {
+            get
+            {
+                foreach (var item in _tuiles)
+                {
+                    if (item.TuileFantome)
+                        return item;
+                }
+                return null;
+            }
+        }
+
+        //private void RemoveTuilesFantomes()
+        //{
+        //    int toRemove = int.MaxValue;
+        //    bool founded = false;
+        //    for (int i = 0; i < _tuiles.Count; i++)
+        //    {
+        //        var current = _tuiles[i];
+        //        if (current.TuileFantome)
+        //        {
+        //            if (founded)
+        //                throw new Exception("shouldn't be more than 1 TuileFantome");
+        //            founded = true;
+        //            toRemove = i;
+        //        }
+        //    }
+        //    if (founded)
+        //        _tuiles.RemoveAt(toRemove);
+        //}
 
         public Tuile tuileDeModelId(ulong id_tuile)
         {
@@ -319,22 +377,19 @@ namespace Assets.system
         {
             Tuile tuile = GetTuile(x, y);
             List<int> resultat = new List<int>();
-            List<Tuile> parcouruesT = new List<Tuile>();
-            List<ulong> parcourusS = new List<ulong>();
+            List<(Tuile, ulong)> parcourus = new List<(Tuile, ulong)>();
 
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
-                Debug.Log("NOMBRE SLOTS CURRENT TUILE : " + tuile.NombreSlot);
-                if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcouruesT, parcourusS))
+                if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
                     resultat.Add(i);
-                parcouruesT.Clear();
-                parcourusS.Clear();
+                parcourus.Clear();
             }
 
             return resultat.ToArray();
         }
 
-        private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<Tuile> parcouruesT, List<ulong> parcourusS)
+        private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<(Tuile, ulong)> parcourus)
         {
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
@@ -342,21 +397,22 @@ namespace Assets.system
 
             if (adj.Length == 0)
                 return false;
-
             int c = 0;
             foreach (var t in adj)
             {
-                if (t == null || (parcouruesT.Contains(t) && parcourusS.Contains(idSlot)))
+                if (t == null || parcourus.Contains((t, idSlot)))
                     continue;
-                parcouruesT.Add(t);
-                parcourusS.Add(idSlot);
+                parcourus.Add((t, idSlot));
 
                 int pos = positionsInternesProchainesTuiles[c++];
                 ulong nextSlot = t.IdSlotFromPositionInterne(pos);
                 ulong idJ = t.Slots[nextSlot].IdJoueur;
+
+                Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
+                
                 if (idJ != ulong.MaxValue)
                     return true;
-                resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcouruesT, parcourusS);
+                resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);
             }
 
             return resultat;
@@ -365,6 +421,8 @@ namespace Assets.system
         public bool PionPosable(int x, int y, ulong idSlot, ulong idJoueur, ulong idMeeple)
         {
             Tuile tuile = GetTuile(x, y);
+
+            Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
 
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;
@@ -378,20 +436,20 @@ namespace Assets.system
             return false;
         }
 
-        public Dictionary<ulong, int> RemoveAllPawnInZone(ulong idTuile, ulong idSlot)
+        public Dictionary<ulong, int> RemoveAllPawnInZone(int x, int y, ulong idSlot)
         {
-            List<Tuile> parcourues = new List<Tuile>();
+            List<(Tuile, ulong)> parcourues = new List<(Tuile, ulong)>();
+            var tuile = GetTuile(x, y);
             var result = new Dictionary<ulong, int>();
-            RemoveAllPawnInZoneAux(idTuile, idSlot, parcourues, ref result);
+            RemoveAllPawnInZoneAux(tuile, idSlot, parcourues, ref result);
             return result;
         }
-        private Dictionary<ulong, int> RemoveAllPawnInZoneAux(ulong idTuile, ulong idSlot,
-            List<Tuile> parcourues, ref Dictionary<ulong, int> result)
+        private Dictionary<ulong, int> RemoveAllPawnInZoneAux(Tuile tuile, ulong idSlot,
+            List<(Tuile, ulong)> parcourues, ref Dictionary<ulong, int> result)
         {
             bool vide;
             int[] positionsInternesProchainesTuiles;
-            Tuile tuile = tuileDeModelId(idTuile);
-            parcourues.Add(tuile);
+            parcourues.Add((tuile, idSlot));
             Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
 
             ulong idCurrentJoueur = tuile.Slots[idSlot].IdJoueur;
@@ -403,10 +461,11 @@ namespace Assets.system
             for (int i = 0; i < adj.Length; i++)
             {
                 Tuile currentTuile = adj[i];
-                if (currentTuile == null || parcourues.Contains(currentTuile))
+                ulong nextSlot = currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]);
+                if (currentTuile == null || parcourues.Contains((currentTuile, nextSlot)))
                     continue;
-                RemoveAllPawnInZoneAux(currentTuile.Id,
-                    currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]), parcourues, ref result);
+                RemoveAllPawnInZoneAux(currentTuile,
+                    nextSlot, parcourues, ref result);
             }
             return result;
         }

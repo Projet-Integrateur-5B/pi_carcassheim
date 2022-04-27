@@ -378,7 +378,7 @@ namespace Assets.system
                 id_tile_init_received = true;
 
                 Debug.Log("packet.Data[1]) = " + packet.Data[1] + " (packet.Data[2]) = " + packet.Data[2] + "(packet.Data[3])) = " + packet.Data[3]);
-                lePlateau.PoserTuile(dico_tuile[(ulong)id_tile_init],
+                lePlateau.PoserTuileFantome((ulong)id_tile_init,
                     Convert.ToInt32(packet.Data[1]),
                     Convert.ToInt32(packet.Data[2]),
                     Convert.ToInt32(packet.Data[3]));

@@ -62,7 +62,7 @@ public class Partie
         // RECEPTIONNER LA POSITION CHOISIE
         Position placementJoueur = new Position();
 
-        _plateau.PoserTuile(tuile, placementJoueur);
+        //_plateau.PoserTuileFantome(tuile, placementJoueur);
 
         int[] pion;// = _plateau.EmplacementPionPossible(tuile, _idCurrentJoueur);
 
@@ -95,7 +95,7 @@ public class Partie
         // RECEPTIONNE COUP
         ulong idTuile = 0, slot = 0;
         Position pos = new Position();
-        _plateau.PoserTuile(idTuile, pos);
+        //_plateau.PoserTuile(idTuile, pos);
         _plateau.PoserPion(_idCurrentJoueur, idTuile, slot);
     }
 }

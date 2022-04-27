@@ -11,6 +11,8 @@ namespace Assets.system
         private readonly int[][] _lienSlotPosition;
         private readonly ulong _id;
         private readonly int[,] _lienEntreSlots;
+
+        public bool TuileFantome { get; set; } = false;
         public bool Riviere
         {
             get
@@ -174,6 +176,11 @@ namespace Assets.system
         }
 
         //public static implicit operator Tuile(ulong id) => DicoTuiles[id];
+
+        public override string ToString()
+        {
+            return "Tuile d'id : " + _id + " de position : (" + X + ", " + Y + ") R : " + Rotation;
+        }
     }
 
 }

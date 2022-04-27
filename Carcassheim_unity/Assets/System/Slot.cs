@@ -28,6 +28,11 @@ namespace Assets.system
 
         public Slot(ulong idTerrain) { }
 
+        public override string ToString()
+        {
+            return "Slot appartenant au joueur: " + IdJoueur;
+        }
+
         static Slot()
         {
             TerrainFromId = new Dictionary<ulong, TypeTerrain>
