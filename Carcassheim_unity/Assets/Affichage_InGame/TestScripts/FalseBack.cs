@@ -547,7 +547,6 @@ public class FalseBack : CarcasheimBack
         {
             Debug.Log("Score + turn");
             system_display.setNextState(DisplaySystemState.scoreChange);
-            system_display.setNextState(DisplaySystemState.turnStart);
         }
     }
 
@@ -591,6 +590,10 @@ public class FalseBack : CarcasheimBack
     {
         players_scores.AddRange(my_scores[num_turn]);
         num_turn += 1;
+        if (num_turn < nb_turn)
+            system_display.setNextState(DisplaySystemState.turnStart);
+        else
+            system_display.setNextState(DisplaySystemState.endOfGame);
     }
 
     override public int askIdTileInitial()
@@ -629,4 +632,8 @@ public class FalseBack : CarcasheimBack
         //TODO Pareil que askScore
     }
 
+    override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
+    {
+        
+    }
 }

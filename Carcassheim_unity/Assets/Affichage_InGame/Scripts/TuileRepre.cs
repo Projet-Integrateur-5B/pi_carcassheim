@@ -39,7 +39,7 @@ public class TuileRepre : MonoBehaviour
             _pos = value;
             body_collider.enabled = _pos != null;
             int rotation = _pos != null ? _pos.Rotation : 0;
-            transform.localRotation = Quaternion.Euler(0, 0, rotation * -90);
+            transform.localRotation = Quaternion.Euler(0, 0, rotation * 90);
         }
         get => _pos;
     }
@@ -59,6 +59,14 @@ public class TuileRepre : MonoBehaviour
         foreach (SlotIndic slot in slots)
         {
             slot.show(player);
+        }
+    }
+    public void showPossibilities(PlayerRepre player, List<int> slot_pos)
+    {
+        hidePossibilities();
+        foreach (int index in slot_pos)
+        {
+            slots[index].show(player);
         }
     }
 

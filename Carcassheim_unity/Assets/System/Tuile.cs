@@ -11,6 +11,8 @@ namespace Assets.system
         private readonly int[][] _lienSlotPosition;
         private readonly ulong _id;
         private readonly int[,] _lienEntreSlots;
+
+        public bool TuileFantome { get; set; } = false;
         public bool Riviere
         {
             get
@@ -60,7 +62,7 @@ namespace Assets.system
             int s = 0;
             for (int i = 0; i < nombreSlot; i++)
             {
-                _slots[i] = new Slot(terrains[i]);
+                _slots[i] = new Slot(terrains[i], new ulong[0]);
                 s += lien[i].Length;
             }
             if (nombreSlot != terrains.Length || lien.Length != nombreSlot || s != 12)
@@ -101,6 +103,12 @@ namespace Assets.system
             }
 
             _lienSlotPosition = actualLink;
+        }
+
+        public static Tuile Copy(Tuile tuile)
+        {
+            Tuile result = new Tuile(tuile._id, tuile._slots, tuile._lienSlotPosition, tuile._lienEntreSlots);
+            return result;
         }
 
         public ulong IdSlotFromPositionInterne(int pos)
@@ -167,7 +175,12 @@ namespace Assets.system
             DicoTuiles = new Dictionary<ulong, Tuile>();
         }
 
-        public static implicit operator Tuile(ulong id) => DicoTuiles[id];
+        //public static implicit operator Tuile(ulong id) => DicoTuiles[id];
+
+        public override string ToString()
+        {
+            return "Tuile d'id : " + _id + " de position : (" + X + ", " + Y + ") R : " + Rotation;
+        }
     }
 
 }

@@ -15,6 +15,11 @@ public class PublicRoomMenu : Miscellaneous
 
 	public List<string> listAction;
 	public Semaphore s_listAction;
+
+
+	private Transform container; 
+	private Text id_room; //id de la room (pour l'instant : 'X')
+
 	void Start()
 	{
 		listAction = new List<string>();
@@ -22,6 +27,9 @@ public class PublicRoomMenu : Miscellaneous
 		RoomInfo.Instance.idPartie = (ulong)Communication.Instance.idRoom;
 
 		OnMenuChange += OnStart;
+
+		container = GameObject.Find("SubMenus").transform.Find("PublicRoomMenu").transform.Find("Text").transform;
+		id_room = container.Find("NumberOfRoom").GetComponent<Text>();
 	}
 
 	public void OnStart(string pageName)

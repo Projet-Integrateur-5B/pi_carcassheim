@@ -12,32 +12,38 @@ namespace Assets.system
 
         private static Dictionary<ulong, TypeTerrain> TerrainFromId;
 
-        public Slot(TypeTerrain terrain)
+        public Slot(TypeTerrain terrain, ulong[] link)
         {
+            _linkOtherSlots = link;
             _terrain = terrain;
-            IdJoueur = 0;
+            IdJoueur = ulong.MaxValue;
         }
 
         public Slot(ulong idTerrain, ulong[] link)
         {
             _linkOtherSlots = link;
             _terrain = TerrainFromId[idTerrain];
-            IdJoueur = 0;
+            IdJoueur = ulong.MaxValue;
         }
 
         public Slot(ulong idTerrain) { }
 
+        public override string ToString()
+        {
+            return "Slot appartenant au joueur: " + IdJoueur;
+        }
+
         static Slot()
         {
             TerrainFromId = new Dictionary<ulong, TypeTerrain>
-        {
-            { 0, TypeTerrain.Ville },
-            { 1, TypeTerrain.Route },
-            { 2, TypeTerrain.Pre },
-            { 3, TypeTerrain.Abbaye },
-            { 4, TypeTerrain.Auberge },
-            { 5, TypeTerrain.Cathedrale }
-        };
+            {
+                { 0, TypeTerrain.Ville },
+                { 1, TypeTerrain.Route },
+                { 2, TypeTerrain.Pre },
+                { 3, TypeTerrain.Abbaye },
+                { 4, TypeTerrain.Auberge },
+                { 5, TypeTerrain.Cathedrale }
+            };
         }
     }
 }
