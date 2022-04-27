@@ -17,7 +17,27 @@
 
         public override string ToString()
         {
-            return _x.ToString() + _y.ToString() + _rot.ToString();
+            string r = "";
+            switch (ROT)
+            {
+                case 0:
+                    r = "nord";
+                    break;
+                case 1:
+                    r = "est";
+                    break;
+                case 2:
+                    r = "sud";
+                    break;
+                case 3:
+                    r = "ouest";
+                    break;
+                default:
+                    r = "lol";
+                    break;
+
+            }
+            return "("+ _x.ToString()+", " + _y.ToString()+", " + r + ")";
         }
 
         /*public static explicit operator(PositionRepr) (Position p)

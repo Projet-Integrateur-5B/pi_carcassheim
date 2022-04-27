@@ -13,6 +13,8 @@ public class MeepleRepre : MonoBehaviour
     // * POSITION *********************************************
     public int Id { get; set; }
 
+    public List<int> slot_possible = new List<int>();
+
     TuileRepre _parentTile = null;
     public TuileRepre ParentTile
     {
