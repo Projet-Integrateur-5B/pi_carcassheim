@@ -107,7 +107,7 @@ namespace Assets.system
             foreach (int position in positionsInternes)
             {
                 //direction = (position + (3 * tuile.Rotation)) / 3;
-                direction = (4 + position / 3 - tuile.Rotation) % 4;
+                direction = (4 + (position / 3) - tuile.Rotation) % 4;
 
                 Tuile elem = _plateau.GetTuile(x + Plateau.PositionAdjacentes[direction, 0],
                                       y + Plateau.PositionAdjacentes[direction, 1]);
@@ -119,7 +119,7 @@ namespace Assets.system
                 {
                     resultat.Add(elem);
                     positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 3);
+                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 4);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();

@@ -357,7 +357,7 @@ namespace Assets.system
                 {
                     resultat.Add(elem);
                     positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 3);
+                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 4);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();
