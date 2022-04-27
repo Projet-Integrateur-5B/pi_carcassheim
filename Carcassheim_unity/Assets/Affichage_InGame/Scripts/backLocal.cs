@@ -39,7 +39,17 @@ public class backLocal : CarcasheimBack
 
     private TurnPlayParam act_turn_play;
 
-    private List<Position> possibilities_act_turn = new List<Position>();
+    private ulong tile_init_normal = 20;
+
+    private ulong tile_init_river = 30;
+
+    private ulong tile_final_river = 10;
+
+    private bool river_on = false;
+
+    private List<ulong> tiles_for_river;
+
+    private List<Position> possibilities_tile_act_turn = new List<Position>();
     private List<ulong> tile_drawn = new List<ulong>();
 
     [SerializeField] private DisplaySystem system_display;
@@ -101,6 +111,16 @@ public class backLocal : CarcasheimBack
                     break;
             }
 
+            if (river_on)
+            {
+                tiles_for_river = new List<ulong>();
+                foreach (Tuile tile in dicoTuile.Values)
+                {
+                    if (tile.isARiver() && tile.Id != tile_init_river && tile.Id != tile_final_river)
+                        tiles_for_river.Add(tile.Id);
+                }
+            }
+
             generatePlayers();
             system_display.gameBegin();
         }
@@ -120,8 +140,8 @@ public class backLocal : CarcasheimBack
 
     override public void sendTile(TurnPlayParam play)
     {
-        Debug.Log("Am i looking likethis " + play.id_tile + " " + play.tile_pos + " " + play.id_meeple + " " + play.slot_pos);
-        Debug.Log("Meeple at " + play.id_meeple + " " + play.slot_pos);
+        // Debug.Log("Am i looking likethis " + play.id_tile + " " + play.tile_pos + " " + play.id_meeple + " " + play.slot_pos);
+        // Debug.Log("Meeple at " + play.id_meeple + " " + play.slot_pos);
         bool tuile_valide = false;
         bool meeple_valide = false;
         ulong player_act = (ulong)players[index_player].id_player;
@@ -130,10 +150,10 @@ public class backLocal : CarcasheimBack
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
-        Debug.Log("Meeple at " + play.id_meeple + " " + play.slot_pos);
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
             _plateau.PoserPion(player_act, (ulong)play.id_tile, (ulong)play.slot_pos);
+            players[index_player] = new PlayerInitParam(players[index_player].id_player, players[index_player].nb_meeple - 1, players[index_player].player_name);
             meeple_valide = true;
         }
         if (tuile_valide)
@@ -181,7 +201,7 @@ public class backLocal : CarcasheimBack
 
     override public void askMeeplesInit(List<MeepleInitParam> meeples)
     {
-        if (players[index_player].nb_meeple > 0)
+        if (players[index_player].nb_meeple > 0 && !river_on)
             meeples.Add(new MeepleInitParam(0, players[index_player].nb_meeple));
     }
 
@@ -193,26 +213,52 @@ public class backLocal : CarcasheimBack
         }
         else
         {
-            possibilities_act_turn.Clear();
+            possibilities_tile_act_turn.Clear();
             tile_drawn.Clear();
             do
             {
                 int index = UnityEngine.Random.Range(0, dicoTuile.Count);
                 tile_drawn.Add((ulong)index);
-                possibilities_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
+                possibilities_tile_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
                 nb_tile_drawn += 1;
-            } while (possibilities_act_turn.Count <= 0);// && nb_tile_drawn < win_tile_nb);
+            } while (possibilities_tile_act_turn.Count <= 0);// && nb_tile_drawn < win_tile_nb);
             last_generated_tile_tour = compteur_de_tour;
         }
     }
+
+    int drawRiver()
+    {
+        ulong result = 0;
+        if (tiles_for_river.Count != 0)
+        {
+            int index = UnityEngine.Random.Range(0, tiles_for_river.Count);
+            result = tiles_for_river[index];
+            tiles_for_river.RemoveAt(index);
+        }
+        else
+        {
+            result = tile_final_river;
+            tile_final_river = ulong.MaxValue;
+
+        }
+        river_on = tiles_for_river.Count > 0 && tile_final_river != ulong.MaxValue;
+        return (int)result;
+    }
+
     override public int askTilesInit(List<TileInitParam> tiles)
     {
-        int tot = 0;
-        generateTile();
-
-        for (int i = 0; i < tile_drawn.Count; i++)
+        if (river_on)
         {
-            tiles.Add(new TileInitParam((int)tile_drawn[i], i + 1 == tile_drawn.Count));
+            tiles.Add(new TileInitParam(drawRiver(), true));
+        }
+        else
+        {
+            generateTile();
+
+            for (int i = 0; i < tile_drawn.Count; i++)
+            {
+                tiles.Add(new TileInitParam((int)tile_drawn[i], i + 1 == tile_drawn.Count));
+            }
         }
         return 1;
     }
@@ -224,7 +270,7 @@ public class backLocal : CarcasheimBack
 
     override public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
     {
-        foreach (Position pos in possibilities_act_turn)
+        foreach (Position pos in possibilities_tile_act_turn)
         {
             //Debug.Log("POSITION POSSIBLE : "+pos.ToString());
             positions.Add(new PositionRepre(pos.X, pos.Y, pos.ROT));
@@ -242,7 +288,7 @@ public class backLocal : CarcasheimBack
 
     override public int askIdTileInitial()
     {
-        return 20;
+        return (int)(river_on ? tile_init_river : tile_init_normal);
     }
 
     override public int getNextPlayer()
@@ -278,7 +324,7 @@ public class backLocal : CarcasheimBack
                 parameters.Add(win_point_nb);
                 break;
             case WinCondition.WinByTile:
-                parameters.Add(win_tile_nb);
+                parameters.Add(win_tile_nb + (river_on ? tiles_for_river.Count + 1 : 0));
                 break;
         }
     }

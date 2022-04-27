@@ -72,7 +72,7 @@ namespace Assets.system
             _lienSlotPosition = lien;
         }
 
-        public Tuile(ulong id, Slot[] slots, int[][]lien, int[,] lienEntreSlots = null) : this(id, slots, lien)
+        public Tuile(ulong id, Slot[] slots, int[][] lien, int[,] lienEntreSlots = null) : this(id, slots, lien)
         {
             if (lienEntreSlots != null)
                 _lienEntreSlots = lienEntreSlots;
@@ -180,6 +180,16 @@ namespace Assets.system
         public override string ToString()
         {
             return "Tuile d'id : " + _id + " de position : (" + X + ", " + Y + ") R : " + Rotation;
+        }
+
+        public bool isARiver()
+        {
+            foreach (Slot s in _slots)
+            {
+                if (s.Terrain == TypeTerrain.Riviere)
+                    return true;
+            }
+            return false;
         }
     }
 

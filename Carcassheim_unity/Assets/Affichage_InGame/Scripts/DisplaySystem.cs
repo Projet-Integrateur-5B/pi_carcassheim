@@ -290,8 +290,8 @@ public class DisplaySystem : MonoBehaviour
                 Debug.Log("Tour de " + act_player.Name + " " + act_player.Id.ToString());
                 if (old_state != DisplaySystemState.noState)
                     player_list.nextPlayer(act_player);
-                // if (my_player == null && act_player.is_my_player)
-                //     banner.setPlayer(my_player);
+                if (my_player == null && act_player.is_my_player)
+                    banner.setPlayer(act_player);
                 table.Focus = act_player.is_my_player;
                 turnBegin();
                 break;
@@ -587,8 +587,20 @@ public class DisplaySystem : MonoBehaviour
         meeples_hand.Clear();
         meeple_distrib.Clear();
 
+        int final_count = system_back.askTilesInit(tiles_init);
+        int L = tiles_init.Count;
+        TuileRepre tl;
+        for (int i = 0; i < L; i++)
+        {
+            tl = instantiateTileOfId(tiles_init[i].id_tile);
+            if (tiles_init[i].tile_flags)
+                system_back.getTilePossibilities(tl.Id, tl.possibilitiesPosition);
+            tiles_drawned.Enqueue(tl);
+            lifespan_tiles_drawned.Enqueue(tiles_init[i].tile_flags);
+        }
+
         system_back.askMeeplesInit(meeples_init);
-        int L = meeples_init.Count;
+        L = meeples_init.Count;
         for (int i = 0; i < L; i++)
         {
             // TODO should instantiate dependnat on the type
@@ -602,17 +614,6 @@ public class DisplaySystem : MonoBehaviour
 
         }
 
-        int final_count = system_back.askTilesInit(tiles_init);
-        L = tiles_init.Count;
-        TuileRepre tl;
-        for (int i = 0; i < L; i++)
-        {
-            tl = instantiateTileOfId(tiles_init[i].id_tile);
-            if (tiles_init[i].tile_flags)
-                system_back.getTilePossibilities(tl.Id, tl.possibilitiesPosition);
-            tiles_drawned.Enqueue(tl);
-            lifespan_tiles_drawned.Enqueue(tiles_init[i].tile_flags);
-        }
 
         table.resetHandSize(final_count, meeples_hand, meeple_distrib);
     }
