@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System;
+using UnityEngine;
 
 namespace Assets.system
 {
@@ -7,6 +9,7 @@ namespace Assets.system
         public static readonly int[,] PositionAdjacentes;
         private Dictionary<ulong, Tuile> _dicoTuile;
 
+        public Dictionary<ulong, Tuile> DicoTuile => _dicoTuile;
         private List<Tuile> _tuiles;
         public List<Tuile> Tuiles
         {
@@ -72,12 +75,12 @@ namespace Assets.system
 
         public void PoserTuile(ulong idTuile, Position pos)
         {
-            PoserTuile(_dicoTuile[idTuile], pos.X, pos.Y, pos.ROT);
+            PoserTuile(tuileDeModelId(idTuile), pos.X, pos.Y, pos.ROT);
         }
 
         public void PoserTuile(ulong idTuile, int x, int y, int rot)
         {
-            PoserTuile(_dicoTuile[idTuile], x, y, rot);
+            PoserTuile(tuileDeModelId(idTuile), x, y, rot);
         }
         public void PoserTuile(Tuile tuile, int x, int y, int rot)
         {
@@ -87,9 +90,14 @@ namespace Assets.system
             _tuiles.Add(tuile);
         }
 
+        public Tuile tuileDeModelId(ulong id_tuile)
+        {
+            return Tuile.Copy(_dicoTuile[id_tuile]);
+        }
+
         public Position[] PositionPlacementPossible(ulong idTuile)
         {
-            return PositionsPlacementPossible(_dicoTuile[idTuile]);
+            return PositionsPlacementPossible(tuileDeModelId(idTuile));
         }
 
         public Position[] PositionsPlacementPossible(Tuile tuile)
@@ -131,7 +139,7 @@ namespace Assets.system
 
         public bool PlacementLegal(ulong idTuile, int x, int y, int rotation)
         {
-            return PlacementLegal(_dicoTuile[idTuile], x, y, rotation);
+            return PlacementLegal(tuileDeModelId(idTuile), x, y, rotation);
         }
 
         public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
@@ -214,7 +222,7 @@ namespace Assets.system
 
         public bool ZoneFermee(ulong idTuile, ulong idSlot)
         {
-            return ZoneFermee(_dicoTuile[idTuile], idSlot);
+            return ZoneFermee(tuileDeModelId(idTuile), idSlot);
         }
 
         public bool ZoneFermee(Tuile tuile, ulong idSlot)
@@ -257,9 +265,18 @@ namespace Assets.system
         private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, ulong idSlot,
             out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
         {
+            Debug.Log("Verif tuile " + tuile.Id.ToString() +" for slot "+idSlot.ToString());
             emplacementVide = false;
-
-            int[] positionsInternes = tuile.LienSlotPosition[idSlot];
+            int[] positionsInternes;
+            try
+            {
+                positionsInternes = tuile.LienSlotPosition[idSlot];
+            }
+            catch (Exception e)
+            {
+                Debug.Log("idSlot = " + idSlot);
+                throw e;
+            }
             List<int> positionsInternesProchainesTuilesTemp = new List<int>();
             List<Tuile> resultat = new List<Tuile>();
             int x = tuile.X, y = tuile.Y;
@@ -290,7 +307,7 @@ namespace Assets.system
 
         public void PoserPion(ulong idJoueur, ulong idTuile, ulong idSlot)
         {
-            PoserPion(idJoueur, _dicoTuile[idTuile], idSlot);
+            PoserPion(idJoueur, tuileDeModelId(idTuile), idSlot);
         }
 
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
@@ -298,30 +315,30 @@ namespace Assets.system
             tuile.Slots[idSlot].IdJoueur = idJoueur;
         }
 
-        public int[] EmplacementPionPossible(ulong idtuile, ulong idJoueur)
+        public int[] EmplacementPionPossible(int x, int y, ulong idJoueur)
         {
-            return EmplacementPionPossible(_dicoTuile[idtuile], idJoueur);
-        }
-        public int[] EmplacementPionPossible(Tuile tuile, ulong idJoueur)
-        {
+            Tuile tuile = GetTuile(x, y);
             List<int> resultat = new List<int>();
-            List<Tuile> parcourues = new List<Tuile>();
+            List<Tuile> parcouruesT = new List<Tuile>();
+            List<ulong> parcourusS = new List<ulong>();
 
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
-                if (ZoneAppartientAutreJoueur(tuile, (ulong)i, idJoueur, parcourues))
+                Debug.Log("NOMBRE SLOTS CURRENT TUILE : " + tuile.NombreSlot);
+                if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcouruesT, parcourusS))
                     resultat.Add(i);
-                parcourues.Clear();
+                parcouruesT.Clear();
+                parcourusS.Clear();
             }
 
             return resultat.ToArray();
         }
 
-        private bool ZoneAppartientAutreJoueur(Tuile tuile, ulong idSlot, ulong idJoueur, List<Tuile> parcourues)
+        private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<Tuile> parcouruesT, List<ulong> parcourusS)
         {
-            bool vide, resultat = true;
+            bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
-            Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
+            Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
 
             if (adj.Length == 0)
                 return false;
@@ -329,29 +346,30 @@ namespace Assets.system
             int c = 0;
             foreach (var t in adj)
             {
-                if (t == null || parcourues.Contains(t))
+                if (t == null || (parcouruesT.Contains(t) && parcourusS.Contains(idSlot)))
                     continue;
-                parcourues.Add(t);
+                parcouruesT.Add(t);
+                parcourusS.Add(idSlot);
 
                 int pos = positionsInternesProchainesTuiles[c++];
                 ulong nextSlot = t.IdSlotFromPositionInterne(pos);
                 ulong idJ = t.Slots[nextSlot].IdJoueur;
-                if (idJ != 0 && idJ != idJoueur)
-                    return false;
-                resultat = resultat && ZoneAppartientAutreJoueur(t, nextSlot, idJoueur, parcourues);
+                if (idJ != ulong.MaxValue)
+                    return true;
+                resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcouruesT, parcourusS);
             }
 
             return resultat;
         }
 
-        public bool PionPosable(ulong idTuile, ulong idSlot, ulong idJoueur)
+        public bool PionPosable(int x, int y, ulong idSlot, ulong idJoueur, ulong idMeeple)
         {
-            Tuile tuile = _dicoTuile[idTuile];
+            Tuile tuile = GetTuile(x, y);
 
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;
 
-            int[] tab = EmplacementPionPossible(tuile, idJoueur);
+            int[] tab = EmplacementPionPossible(x, y, idJoueur);
             for (int i = 0; i < tab.Length; i++)
             {
                 if ((ulong)tab[i] == idSlot)
@@ -360,28 +378,37 @@ namespace Assets.system
             return false;
         }
 
-        //public void RemoveAllPawnInZone(ulong idTuile, ulong idSlot)
-        //{
-        //    List<Tuile> parcourues = new List<Tuile>();
-        //    RemoveAllPawnInZoneAux(idTuile, idSlot, parcourues);
-        //}
-        //private void RemoveAllPawnInZoneAux(ulong idTuile, ulong idSlot, List<Tuile> parcourues)
-        //{
-        //    bool vide;
-        //    int[] positionsInternesProchainesTuiles;
-        //    Tuile tuile = _dicoTuile[idTuile];
-        //    parcourues.Add(tuile);
-        //    Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
+        public Dictionary<ulong, int> RemoveAllPawnInZone(ulong idTuile, ulong idSlot)
+        {
+            List<Tuile> parcourues = new List<Tuile>();
+            var result = new Dictionary<ulong, int>();
+            RemoveAllPawnInZoneAux(idTuile, idSlot, parcourues, ref result);
+            return result;
+        }
+        private Dictionary<ulong, int> RemoveAllPawnInZoneAux(ulong idTuile, ulong idSlot,
+            List<Tuile> parcourues, ref Dictionary<ulong, int> result)
+        {
+            bool vide;
+            int[] positionsInternesProchainesTuiles;
+            Tuile tuile = tuileDeModelId(idTuile);
+            parcourues.Add(tuile);
+            Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
 
-        //    tuile.Slots[idSlot].IdJoueur = (unchecked ulong) -1;
-        //    for (int i = 0; i++; i < adj.Length)
-        //    {
-        //        Tuile currentTuile = adj[i];
-        //        if (currentTuile == null || parcourue.Contains(currentTuile))
-        //            continue;
-        //        RemoveAllPawnInZoneAux(currentTuile,
-        //            currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]), parcourues);
-        //    }
-        //}
+            ulong idCurrentJoueur = tuile.Slots[idSlot].IdJoueur;
+            if (result.ContainsKey(idCurrentJoueur))
+                result[idCurrentJoueur] += 1;
+            else
+                result.Add(idCurrentJoueur, 1);
+            tuile.Slots[idSlot].IdJoueur = ulong.MaxValue;
+            for (int i = 0; i < adj.Length; i++)
+            {
+                Tuile currentTuile = adj[i];
+                if (currentTuile == null || parcourues.Contains(currentTuile))
+                    continue;
+                RemoveAllPawnInZoneAux(currentTuile.Id,
+                    currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]), parcourues, ref result);
+            }
+            return result;
+        }
     }
 }

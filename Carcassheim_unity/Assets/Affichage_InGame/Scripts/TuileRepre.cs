@@ -63,6 +63,7 @@ public class TuileRepre : MonoBehaviour
     }
     public void showPossibilities(PlayerRepre player, List<int> slot_pos)
     {
+        hidePossibilities();
         foreach (int index in slot_pos)
         {
             slots[index].show(player);
