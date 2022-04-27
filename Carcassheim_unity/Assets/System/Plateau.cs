@@ -160,7 +160,16 @@ namespace Assets.system
 
         public Position[] PositionsPlacementPossible(Tuile tuile)
         {
-            if (_tuiles.Count == 0)
+            var listTuiles = new List<Tuile>();
+
+            foreach (var item in _tuiles)
+            {
+                if (item.TuileFantome)
+                    continue;
+                listTuiles.Add(item);
+            }
+
+            if (listTuiles.Count == 0)
                 return new Position[] { new Position(0, 0, 0) };
 
             List<Position> resultat = new List<Position>();
@@ -168,7 +177,7 @@ namespace Assets.system
             int x, y, rot;
 
             List<Position> checked_pos = new List<Position>();
-            foreach (var t in _tuiles)
+            foreach (var t in listTuiles)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -202,11 +211,22 @@ namespace Assets.system
 
         public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
         {
-            if (GetTuile(x, y) != null)
+            Tuile tl = GetTuile(x, y);
+            if (tl != null && !tl.TuileFantome)
             {
                 return false;
             }
+
+            var listTuiles = new List<Tuile>();
+
             foreach (var item in _tuiles)
+            {
+                if (item.TuileFantome)
+                    continue;
+                listTuiles.Add(item);
+            }
+
+            foreach (var item in listTuiles)
             {
                 if (item.X == x && item.Y == y)
                     return false;
