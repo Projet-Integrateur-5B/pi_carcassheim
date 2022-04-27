@@ -277,7 +277,7 @@ public static partial class Server
         // Stores a list of packet which has the "IdMessage" set at "Logout".
         var packetLogout = new List<Packet>();
         // Stores a list of tasks to wait on.
-        var Tasks = new List<Task>();
+        var tasks = new List<Task>();
 
         // Process each packet received.
         foreach (var packet in state.Packets)
@@ -290,12 +290,12 @@ public static partial class Server
             // Else : process the packet.
             else
             {
-                Tasks.Add(Task.Run(() => HandleReceivedPacket(ar, packet)));
+                tasks.Add(Task.Run(() => HandleReceivedPacket(ar, packet)));
             }
         }
 
         // Waiting for each running Task to end before running the "Logout" ones.
-        Task.WhenAll(Tasks).Wait();
+        Task.WhenAll(tasks).Wait();
 
         // No "Logout" -> continue to read on the socket.
         if (packetLogout.Count == 0)
@@ -323,20 +323,6 @@ public static partial class Server
         }
         var listener = state.Listener;
 
-        /*var dataLength = state.Data.Length;
-        state.Data = state.Data.Concat(original.Data).ToArray();
-        if (dataLength > 0)
-        {
-            if (state.Data[dataLength] == "")
-            {
-                state.Data = state.Data.Where((source, index) => index != dataLength)
-                    .ToArray();
-                state.Data[dataLength - 1] += state.Data[dataLength];
-                state.Data = state.Data.Where((source, index) => index != dataLength)
-                    .ToArray();
-            }
-        }*/
-
         var debug = "Reading from : " + listener.RemoteEndPoint +
                     "\n\t Packet =>\t" + original +
                     "\n\t Data buffer =>\t\t" + string.Join(" ", original.Data);
@@ -358,8 +344,6 @@ public static partial class Server
             var packet = GetFromDatabase(original);
             // Send answer to the client.
             SendBackToClient(ar, packet);
-
-            // Start listening again.
         }
     }
 
