@@ -92,7 +92,7 @@ public class backLocal : CarcasheimBack
         Debug.Log("Cakked");
         if (validate_start())
         {
-            _plateau.PoserTuile((ulong) askIdTileInitial(), 0, 0, 0);
+            _plateau.Poser1ereTuile((ulong) askIdTileInitial());
 
             switch (my_wincond)
             {
@@ -127,7 +127,7 @@ public class backLocal : CarcasheimBack
         ulong player_act = (ulong) players[index_player].id_player;
         if (play.id_tile != -1 && _plateau.PlacementLegal((ulong) play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation))
         {
-            _plateau.PoserTuile((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
+            _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
         Debug.Log("Meeple at "+play.id_meeple+" "+play.slot_pos);
@@ -136,7 +136,7 @@ public class backLocal : CarcasheimBack
             _plateau.PoserPion(player_act, (ulong)play.id_tile, (ulong)play.slot_pos);
             meeple_valide = true;
         }
-
+        _plateau.ValiderTour();
         //TODO regarder avancement score pour tout les joueurs int  += CompteurPoint.CompterZoneFerme(play.id_tile, play.slot_pos);
         
         bool end = false;
@@ -224,7 +224,7 @@ public class backLocal : CarcasheimBack
     {
         foreach (Position pos in possibilities_act_turn)
         {
-            Debug.Log("POSITION POSSIBLE : "+pos.ToString());
+            //Debug.Log("POSITION POSSIBLE : "+pos.ToString());
             positions.Add(new PositionRepre(pos.X, pos.Y, pos.ROT));
         }
     }

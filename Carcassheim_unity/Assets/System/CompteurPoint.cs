@@ -68,7 +68,6 @@ namespace Assets.system
                     continue;
                 parcourue.Add(item);
 
-
                 int pos = positionsInternesProchainesTuiles[c++];
                 int nextSlot = (int)item.IdSlotFromPositionInterne(pos);
                 ulong idJ = item.Slots[nextSlot].IdJoueur;
@@ -108,7 +107,7 @@ namespace Assets.system
             foreach (int position in positionsInternes)
             {
                 //direction = (position + (3 * tuile.Rotation)) / 3;
-                direction = (position / 3 + tuile.Rotation) % 3;
+                direction = (4 + position / 3 - tuile.Rotation) % 4;
 
                 Tuile elem = _plateau.GetTuile(x + Plateau.PositionAdjacentes[direction, 0],
                                       y + Plateau.PositionAdjacentes[direction, 1]);

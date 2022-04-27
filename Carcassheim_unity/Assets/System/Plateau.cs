@@ -34,10 +34,10 @@ namespace Assets.system
         {
             PositionAdjacentes = new int[,]
             {
-            { 0, -1 },
-            { 1, 0 },
-            { 0, 1 },
-            { -1, 0 }
+                { 0, -1 },
+                { 1, 0 },
+                { 0, 1 },
+                { -1, 0 }
             };
         }
         public Tuile GetTuile(int x, int y)
@@ -343,7 +343,9 @@ namespace Assets.system
             foreach (int position in positionsInternes)
             {
                 //direction = (position + (3 * tuile.Rotation)) / 3;
-                direction = (position / 3 + tuile.Rotation) % 3;
+                direction = (4 + position / 3 - tuile.Rotation) % 4;
+
+                Debug.Log("Direction vers la prochaine Tuile de la zone = " + direction);
 
                 Tuile elem = GetTuile(x + PositionAdjacentes[direction, 0],
                                       y + PositionAdjacentes[direction, 1]);
@@ -375,10 +377,11 @@ namespace Assets.system
 
         public int[] EmplacementPionPossible(int x, int y, ulong idJoueur)
         {
+            Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
             Tuile tuile = GetTuile(x, y);
             List<int> resultat = new List<int>();
             List<(Tuile, ulong)> parcourus = new List<(Tuile, ulong)>();
-
+            Debug.Log("NombreSlot = " + tuile.NombreSlot);
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
                 if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
@@ -391,9 +394,17 @@ namespace Assets.system
 
         private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<(Tuile, ulong)> parcourus)
         {
+            Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
+                + " liste des tuiles parcourues de longeur: " + parcourus.Count);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
             Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
+
+            Debug.Log("methode TuilesAdjacentesAuSlot appelee, adj de longueur: " + adj.Length);
+            foreach (var item in adj)
+            {
+                Debug.Log("Tuile dans adj :" + item.ToString());
+            }
 
             if (adj.Length == 0)
                 return false;
