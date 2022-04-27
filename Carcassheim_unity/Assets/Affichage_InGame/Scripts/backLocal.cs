@@ -136,7 +136,8 @@ public class backLocal : CarcasheimBack
             _plateau.PoserPion(player_act, (ulong)play.id_tile, (ulong)play.slot_pos);
             meeple_valide = true;
         }
-        _plateau.ValiderTour();
+        if (tuile_valide)
+            _plateau.ValiderTour();
         //TODO regarder avancement score pour tout les joueurs int  += CompteurPoint.CompterZoneFerme(play.id_tile, play.slot_pos);
 
         bool end = false;
