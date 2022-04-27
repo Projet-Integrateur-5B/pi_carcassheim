@@ -180,32 +180,22 @@ public class ClientAsync
     {
 
         byte[]? bytes = null;
-        var error_value = Tools.Errors.None;
-        var packets = new List<Packet>();
+        var error_value = Tools.Errors.None; // Default error value.
 
-        packets = original.Split(ref error_value);
-        if (error_value != Tools.Errors.None)
+        // Serialize the packet.
+        bytes = original.PacketToByteArray(ref error_value);
+        if (error_value != Tools.Errors.None) // Checking for errors.
         {
-            // TODO : Split => handle error
-            // return Tools.Errors.Data;
+            // Setting the error value.
+            // TODO : PacketToByteArray => handle error
+            return;
         }
 
-        foreach (var packet in packets)
-        {
-            // Send the data through the socket.
-            bytes = packet.PacketToByteArray(ref error_value);
-            if (error_value != Tools.Errors.None)
-            {
-                // TODO : PacketToByteArray => handle error
-                // return Tools.Errors.Data;
-            }
-
-            // Begin sending the data to the remote device.
-            var size = bytes.Length;
-            Console.WriteLine("Sent {0} bytes to {1} =>\t" + packet, size, client.RemoteEndPoint);
-            client.BeginSend(bytes, 0, size, 0,
-                null, client);
-        }
+        var size = bytes.Length;
+        Console.WriteLine("Sending back : " + client.RemoteEndPoint +
+                          "\n\t Sent {0} bytes =>\t" + original, size);
+        // Send the packet through the socket.
+        client.BeginSend(bytes, 0, size, 0, null, client);
     }
 
     private static void SendCallback(IAsyncResult ar)

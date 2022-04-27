@@ -224,73 +224,101 @@ public static partial class Server
         {
             return;
         }
+        
+        Console.WriteLine("Total bytes read = " + bytesRead + ", from : " + listener.RemoteEndPoint);
 
         // Get the last received bytes.
         var packetAsBytes = new byte[bytesRead];
         Array.Copy(state.Buffer, packetAsBytes, bytesRead);
         var error_value = Tools.Errors.None;
 
-        // Deserialize the byte array
-        state.Packet = packetAsBytes.ByteArrayToPacket(ref error_value);
+        // Deserialize the byte array.
+        state.Packets = packetAsBytes.ByteArrayToPacket(ref error_value);
         if (error_value != Tools.Errors.None) // Checking for errors.
         {
             // Setting the error value.
             // TODO : ByteArrayToPacket => handle error
             return;
         }
-
-        var dataLength = state.Data.Length;
-        state.Data = state.Data.Concat(state.Packet.Data).ToArray();
-        if (dataLength > 0)
+        
+        // Stores a list of packet which has the "IdMessage" set at "Logout".
+        var packetLogout = new List<Packet>();
+        // Stores a list of tasks to wait on.
+        var tasks = new List<Task>();
+        
+        // Process each packet received.
+        foreach (var packet in state.Packets)
         {
-            if (state.Data[dataLength] == "" /*&& state.Final == false*/)
+            // "Logout" packets will only be processed after anything else.
+            if (packet.IdMessage == Tools.IdMessage.AccountLogout)
             {
-                state.Data = state.Data.Where((source, index) => index != dataLength)
-                    .ToArray();
-                state.Data[dataLength - 1] += state.Data[dataLength];
-                state.Data = state.Data.Where((source, index) => index != dataLength)
-                    .ToArray();
+                packetLogout.Add(packet);
+            }
+            // Else : process the packet.
+            else
+            {
+                tasks.Add(Task.Run(() => HandleReceivedPacket(ar, packet)));
             }
         }
 
+        // Waiting for each running Task to end before running the "Logout" ones.
+        Task.WhenAll(tasks).Wait();
+
+        // No "Logout" -> continue to read on the socket.
+        if (packetLogout.Count == 0)
+        {
+            // Start listening again.
+            state.Packets.Clear();
+            StartReading(ar, listener, true);
+        }
+        // "Logout" -> doesn't need to keep reading.
+        else
+        {
+            HandleReceivedPacket(ar, packetLogout[0]);
+        }
+    }
+    
+    /// <summary>
+    ///     Handles a received packet, executes the required action and answer if needed.
+    /// </summary>
+    /// <param name="ar">Async <see cref="StateObject" />.</param>
+    /// <param name="original">Instance of <see cref="Packet" /> to send.</param>
+    private static void HandleReceivedPacket(IAsyncResult ar, Packet original)
+    {
+        // Retrieve the state object from the asynchronous state object.
+        var state = (StateObject?)ar.AsyncState;
+        if (state is null) // Checking for errors.
+        {
+            // Setting the error value.
+            // TODO : state is null
+            return;
+        }
+        var listener = state.Listener;
+
         var debug = "Reading from : " + listener.RemoteEndPoint + " on : " + state.Listener.LocalEndPoint + 
-                    "\n\t Read {0} bytes =>\t" + state.Packet +
-                    "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
+                    "\n\t Packet =>\t" + original +
+                    "\n\t Data buffer =>\t\t" + string.Join(" ", original.Data);
 
         // The client asked for a disconnection.
-        if (state.Packet.IdMessage == Tools.IdMessage.AccountLogout)
+        if (original.IdMessage == Tools.IdMessage.AccountLogout)
         {
-            Console.WriteLine(debug + "\n\t => FIN !", bytesRead);
+            Console.WriteLine(debug + "\n\t => FIN !");
             DisconnectFromClient(ar);
         }
-        // Final packet of the series has been received.
-        else if (state.Packet.Final)
+        // Received classic packet.
+        else
         {
-            Console.WriteLine(debug + "\n\t => Every packet has been received !",
-                bytesRead);
-
-            state.Packet.Data = state.Data;
+            Console.WriteLine(debug);
 
             // TODO: check if packet.IdMessage requires an answer for the client
 
             // Get required data from the database.
-            var packet = GetFromDatabase(ar, listener);
+            var packet = GetFromDatabase(ar, listener, original);
             // Send answer to the client.
             SendBackToClient(ar, packet);
-
-            // Start listening again.
-            StartReading(ar, listener, true);
-        }
-        // More packets to receive in this series.
-        else
-        {
-            Console.WriteLine(debug + "\n\t => Waiting for the rest to be send...",
-                bytesRead);
-            // Keep listening.
-            StartReading(ar, listener, false);
         }
     }
-
+    
     /// <summary>
     ///     Sends data asynchronously to <see cref="StateObject.Listener" /> in <see cref="Server" />.
     /// </summary>
@@ -310,33 +338,20 @@ public static partial class Server
             return;
         }
 
-        // Original packet may be to big to be send directly : splitting it into smaller ones.
-        var packets = original.Split(ref error_value);
+        // Serialize the packet.
+        bytes = original.PacketToByteArray(ref error_value);
         if (error_value != Tools.Errors.None) // Checking for errors.
         {
             // Setting the error value.
-            // TODO : Split => handle error
+            // TODO : PacketToByteArray => handle error
             return;
         }
 
-        // Sending split packets.
-        foreach (var packet in packets)
-        {
-            // Serialize the packet.
-            bytes = packet.PacketToByteArray(ref error_value);
-            if (error_value != Tools.Errors.None) // Checking for errors.
-            {
-                // Setting the error value.
-                // TODO : PacketToByteArray => handle error
-                return;
-            }
-
-            var size = bytes.Length;
-            Console.WriteLine("Sending back : " + state.Listener.RemoteEndPoint + " on : " + state.Listener.LocalEndPoint + 
-                              "\n\t Sent {0} bytes =>\t" + packet, size);
-            // Send the packet through the socket.
-            state.Listener.BeginSend(bytes, 0, size, 0, null, state);
-        }
+        var size = bytes.Length;
+        Console.WriteLine("Sending back : " + state.Listener.RemoteEndPoint + " on : " + state.Listener.LocalEndPoint + 
+                          "\n\t Sent {0} bytes =>\t" + original, size);
+        // Send the packet through the socket.
+        state.Listener.BeginSend(bytes, 0, size, 0, null, state);
     }
 
     /// <summary>
@@ -345,7 +360,6 @@ public static partial class Server
     /// <param name="ar">Async <see cref="StateObject" />.</param>
     private static void DisconnectFromClient(IAsyncResult ar)
     {
-
         // Retrieve the state object from the asynchronous state object.
         var state = (StateObject?)ar.AsyncState;
         if (state is null) // Checking for errors.
@@ -370,6 +384,9 @@ public static partial class Server
     /// </summary>
     public class StateObject
     {
+        /// <summary>
+        ///     Stores the player's ID in <see cref="StateObject" />.
+        /// </summary>
         public ulong IdPlayer { get; set; }
         
         /// <summary>
@@ -384,10 +401,10 @@ public static partial class Server
         public byte[] Buffer { get; } = new byte[BufferSize];
 
         /// <summary>
-        ///     Stores everything from <see cref="Listener" /> in the <see cref="Packet" /> format in
+        ///     Stores everything from <see cref="Listener" /> as a list of the <see cref="Packet" /> format in
         ///     <see cref="StateObject" />.
         /// </summary>
-        public Packet? Packet { get; set; }
+        public List<Packet>? Packets { get; set; }
 
         /// <summary>
         ///     Represents the listening socket used asynchronously for each client in
@@ -395,8 +412,6 @@ public static partial class Server
         /// </summary>
         public Socket Listener { get; set; } = new(AddressFamily.InterNetwork,
             SocketType.Stream, ProtocolType.Tcp);
-
-        public string[] Data { get; set; } = Array.Empty<string>();
 
         /// <summary>
         ///     Stores an asynchronous <see cref="Tools.Errors" /> value.

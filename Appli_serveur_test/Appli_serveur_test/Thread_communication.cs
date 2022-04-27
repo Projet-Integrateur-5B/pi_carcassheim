@@ -97,7 +97,6 @@ namespace system
             // Generate packet
             Packet packet = new Packet();
             packet.IdMessage = idMessage;
-            packet.Type = true;
 
             packet.IdPlayer = idPlayer;
 
@@ -544,7 +543,6 @@ namespace system
         public void PlayerCheated(ulong idPlayer, Socket? playerSocket, string idRoom)
         {
             Packet packet = new Packet();
-            packet.Type = true;
 
 
             // Recherche de la partie

@@ -15,110 +15,111 @@ public partial class Server
     /// <summary>
     ///     Analyzes the client request and executes it.
     /// </summary>
-    /// <param name="ar">Async <see cref="StateObject" />.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> which has been sent by the client.</param>
     /// <returns>Instance of <see cref="Packet" /> containing the response from the <see cref="Server" />.</returns>
-    public static Packet GetFromDatabase(IAsyncResult ar, Socket socket)
+    public static Packet GetFromDatabase(IAsyncResult ar, Socket socket, Packet packetReceived)
     {
-        // Initialize the packet to default.
-        var packet = new Packet();
-
+        // Initialize the packet to default with some received values.
+        var packet = new Packet
+        {
+            IdMessage = packetReceived.IdMessage,
+            IdPlayer = packetReceived.IdPlayer,
+            IdRoom = packetReceived.IdRoom
+        };
+        
         var state = (StateObject?)ar.AsyncState;
-        if (state?.Packet is null) // Checking for errors.
+        if (state is null) // Checking for errors.
         {
             // Setting the error value.
             // TODO : state is null
+            packet.Error = Tools.Errors.Permission;
             return packet;
         }
 
-        // TODO : get what the client asked from the database or whatever
-        packet.Type = state.Packet.Type;
-        packet.IdMessage = state.Packet.IdMessage;
-        packet.IdPlayer = state.Packet.IdPlayer;
-
         // Check IdMessage : different action
 
-        switch (state.Packet.IdMessage)
+        switch (packetReceived.IdMessage)
         {
             case Tools.IdMessage.AccountSignup:
-                AccountSignup(state.Packet, ref packet, socket);
+                AccountSignup(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountLogin:
-                AccountLogin(ar, state.Packet, ref packet, socket);
+                AccountLogin(ar, packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountLogout: // impossible
-                AccountLogout(state.Packet, ref packet, socket);
+                AccountLogout(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountStatistics:
-                AccountStatistics(state.Packet, ref packet, socket);
+                AccountStatistics(packetReceived, ref packet, socket);
                 break;
 
             case Tools.IdMessage.RoomList:
-                RoomList(state.Packet, ref packet, socket);
+                RoomList(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.RoomCreate:
-                RoomCreate(state.Packet, ref packet, socket);
+                RoomCreate(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.RoomSettingsGet:
-                RoomSettingsGet(state.Packet, ref packet, socket);
+                RoomSettingsGet(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.RoomSettingsSet:
-                RoomSettingsSet(state.Packet, ref packet, socket);
+                RoomSettingsSet(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.AskPort:
-                AskPort(state.Packet, ref packet, socket);
+                AskPort(packetReceived, ref packet, socket);
                 break;
 
             case Tools.IdMessage.PlayerJoin:
-                PlayerJoin(state.Packet, ref packet, socket);
+                PlayerJoin(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.PlayerLeave:
-                PlayerLeave(state.Packet, ref packet, socket);
+                PlayerLeave(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.PlayerReady:
-                PlayerReady(state.Packet, ref packet, socket);
+                PlayerReady(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.PlayerKick:
-                PlayerKick(state.Packet, ref packet, socket);
+                PlayerKick(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.PlayerCheat:
-                PlayerCheat(state.Packet, ref packet, socket);
+                PlayerCheat(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.PlayerList:
-                PlayerList(state.Packet, ref packet, socket);
+                PlayerList(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.PlayerCurrent:
-                PlayerCurrent(state.Packet, ref packet, socket);
+                PlayerCurrent(packetReceived, ref packet, socket);
                 break;
 
             case Tools.IdMessage.StartGame:
-                GameStart(state.Packet, ref packet, socket);
+                GameStart(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.EndGame:
-                GameEnd(state.Packet, ref packet, socket);
+                GameEnd(packetReceived, ref packet, socket);
                 break;
             
             case Tools.IdMessage.EndTurn:
-                EndTurn(state.Packet, ref packet, socket);
+                EndTurn(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.TimerPlayer:
                 TimerPlayer(ref packet, socket, "0", 0); // TODO : fix param
                 break;
 
             case Tools.IdMessage.TuileDraw:
-                TuileDraw(state.Packet, ref packet, socket);
+                TuileDraw(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.TuilePlacement:
-                packet.Error = TuilePlacement(state.Packet, socket);
+                packet.Error = TuilePlacement(packetReceived, socket);
                 break;
             case Tools.IdMessage.PionPlacement:
-                packet.Error = PionPlacement(state.Packet, socket);
+                packet.Error = PionPlacement(packetReceived, socket);
                 break;
             case Tools.IdMessage.CancelTuilePlacement:
-                packet.Error = CancelTuilePlacement(state.Packet, ref packet, socket);
+                packet.Error = CancelTuilePlacement(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.CancelPionPlacement:
-                packet.Error = CancelPionPlacement(state.Packet, ref packet, socket);
+                packet.Error = CancelPionPlacement(packetReceived, ref packet, socket);
                 break;
 
             case Tools.IdMessage.Default:
@@ -181,7 +182,7 @@ public partial class Server
         }
         
         var state = (StateObject?)ar.AsyncState;
-        if (state?.Packet is null) // Checking for errors.
+        if (state is null) // Checking for errors.
         {
             // Setting the error value.
             // TODO : state is null
