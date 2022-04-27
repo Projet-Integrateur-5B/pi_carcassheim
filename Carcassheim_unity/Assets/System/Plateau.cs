@@ -167,7 +167,7 @@ namespace Assets.system
 
             int x, y, rot;
 
-            List <Position> checked_pos = new List<Position>();
+            List<Position> checked_pos = new List<Position>();
             foreach (var t in _tuiles)
             {
                 for (int i = 0; i < 4; i++)
@@ -323,7 +323,7 @@ namespace Assets.system
         private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, ulong idSlot,
             out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
         {
-            Debug.Log("Verif tuile " + tuile.Id.ToString() +" for slot "+idSlot.ToString());
+            Debug.Log("Verif tuile " + tuile.Id.ToString() + " for slot " + idSlot.ToString());
             emplacementVide = false;
             int[] positionsInternes;
             try
@@ -375,6 +375,11 @@ namespace Assets.system
             tuile.Slots[idSlot].IdJoueur = idJoueur;
         }
 
+        public int[] EmplacementPionPossible(int x, int y, ulong idJoueur, ulong id_meeple)
+        {
+            return EmplacementPionPossible(x, y, idJoueur);
+        }
+
         public int[] EmplacementPionPossible(int x, int y, ulong idJoueur)
         {
             Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
@@ -420,7 +425,7 @@ namespace Assets.system
                 ulong idJ = t.Slots[nextSlot].IdJoueur;
 
                 Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
-                
+
                 if (idJ != ulong.MaxValue)
                     return true;
                 resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);

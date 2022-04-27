@@ -306,12 +306,13 @@ public class DisplaySystem : MonoBehaviour
                 board.displayTilePossibilities();
                 break;
             case DisplaySystemState.meeplePosing:
-                // foreach (MeepleRepre mp in meeples_hand)
-                // {
-                //     mp.slot_possible.Clear();
-                //     system_back.askMeeplePosition(new MeeplePosParam(act_tile.Id, act_tile.Pos, mp.Id) ,mp.slot_possible);
-                // }
-                act_tile.showPossibilities(act_player);
+                foreach (MeepleRepre mp in meeples_hand)
+                {
+                    mp.slot_possible.Clear();
+                    system_back.askMeeplePosition(new MeeplePosParam(act_tile.Id, act_tile.Pos, mp.Id), mp.slot_possible);
+                }
+                if (act_meeple != null)
+                    act_tile.showPossibilities(act_player, act_meeple.slot_possible);
                 break;
             case DisplaySystemState.scoreChange:
                 List<PlayerScoreParam> scores = new List<PlayerScoreParam>();
@@ -354,7 +355,7 @@ public class DisplaySystem : MonoBehaviour
                         {
                             n_sup += 1;
                         }
-                    
+
                     }
                     score_board.setEndOfGame(my_player, 1 + n_sup);
                 }
@@ -388,7 +389,7 @@ public class DisplaySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool mouse_consumed = false;
+        bool mouse_consumed = act_system_state == DisplaySystemState.endOfGame;
         if (!mouse_consumed && Input.GetMouseButtonUp(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -598,7 +599,7 @@ public class DisplaySystem : MonoBehaviour
             meeple_distrib[mp.Id] = meeples_init[i].nb_meeple;
 
             mp.slot_possible.Clear();
-            
+
         }
 
         int final_count = system_back.askTilesInit(tiles_init);
@@ -690,10 +691,10 @@ public class DisplaySystem : MonoBehaviour
             }
             table.activeMeepleChanged(act_meeple, n_meeple);
             act_meeple = n_meeple;
-            // if (act_system_state == DisplaySystemState.meeplePosing)
-            // {
-            //     act_tile.showPossibilities(act_player, act_meeple.slot_possible);
-            // }
+            if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null)
+            {
+                act_tile.showPossibilities(act_player, act_meeple.slot_possible);
+            }
             if (act_player.is_my_player)
                 system_back.sendAction(new DisplaySystemActionMeepleSelection(act_meeple.Id, index));
         }
