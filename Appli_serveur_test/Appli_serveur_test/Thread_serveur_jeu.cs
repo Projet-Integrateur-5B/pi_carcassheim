@@ -769,7 +769,7 @@ namespace system
             _s_tuilesGame.Release();
         }
 
-        public Socket? CancelTurn(string idRoom)
+        public Socket? CancelTurn()
         {
             // Remise à inexistant la tuilePosActu et pionPosActu
             _s_posTuileTourActu.WaitOne();

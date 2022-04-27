@@ -103,7 +103,7 @@ public partial class Server
                 EndTurn(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.TimerPlayer:
-                TimerPlayer(ref packet, socket, "0", 0); // TODO : fix param
+                TimerPlayer(ref packet, socket); 
                 break;
 
             case Tools.IdMessage.TuileDraw:
@@ -377,7 +377,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to get the room settings.
-        var data = gestionnaire.SettingsRoom(packetReceived.Data[0]);
+        var data = gestionnaire.SettingsRoom(packetReceived.IdRoom);
 
         if (data.Length > 0)
         {
@@ -419,7 +419,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to update a room.
-        gestionnaire.UpdateRoom(packetReceived.Data[0], packetReceived.IdPlayer, packetReceived.Data.Skip(0).ToArray());
+        gestionnaire.UpdateRoom(packetReceived.IdRoom, packetReceived.IdPlayer, packetReceived.Data.Skip(0).ToArray());
     }
     /// <summary>
     ///     Client is asking the port of a room
@@ -449,7 +449,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to add a player to the room.
-        var port = gestionnaire.CallAskPort(packetReceived.Data[0]);
+        var port = gestionnaire.CallAskPort(packetReceived.IdRoom);
 
         if (port != -1)
         {
@@ -495,7 +495,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to add a player to the room.
-        Tools.Errors errors = gestionnaire.JoinPlayer(packetReceived.Data[0], packetReceived.IdPlayer, socket);
+        Tools.Errors errors = gestionnaire.JoinPlayer(packetReceived.IdRoom, packetReceived.IdPlayer, socket);
 
         packet.Error = errors;
     }
@@ -527,7 +527,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
         // Attempt from a player to leave the room.
-        var playerStatus = gestionnaire.RemovePlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+        var playerStatus = gestionnaire.RemovePlayer(packetReceived.IdRoom, packetReceived.IdPlayer);
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
@@ -579,7 +579,7 @@ public partial class Server
         }
         
         // Attempt to kick a player from the room.
-        var playerStatus = gestionnaire.KickPlayer(packetReceived.Data[0], packetReceived.IdPlayer, idPlayerToKick);
+        var playerStatus = gestionnaire.KickPlayer(packetReceived.IdRoom, packetReceived.IdPlayer, idPlayerToKick);
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
@@ -616,7 +616,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to update a player status within the room.
-        var playerStatus = gestionnaire.ReadyPlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+        var playerStatus = gestionnaire.ReadyPlayer(packetReceived.IdRoom, packetReceived.IdPlayer);
         if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
@@ -627,7 +627,7 @@ public partial class Server
 
         
         // Check if everyone is ready and starts the game.
-        packet.Error = gestionnaire.StartGame(packetReceived.Data[0]);
+        packet.Error = gestionnaire.StartGame(packetReceived.IdRoom);
     }
     /// <summary>
     ///     Player cheated.
@@ -643,7 +643,7 @@ public partial class Server
         
         // Attempt to update the number of times a player has cheated in a specific game.
         // Count will be incremented but player can keep playing until the limit is reached.
-        var playerStatus = gestionnaire.CheatPlayer(packetReceived.Data[0], packetReceived.IdPlayer);
+        var playerStatus = gestionnaire.CheatPlayer(packetReceived.IdRoom, packetReceived.IdPlayer);
         
         // Player has reached the limit and must be kicked out.
         if (playerStatus == Tools.PlayerStatus.Kicked)
@@ -685,7 +685,7 @@ public partial class Server
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
-        string[] listOfPlayers = gestionnaire.CallPlayerList(packetReceived.Data[0]);
+        string[] listOfPlayers = gestionnaire.CallPlayerList(packetReceived.IdRoom);
 
         if(listOfPlayers.Length == 0)
         {
@@ -730,7 +730,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.Data[0]);
+        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
 
         if(idActualPlayer != 0)
         {
@@ -767,7 +767,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        Tools.Errors errors = gestionnaire.StartGame(packetReceived.Data[0]);
+        Tools.Errors errors = gestionnaire.StartGame(packetReceived.IdRoom);
 
         packet.Error = errors;
     }
@@ -795,7 +795,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        gestionnaire.EndGame(packetReceived.Data[0], packetReceived.IdPlayer);
+        gestionnaire.EndGame(packetReceived.IdRoom, packetReceived.IdPlayer);
         
         // TODO : check le retour de EndGame
     }
@@ -824,7 +824,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.Data[0]);
+        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.IdRoom);
 
         packet.Error = errors;
     }
@@ -833,13 +833,13 @@ public partial class Server
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void TimerPlayer(ref Packet packet, Socket socket, string idRoom, ulong idPlayer)
+    public static void TimerPlayer(ref Packet packet, Socket socket)
     {
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to stop the timer and close the round.
-        gestionnaire.PlayerTimer(idRoom, idPlayer);
+        gestionnaire.PlayerTimer(packet.IdRoom, packet.IdPlayer);
         
         packet.IdMessage = Tools.IdMessage.TimerPlayer;
     }
@@ -896,7 +896,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4]);
+        Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4]);
 
 
         return errors; 
@@ -922,7 +922,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
+        Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
 
         return errors; 
     }
@@ -947,7 +947,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallCancelTuilePlacement(packetReceived.IdPlayer, socket, packetReceived.Data[0]);
+        Tools.Errors errors = gestionnaire.CallCancelTuilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom);
 
         return errors;
     }
@@ -972,7 +972,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallCancelPionPlacement(packetReceived.IdPlayer, socket, packetReceived.Data[0]);
+        Tools.Errors errors = gestionnaire.CallCancelPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom);
 
         return errors;
     }

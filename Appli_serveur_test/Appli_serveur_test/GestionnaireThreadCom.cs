@@ -263,14 +263,14 @@ namespace system
         }
         
         
-        public void UpdateRoom(string idRoom, ulong idPlayer, string[] settings)
+        public void UpdateRoom(int idRoom, ulong idPlayer, string[] settings)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     thread_serv_ite.Set_Settings(idPlayer, settings);
                     thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.RoomSettingsSet, idPlayer, settings);
                     return;
@@ -278,14 +278,14 @@ namespace system
             }
         }
         
-        public string[] SettingsRoom(string idRoom)
+        public string[] SettingsRoom(int idRoom)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom == thread_serv_ite.Get_ID().ToString())
+                    if (idRoom == thread_serv_ite.Get_ID())
                         return thread_serv_ite.Get_Settings();
                 }
             }
@@ -293,14 +293,14 @@ namespace system
             return Array.Empty<string>();
         }
 
-        public int CallAskPort(string idRoom)
+        public int CallAskPort(int idRoom)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     return thread_com_iterateur.Get_remotePort();
                 }
             }
@@ -308,14 +308,14 @@ namespace system
             return -1;
         }
 
-        public Tools.Errors JoinPlayer(string idRoom, ulong idPlayer, Socket? playerSocket)
+        public Tools.Errors JoinPlayer(int idRoom, ulong idPlayer, Socket? playerSocket)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
                     if (playerStatus == Tools.PlayerStatus.Full) // La room est pleine
                     {
@@ -330,7 +330,7 @@ namespace system
             return Tools.Errors.None;
         }
 
-        public Tools.PlayerStatus RemovePlayer(string idRoom, ulong idPlayer)
+        public Tools.PlayerStatus RemovePlayer(int idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
@@ -342,14 +342,14 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
         
-        public Tools.PlayerStatus KickPlayer(string idRoom, ulong idModo, ulong idPlayer)
+        public Tools.PlayerStatus KickPlayer(int idRoom, ulong idModo, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     if (idModo != thread_serv_ite.Get_Moderateur())
                         return Tools.PlayerStatus.Permissions;
                     return thread_serv_ite.RemoveJoueur(idPlayer);
@@ -359,14 +359,14 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
         
-        public Tools.PlayerStatus ReadyPlayer(string idRoom, ulong idPlayer)
+        public Tools.PlayerStatus ReadyPlayer(int idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     Tools.PlayerStatus playerStatusReturn = thread_serv_ite.SetPlayerStatus(idPlayer);
                     if(playerStatusReturn == Tools.PlayerStatus.Success)
                     {
@@ -385,14 +385,14 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
         
-        public Tools.PlayerStatus CheatPlayer(string idRoom, ulong idPlayer)
+        public Tools.PlayerStatus CheatPlayer(int idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     return thread_serv_ite.SetPlayerTriche(idPlayer);
                 }
             }
@@ -400,7 +400,7 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
 
-        public string[] CallPlayerList(string idRoom)
+        public string[] CallPlayerList(int idRoom)
         {
             List<string> listPlayerAndName = new List<string>();
 
@@ -411,7 +411,7 @@ namespace system
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
                         string playerName = db.GetPseudo((int)joueur.Key);
@@ -426,7 +426,7 @@ namespace system
             return listPlayerAndName.ToArray();
         }
 
-        public ulong CallPlayerCurrent(string idRoom)
+        public ulong CallPlayerCurrent(int idRoom)
         {
             ulong idActualPlayer = 0;
 
@@ -435,7 +435,7 @@ namespace system
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     idActualPlayer = thread_serv_ite.Get_ActualPlayerId();
                     return idActualPlayer;
                 }
@@ -469,7 +469,7 @@ namespace system
         /// <param name="idRoom"></param>
         /// <param name="playerSocket"></param>
         /// <returns></returns>
-        public Tools.Errors StartGame(string idRoom)
+        public Tools.Errors StartGame(int idRoom)
         {
             Tools.Errors errors = Tools.Errors.NotFound;
 
@@ -478,7 +478,7 @@ namespace system
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     if (thread_serv_ite.NbJoueurs < 2)
                         return Tools.Errors.NbPlayers;
                     if (thread_serv_ite.EveryoneIsReady())
@@ -519,7 +519,7 @@ namespace system
         /// <param name="posY"></param>
         /// <param name="rotat"></param>
         /// <returns> Errors.Permission if it is not the actual player, IllegalPlay if incorrect place or None if all goes well </returns>
-        public Tools.Errors CallVerifyTilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
+        public Tools.Errors CallVerifyTilePlacement(ulong idPlayer, Socket? playerSocket, int idRoom, string idTuile, string posX, string posY, string rotat)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -528,7 +528,7 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
                     errors = thread_com_iterateur.VerifyTilePlacement(idPlayer, playerSocket, idRoom, idTuile, posX, posY, rotat);
                     break;
@@ -538,7 +538,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CallVerifyPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string idMeeple, string slotPos)
+        public Tools.Errors CallVerifyPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom, string idTuile, string idMeeple, string slotPos)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -547,7 +547,7 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
                     errors = thread_com_iterateur.VerifyPionPlacement(idPlayer, playerSocket, idRoom, idTuile, idMeeple, slotPos);
                     break;
@@ -557,7 +557,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CallCancelTuilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        public Tools.Errors CallCancelTuilePlacement(ulong idPlayer, Socket? playerSocket, int idRoom)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -566,7 +566,7 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
                     errors = thread_com_iterateur.CancelTuilePlacement(idPlayer, playerSocket, idRoom);
                     break;
@@ -576,7 +576,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CallCancelPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        public Tools.Errors CallCancelPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -585,7 +585,7 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
                     errors = thread_com_iterateur.CancelPionPlacement(idPlayer, playerSocket, idRoom);
                     break;
@@ -595,7 +595,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CallEndTurn(ulong idPlayer, string idRoom)
+        public Tools.Errors CallEndTurn(ulong idPlayer, int idRoom)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -604,7 +604,7 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(Int32.Parse(idRoom)))
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
                     errors = thread_com_iterateur.Com_EndTurn(idPlayer, idRoom);
                     break;
@@ -614,28 +614,28 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public void EndGame(string idRoom, ulong idPlayer)
+        public void EndGame(int idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     thread_serv_ite.EndGame();
                     return; // return valeur correcte
                 }
             }
         }
         
-        public void PlayerTimer(string idRoom, ulong idPlayer)
+        public void PlayerTimer(int idRoom, ulong idPlayer)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
                     thread_serv_ite.TimerPlayer(idPlayer);
                     return; // return valeur correcte
                 }

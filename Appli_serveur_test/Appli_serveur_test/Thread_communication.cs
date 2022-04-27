@@ -92,7 +92,7 @@ namespace system
         /// <param name="idMessage"></param>
         /// <param name="idPlayer"> Player originating the broadcast </param>
         /// <param name="data"></param>
-        public void SendBroadcast(string roomId, Tools.IdMessage idMessage, ulong idPlayer, string[] data)
+        public void SendBroadcast(int roomId, Tools.IdMessage idMessage, ulong idPlayer, string[] data)
         {
             // Generate packet
             Packet packet = new Packet();
@@ -104,7 +104,7 @@ namespace system
 
             foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
             {
-                if (thread_serv_ite.Get_ID() == Int32.Parse(roomId))
+                if (thread_serv_ite.Get_ID() == roomId)
                 {
                     // Envoi à chaque joueur
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
@@ -128,17 +128,17 @@ namespace system
         // Surcharges de la méthode de communication
         // -----------------------------------------
 
-        public void SendBroadcast(string roomId, Tools.IdMessage idMessage)
+        public void SendBroadcast(int roomId, Tools.IdMessage idMessage)
         {
             SendBroadcast(roomId, idMessage, 0, Array.Empty<string>());
         }
 
-        public void SendBroadcast(string roomId, Tools.IdMessage idMessage, ulong idPlayer)
+        public void SendBroadcast(int roomId, Tools.IdMessage idMessage, ulong idPlayer)
         {
             SendBroadcast(roomId, idMessage, idPlayer, Array.Empty<string>());
         }
 
-        public void SendBroadcast(string roomId, Tools.IdMessage idMessage, string[] data)
+        public void SendBroadcast(int roomId, Tools.IdMessage idMessage, string[] data)
         {
             SendBroadcast(roomId, idMessage, 0, data);
         }
@@ -191,12 +191,12 @@ namespace system
 
         }
 
-        public void DeleteGame(string roomId)
+        public void DeleteGame(int roomId)
         {
             int indexOfRoom = 0;
             foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
             {
-                if (thread_serv_ite.Get_ID() == Int32.Parse(roomId))
+                if (thread_serv_ite.Get_ID() == roomId)
                 {
                     lock (_lock_nb_parties_gerees)
                     {
@@ -237,11 +237,11 @@ namespace system
 
 
         // La fonction du joueur dont c'est le tour
-        public void DrawAntiCheatPlayer(string idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
+        public void DrawAntiCheatPlayer(int idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
         {
             foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
             {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                if (threadJeu.Get_ID() == idRoom)
                 {
                     threadJeu.SetACBarrier();
 
@@ -272,11 +272,11 @@ namespace system
         }
 
         // La fonction pour les autres joueurs, qui ne servent que d'arbitre
-        public void DrawAntiCheatVerif(string idRoom, bool isValid, ulong idTuile, Position pos)
+        public void DrawAntiCheatVerif(int idRoom, bool isValid, ulong idTuile, Position pos)
         {
             foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
             {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                if (threadJeu.Get_ID() == idRoom)
                 {
                     if (isValid)
                     {
@@ -295,11 +295,11 @@ namespace system
             }
         }
 
-        public void ChooseIdTile(string idRoom, ulong idPlayer, ulong idTuile, Position exemplePos, Socket? playerSocket)
+        public void ChooseIdTile(int idRoom, ulong idPlayer, ulong idTuile, Position exemplePos, Socket? playerSocket)
         {
             foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
             {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                if (threadJeu.Get_ID() == idRoom)
                 {
                     // Vérifie que l'exemple de position est bon
                     bool isLegal = threadJeu.isTilePlacementLegal(idTuile, exemplePos.X, exemplePos.Y, exemplePos.ROT);
@@ -323,7 +323,7 @@ namespace system
             }
         }
 
-        public Tools.Errors VerifyTilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string posX, string posY, string rotat)
+        public Tools.Errors VerifyTilePlacement(ulong idPlayer, Socket? playerSocket, int idRoom, string idTuile, string posX, string posY, string rotat)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -332,7 +332,7 @@ namespace system
 
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
-                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idRoom != thread_serv_ite.Get_ID()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Vérification qu'une tuile n'a pas déjà été placée auparavant 
@@ -377,7 +377,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors VerifyPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom, string idTuile, string idMeeple, string slotPos)
+        public Tools.Errors VerifyPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom, string idTuile, string idMeeple, string slotPos)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -386,7 +386,7 @@ namespace system
 
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
-                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idRoom != thread_serv_ite.Get_ID()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Vérification qu'une tuile a bien été placée auparavant ET qu'aucun pion n'est pas déjà placé
@@ -426,7 +426,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CancelTuilePlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        public Tools.Errors CancelTuilePlacement(ulong idPlayer, Socket? playerSocket, int idRoom)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -435,7 +435,7 @@ namespace system
 
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
-                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idRoom != thread_serv_ite.Get_ID()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Vérification qu'une tuile a bien été placée auparavant ET qu'un pion n'y est pas déjà placé
@@ -461,7 +461,7 @@ namespace system
             return errors; 
         }
 
-        public Tools.Errors CancelPionPlacement(ulong idPlayer, Socket? playerSocket, string idRoom)
+        public Tools.Errors CancelPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -470,7 +470,7 @@ namespace system
 
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
-                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idRoom != thread_serv_ite.Get_ID()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Vérification qu'un pion a bien été placée auparavant
@@ -495,14 +495,14 @@ namespace system
             return errors;
         }
 
-        public Tools.Errors Com_EndTurn(ulong idPlayer, string idRoom)
+        public Tools.Errors Com_EndTurn(ulong idPlayer, int idRoom)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
 
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
-                if (idRoom != thread_serv_ite.Get_ID().ToString()) continue;
+                if (idRoom != thread_serv_ite.Get_ID()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Vérifie qu'il a au moins placé une tuile validée
@@ -540,7 +540,7 @@ namespace system
             return errors;
         }
 
-        public void PlayerCheated(ulong idPlayer, Socket? playerSocket, string idRoom)
+        public void PlayerCheated(ulong idPlayer, Socket? playerSocket, int idRoom)
         {
             Packet packet = new Packet();
 
@@ -548,7 +548,7 @@ namespace system
             // Recherche de la partie
             foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
             {
-                if(threadJeu.Get_ID() == Int32.Parse(idRoom))
+                if(threadJeu.Get_ID() == idRoom)
                 {
                     // Indique au serveur la triche
                     Tools.PlayerStatus playerStatus = threadJeu.SetPlayerStatus(idPlayer);
@@ -574,12 +574,12 @@ namespace system
 
         }
 
-        public Tools.PlayerStatus PlayerLeave(ulong idPlayer, string idRoom)
+        public Tools.PlayerStatus PlayerLeave(ulong idPlayer, int idRoom)
         {
             // Recherche de la partie
             foreach (Thread_serveur_jeu threadJeu in _lst_serveur_jeu)
             {
-                if (threadJeu.Get_ID() == Int32.Parse(idRoom))
+                if (threadJeu.Get_ID() == idRoom)
                 {
                     // Retrait du joueur de la partie
                     Tools.PlayerStatus playerStatus = threadJeu.RemoveJoueur(idPlayer);
@@ -589,7 +589,7 @@ namespace system
                     if(threadJeu.Get_ActualPlayerId() == idPlayer)
                     {
                         // On abandonne les informations du tour actuel
-                        Socket? nextPlayerSock = threadJeu.CancelTurn(idRoom);
+                        Socket? nextPlayerSock = threadJeu.CancelTurn();
                         // On lui envoit les 3 tuiles
                         SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
                     }
@@ -630,12 +630,12 @@ namespace system
                             Console.WriteLine("ERROR: Parsing the array representing the 3 tiles sended : " + ex);
                         }
                         
-                        DrawAntiCheatPlayer(packet.Data[0], packet.IdPlayer, socket, tuilesEnvoyees);
+                        DrawAntiCheatPlayer(packet.IdRoom, packet.IdPlayer, socket, tuilesEnvoyees);
                         break;
 
                     // Réponse d'un autre joueur (anti cheat) -> pas posable
                     case Tools.IdMessage.TuileVerification:
-                        DrawAntiCheatVerif(packet.Data[0], false, (ulong)0, new Position(-1,-1,-1));
+                        DrawAntiCheatVerif(packet.IdRoom, false, (ulong)0, new Position(-1,-1,-1));
                         break;
 
                     case Tools.IdMessage.StartGame:
@@ -650,14 +650,14 @@ namespace system
                     // Joueur choisi une des tuiles posables
                     case Tools.IdMessage.TuileDraw:
                         Position exemplePosValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
-                        ChooseIdTile(packet.Data[0], packet.IdPlayer, UInt64.Parse(packet.Data[1]), exemplePosValid, socket);
+                        ChooseIdTile(packet.IdRoom, packet.IdPlayer, UInt64.Parse(packet.Data[1]), exemplePosValid, socket);
                         break;
 
 
                     // Réponse d'un autre joueur (anti cheat) -> posable
                     case Tools.IdMessage.TuileVerification:
                         Position posValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
-                        DrawAntiCheatVerif(packet.Data[0], true, UInt64.Parse(packet.Data[1]), posValid);
+                        DrawAntiCheatVerif(packet.IdRoom, true, UInt64.Parse(packet.Data[1]), posValid);
                         break;
 
                 }
