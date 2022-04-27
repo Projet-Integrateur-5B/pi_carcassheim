@@ -71,7 +71,15 @@ namespace Assets.system
 
                 int pos = positionsInternesProchainesTuiles[c++];
                 int nextSlot = (int)item.IdSlotFromPositionInterne(pos);
-                int idJ = (int)item.Slots[nextSlot].IdJoueur;
+                ulong idJ = item.Slots[nextSlot].IdJoueur;
+
+                if (idJ != ulong.MaxValue)
+                {
+                    if (pionParJoueur.ContainsKey(idJ))
+                        pionParJoueur[idJ]++;
+                    else
+                        pionParJoueur.Add(idJ, 1);
+                }
 
                 result += PointTerrain(item.Slots[nextSlot].Terrain);
                 PointsZone(item, nextSlot, parcourue, ref result, pionParJoueur);
@@ -80,7 +88,7 @@ namespace Assets.system
 
         private static int PointTerrain(TypeTerrain terrain)
         {
-            if (terrain == TypeTerrain.Ville)
+            if (terrain == TypeTerrain.VilleBlason)
                 return 2;
             return 1;
         }
