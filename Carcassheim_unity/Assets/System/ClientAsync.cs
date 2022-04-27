@@ -302,7 +302,7 @@ public class ClientAsync
                 packet2.Error = state.Packet.Error;
                 int taille = state.Packet.Data.Length;
                 packet2.Data = new string[taille];
-                Array.Copy(packet2.Data, state.Packet.Data, taille);
+                Array.Copy(state.Packet.Data, packet2.Data, taille);
                 OnPacketReceived?.Invoke(typeof(ClientAsync), packet2);
 
                 //Receive(client);

@@ -270,8 +270,8 @@ namespace Assets.system
             // ======================
             // ==== DANS LA GAME ====
             // ======================
-            lePlateau = new Plateau();
             dico_tuile = LireXML2.Read("config_back.xml");
+            lePlateau = new Plateau(dico_tuile);
             tiles_drawed = new List<TileInitParam>();
 
             Communication.Instance.StartListening(OnPacketReceived);

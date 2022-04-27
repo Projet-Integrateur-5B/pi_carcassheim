@@ -19,6 +19,7 @@ public class PublicRoomMenu : Miscellaneous
 	{
 		listAction = new List<string>();
 		s_listAction = new Semaphore(1, 1);
+		RoomInfo.Instance.idPartie = (ulong)Communication.Instance.idRoom;
 
 		OnMenuChange += OnStart;
 	}
@@ -113,6 +114,8 @@ public class PublicRoomMenu : Miscellaneous
         {
 			if (packet.Error == Tools.Errors.None)
 			{
+				string[] res = new string[packet.Data.Length];
+				Array.Copy(packet.Data,res, packet.Data.Length);
 				RoomInfo.Instance.SetValues(packet.Data);
 			}
 		}
