@@ -12,92 +12,85 @@ public partial class Server
     /// </summary>
     /// <param name="ar">Async <see cref="StateObject" />.</param>
     /// <returns>Instance of <see cref="Packet" /> containing the response from the <see cref="Server" />.</returns>
-    public static Packet GetFromDatabase(IAsyncResult ar)
+    public static Packet GetFromDatabase(Packet packetReceived)
     {
         // Initialize the packet to default.
-        var packet = new Packet();
-
-        var state = (StateObject?)ar.AsyncState;
-        if (state?.Packet is null) // Checking for errors.
+        var packet = new Packet
         {
-            // Setting the error value.
-            // TODO : state is null
-            return packet;
-        }
 
-        // TODO : get what the client asked from the database or whatever
-        packet.Type = state.Packet.Type;
-        packet.IdMessage = state.Packet.IdMessage;
-        packet.Error = state.Packet.Error;
-        packet.Final = state.Packet.Final;
-        packet.IdPlayer = state.Packet.IdPlayer;
+            // TODO : get what the client asked from the database or whatever
+            IdMessage = packetReceived.IdMessage,
+            Error = packetReceived.Error,
+            IdPlayer = packetReceived.IdPlayer,
+            IdRoom = packetReceived.IdRoom
+        };
 
         // Check IdMessage : different action
 
-        switch (state.Packet.IdMessage)
+        switch (packetReceived.IdMessage)
         {
             case Tools.IdMessage.Login:
-                packet.Error = Login(state.Packet);
+                packet.Error = Login(packetReceived);
                 break;
             case Tools.IdMessage.Signup:
-                packet.Error = Signup(state.Packet);
+                packet.Error = Signup(packetReceived);
                 break;
             case Tools.IdMessage.Statistics:
-                Statistics(state.Packet, ref packet);
+                Statistics(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.RoomJoin:
-                RoomJoin(state.Packet, ref packet);
+                RoomJoin(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.RoomList:
-                RoomList(state.Packet, ref packet);
+                RoomList(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.RoomLeave:
-                packet.Error = RoomLeave(state.Packet);
+                packet.Error = RoomLeave(packetReceived);
                 break;
             case Tools.IdMessage.RoomReady:
-                packet.Error = RoomReady(state.Packet);
+                packet.Error = RoomReady(packetReceived);
                 break;
             case Tools.IdMessage.RoomSettingsGet:
-                packet.Data = RoomSettingsGet(state.Packet);
+                packet.Data = RoomSettingsGet(packetReceived);
                 break;
             case Tools.IdMessage.RoomSettingsSet:
-                packet.Data = RoomSettingsSet(state.Packet);
+                packet.Data = RoomSettingsSet(packetReceived);
                 break;
             case Tools.IdMessage.RoomStart:
-                RoomStart(state.Packet, ref packet);
+                RoomStart(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.TuileDraw:
-                TuileDraw(state.Packet, ref packet);
+                TuileDraw(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.TuilePlacement:
-                packet.Error = TuilePlacement(state.Packet);
+                packet.Error = TuilePlacement(packetReceived);
                 break;
             case Tools.IdMessage.PionPlacement:
-                packet.Error = PionPlacement(state.Packet);
+                packet.Error = PionPlacement(packetReceived);
                 break;
             case Tools.IdMessage.TourValidation:
-                TourValidation(state.Packet, ref packet);
+                TourValidation(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.TimerExpiration:
                 TimerExpiration(ref packet);
                 break;
             case Tools.IdMessage.LeaveGame:
-                LeaveGame(state.Packet, ref packet);
+                LeaveGame(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.EndGame:
-                EndGame(state.Packet, ref packet);
+                EndGame(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.Logout: // impossible
-                packet.Error = Logout(state.Packet);
+                packet.Error = Logout(packetReceived);
                 break;
             case Tools.IdMessage.RoomCreate:
-                RoomCreate(state.Packet, ref packet);
+                RoomCreate(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.CancelTuilePlacement:
-                CancelTuilePlacement(state.Packet, ref packet);
+                CancelTuilePlacement(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.CancelPionPlacement:
-                CancelPionPlacement(state.Packet, ref packet);
+                CancelPionPlacement(packetReceived, ref packet);
                 break;
             case Tools.IdMessage.WarningCheat:
                 WarningCheat(ref packet);

@@ -168,33 +168,18 @@ public static partial class Client
         {
             byte[]? bytes = null;
             var error_value = Tools.Errors.None;
-            // création de la liste de packet
-            var packets = new List<Packet>();
-            // création du packet
-            var original = new Packet(false, idMessage, true, 999, data);
+            var original = new Packet(idMessage, Tools.Errors.None, 999, 0, data);
 
-            // split du packet si trop grand
-            packets = original.Split(ref error_value);
+            // Send the data through the socket.
+            bytes = original.PacketToByteArray(ref error_value);
             if (error_value != Tools.Errors.None)
             {
-                // TODO : Split => handle error
+                // TODO : PacketToByteArray => handle error
                 return Tools.Errors.Data;
             }
 
-            // envoye des packets
-            foreach (var packet in packets)
-            {
-                // Send the data through the socket.
-                bytes = packet.PacketToByteArray(ref error_value);
-                if (error_value != Tools.Errors.None)
-                {
-                    // TODO : PacketToByteArray => handle error
-                    return Tools.Errors.Data;
-                }
-
-                var bytesSent = socket.Send(bytes);
-                Console.WriteLine("Sent {0} bytes =>\t" + packet, bytesSent);
-            }
+            var bytesSent = socket.Send(bytes);
+            Console.WriteLine("Sent {0} bytes =>\t" + original, bytesSent);
 
             // check if an answer is needed
             if (idMessage == Tools.IdMessage.Logout)
@@ -204,32 +189,20 @@ public static partial class Client
 
             // Receive the response from the remote device.
             bytes = new byte[Packet.MaxPacketSize];
-            var bytesRec = 0;
+            var bytesRec = socket.Receive(bytes);
             var packetAsBytes = new byte[bytesRec];
-            var part_answer = new Packet();
 
-            while (true)
+            Array.Copy(bytes, packetAsBytes, bytesRec);
+            var temp = packetAsBytes.ByteArrayToPacket(ref error_value);
+            received = temp[0];
+            if (error_value != Tools.Errors.None)
             {
-                bytesRec = socket.Receive(bytes);
-                packetAsBytes = new byte[bytesRec];
-
-                Array.Copy(bytes, packetAsBytes, bytesRec);
-                part_answer = packetAsBytes.ByteArrayToPacket(ref error_value);
-                if (error_value != Tools.Errors.None)
-                {
-                    // TODO : ByteArrayToPacket => handle error
-                    return Tools.Errors.Data;
-                }
-
-                Console.WriteLine("Read {0} bytes => \t" + part_answer, bytesRec);
-
-                received.Data = received.Data.Concat(part_answer.Data).ToArray();
-                if (part_answer.Final)
-                {
-                    Console.WriteLine("Received = " + received + "\n\tError = " + part_answer.Error);
-                    return Tools.Errors.None;
-                }
+                // TODO : ByteArrayToPacket => handle error
+                return Tools.Errors.Data;
             }
+
+            Console.WriteLine("Read {0} bytes => \t" + received, bytesRec);
+            return Tools.Errors.None;
         }
         catch (ArgumentNullException ane)
         {
