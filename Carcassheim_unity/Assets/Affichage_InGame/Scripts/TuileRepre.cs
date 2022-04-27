@@ -6,171 +6,190 @@ using UnityEngine.UI;
 public class TuileRepre : MonoBehaviour
 {
 
-    // * LOOK *************************************************
-    public Transform pivotPoint;
-    public GameObject model;
+        // * LOOK *************************************************
+        public Transform pivotPoint;
+        public GameObject model;
 
-    [SerializeField] private Collider body_collider;
+        [SerializeField] private Collider body_collider;
 
-    [SerializeField] private TMPro.TMP_Text _id_repre;
-    [SerializeField] private List<SlotIndic> slots;
-    [SerializeField] private Transform rep_O, rep_u, rep_v;
+        [SerializeField] private TMPro.TMP_Text _id_repre;
+        [SerializeField] private List<SlotIndic> slots;
+        [SerializeField] private Transform rep_O, rep_u, rep_v;
 
-    Dictionary<int, SlotIndic> slots_mapping;
+        public Dictionary<int, SlotIndic> slots_mapping;
 
-    // * STAT *************************************************
-    private int _id = 0;
+        // * STAT *************************************************
+        private int _id = 0;
 
-    public int Id
-    {
-        set { _id = value; _id_repre.text = value.ToString(); if (value < 0) _id_repre.gameObject.SetActive(false); }
-        get { return _id; }
-    }
-
-    // * POSITION *********************************************
-    private PositionRepre _pos;
-    public PositionRepre Pos
-    {
-        set
+        public int Id
         {
-            // Debug.Log("Setting position " + (_pos == null ? "nothing" : _pos.ToString()) + " to " + (value == null ? "nothing" : value.ToString()));
-            _pos = value;
-            body_collider.enabled = _pos != null;
-            int rotation = _pos != null ? _pos.Rotation : 0;
-            transform.localRotation = Quaternion.Euler(0, 0, rotation * -90);
+                set { _id = value; _id_repre.text = value.ToString(); if (value < 0) _id_repre.gameObject.SetActive(false); }
+                get { return _id; }
         }
-        get => _pos;
-    }
-    public List<PositionRepre> possibilitiesPosition = new List<PositionRepre>();
 
-    void Awake()
-    {
-        slots_mapping = new Dictionary<int, SlotIndic>();
-        foreach (SlotIndic slot in slots)
+        // * POSITION *********************************************
+        private PositionRepre _pos;
+        public PositionRepre Pos
         {
-            slots_mapping.Add(slot.Id, slot);
+                set
+                {
+                        // Debug.Log("Setting position " + (_pos == null ? "nothing" : _pos.ToString()) + " to " + (value == null ? "nothing" : value.ToString()));
+                        _pos = value;
+                        body_collider.enabled = _pos != null;
+                        int rotation = _pos != null ? _pos.Rotation : 0;
+                        transform.localRotation = Quaternion.Euler(0, 0, rotation * -90);
+                }
+                get => _pos;
         }
-    }
 
-    public void showPossibilities(PlayerRepre player)
-    {
-        foreach (SlotIndic slot in slots)
+        private int _index = -1;
+        public int Index
         {
-            slot.show(player);
+                set { _index = value; }
+                get { return _index; }
         }
-    }
 
-    public void hidePossibilities()
-    {
-        foreach (SlotIndic slot in slots)
-        {
-            slot.hide();
-        }
-    }
+        public List<PositionRepre> possibilitiesPosition = new List<PositionRepre>();
 
-    public void highlightFace(PlayerRepre player, int id)
-    {
-        slots_mapping[id].highlightFace(player);
-    }
+        void Awake()
+        {
+                slots_mapping = new Dictionary<int, SlotIndic>();
+                foreach (SlotIndic slot in slots)
+                {
+                        slots_mapping.Add(slot.Id, slot);
+                }
+        }
 
-    public void unlightFace(int id)
-    {
-        slots_mapping[id].unlightFace();
-    }
+        public void showPossibilities(PlayerRepre player)
+        {
+                foreach (SlotIndic slot in slots)
+                {
+                        slot.show(player);
+                }
+        }
 
-    public PositionRepre isPossible(PositionRepre pos)
-    {
-        if (pos == null)
-            return null;
-        foreach (PositionRepre true_pos in possibilitiesPosition)
+        public void hidePossibilities()
         {
-            if (true_pos.X == pos.X && true_pos.Y == pos.Y && (pos.Rotation == -1 || true_pos.Rotation == pos.Rotation))
-                return true_pos;
+                foreach (SlotIndic slot in slots)
+                {
+                        slot.hide();
+                }
         }
-        return null;
-    }
 
-    public bool nextRotation()
-    {
-        if (Pos == null)
-            return false;
-        int x = Pos.X;
-        int y = Pos.Y;
-        int rotation = Pos.Rotation;
-        bool found = false;
-        for (int i = 0; i < 3; i++)
+        public void highlightFace(PlayerRepre player, int id)
         {
-            rotation = (rotation + 1) % 4;
-            if (isPossible(new PositionRepre(x, y, rotation)) != null)
-            {
-                found = true;
-                break;
-            }
+                slots_mapping[id].highlightFace(player);
         }
-        if (found)
-        {
-            Pos = new PositionRepre(x, y, rotation);
-        }
-        return found;
-    }
 
-    public bool nextRotation(out PositionRepre npos)
-    {
-        npos = null;
-        if (Pos == null)
-            return false;
-        int x = Pos.X;
-        int y = Pos.Y;
-        int rotation = Pos.Rotation;
-        bool found = false;
-        for (int i = 0; i < 3; i++)
+        public void unlightFace(int id)
         {
-            rotation = (rotation + 1) % 4;
-            if (isPossible(new PositionRepre(x, y, rotation)) != null)
-            {
-                found = true;
-                break;
-            }
+                slots_mapping[id].unlightFace();
         }
-        if (found)
-        {
-            npos = new PositionRepre(x, y, rotation);
-        }
-        return found;
-    }
 
-    public void addSlot(SlotIndic slot)
-    {
-        slot.transform.parent = pivotPoint;
-        slot.front.transform.parent = pivotPoint;
-        Vector3 whynot = new Vector3(0, 0.0772999972f, -0.00100000005f);
-        slot.front.transform.localPosition = whynot;
-        slot.transform.localPosition = rep_O.localPosition + (rep_u.localPosition - rep_O.localPosition) * slot.Xf + (rep_v.localPosition - rep_O.localPosition) * slot.Yf;
-        slots.Add(slot);
-    }
+        public PositionRepre isPossible(PositionRepre pos)
+        {
+                if (pos == null)
+                        return null;
+                foreach (PositionRepre true_pos in possibilitiesPosition)
+                {
+                        if (true_pos.X == pos.X && true_pos.Y == pos.Y && (pos.Rotation == -1 || true_pos.Rotation == pos.Rotation))
+                                return true_pos;
+                }
+                return null;
+        }
 
-    public bool setMeeplePos(MeepleRepre meeple, int id_slot)
-    {
-        if (id_slot == -1)
+        public void setIndexFromPos()
         {
-            meeple.ParentTile = null;
-            meeple.SlotPos = -1;
-            return true;
+                if (Pos == null)
+                        _index = -1;
+                for (int idx = 0; idx < possibilitiesPosition.Count; idx++)
+                {
+                        if (possibilitiesPosition[idx] == Pos)
+                                _index = idx;
+                }
         }
-        SlotIndic slot_indic;
-        if (slots_mapping.TryGetValue(id_slot, out slot_indic))
+
+        public bool nextRotation()
         {
-            return setMeeplePos(meeple, slot_indic);
+                if (Pos == null)
+                        return false;
+                int x = Pos.X;
+                int y = Pos.Y;
+                int rotation = Pos.Rotation;
+                bool found = false;
+                for (int i = 0; i < 3; i++)
+                {
+                        rotation = (rotation + 1) % 4;
+                        if (isPossible(new PositionRepre(x, y, rotation)) != null)
+                        {
+                                found = true;
+                                break;
+                        }
+                }
+                if (found)
+                {
+                        Pos = new PositionRepre(x, y, rotation);
+                }
+                return found;
         }
-        else
-            return false;
-    }
-    public bool setMeeplePos(MeepleRepre meeple, SlotIndic slot_indic)
-    {
-        meeple.ParentTile = this;
-        meeple.SlotPos = slot_indic.Id;
-        meeple.transform.parent = slot_indic.transform;
-        meeple.transform.localPosition = new Vector3(0, 0, 0);
-        return true;
-    }
+
+        public bool nextRotation(out PositionRepre npos)
+        {
+                npos = null;
+                if (Pos == null)
+                        return false;
+                int x = Pos.X;
+                int y = Pos.Y;
+                int rotation = Pos.Rotation;
+                bool found = false;
+                for (int i = 0; i < 3; i++)
+                {
+                        rotation = (rotation + 1) % 4;
+                        if (isPossible(new PositionRepre(x, y, rotation)) != null)
+                        {
+                                found = true;
+                                break;
+                        }
+                }
+                if (found)
+                {
+                        npos = new PositionRepre(x, y, rotation);
+                }
+                return found;
+        }
+
+        public void addSlot(SlotIndic slot)
+        {
+                slot.transform.parent = pivotPoint;
+                slot.front.transform.parent = pivotPoint;
+                Vector3 whynot = new Vector3(0, 0.0772999972f, -0.00100000005f);
+                slot.front.transform.localPosition = whynot;
+                slot.transform.localPosition = rep_O.localPosition + (rep_u.localPosition - rep_O.localPosition) * slot.Xf + (rep_v.localPosition - rep_O.localPosition) * slot.Yf;
+                slots.Add(slot);
+        }
+
+        public bool setMeeplePos(MeepleRepre meeple, int id_slot)
+        {
+                if (id_slot == -1)
+                {
+                        meeple.ParentTile = null;
+                        meeple.SlotPos = -1;
+                        return true;
+                }
+                SlotIndic slot_indic;
+                if (slots_mapping.TryGetValue(id_slot, out slot_indic))
+                {
+                        return setMeeplePos(meeple, slot_indic);
+                }
+                else
+                        return false;
+        }
+        public bool setMeeplePos(MeepleRepre meeple, SlotIndic slot_indic)
+        {
+                meeple.ParentTile = this;
+                meeple.SlotPos = slot_indic.Id;
+                meeple.transform.parent = slot_indic.transform;
+                meeple.transform.localPosition = new Vector3(0, 0, 0);
+                return true;
+        }
 }

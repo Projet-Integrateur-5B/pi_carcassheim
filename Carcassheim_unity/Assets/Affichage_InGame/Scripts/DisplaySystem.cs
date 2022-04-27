@@ -72,15 +72,26 @@ public class DisplaySystem : MonoBehaviour
 
         // * BUTTONS **********************************************
 
-        private Button btn, btn2, btn3, btn4;
+        private Button cancelButt, AcceptButt, LeftArrowButt, RightArrowButt;
 
         // Start is called before the first frame update
 
         void Awake()
         {
-                Transform t = GameObject.Find("Boutons").transform;
-                btn = t.Find("Cancel").GetComponent<Button>();
-                btn.onClick.AddListener(cancel);
+                Transform t_buttons = GameObject.Find("Boutons").transform;
+
+                cancelButt = t_buttons.Find("Cancel").GetComponent<Button>();
+                cancelButt.onClick.AddListener(cancel);
+
+
+                AcceptButt = t_buttons.Find("Validate").GetComponent<Button>();
+                AcceptButt.onClick.AddListener(accept);
+
+                LeftArrowButt = t_buttons.Find("LeftArrow").GetComponent<Button>();
+                LeftArrowButt.onClick.AddListener(left_possibility);
+
+                RightArrowButt = t_buttons.Find("RightArrow").GetComponent<Button>();
+                RightArrowButt.onClick.AddListener(right_possibility);
 
                 TableLayer = LayerMask.NameToLayer("Table");
                 BoardLayer = LayerMask.NameToLayer("Board");
@@ -103,11 +114,6 @@ public class DisplaySystem : MonoBehaviour
                 }
                 //! TEST
                 //gameBegin();
-        }
-
-        public void cancel()
-        {
-                Debug.Log(" coucou !");
         }
 
         public void execAction(DisplaySystemAction action)
@@ -172,6 +178,206 @@ public class DisplaySystem : MonoBehaviour
                 }
         }
 
+
+        // TODO : Attention à la touche entrer : elle permet aussi de faire l'action du dernier bouton qui a été appelé
+        public void meeple_cancel()
+        {
+                if (act_meeple.SlotPos != -1 && act_tile.setMeeplePos(act_meeple, -1))
+                        table.meeplePositionChanged(act_meeple);
+                else
+                {
+                        setNextState(DisplaySystemState.tilePosing);
+                        system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.tilePosing));
+                }
+        }
+
+        public void tile_cancel()
+        {
+                if (act_tile != null && act_tile.Pos != null)
+                {
+                        if (board.setTileAt(null, act_tile))
+                        {
+                                act_tile.setIndexFromPos();
+                                table.tilePositionChanged(act_tile);
+                        }
+                        act_tile.Index = -1;
+                        system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
+                }
+        }
+
+        public void meeple_accept()
+        {
+                if (act_meeple.SlotPos != -1)
+                {
+                        setNextState(DisplaySystemState.idleState);
+                        system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.idleState));
+                }
+        }
+
+        public void tile_accept()
+        {
+                if (act_tile != null && act_tile.Pos != null)
+                {
+                        if (meeples_hand.Count > 0)
+                        {
+                                setNextState(DisplaySystemState.meeplePosing);
+                                system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.meeplePosing));
+                        }
+                        else
+                        {
+                                setNextState(DisplaySystemState.idleState);
+                                system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.idleState));
+                        }
+                }
+        }
+
+        public void meeple_poss(bool right)
+        {
+                bool verif_meeple = false;
+                if (right)
+                {
+
+                        if (act_meeple.SlotPos <= 0)
+                                verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.slots_mapping.Count - 1); // On va à droite donc on prend la dernière position possible
+                        else if (act_meeple.SlotPos >= act_tile.slots_mapping.Count)
+                                verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.slots_mapping.Count - 1);
+                        else
+                                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos - 1);
+                }
+                else
+                {
+                        if (act_meeple.SlotPos <= 0)
+                                verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.slots_mapping.Count - 1); // On va à droite donc on prend la dernière position possible
+                        else if (act_meeple.SlotPos >= act_tile.slots_mapping.Count)
+                                verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.slots_mapping.Count - 1);
+                        else
+                                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos - 1);
+                }
+
+                bool meeple_position_is_null = act_meeple.ParentTile == null;
+                if (verif_meeple)
+                {
+                        if (meeple_position_is_null != (act_meeple.ParentTile == null))
+                                table.meeplePositionChanged(act_meeple);
+                }
+                system_back.sendAction(new DisplaySystemActionMeepleSetCoord(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
+        }
+
+        public void tile_poss(bool right)
+        {
+                int old_index = act_tile.Index;
+                PositionRepre old_pos = act_tile.Pos, new_pos;
+                bool have_same_pos = false;
+
+                //Si les index ont les mêmes x et y, on cherche celui à partir duquel la position change
+                do
+                {
+                        if (right)
+                        {
+                                act_tile.Index++;
+                                if (act_tile.Index <= -1)
+                                        act_tile.Index = 0; // On va à droite donc on prend la première position possible
+
+                                else if (act_tile.Index >= act_tile.possibilitiesPosition.Count)
+                                        act_tile.Index = 0;
+                        }
+                        else
+                        {
+                                act_tile.Index--;
+                                if (act_tile.Index <= -1)
+                                        act_tile.Index = act_tile.possibilitiesPosition.Count - 1; // On va à gauche donc on prend la dernière position possible
+
+                                else if (act_tile.Index >= act_tile.possibilitiesPosition.Count)
+                                        act_tile.Index = act_tile.possibilitiesPosition.Count - 1;
+                        }
+
+                        new_pos = act_tile.possibilitiesPosition[act_tile.Index];
+                        have_same_pos = areSamePos(old_pos, new_pos);
+
+                } while (have_same_pos && act_tile.Index != old_index);
+
+                if (board.setTileAt(new_pos, act_tile))
+                {
+                        table.tilePositionChanged(act_tile);
+                }
+                system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
+        }
+
+        public void cancel()
+        {
+                if (act_player == my_player || DEBUG)
+                {
+                        switch (act_system_state)
+                        {
+                                case DisplaySystemState.meeplePosing:
+                                        meeple_cancel();
+                                        break;
+                                case DisplaySystemState.tilePosing:
+                                        tile_cancel();
+                                        break;
+                        }
+                }
+        }
+
+        public void accept()
+        {
+                if (act_player == my_player || DEBUG)
+                {
+                        switch (act_system_state)
+                        {
+                                case DisplaySystemState.meeplePosing:
+                                        meeple_accept();
+                                        break;
+                                case DisplaySystemState.tilePosing:
+                                        tile_accept();
+                                        break;
+                        }
+                }
+        }
+
+        public void left_possibility()
+        {
+                if (act_player == my_player || DEBUG)
+                {
+                        switch (act_system_state)
+                        {
+                                case DisplaySystemState.meeplePosing:
+                                        meeple_poss(false); //false car on va à gauche et pas à droite
+                                        break;
+                                case DisplaySystemState.tilePosing:
+                                        tile_poss(false);
+                                        break;
+                        }
+                }
+        }
+
+        public void right_possibility()
+        {
+                if (act_player == my_player || DEBUG)
+                {
+                        switch (act_system_state)
+                        {
+                                case DisplaySystemState.meeplePosing:
+                                        meeple_poss(true);
+                                        break;
+                                case DisplaySystemState.tilePosing:
+                                        tile_poss(true);
+                                        break;
+                        }
+                }
+        }
+
+        public bool areSamePos(PositionRepre pos1, PositionRepre pos2)
+        {
+                if (pos1 == null && pos2 == null)
+                        return true;
+                else if ((pos1 == null && pos2 != null) || (pos1 != null && pos2 == null))
+                        return false;
+                else
+                        return (pos1.X == pos2.X && pos1.Y == pos2.Y) ? true : false;
+        }
+
+
         public void setNextState(DisplaySystemState next_state)
         {
                 state_transition.Enqueue(next_state);
@@ -221,7 +427,7 @@ public class DisplaySystem : MonoBehaviour
                                 TurnPlayParam play_param;
                                 system_back.getTile(out play_param);
                                 int index;
-                                // tuile posé
+                                // tuile posée
                                 if (play_param.id_tile != -1)
                                 {
                                         if (act_tile == null || act_tile.Id != play_param.id_tile)
@@ -362,29 +568,6 @@ public class DisplaySystem : MonoBehaviour
         // Update is called once per frame
         void Update()
         {
-
-                // ! Faire en sort que ativé qu'une seule fois
-                if (Input.GetKey(KeyCode.X))
-                {
-                        cancel();
-                }
-
-                if (Input.GetKey(KeyCode.Return))
-                {
-                        cancel();
-                }
-
-                if (Input.GetKey(KeyCode.C/* "LeftArrow" */))
-                {
-                        cancel();
-                }
-
-                if (Input.GetKey(KeyCode.V/* "RightArrow" */))
-                {
-                        cancel();
-                }
-
-
                 bool mouse_consumed = false;
                 if (!mouse_consumed && Input.GetMouseButtonUp(0))
                 {
@@ -394,24 +577,7 @@ public class DisplaySystem : MonoBehaviour
 
                         RaycastHit hit = new RaycastHit();
                         bool hit_valid = (DEBUG || act_player == my_player) && !mouse_consumed && Physics.Raycast(ray, out hit, Mathf.Infinity, (1 << BoardLayer));
-                        /*
-                                    float enter;
-                                    if (!hit_valid && !mouse_consumed && board_plane.Raycast(ray, out enter))
-                                    {
-                                        if (act_system_state == DisplaySystemState.tilePosing && hit.transform.tag == "TileIndicCollider" && act_tile != null)
-                                        {
-                                            Vector3 p = ray.GetPoint(enter);
-                                            if (act_system_state == DisplaySystemState.tilePosing && act_tile != null)
-                                            {
-                                                board.setTileAt(act_tile.possibilitiesPosition[Random.Range(0, act_tile.possibilitiesPosition.Count)], act_tile);
-                                                act_tile.transform.position = p;
-                                                table.tilePositionChanged(act_tile);
-                                            }
-                                        }
-                                        else
-                                            Debug.Log("PROBLEM " + hit.transform.tag);
-                                    }
-                        */
+
                         if (hit_valid)
                         {
                                 SlotIndic slot;
@@ -423,7 +589,9 @@ public class DisplaySystem : MonoBehaviour
                                                         TileIndicator tile_indic = hit.transform.parent.GetComponent<TileIndicator>();
                                                         if (board.setTileAt(tile_indic.position, act_tile))
                                                         {
+                                                                act_tile.setIndexFromPos();
                                                                 table.tilePositionChanged(act_tile);
+
                                                         }
                                                         else
                                                                 Debug.Log("Tuile non placée à " + tile_indic.position.ToString());
@@ -457,7 +625,8 @@ public class DisplaySystem : MonoBehaviour
                                                                 Debug.Log("Tried to rotate " + hit.transform.parent.name + " instead of act tile");
                                                         else if (act_tile.nextRotation(out rotation))
                                                         {
-                                                                board.setTileAt(rotation, act_tile);
+                                                                if (board.setTileAt(rotation, act_tile))
+                                                                        act_tile.setIndexFromPos();
                                                                 system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
                                                         }
                                                 }
@@ -475,33 +644,26 @@ public class DisplaySystem : MonoBehaviour
                                 if (act_player == my_player || DEBUG)
                                 {
                                         if (Input.GetKeyDown(KeyCode.Return))
-                                        {
-                                                setNextState(DisplaySystemState.idleState);
-                                                system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.idleState));
-                                        }
+                                                meeple_accept();
                                         else if (Input.GetKeyDown(KeyCode.Backspace))
-                                        {
-                                                setNextState(DisplaySystemState.tilePosing);
-                                                system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.tilePosing));
-                                        }
+                                                meeple_cancel();
+                                        else if (Input.GetKeyDown(KeyCode.L))
+                                                meeple_poss(false);
+                                        else if (Input.GetKeyDown(KeyCode.R))
+                                                meeple_poss(true);
                                 }
                                 break;
                         case DisplaySystemState.tilePosing:
-                                if ((act_player == my_player || DEBUG) &&
-                                    Input.GetKeyDown(KeyCode.Return) &&
-                                    act_tile != null &&
-                                    act_tile.Pos != null)
+                                if (act_player == my_player || DEBUG)
                                 {
-                                        if (meeples_hand.Count > 0)
-                                        {
-                                                setNextState(DisplaySystemState.meeplePosing);
-                                                system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.meeplePosing));
-                                        }
-                                        else
-                                        {
-                                                setNextState(DisplaySystemState.idleState);
-                                                system_back.sendAction(new DisplaySystemActionStateSelection(DisplaySystemState.idleState));
-                                        }
+                                        if (Input.GetKeyDown(KeyCode.Return))
+                                                tile_accept();
+                                        else if (Input.GetKeyDown(KeyCode.Backspace))
+                                                tile_cancel();
+                                        else if (Input.GetKeyDown(KeyCode.L))
+                                                tile_poss(false);
+                                        else if (Input.GetKeyDown(KeyCode.R))
+                                                tile_poss(true);
                                 }
                                 break;
                         case DisplaySystemState.turnStart:
