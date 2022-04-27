@@ -18,7 +18,7 @@ public class StateObject
     public byte[] buffer = new byte[BufferSize];
     // Received data string.
     public StringBuilder sb = new StringBuilder();
-    public Packet? Packet { get; set; }
+    public List<Packet>? Packets { get; set; }
     public string[] Data { get; set; } = Array.Empty<string>();
 }
 
@@ -41,22 +41,6 @@ public class ClientAsync
 
     public delegate void OnPacketReceivedHandler(object sender, Packet packet, Socket? socket);
     public static event OnPacketReceivedHandler OnPacketReceived;
-
-
-    public static void Connection(Socket client_socket,Parameters parameters)
-    {
-        //Version : Unity
-        IPAddress ipAddress = IPAddress.Parse(parameters.ServerIP);
-        var remoteEP = new IPEndPoint(ipAddress, parameters.ServerPort);
-
-        // Create a TCP/IP socket.
-        client_socket = new Socket(ipAddress.AddressFamily,
-            SocketType.Stream, ProtocolType.Tcp);
-
-        // Connect to the remote endpoint.
-        client_socket.BeginConnect(remoteEP,
-            new AsyncCallback(ConnectCallback), client_socket);
-    }
 
     private static void ConnectCallback(IAsyncResult ar)
     {
@@ -111,9 +95,7 @@ public class ClientAsync
 
             // Nothing to read here.
             if (bytesRead <= 0)
-            {
                 return;
-            }
 
             // Get the last received bytes.
             var packetAsBytes = new byte[bytesRead];
@@ -121,7 +103,7 @@ public class ClientAsync
             var error_value = Tools.Errors.None;
 
             // Deserialize the byte array
-            state.Packet = packetAsBytes.ByteArrayToPacket(ref error_value);
+            state.Packets = packetAsBytes.ByteArrayToPacket(ref error_value);
             if (error_value != Tools.Errors.None) // Checking for errors.
             {
                 // Setting the error value.
@@ -129,46 +111,19 @@ public class ClientAsync
                 return;
             }
 
-            var dataLength = state.Data.Length;
-            state.Data = state.Data.Concat(state.Packet.Data).ToArray();
-            if (dataLength > 0)
+            var tasks = new List<Task>();
+            foreach(var packet in state.Packets)
             {
-                if (state.Data[dataLength] == "")
-                {
-                    state.Data = state.Data.Where((source, index) => index != dataLength)
-                        .ToArray();
-                    state.Data[dataLength - 1] += state.Data[dataLength];
-                    state.Data = state.Data.Where((source, index) => index != dataLength)
-                        .ToArray();
-                }
+                var debug = "Reading from : " + client.RemoteEndPoint +
+                            "\n\t Read {0} bytes =>\t" + packet +
+                            "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
+                Console.WriteLine(debug);
+
+                tasks.Add(Task.Run(() => OnPacketReceived?.Invoke(typeof(ClientAsync), packet, client)));
             }
 
-            var debug = "Reading from : " + client.RemoteEndPoint +
-                        "\n\t Read {0} bytes =>\t" + state.Packet +
-                        "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
-
-            if (state.Packet.Final)
-            {
-                Console.WriteLine(debug + "\n\t => Every packet has been received !",
-                    bytesRead);
-
-                state.Packet.Data = state.Data;
-
-                OnPacketReceived?.Invoke(typeof(ClientAsync), state.Packet, client);
-                Receive(client);
-                // TODO: check if packet.IdMessage requires an answer for the client
-
-                // Start listening again.
-                // StartReading(ar, listener, true);
-
-            }
-            // More packets to receive in this series.
-            else
-            {
-                // Get the rest of the data.
-                client.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
-                    new AsyncCallback(ReceiveCallback), state);
-            }
+            Task.WhenAll(tasks).Wait();
+            state.Packets.Clear();
         }
         catch (Exception e)
         {
@@ -176,9 +131,13 @@ public class ClientAsync
         }
     }
 
+    /// <summary>
+    ///     Sends a packet to a specific <see cref="Socket" />.
+    /// </summary>
+    /// <param name="client">Instance of <see cref="Socket" /> to send to.</param>
+    /// <param name="original">Instance of <see cref="Packet" /> to send.</param>
     public static void Send(Socket client, Packet original)
     {
-
         byte[]? bytes = null;
         var error_value = Tools.Errors.None; // Default error value.
 
@@ -192,31 +151,9 @@ public class ClientAsync
         }
 
         var size = bytes.Length;
-        Console.WriteLine("Sending back : " + client.RemoteEndPoint +
+        Console.WriteLine("Sending to : " + client.RemoteEndPoint + " on : " + client.LocalEndPoint + 
                           "\n\t Sent {0} bytes =>\t" + original, size);
         // Send the packet through the socket.
         client.BeginSend(bytes, 0, size, 0, null, client);
-    }
-
-    private static void SendCallback(IAsyncResult ar)
-    {
-        try
-        {
-            // Retrieve the socket from the state object.
-            Socket client = (Socket)ar.AsyncState;
-
-            // Complete sending the data to the remote device.
-            int bytesSent = client.EndSend(ar);
-            Console.WriteLine("Sent total {0} bytes to server.", bytesSent);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.ToString());
-        }
-    }
-
-    public static void StopListening(Socket client)
-    {
-        client.EndReceive(null);
     }
 }
