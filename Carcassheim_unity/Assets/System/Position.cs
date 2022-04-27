@@ -19,5 +19,15 @@
         {
             return _x.ToString() + _y.ToString() + _rot.ToString();
         }
+
+        /*public static explicit operator(PositionRepr) (Position p)
+        {
+            return new PositionRepr(p._x, p._y, p._rot);
+        }
+
+        public static explicit operator(Position) (PositionRepr p)
+        {
+            return new Position(p._x, p._y, p._rot);
+        }*/
     }
 }
