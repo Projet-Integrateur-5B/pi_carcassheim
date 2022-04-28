@@ -61,6 +61,8 @@ public class ConnectionMenu : Miscellaneous
 		HidePopUpOptions();
 		ResetWarningTextCM();
 		ChangeMenu("ConnectionMenu", "HomeMenu");
+		Connected();
+		Debug.Log("here");
 	}
 
 	public void ForgottenPwdUser()
@@ -150,7 +152,6 @@ public class ConnectionMenu : Miscellaneous
 			if (GetState())
 			{
 				HideConnection();
-				Connected();
 			}
 			else
 			{
