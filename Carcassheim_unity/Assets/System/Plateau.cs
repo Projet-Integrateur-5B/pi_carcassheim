@@ -283,9 +283,9 @@ namespace Assets.system
             return TuilesAdjacentes(t.X, t.Y);
         }
 
-        public bool ZoneFermee(ulong idTuile, ulong idSlot)
+        public bool ZoneFermee(int x, int y, ulong idSlot)
         {
-            return ZoneFermee(tuileDeModelId(idTuile), idSlot);
+            return ZoneFermee(GetTuile(x, y), idSlot);
         }
 
         public bool ZoneFermee(Tuile tuile, ulong idSlot)
@@ -328,7 +328,7 @@ namespace Assets.system
         private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, ulong idSlot,
             out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
         {
-            Debug.Log("Verif tuile " + tuile.Id.ToString() + " for slot " + idSlot.ToString());
+            //Debug.Log("Verif tuile " + tuile.Id.ToString() + " for slot " + idSlot.ToString());
             emplacementVide = false;
             int[] positionsInternes;
             try
@@ -338,7 +338,7 @@ namespace Assets.system
             catch (Exception e)
             {
                 Debug.Log("idSlot = " + idSlot);
-                throw e;
+                throw new Exception(e.Message + " (probablement la faute de Justin)");
             }
             List<int> positionsInternesProchainesTuilesTemp = new List<int>();
             List<Tuile> resultat = new List<Tuile>();
@@ -350,7 +350,7 @@ namespace Assets.system
                 //direction = (position + (3 * tuile.Rotation)) / 3;
                 direction = (4 + position / 3 - tuile.Rotation) % 4;
 
-                Debug.Log("Direction vers la prochaine Tuile de la zone = " + direction);
+                //Debug.Log("Direction vers la prochaine Tuile de la zone = " + direction);
 
                 Tuile elem = GetTuile(x + PositionAdjacentes[direction, 0],
                                       y + PositionAdjacentes[direction, 1]);
@@ -399,11 +399,11 @@ namespace Assets.system
 
         public int[] EmplacementPionPossible(int x, int y, ulong idJoueur)
         {
-            Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
+            //Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
             Tuile tuile = GetTuile(x, y);
             List<int> resultat = new List<int>();
             List<(Tuile, ulong)> parcourus = new List<(Tuile, ulong)>();
-            Debug.Log("NombreSlot = " + tuile.NombreSlot);
+            //Debug.Log("NombreSlot = " + tuile.NombreSlot);
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
                 if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
@@ -416,16 +416,16 @@ namespace Assets.system
 
         private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<(Tuile, ulong)> parcourus)
         {
-            Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
-                + " liste des tuiles parcourues de longeur: " + parcourus.Count);
+            //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
+                //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
             Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
 
-            Debug.Log("methode TuilesAdjacentesAuSlot appelee, adj de longueur: " + adj.Length);
+            //Debug.Log("methode TuilesAdjacentesAuSlot appelee, adj de longueur: " + adj.Length);
             foreach (var item in adj)
             {
-                Debug.Log("Tuile dans adj :" + item.ToString());
+                //Debug.Log("Tuile dans adj :" + item.ToString());
             }
 
             if (adj.Length == 0)
@@ -441,7 +441,7 @@ namespace Assets.system
                 ulong nextSlot = t.IdSlotFromPositionInterne(pos);
                 ulong idJ = t.Slots[nextSlot].IdJoueur;
 
-                Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
+                //Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
 
                 if (idJ != ulong.MaxValue)
                     return true;
