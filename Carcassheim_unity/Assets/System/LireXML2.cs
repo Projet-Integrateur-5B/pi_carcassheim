@@ -145,7 +145,7 @@ namespace Assets.system
                         readingNom = false;
                         if (xmlReader.Name == "terrain")
                         {
-                            //Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
+                            Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
                             IdVersTerrain.Add(currentId, DictionaireTemp[currentNom]);
                         }
                         break;
