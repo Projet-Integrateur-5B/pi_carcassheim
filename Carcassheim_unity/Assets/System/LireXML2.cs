@@ -98,7 +98,7 @@ namespace Assets.system
                                 {
                                     temp.Add(item.ToArray());
                                 }
-                                // Debug.Log("TUILE " + currentId.ToString());
+                                Debug.Log("TUILE " + currentId.ToString());
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
                                 result.Add((ulong)currentId, current);
                             }
@@ -227,7 +227,7 @@ namespace Assets.system
             }
 
             slot = new Slot(IdVersTerrain[idTerrain], tempSlotLink.ToArray());
-            //Debug.Log("END SLOT OF" + IdVersTerrain[idTerrain].ToString() + " of " + pos_// Debug);
+            Debug.Log("END SLOT OF" + IdVersTerrain[idTerrain].ToString() + " of " + pos_debug);
             return result;
         }
     }
