@@ -175,7 +175,9 @@ public class CameraManager : MonoBehaviour
     {
         float camRay = cameraRay(target, axis);
 
-        if (camRay >= limitRay)
+        Debug.Log("limit ray : " + limitRay + " cam ray : " + camRay);
+
+        if (((axis == (int)Axis.Y) && camRay >= limitRay-2) || ((axis == (int)Axis.Z) && camRay >= limitRay-1.75f) || camRay >= limitRay)
             return true;
 
         return false;
