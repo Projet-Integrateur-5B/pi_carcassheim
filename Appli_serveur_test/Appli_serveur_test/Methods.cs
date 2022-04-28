@@ -342,11 +342,11 @@ public partial class Server
         }
         else
         {
-            packet.Data = new string[2];
+            packet.Data = new string[1];
             // Sending the room's ID back to the client. 
-            packet.Data[0] = result[0].ToString();
+            packet.IdRoom = result[0];
             // Sending the new server's port (i.e. room port) back to the client.
-            packet.Data[1] = result[1].ToString();
+            packet.Data[0] = result[1].ToString();
         }
     }
     /// <summary>
