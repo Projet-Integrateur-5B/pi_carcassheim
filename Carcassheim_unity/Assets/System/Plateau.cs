@@ -430,9 +430,9 @@ namespace Assets.system
             return resultat.ToArray();
         }
 
-        public void PoserPion(ulong idJoueur, ulong idTuile, ulong idSlot)
+        public void PoserPion(ulong idJoueur, int x, int y, ulong idSlot)
         {
-            PoserPion(idJoueur, tuileDeModelId(idTuile), idSlot);
+            PoserPion(idJoueur, GetTuile(x, y), idSlot);
         }
 
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
@@ -467,10 +467,11 @@ namespace Assets.system
         {
             //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
             //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
-            Debug.Log("READING " + x + ", " + y + ", " + idSlot);
+            Tuile tl_ref = GetTuile(x, y);
+            Debug.Log("READING (" + tl_ref.Id + ") " + x + ", " + y + ", " + tl_ref.Rotation + " :" + idSlot + " : " + tl_ref.Slots[idSlot].Terrain);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
-            Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
+            Tuile[] adj = TuilesAdjacentesAuSlot(tl_ref, idSlot, out vide, out positionsInternesProchainesTuiles);
 
             //Debug.Log("methode TuilesAdjacentesAuSlot appelee, adj de longueur: " + adj.Length);
             foreach (var item in adj)
@@ -498,6 +499,7 @@ namespace Assets.system
                     Debug.Log("Zone " + x + ", " + y + ", " + idSlot + " appartient à " + idJ);
                     return true;
                 }
+                Debug.Log("FROM " + x + ", " + y + ", " + idSlot + " to " + t.X + ", " + t.Y + ", " + nextSlot);
                 resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);
                 if (resultat)
                     return resultat;

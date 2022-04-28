@@ -154,7 +154,7 @@ public class backLocal : CarcasheimBack
         }
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
-            _plateau.PoserPion(player_act, (ulong)play.id_tile, (ulong)play.slot_pos);
+            _plateau.PoserPion(player_act, play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos);
             players[index_player] = new PlayerInitParam(players[index_player].id_player, players[index_player].nb_meeple - 1, players[index_player].player_name);
             meeple_valide = true;
         }
@@ -222,11 +222,16 @@ public class backLocal : CarcasheimBack
         }
         else
         {
+            int[] tiles = new int[] { 23, 14, 16, 10, 10, 12, 21, 4 };
             possibilities_tile_act_turn.Clear();
             tile_drawn.Clear();
             do
             {
-                int index = UnityEngine.Random.Range(0, 24);
+                int index;
+                if (compteur_de_tour >= tiles.Length)
+                    index = UnityEngine.Random.Range(0, 24);
+                else
+                    index = tiles[compteur_de_tour];
                 tile_drawn.Add((ulong)index);
                 possibilities_tile_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
                 nb_tile_drawn += 1;
