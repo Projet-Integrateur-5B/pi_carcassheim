@@ -453,6 +453,8 @@ namespace Assets.system
 
         public bool PionPosable(int x, int y, ulong idSlot, ulong idJoueur, ulong idMeeple)
         {
+            if (idSlot > 12)
+                return false;
             Tuile tuile = GetTuile(x, y);
 
             Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
