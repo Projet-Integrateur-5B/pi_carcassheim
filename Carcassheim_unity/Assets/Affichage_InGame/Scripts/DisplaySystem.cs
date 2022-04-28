@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Assets.system;
 
 public enum DisplaySystemState
 {
@@ -173,7 +173,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
     {
-        Debug.Log("Leaving " + old_state + " to " + new_state);
+        //Debug.Log("Leaving " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.meeplePosing:
@@ -282,7 +282,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        Debug.Log("State enterring from " + old_state + " to " + new_state);
+        //Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
@@ -316,20 +316,24 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.scoreChange:
                 List<PlayerScoreParam> scores = new List<PlayerScoreParam>();
-                system_back.askScores(scores);
+                List<Zone> zones = new List<Zone>();
+                system_back.askScores(scores, zones);
                 foreach (PlayerScoreParam score in scores)
                 {
-                    players_mapping[score.id_player].Score = score.points_gagnes;
+                    players_mapping[(int)score.id_player].Score = score.points_gagnes;
                     Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
-                    foreach (Zone z in score.zone)
+                    foreach (Zone z in zones)
                     {
-                        TuileRepre tl = board.getTileAt(z.pos);
-                        if (tl != null && tl.Id == z.id_tuile)
+                        foreach (System.Tuple<int, int, ulong> pos in z.positions)
                         {
-                            SlotIndic slt = tl.getSlotAt(z.id_slot);
-                            if (slt != null)
+                            TuileRepre tl = board.getTileAt(new PositionRepre(pos.Item1, pos.Item2));
+                            if (tl != null)
                             {
-                                slt.clean();
+                                SlotIndic slt = tl.getSlotAt((int)pos.Item3);
+                                if (slt != null)
+                                {
+                                    slt.clean();
+                                }
                             }
                         }
                     }
@@ -338,13 +342,14 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
                 List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
-                system_back.askFinalScore(scores_final);
+                List<Zone> zones_final = new List<Zone>();
+                system_back.askFinalScore(scores_final, zones_final);
 
                 if (my_player != null)
                 {
                     foreach (PlayerScoreParam score in scores_final)
                     {
-                        players_mapping[score.id_player].Score = score.points_gagnes;
+                        players_mapping[(int)score.id_player].Score = score.points_gagnes;
                         Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
                     }
 

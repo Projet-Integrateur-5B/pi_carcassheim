@@ -4,6 +4,29 @@ using UnityEngine;
 
 namespace Assets.system
 {
+    public struct Zone
+    {
+        public Zone(ulong[] id_players, Tuple<int, int, ulong>[] positions)
+        {
+
+            this.id_players = id_players;
+            this.positions = positions;
+        }
+
+        public ulong[] id_players;
+        public Tuple<int, int, ulong>[] positions;
+    };
+
+    public struct PlayerScoreParam
+    {
+        public PlayerScoreParam(ulong id_player, int points_gagnes)
+        {
+            this.id_player = id_player;
+            this.points_gagnes = points_gagnes;
+        }
+        public ulong id_player;
+        public int points_gagnes;
+    };
     public class Plateau
     {
         public static readonly int[,] PositionAdjacentes;
@@ -20,6 +43,7 @@ namespace Assets.system
         public Plateau(Dictionary<ulong, Tuile> dicoTuiles)
         {
             _tuiles = new List<Tuile>();
+            CompteurPoints.Init(this);
             _dicoTuile = dicoTuiles;
         }
 
@@ -283,12 +307,39 @@ namespace Assets.system
             return TuilesAdjacentes(t.X, t.Y);
         }
 
-        public bool ZoneFermee(int x, int y, ulong idSlot)
+        public bool VerifZoneFermeeTuile(int x, int y, List<PlayerScoreParam> gain, List<Zone> zones)
         {
-            return ZoneFermee(GetTuile(x, y), idSlot);
+            Tuile tl = GetTuile(x, y);
+            bool point_change = false;
+            for (ulong i = 0; i < (ulong)tl.NombreSlot; i++)
+            {
+                if (ZoneFermeeForSlot(x, y, i))
+                {
+                    Debug.Log("Une Zone a ete fermee");
+                    ulong[] gagnants;
+                    int point = CompteurPoints.CompterZoneFerme(x, y, (int)i, out gagnants);
+                    foreach (ulong id_joueur in gagnants)
+                    {
+                        gain.Add(new PlayerScoreParam(id_joueur, point));
+                        point_change = true;
+                    }
+                    Zone z = new Zone();
+                    z.id_players = gagnants;
+                    z.positions = new Tuple<int, int, ulong>[1];
+                    z.positions[0] = new Tuple<int, int, ulong>(x, y, i);
+                    zones.Add(z);
+                }
+
+            }
+            return point_change;
         }
 
-        public bool ZoneFermee(Tuile tuile, ulong idSlot)
+        public bool ZoneFermeeForSlot(int x, int y, ulong idSlot)
+        {
+            return ZoneFermeeForSlot(GetTuile(x, y), idSlot);
+        }
+
+        public bool ZoneFermeeForSlot(Tuile tuile, ulong idSlot)
         {
             if (!_tuiles.Contains(tuile)) // ERROR
                 return false;
@@ -361,14 +412,14 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    var trucComplique = ((position + 3 * elem.Rotation) + 18 - 3 * tuile.Rotation) % 12;
+                    var trucComplique = ((position + 3 * tuile.Rotation) + 18 - 3 * elem.Rotation) % 12;
                     switch (trucComplique % 3)
                     {
                         case 0:
-                            trucComplique += 2;
+                            trucComplique = (trucComplique + 2) % 12;
                             break;
                         case 2:
-                            trucComplique -= 2;
+                            trucComplique = (trucComplique + 10) % 12;
                             break;
                         default:
                             break;
@@ -417,7 +468,7 @@ namespace Assets.system
         private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<(Tuile, ulong)> parcourus)
         {
             //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
-                //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
+            //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
             Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
@@ -457,7 +508,7 @@ namespace Assets.system
                 return false;
             Tuile tuile = GetTuile(x, y);
 
-            Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
+            // Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
 
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;

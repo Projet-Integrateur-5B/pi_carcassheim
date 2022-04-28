@@ -170,7 +170,6 @@ public class Table : MonoBehaviour
 
     void cleanHand()
     {
-        Debug.Log("HAND CLEANED");
         int L = meeple_zone.transform.childCount;
         Transform c;
         for (int i = L - 1; i >= 0; i--)

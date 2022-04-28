@@ -75,7 +75,7 @@ namespace Assets.system
             PositionRepre tile_pos = param.tile_pos;
             int id_meeple = param.id_meeple;
             int slot_pos = param.slot_pos;
-            
+
             SendPosition((ulong)tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation, id_meeple, slot_pos);
         }
 
@@ -135,7 +135,7 @@ namespace Assets.system
 
         //=======================================================
         // SCORE
-        override public void askScores(List<PlayerScoreParam> players_scores)
+        override public void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones)
         {
             //TODO PARTAGER LES NOUVEAUX SCORES POUR CHAQUE JOUEUR => Display
             // Id du joueur dont le score change, Nouveau score, Zone provoquant le changement de score
@@ -144,9 +144,8 @@ namespace Assets.system
             for (int j = 0; j < taille; j++)
             {
                 players_scores.Add(new PlayerScoreParam(
-                    (int)playerList[j].id,
-                    (int)playerList[j].score,
-                    Array.Empty<Zone>()));//JUSTIN si tu ne n'as pas fait, je te tuerais
+                    (ulong)playerList[j].id,
+                    (int)playerList[j].score));
             }
         }
 
@@ -225,16 +224,15 @@ namespace Assets.system
         //=======================================================
         // END GAME
 
-        override public void askFinalScore(List<PlayerScoreParam> playerScores)
+        override public void askFinalScore(List<PlayerScoreParam> playerScores, List<Zone> zones)
         {
             //TODO Pareil que askScore
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
                 playerScores.Add(new PlayerScoreParam(
-                    (int)playerList[j].id,
-                    (int)playerList[j].score,
-                    Array.Empty<Zone>()));//JUSTIN si tu ne n'as pas fait, je te tuerais
+                    (ulong)playerList[j].id,
+                    (int)playerList[j].score));
             }
         }
 
@@ -299,7 +297,7 @@ namespace Assets.system
             packet.IdPlayer = Communication.Instance.idClient;
             packet.Data = new string[] { Communication.Instance.idRoom.ToString() };
             packet.IdMessage = Tools.IdMessage.PlayerList;
-            
+
             Communication.Instance.SendAsync(packet);
             Thread.Sleep(500);
             packet.IdMessage = Tools.IdMessage.PlayerCurrent;
@@ -372,7 +370,7 @@ namespace Assets.system
             {
                 OnPlayerCurrentReceive(packet);
             }
-            else if(packet.IdMessage == Tools.IdMessage.TuilePlacement)
+            else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
                 id_tile_init = Convert.ToInt32(packet.Data[0]);
                 id_tile_init_received = true;
@@ -481,7 +479,7 @@ namespace Assets.system
                 playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
             }
             player_received = true;
-            
+
             checkGameBegin();
         }
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using UnityEngine;
 namespace Assets.system
 {
     internal class CompteurPoints
@@ -17,7 +17,10 @@ namespace Assets.system
 
         public static void Init(Plateau plateau)
         {
-            instance = new CompteurPoints(plateau);
+            if (instance == null)
+                instance = new CompteurPoints(plateau);
+            else
+                instance._plateau = plateau;
         }
 
         public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur)
@@ -33,18 +36,28 @@ namespace Assets.system
             Dictionary<ulong, int> pionParJoueur = new Dictionary<ulong, int>();
             instance.PointsZone(tuile, idSlot, parcourue, ref result, pionParJoueur);
 
+            Debug.Log("POINTS : " + result);
+
             ulong playerWithMostPawn = ulong.MaxValue;
             int mostPawn = -1;
             List<ulong> playerGainingPoints = new List<ulong>();
             foreach (var item in pionParJoueur)
             {
+                Debug.Log(item);
                 if (item.Value > mostPawn)
+                {
+                    mostPawn = item.Value;
                     playerWithMostPawn = item.Key;
+                }
             }
+            Debug.Log("PION " + mostPawn);
             foreach (var item in pionParJoueur)
             {
                 if (item.Value == mostPawn)
+                {
                     playerGainingPoints.Add(item.Key);
+                    Debug.Log("JOUEUR " + item.Key);
+                }
             }
             idJoueur = playerGainingPoints.ToArray();
 
@@ -118,14 +131,14 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    var trucComplique = ((position + 3 * elem.Rotation) + 18 - 3 * tuile.Rotation) % 12;
+                    var trucComplique = ((position + 3 * tuile.Rotation) + 18 - 3 * elem.Rotation) % 12;
                     switch (trucComplique % 3)
                     {
                         case 0:
-                            trucComplique += 2;
+                            trucComplique = (trucComplique + 2) % 12;
                             break;
                         case 2:
-                            trucComplique -= 2;
+                            trucComplique = (trucComplique + 10) % 12;
                             break;
                         default:
                             break;

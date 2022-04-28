@@ -11,7 +11,7 @@ public class backLocal : CarcasheimBack
 
     private Plateau _plateau;
     private List<PlayerInitParam> players = new List<PlayerInitParam>();
-    private List<int> players_score = new List<int>();
+    private List<int> saved_players_score = new List<int>();
 
     private int index_player = 0; // joueur en jeu
     private int nb_player = 3; // à remplir via field
@@ -48,6 +48,8 @@ public class backLocal : CarcasheimBack
     private bool river_on = false;
 
     private List<ulong> tiles_for_river;
+    List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
+    List<Zone> zones = new List<Zone>();
 
     private List<Position> possibilities_tile_act_turn = new List<Position>();
     private List<ulong> tile_drawn = new List<ulong>();
@@ -56,11 +58,8 @@ public class backLocal : CarcasheimBack
 
     void Start()
     {
-        Debug.Log("first 1");
         dicoTuile = LireXML2.Read(XML_PATH);
-        Debug.Log("first 2");
         _plateau = new Plateau(dicoTuile);
-        Debug.Log("first 3");
         gameStart();
     }
 
@@ -94,12 +93,12 @@ public class backLocal : CarcasheimBack
         for (int i = 0; i < nb_player; i++)
         {
             players.Add(new PlayerInitParam(i, nb_meeple, "Joueur " + (i + 1).ToString()));
+            saved_players_score.Add(0);
         }
     }
 
     public void gameStart()
     {
-        Debug.Log("Cakked");
         if (validate_start())
         {
             _plateau.Poser1ereTuile((ulong)askIdTileInitial());
@@ -140,6 +139,9 @@ public class backLocal : CarcasheimBack
 
     override public void sendTile(TurnPlayParam play)
     {
+        Debug.Log("FIN TOUR");
+        bool end = false;
+        bool score_changed = false;
         // Debug.Log("Am i looking likethis " + play.id_tile + " " + play.tile_pos + " " + play.id_meeple + " " + play.slot_pos);
         // Debug.Log("Meeple at " + play.id_meeple + " " + play.slot_pos);
         bool tuile_valide = false;
@@ -157,14 +159,14 @@ public class backLocal : CarcasheimBack
             meeple_valide = true;
         }
         if (tuile_valide)
+        {
             _plateau.ValiderTour();
+            gains.Clear();
+            zones.Clear();
+            score_changed = _plateau.VerifZoneFermeeTuile(play.tile_pos.X, play.tile_pos.Y, gains, zones);
+            Debug.Log("Score changed ? " + score_changed);
+        }
 
-        if (_plateau.ZoneFermee(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos))
-            Debug.Log("Une Zone a ete fermee");
-        //TODO regarder avancement score pour tout les joueurs int  += CompteurPoint.CompterZoneFerme(play.id_tile, play.slot_pos);
-
-        bool end = false;
-        bool score_changed = false;
         switch (my_wincond)
         {
             case WinCondition.WinByTime:
@@ -173,7 +175,7 @@ public class backLocal : CarcasheimBack
             case WinCondition.WinByPoint:
                 for (int i = 0; i < players.Count; i++)
                 {
-                    end = end || (players_score[index_player] >= win_point_nb);
+                    end = end || (saved_players_score[index_player] >= win_point_nb);
                 }
                 break;
             case WinCondition.WinByTile:
@@ -220,7 +222,7 @@ public class backLocal : CarcasheimBack
             tile_drawn.Clear();
             do
             {
-                int index = UnityEngine.Random.Range(0, dicoTuile.Count);
+                int index = UnityEngine.Random.Range(0, 24);
                 tile_drawn.Add((ulong)index);
                 possibilities_tile_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
                 nb_tile_drawn += 1;
@@ -285,8 +287,19 @@ public class backLocal : CarcasheimBack
 
     }
 
-    override public void askScores(List<PlayerScoreParam> players_scores)
+    override public void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones)
     {
+        for (int i = 0; i < gains.Count; i++)
+        {
+            Debug.Log(gains[i].id_player);
+            saved_players_score[(int)gains[i].id_player] += gains[i].points_gagnes;
+        }
+        for (int i = 0; i < players.Count; i++)
+        {
+            ulong id_p = (ulong)players[i].id_player;
+            int score_p = saved_players_score[i];
+            players_scores.Add(new PlayerScoreParam(id_p, score_p));
+        }
     }
 
     override public int askIdTileInitial()
@@ -332,7 +345,7 @@ public class backLocal : CarcasheimBack
         }
     }
 
-    override public void askFinalScore(List<PlayerScoreParam> playerScores)
+    override public void askFinalScore(List<PlayerScoreParam> playerScores, List<Zone> zones)
     {
         //TODO Pareil que askScore
     }
