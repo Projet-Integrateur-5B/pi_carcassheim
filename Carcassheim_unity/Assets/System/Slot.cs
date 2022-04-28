@@ -33,6 +33,16 @@ namespace Assets.system
             return "Slot appartenant au joueur: " + IdJoueur;
         }
 
+        public static Slot[] CoypArray(Slot[] src)
+        {
+            Slot[] result = new Slot[src.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = new Slot(src[i].Terrain, src[i].LinkOtherSlots);
+            }
+            return result;
+        }
+
         static Slot()
         {
             TerrainFromId = new Dictionary<ulong, TypeTerrain>

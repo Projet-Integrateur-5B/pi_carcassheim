@@ -137,10 +137,10 @@ namespace Assets.system
                     switch (trucComplique % 3)
                     {
                         case 0:
-                            trucComplique = (trucComplique + 2) % 12;
+                            trucComplique = (trucComplique + 2);
                             break;
                         case 2:
-                            trucComplique = (trucComplique + 10) % 12;
+                            trucComplique = (trucComplique - 2);
                             break;
                         default:
                             break;
