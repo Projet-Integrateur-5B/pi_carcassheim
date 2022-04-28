@@ -158,6 +158,9 @@ public class backLocal : CarcasheimBack
         }
         if (tuile_valide)
             _plateau.ValiderTour();
+
+        if (_plateau.ZoneFermee(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos))
+            Debug.Log("Une Zone a ete fermee");
         //TODO regarder avancement score pour tout les joueurs int  += CompteurPoint.CompterZoneFerme(play.id_tile, play.slot_pos);
 
         bool end = false;
