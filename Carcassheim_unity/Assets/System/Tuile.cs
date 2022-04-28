@@ -107,7 +107,8 @@ namespace Assets.system
 
         public static Tuile Copy(Tuile tuile)
         {
-            Tuile result = new Tuile(tuile._id, tuile._slots, tuile._lienSlotPosition, tuile._lienEntreSlots);
+
+            Tuile result = new Tuile(tuile._id, Slot.CoypArray(tuile._slots), tuile._lienSlotPosition, tuile._lienEntreSlots);
             return result;
         }
 

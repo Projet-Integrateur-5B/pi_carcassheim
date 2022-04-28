@@ -164,6 +164,10 @@ public class backLocal : CarcasheimBack
             gains.Clear();
             zones.Clear();
             score_changed = _plateau.VerifZoneFermeeTuile(play.tile_pos.X, play.tile_pos.Y, gains, zones);
+            if (score_changed)
+            {
+                //_plateau.RemoveAllPawnInZone()
+            }
             Debug.Log("Score changed ? " + score_changed);
         }
 
