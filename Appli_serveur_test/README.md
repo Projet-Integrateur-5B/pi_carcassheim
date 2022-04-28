@@ -1,6 +1,6 @@
 Avoir le programme du serveur qui tourne auto :
 
-[a link](https://swimburger.net/blog/dotnet/how-to-run-a-dotnet-core-console-app-as-a-service-using-systemd-on-linux)
+[Lien vers le guide](https://swimburger.net/blog/dotnet/how-to-run-a-dotnet-core-console-app-as-a-service-using-systemd-on-linux)
 
 Etapes à reproduire :
 
@@ -80,7 +80,7 @@ sudo journalctl --vacuum-time=1s
 Après avoir apporté des modifications dans le code (depuis le bon répertoire!!!):
 ```
 sudo systemctl stop Appli_serveur_test
-dotnet publish -c Release -o /srv/Appli_serveur_test
+sudo dotnet publish -c Release -o /srv/Appli_serveur_test
 sudo systemctl start Appli_serveur_test
 ```
 
