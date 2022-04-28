@@ -31,11 +31,12 @@ namespace Assets.system
 
             //idJoueur = tuile.Slots[idSlot].IdJoueur;
 
-            List<Tuile> parcourue = new List<Tuile> { tuile };
+            List<(Tuile, ulong)> parcourue = new List<(Tuile, ulong)>();
             int result = 0;
             Dictionary<ulong, int> pionParJoueur = new Dictionary<ulong, int>();
             instance.PointsZone(tuile, idSlot, parcourue, ref result, pionParJoueur);
 
+            Debug.Log("Pions Par Joueur : " + pionParJoueur.ToString());
             Debug.Log("POINTS : " + result);
 
             ulong playerWithMostPawn = ulong.MaxValue;
@@ -65,7 +66,7 @@ namespace Assets.system
         }
 
         private void PointsZone(Tuile tuile, int idSlot,
-            List<Tuile> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
+            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
         {
             bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
@@ -77,12 +78,13 @@ namespace Assets.system
             int c = 0;
             foreach (var item in adj)
             {
-                if (item == null || parcourue.Contains(item))
-                    continue;
-                parcourue.Add(item);
-
                 int pos = positionsInternesProchainesTuiles[c++];
-                int nextSlot = (int)item.IdSlotFromPositionInterne(pos);
+                ulong nextSlot = item.IdSlotFromPositionInterne(pos);
+
+                if (item == null || parcourue.Contains((item, nextSlot)))
+                    continue;
+                parcourue.Add((item, nextSlot));
+
                 ulong idJ = item.Slots[nextSlot].IdJoueur;
 
                 if (idJ != ulong.MaxValue)
@@ -94,7 +96,7 @@ namespace Assets.system
                 }
 
                 result += PointTerrain(item.Slots[nextSlot].Terrain);
-                PointsZone(item, nextSlot, parcourue, ref result, pionParJoueur);
+                PointsZone(item, (int)nextSlot, parcourue, ref result, pionParJoueur);
             }
         }
 
