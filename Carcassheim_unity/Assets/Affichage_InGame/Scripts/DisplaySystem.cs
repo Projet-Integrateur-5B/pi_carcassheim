@@ -42,8 +42,9 @@ public class DisplaySystem : MonoBehaviour
         public TuileRepre reference_tile;
 
 
-        // * PLAYER GESTION ***************************************
-        public event System.Action<PlayerRepre> OnPlayerDisconnected;
+    // * PLAYER GESTION ***************************************
+    public event System.Action<PlayerRepre> OnPlayerDisconnected;
+    private PauseMenu pauseMenu;
 
         // * TILE *************************************************
         [SerializeField] private TuileRepre tuile_model;
@@ -114,6 +115,7 @@ public class DisplaySystem : MonoBehaviour
                 }
                 //! TEST
                 //gameBegin();
+                pauseMenu = new PauseMenu();
         }
 
         public void execAction(DisplaySystemAction action)
@@ -636,6 +638,11 @@ public class DisplaySystem : MonoBehaviour
                                                 break;
                                 }
                         }
+                }
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                        var pause = pauseMenu.getGameInPause();
+                        pauseMenu.setGameInPause(pause);
                 }
 
                 switch (act_system_state)

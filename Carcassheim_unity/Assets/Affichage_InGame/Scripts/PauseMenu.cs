@@ -1,30 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    public static bool gameInPause = false;
+    bool gameInPause = false;
+    private GameObject PauseMenuUI;
+    private GameObject ParentPauseMenuUI;
 
-    [SerializeField] private GameObject PauseMenuUI;
+    // void Start() {
+    // }
 
+    void Start()
+    {
+        
+    }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+    }
+
+    GameObject FindPauseMenu()
+    {
+        Transform[] trs = ParentPauseMenuUI.GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in trs)
         {
+            if (t.name == "Menu Pause")
+            {
+                return t.gameObject;
+            }
+        }
+        return null;
+    }
+    public void setGameInPause(bool value)
+    {
+        gameInPause = value;
+        ParentPauseMenuUI =  GameObject.Find("/Pause");
+        PauseMenuUI = FindPauseMenu();
+        Debug.Log("pause menu" + PauseMenuUI);
             if (gameInPause)
             {
                 Resume();
-            }else {
+            }
+            else
+            {
                 Pause();
             }
-        }
+        
+    }
+
+    public bool getGameInPause()
+    {
+        return gameInPause;
     }
 
     public void Resume()
     {
+        Debug.Log("Resume game");
+        ParentPauseMenuUI =  GameObject.Find("/Pause");
+        PauseMenuUI = FindPauseMenu();
         PauseMenuUI.SetActive(false);
         Time.timeScale = 1f;
         gameInPause = false;
@@ -42,10 +78,13 @@ public class PauseMenu : MonoBehaviour
         Application.Quit();
     }
 
-    void Pause()
+    public void Pause()
     {
+        Debug.Log("Menu en pause");
+        ParentPauseMenuUI =  GameObject.Find("/Pause");
+        PauseMenuUI = FindPauseMenu();
+        gameInPause = true;
         PauseMenuUI.SetActive(true);
         Time.timeScale = 0f;
-        gameInPause = true;
     }
 }

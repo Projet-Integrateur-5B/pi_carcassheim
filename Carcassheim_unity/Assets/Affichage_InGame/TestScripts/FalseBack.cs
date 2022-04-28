@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
+using System;
+using TMPro;
 public class FalseBack : CarcasheimBack
 {
         public int tile_number;
@@ -32,13 +34,16 @@ public class FalseBack : CarcasheimBack
         public int nb_turn;
         public bool first = true;
 
-        [SerializeField] private DisplaySystem system_display;
+    [SerializeField] private DisplaySystem system_display;
+    [SerializeField] private GameObject am_i_here;
 
         public int my_scenario;
 
-        void Awake()
-        {
-                my_players = new List<PlayerInitParam>();
+
+
+    void Start()
+    {
+        my_players = new List<PlayerInitParam>();
 
 
                 my_scores = new List<List<PlayerScoreParam>>();
@@ -50,10 +55,19 @@ public class FalseBack : CarcasheimBack
 
                 num_turn = 0;
 
-                read_scenario();
+        am_i_here.transform.localScale = new Vector3(2, 2, 2);
+
+        try {
+            read_scenario();
+        }catch(Exception e){
+            var error = GameObject.Find("/Canvas/Error").GetComponent<TMP_Text>();
+            error.SetText(e.ToString());
+            
         }
 
-
+        Destroy(am_i_here);
+        system_display.gameBegin();
+    }
 
         void read_init(XmlReader reader)
         {
@@ -524,10 +538,6 @@ public class FalseBack : CarcasheimBack
                 }
         }
 
-        void Start()
-        {
-                system_display.gameBegin();
-        }
 
         // Update is called once per frame
         void Update()
