@@ -133,7 +133,7 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    var trucComplique = ((position + 3 * tuile.Rotation) + 18 - 3 * elem.Rotation) % 12;
+                    var trucComplique = ((position - 3 * tuile.Rotation) + 18 + 3 * elem.Rotation) % 12;
                     switch (trucComplique % 3)
                     {
                         case 0:

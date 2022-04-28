@@ -344,10 +344,7 @@ namespace Assets.system
             if (!_tuiles.Contains(tuile)) // ERROR
                 return false;
 
-            List<Tuile> tuilesFormantZone = new List<Tuile>
-            {
-                tuile
-            };
+            List<Tuile> tuilesFormantZone = new List<Tuile>();
 
             return ZoneFermeeAux(tuile, idSlot, tuilesFormantZone);
         }
@@ -412,7 +409,7 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    var trucComplique = ((position + 3 * tuile.Rotation) + 18 - 3 * elem.Rotation) % 12;
+                    var trucComplique = ((position - 3 * tuile.Rotation) + 18 + 3 * elem.Rotation) % 12;
                     switch (trucComplique % 3)
                     {
                         case 0:
@@ -457,6 +454,7 @@ namespace Assets.system
             //Debug.Log("NombreSlot = " + tuile.NombreSlot);
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
+                Debug.Log("LOOKING SLOT " + i);
                 if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
                     resultat.Add(i);
                 parcourus.Clear();
@@ -469,6 +467,7 @@ namespace Assets.system
         {
             //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
             //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
+            Debug.Log("READING " + x + ", " + y + ", " + idSlot);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
             Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
@@ -495,8 +494,13 @@ namespace Assets.system
                 //Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
 
                 if (idJ != ulong.MaxValue)
+                {
+                    Debug.Log("Zone " + x + ", " + y + ", " + idSlot + " appartient à " + idJ);
                     return true;
+                }
                 resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);
+                if (resultat)
+                    return resultat;
             }
 
             return resultat;
