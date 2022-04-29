@@ -588,8 +588,6 @@ public partial class Server
             // Something went wrong.
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.PlayerReady;
-            if (playerStatus == Tools.PlayerStatus.GameStart) // Game is starting, no need for an answer.
-                packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
             return;
         }
 
