@@ -159,7 +159,7 @@ public class ClientAsync
             }
 
             var tasks = new List<Task>();
-            foreach(var packet in state.Packets)
+            foreach (var packet in state.Packets)
             {
                 var debug = "Reading from : " + client.RemoteEndPoint +
                         "\n\t Read {0} bytes =>\t" + packet +
@@ -196,7 +196,7 @@ public class ClientAsync
                     new AsyncCallback(ReceiveLoopCallback), state);
                 receiveDone.WaitOne();
             }
-            
+
         }
         catch (Exception e)
         {
@@ -250,6 +250,6 @@ public class ClientAsync
 
     public static void StopListening(Socket client)
     {
-       //Todo
+        //Todo
     }
 }

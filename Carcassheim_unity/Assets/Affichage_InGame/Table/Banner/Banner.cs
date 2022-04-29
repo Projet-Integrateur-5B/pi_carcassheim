@@ -79,7 +79,7 @@ public class Banner : MonoBehaviour
         {
             _player.OnMeepleUpdate += meepleUpdated;
             _player.OnScoreUpdate += scoreUpdated;
-            Debug.Log("HERE NB PLAYER " + player.NbMeeple + " " + player.Score);
+            // Debug.Log("HERE NB PLAYER " + player.NbMeeple + " " + player.Score);
             nbMeepleTMP.text = player.NbMeeple.ToString();
             nbPointsTMP.text = player.Score.ToString();
         }

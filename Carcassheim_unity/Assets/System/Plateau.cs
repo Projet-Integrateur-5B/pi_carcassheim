@@ -454,7 +454,7 @@ namespace Assets.system
             //Debug.Log("NombreSlot = " + tuile.NombreSlot);
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
-                Debug.Log("LOOKING SLOT " + i);
+                //Debug.Log("LOOKING SLOT " + i);
                 if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
                     resultat.Add(i);
                 parcourus.Clear();
@@ -468,7 +468,7 @@ namespace Assets.system
             //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
             //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
             Tuile tl_ref = GetTuile(x, y);
-            Debug.Log("READING (" + tl_ref.Id + ") " + x + ", " + y + ", " + tl_ref.Rotation + " :" + idSlot + " : " + tl_ref.Slots[idSlot].Terrain);
+            //Debug.Log("READING (" + tl_ref.Id + ") " + x + ", " + y + ", " + tl_ref.Rotation + " :" + idSlot + " : " + tl_ref.Slots[idSlot].Terrain);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
             Tuile[] adj = TuilesAdjacentesAuSlot(tl_ref, idSlot, out vide, out positionsInternesProchainesTuiles);
@@ -487,7 +487,6 @@ namespace Assets.system
                 c++;
                 if (t == null || parcourus.Contains((t, idSlot)))
                 {
-                    c++;
                     continue;
                 }
                 parcourus.Add((t, idSlot));
@@ -500,10 +499,10 @@ namespace Assets.system
 
                 if (idJ != ulong.MaxValue)
                 {
-                    Debug.Log("Zone " + x + ", " + y + ", " + idSlot + " appartient à " + idJ);
+                    //Debug.Log("Zone " + x + ", " + y + ", " + idSlot + " appartient à " + idJ);
                     return true;
                 }
-                Debug.Log("FROM " + x + ", " + y + ", " + idSlot + " to " + t.X + ", " + t.Y + ", " + nextSlot);
+                //Debug.Log("FROM " + x + ", " + y + ", " + idSlot + " to " + t.X + ", " + t.Y + ", " + nextSlot);
                 resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);
                 if (resultat)
                     return resultat;
