@@ -148,6 +148,12 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
+        
+        if (packetReceived.Data.Length < 4)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
 
         var db = new Database();
         try
@@ -178,6 +184,12 @@ public partial class Server
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+        
+        if (packetReceived.Data.Length < 2)
+        {
+            packet.Error = Tools.Errors.BadData;
             return;
         }
         
@@ -366,12 +378,6 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-        
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
@@ -478,12 +484,6 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-        
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
@@ -510,13 +510,7 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-        
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
-        
+
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
@@ -549,7 +543,7 @@ public partial class Server
             return;
         }
         
-        if (packetReceived.Data.Length < 2)
+        if (packetReceived.Data.Length < 1)
         {
             packet.Error = Tools.Errors.BadData;
             return;
@@ -600,12 +594,6 @@ public partial class Server
             return;
         }
 
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
-        
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
@@ -670,12 +658,6 @@ public partial class Server
             return;
         }
 
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
-
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
@@ -684,14 +666,12 @@ public partial class Server
         if(listOfPlayers.Length == 0)
         {
             packet.Error = Tools.Errors.NotFound;
-            return;
         }
         else
         {
             packet.Data = listOfPlayers;
             packet.Error = Tools.Errors.None;
         }
-
     }
 
     /// <summary>
@@ -709,12 +689,6 @@ public partial class Server
             Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
-            return;
-        }
-
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
             return;
         }
 
