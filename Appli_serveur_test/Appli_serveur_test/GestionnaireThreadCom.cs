@@ -56,6 +56,7 @@ namespace system
                         _instance._lst_remotePort_dispo = new List<int>();
                         _instance._compteur_id_thread_com = 0;
                         _instance._compteur_id_partie = 0;
+                        _instance._s_compteur_id_partie = new Semaphore(1, 1);
 
                         var error_value = Tools.Errors.None;
                         var test = ServerParameters.GetConfig(ref error_value);
