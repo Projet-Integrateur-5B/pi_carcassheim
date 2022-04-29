@@ -79,7 +79,7 @@ namespace Assets.system
             PositionRepre tile_pos = param.tile_pos;
             int id_meeple = param.id_meeple;
             int slot_pos = param.slot_pos;
-            
+
             SendPosition(tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation);
             SendMeepple(tile_id, id_meeple, slot_pos);
         }
@@ -95,7 +95,9 @@ namespace Assets.system
 
         override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
         {
-
+            lePlateau.PoserTuileFantome((ulong)mp.id_tile, mp.pos_tile.X, mp.pos_tile.Y, mp.pos_tile.Rotation);
+            // Debug.Log("ROTATION   " + mp.pos_tile);
+            slot_pos.AddRange(lePlateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, nextPlayer, (ulong)mp.id_meeple));
         }
         override public int getNextPlayer()
         {
@@ -161,6 +163,7 @@ namespace Assets.system
         override public void askPlayersInit(List<PlayerInitParam> players)
         {
             //TODO PARTAGER ID JOUEUR, NOM JOUEUR, NB DE MEEPLE => Display
+            Debug.Log("JOUEUR DDEANDE");
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
@@ -173,12 +176,14 @@ namespace Assets.system
         }
         override public int askIdTileInitial()
         {
+            Debug.Log("TUILE DEMANDE");
             // TODO PARTAGER ID DE LA TUILE INITIAL EN POSITION (0, 0) => Display
             return id_tile_init;
         }
 
         override public void askTimerTour(out int min, out int sec)
         {
+            Debug.Log("TIMER DDEANDE");
             // TODO PARTAGER LE TEMPS DISPONIBLE PAR TOUR => Display
             min = _timer / 60;
             sec = _timer % 60;
@@ -186,6 +191,7 @@ namespace Assets.system
 
         override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
         {
+            Debug.Log("WIN COND DEMANDED");
             // TODO PARTAGER CONDITION DE VICTOIRE => Display
             // 0 TUILE => nb de tuile
             // 1 TEMPS => nb de min, puis nb de sec
@@ -210,6 +216,7 @@ namespace Assets.system
 
         override public int getMyPlayer()
         {
+            Debug.Log("MON JOUEUR DDEANDE");
             // TODO PARTAGER ID DU JOUEUR SUR CE CLIENT => Display
             return (int)_mon_id;
         }
@@ -294,14 +301,14 @@ namespace Assets.system
             _nb_tuiles = -1;
             _score_max = RoomInfo.Instance.scoreMax;
             _timer_max_joueur = (int)RoomInfo.Instance.timerJoueur; // En secondes
-            
+
             s_InGame.WaitOne();
             win_cond_received = true;
             s_InGame.Release();
 
             _nb_joueur_max = RoomInfo.Instance.nbJoueurMax;
             _timer = (int)RoomInfo.Instance.timerPartie; // En secondes
-            
+
             s_InGame.WaitOne();
             timer_tour_received = true;
             s_InGame.Release();
@@ -385,7 +392,7 @@ namespace Assets.system
             socket.Close();
 
             Communication.Instance.isInRoom = 0;
-            
+
         }
 
         public void OnPacketReceived(object sender, Packet packet)
@@ -500,7 +507,7 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        public void SendMeepple(int id_tuile,int id_meeple, int slot_pos)
+        public void SendMeepple(int id_tuile, int id_meeple, int slot_pos)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.PionPlacement;
@@ -539,6 +546,7 @@ namespace Assets.system
 
         public void checkGameBegin()
         {
+            Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received);
             s_InGame.WaitOne();
             if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin)
             {

@@ -529,12 +529,15 @@ public class DisplaySystem : MonoBehaviour
 
     public void gameBegin()
     {
+        Debug.Log("HERE");
         WinCondition win = WinCondition.WinByTime;
         List<int> param = new List<int>();
         system_back.askWinCondition(ref win, param);
+        Debug.Log("HERE");
 
         List<PlayerInitParam> players_init = new List<PlayerInitParam>();
         system_back.askPlayersInit(players_init);
+        Debug.Log("HERE");
         my_player = null;
         int my_player_id = system_back.getMyPlayer();
 
@@ -551,6 +554,7 @@ public class DisplaySystem : MonoBehaviour
         }
 
         int first_tile = system_back.askIdTileInitial();
+        Debug.Log("HERE");
         TuileRepre tl = instantiateTileOfId(first_tile);
         board.setTileAt(new PositionRepre(0, 0, 0), tl);
 
