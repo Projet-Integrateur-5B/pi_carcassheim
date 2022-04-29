@@ -222,8 +222,8 @@ public class backLocal : CarcasheimBack
         }
         else
         {
-            //int[] tiles = new int[] { 10, 10, 12, 21 };
-            int[] tiles = new int[] { };
+            //int[] tiles = new int[] { 19, 21, 18, 11, 17, 1, 1 };
+            int[] tiles = new int[] { 23, 14, 16, 10, 10, 12, 21, 4 };
             possibilities_tile_act_turn.Clear();
             tile_drawn.Clear();
             do

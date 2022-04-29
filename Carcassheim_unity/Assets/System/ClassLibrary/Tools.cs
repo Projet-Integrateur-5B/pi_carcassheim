@@ -57,7 +57,7 @@ namespace ClassLibrary
             RoomCreate = 11,
             RoomSettingsGet = 12,
             RoomSettingsSet = 13,
-            AskPort = 14,
+            RoomAskPort = 14,
 
             PlayerJoin = 20,
             PlayerLeave = 21,
@@ -158,12 +158,12 @@ namespace ClassLibrary
         /// <param name="byteArray">Byte array which is being deserialized.</param>
         /// <param name="error">Stores the <see cref="Errors" /> value.</param>
         /// <returns>
-        ///     The instance of <see cref="Packet" /> corresponding to a byte array which has been
+        ///     A list of instances of <see cref="Packet" /> corresponding to byte arrays which has been
         ///     deserialized.
         /// </returns>
         /// <exception cref="InvalidEnumArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public static Packet ByteArrayToPacket(this byte[] byteArray, ref Errors error)
+        public static List<Packet>? ByteArrayToPacket(this byte[] byteArray, ref Errors error)
         {
             // Check if enum "Errors" do exist.
             if (!Enum.IsDefined(typeof(Errors), error))
@@ -171,16 +171,24 @@ namespace ClassLibrary
                 throw new InvalidEnumArgumentException(nameof(error), (int)error, typeof(Errors));
             }
 
-            // Initialize a Packet to default.
-            var packet = new Packet();
+            // Initialize an empty list of Packet.
+            var packets = new List<Packet>();
 
             try
             {
                 // Converts a byte array to a JSON string.
                 var packetAsJson = Encoding.ASCII.GetString(byteArray);
-                // Converts a JSON string to an instance of "Packet".
-                packet = JsonConvert.DeserializeObject<Packet>(packetAsJson) ??
-                         throw new ArgumentNullException(packetAsJson);
+
+                // Splits the different packets received.
+                var packetAsJsonList = packetAsJson.Split('}');
+
+                // Puts each packet received in the list.
+                for (var i = 0; i < packetAsJsonList.Length - 1; i++)
+                {
+                    // Converts a JSON string to an instance of "Packet".
+                    packets.Add(JsonConvert.DeserializeObject<Packet>(packetAsJsonList[i] + "}") ??
+                                throw new ArgumentNullException(packetAsJson));
+                }
 
                 // No error has occured.
                 error = Errors.None;
@@ -192,173 +200,7 @@ namespace ClassLibrary
                 error = Errors.Socket;
             }
 
-            return packet;
-        }
-
-        /// <summary>
-        ///     Split an instance of <see cref="Packet" /> into a list of instances.
-        /// </summary>
-        /// <param name="original">Instance of <see cref="Packet" /> which is being split.</param>
-        /// <param name="error">Stores the <see cref="Errors" /> value.</param>
-        /// <returns>The list of <see cref="Packet" /></returns>
-        public static List<Packet> Split(this Packet original, ref Errors error)
-        {
-            // Initialize a list of Packet.
-            var packets = new List<Packet>();
-
-            // Get the original packet length to check if a split is mandatory.
-            var originalBytesLength = original.PacketToByteArray(ref error).Length;
-            if (error != Errors.None) // Checking for errors.
-            {
-                // Setting the error value.
-                // TODO : PacketToByteArray => handle error
-                return packets; // List is empty.
-            }
-
-            // Check if a split is mandatory.
-            if (originalBytesLength < Packet.MaxPacketSize)
-            {
-                // Not mandatory : add the original packet to the list and return.
-                packets.Add(original);
-                return packets;
-            }
-
-            // Split is mandatory.
-
-            // Copying the original data and getting its length.
-            var dataString = string.Join(string.Empty, original.Data);
-            var packetLength = original.Data.Length;
-
-            // Copying the rest : common header for each packet of the list.
-            var header = new Packet(original.Type, original.IdMessage, original.Error, false, original.IdPlayer, Array.Empty<string>());
-
-            // Serializing the header.
-            var headerBytes = header.PacketToByteArray(ref error);
-            if (error != Errors.None) // Checking for errors.
-            {
-                // Setting the error value.
-                // TODO : PacketToByteArray => handle error
-                return packets; // List is empty.
-            }
-
-            // Get the headers length.
-            var headerBytesLength = headerBytes.Length;
-            // Get the maximum length of the data field (depending on the headers length).
-            var headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength;
-
-            // Serializing the original data field and getting its length.
-            var dataBytes = Encoding.ASCII.GetBytes(dataString);
-            var dataBytesTotalLength = dataBytes.Length;
-
-            // Deserializing the header.
-            var packet = headerBytes.ByteArrayToPacket(ref error);
-            if (error != Errors.None) // Checking for errors.
-            {
-                // Setting the error value.
-                // TODO : ByteArrayToPacket => handle error
-                return new List<Packet>(); // List is empty.
-            }
-
-            int dataLength;
-            while (true)
-            {
-                try
-                {
-                    // get the data length
-                    dataLength = Encoding.ASCII.GetBytes(original.Data[0]).Length;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
-
-                // ajout d'un string dans le packet si il y a assez de place
-                if (dataLength < headerBytesMaxLength - 3)
-                {
-                    // ajoute la data dans le packet
-                    packet.Data = new List<string>(packet.Data.ToList()) { original.Data[0] }.ToArray();
-                    // r�duit le nombre de string qu'il reste � ajouter
-                    packetLength--;
-                    // r�duit la place disponible dans le reste du packet
-                    headerBytesMaxLength = headerBytesMaxLength - dataLength - 3;
-                    // supprime de original la data mis dans le packet
-                    original.Data = original.Data.Where((source, index) => index != 0).ToArray();
-                }
-                else
-                {
-                    // r�cup�re ce qu'on peut encore rajouter dans le reste du packet
-                    var chaine = original.Data[0].Substring(0, headerBytesMaxLength - 5);
-                    // original.Data[0].Substring(0, headerBytesMaxLength - 5);
-
-                    // ajoute la chaine r�cup�rer
-                    packet.Data = new List<string>(packet.Data.ToList()) { chaine }.ToArray();
-
-                    //supprimer dans original la chaine ajouter
-                    original.Data[0] = original.Data[0].Substring(headerBytesMaxLength - 5);
-                    // original.Data[0].Substring(headerBytesMaxLength - 5);
-
-                    //packet non final
-                    packet.Final = false;
-                    //ajout du packet
-                    packets.Add(packet);
-                    //reinitialisation du packet pour le prochain ajout
-                    packet = headerBytes.ByteArrayToPacket(ref error);
-                    packet.Data = new List<string>(packet.Data.ToList()) { "" }.ToArray();
-                    if (error != Errors.None)
-                    {
-                        // TODO : ByteArrayToPacket => handle error
-                        return new List<Packet>();
-                    }
-                    // reinitialisation de la place dispo dans le prochain packet
-                    headerBytesMaxLength = Packet.MaxPacketSize - headerBytesLength - 4;
-                }
-
-                if (packetLength == 0)
-                {
-                    // dernier packet
-                    packet.Final = true;
-                    // ajout du dernier pacekt
-                    packets.Add(packet);
-                    break;
-                }
-            }
-
             return packets;
-        }
-
-        /// <summary>
-        ///     Concatenate a list of instances of <see cref="Packet" /> into a single instance.
-        /// </summary>
-        /// <param name="packets">Instances of <see cref="Packet" /> which is being concatenated.</param>
-        /// <param name="error">Stores the <see cref="Errors" /> value.</param>
-        /// <returns>The concatenated list of <see cref="Packet" />.</returns>
-        public static Packet Concatenate(this List<Packet> packets, ref Errors error)
-        {
-            // Initialize the list to default : minimum size is 1.
-            var original = packets[0];
-
-            // All packets in the list except the first one.
-            foreach (var packet in packets.Skip(1))
-            {
-                // Catch : could not concatenate the data
-                try
-                {
-                    // Adding packet.Data to original.Data
-                    original.Data = original.Data.Concat(packet.Data).ToArray();
-
-                    // No error has occured.
-                    error = Errors.None;
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    // Setting the error value.
-                    error = Errors.Data;
-                }
-            }
-
-            return original;
         }
     }
 }

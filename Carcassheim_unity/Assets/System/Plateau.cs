@@ -481,9 +481,10 @@ namespace Assets.system
 
             if (adj.Length == 0)
                 return false;
-            int c = 0;
+            int c = -1;
             foreach (var t in adj)
             {
+                c++;
                 if (t == null || parcourus.Contains((t, idSlot)))
                 {
                     c++;
@@ -491,7 +492,7 @@ namespace Assets.system
                 }
                 parcourus.Add((t, idSlot));
 
-                int pos = positionsInternesProchainesTuiles[c++];
+                int pos = positionsInternesProchainesTuiles[c];
                 ulong nextSlot = t.IdSlotFromPositionInterne(pos);
                 ulong idJ = t.Slots[nextSlot].IdJoueur;
 

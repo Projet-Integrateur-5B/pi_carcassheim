@@ -101,6 +101,7 @@ namespace Assets.System
             try
             {
                 s_RoomInfo.WaitOne();
+
                 idModerateur = ulong.Parse(values[0]);
                 nbJoueur = int.Parse(values[1]);
                 nbJoueurMax = int.Parse(values[2]);

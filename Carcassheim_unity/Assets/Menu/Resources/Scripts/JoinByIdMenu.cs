@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System;
 
 public class JoinByIdMenu : Miscellaneous
 {
@@ -61,11 +62,12 @@ public class JoinByIdMenu : Miscellaneous
 		InputFieldEndEdit(idCM);
 
 		Packet packet = new Packet();
-		packet.IdMessage = Tools.IdMessage.AskPort;
+		packet.IdMessage = Tools.IdMessage.RoomAskPort;
 		packet.IdPlayer = Communication.Instance.idClient;
-		packet.Data = new string[] { RemoveLastSpace(idCM.text) };
+		packet.IdRoom = int.Parse(RemoveLastSpace(idCM.text));
+		packet.Data = Array.Empty<string>();
 
-		Communication.Instance.SetRoom(int.Parse(idCM.text));
+		Communication.Instance.SetRoom(packet.IdRoom);
 		Communication.Instance.SetIsInRoom(0);
 		Communication.Instance.SendAsync(packet);
 	}
@@ -74,7 +76,7 @@ public class JoinByIdMenu : Miscellaneous
 	{
 
 		bool res = false;
-		if (packet.IdMessage == Tools.IdMessage.AskPort)
+		if (packet.IdMessage == Tools.IdMessage.RoomAskPort)
 		{
 			if (packet.Error == Tools.Errors.None)
 			{
