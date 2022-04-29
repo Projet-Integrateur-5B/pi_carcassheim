@@ -96,6 +96,6 @@ public class Partie
         ulong idTuile = 0, slot = 0;
         Position pos = new Position();
         //_plateau.PoserTuile(idTuile, pos);
-        _plateau.PoserPion(_idCurrentJoueur, idTuile, slot);
+        //_plateau.PoserPion(_idCurrentJoueur, idTuile, slot);
     }
 }

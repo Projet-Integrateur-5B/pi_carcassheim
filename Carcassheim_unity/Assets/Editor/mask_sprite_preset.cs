@@ -5,13 +5,14 @@ using UnityEditor;
 using UnityEditor.Presets;
 public class mask_sprite_preset : AssetPostprocessor
 {
-    Preset pres = AssetDatabase.LoadAssetAtPath<Preset>("Assets/Affichage_InGame/Tuiles/sprites/mask_preset.preset");
-    void OnPreprocessTexture(Texture2D texture)
+    Preset pres = AssetDatabase.LoadAssetAtPath<Preset>("Assets/Affichage_InGame/Tuiles/mask_preset.preset");
+    void OnPreprocessTexture()
     {
+        if (pres == null)
+            pres = AssetDatabase.LoadAssetAtPath<Preset>("Assets/Affichage_InGame/Tuiles/mask_preset.preset");
         if (assetPath.StartsWith("Assets/Affichage_InGame/Tuiles/sprites/mask"))
         {
             pres.ApplyTo(assetImporter);
-            // Debug.Log(assetPath);
         }
     }
 }

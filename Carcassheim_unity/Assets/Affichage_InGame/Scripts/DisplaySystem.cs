@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Assets.system;
 
 public enum DisplaySystemState
 {
@@ -173,7 +173,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
     {
-        Debug.Log("Leaving " + old_state + " to " + new_state);
+        //Debug.Log("Leaving " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.meeplePosing:
@@ -282,7 +282,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        Debug.Log("State enterring from " + old_state + " to " + new_state);
+        //Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
@@ -290,8 +290,8 @@ public class DisplaySystem : MonoBehaviour
                 Debug.Log("Tour de " + act_player.Name + " " + act_player.Id.ToString());
                 if (old_state != DisplaySystemState.noState)
                     player_list.nextPlayer(act_player);
-                // if (my_player == null && act_player.is_my_player)
-                //     banner.setPlayer(my_player);
+                if (my_player == null && act_player.is_my_player)
+                    banner.setPlayer(act_player);
                 table.Focus = act_player.is_my_player;
                 turnBegin();
                 break;
@@ -306,29 +306,34 @@ public class DisplaySystem : MonoBehaviour
                 board.displayTilePossibilities();
                 break;
             case DisplaySystemState.meeplePosing:
-                // foreach (MeepleRepre mp in meeples_hand)
-                // {
-                //     mp.slot_possible.Clear();
-                //     system_back.askMeeplePosition(new MeeplePosParam(act_tile.Id, act_tile.Pos, mp.Id) ,mp.slot_possible);
-                // }
-                act_tile.showPossibilities(act_player);
+                foreach (MeepleRepre mp in meeples_hand)
+                {
+                    mp.slot_possible.Clear();
+                    system_back.askMeeplePosition(new MeeplePosParam(act_tile.Id, act_tile.Pos, mp.Id), mp.slot_possible);
+                }
+                if (act_meeple != null)
+                    act_tile.showPossibilities(act_player, act_meeple.slot_possible);
                 break;
             case DisplaySystemState.scoreChange:
                 List<PlayerScoreParam> scores = new List<PlayerScoreParam>();
-                system_back.askScores(scores);
+                List<Zone> zones = new List<Zone>();
+                system_back.askScores(scores, zones);
                 foreach (PlayerScoreParam score in scores)
                 {
-                    players_mapping[score.id_player].Score = score.points_gagnes;
+                    players_mapping[(int)score.id_player].Score = score.points_gagnes;
                     Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
-                    foreach (Zone z in score.zone)
+                    foreach (Zone z in zones)
                     {
-                        TuileRepre tl = board.getTileAt(z.pos);
-                        if (tl != null && tl.Id == z.id_tuile)
+                        foreach (System.Tuple<int, int, ulong> pos in z.positions)
                         {
-                            SlotIndic slt = tl.getSlotAt(z.id_slot);
-                            if (slt != null)
+                            TuileRepre tl = board.getTileAt(new PositionRepre(pos.Item1, pos.Item2));
+                            if (tl != null)
                             {
-                                slt.clean();
+                                SlotIndic slt = tl.getSlotAt((int)pos.Item3);
+                                if (slt != null)
+                                {
+                                    slt.clean();
+                                }
                             }
                         }
                     }
@@ -337,13 +342,14 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
                 List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
-                system_back.askFinalScore(scores_final);
+                List<Zone> zones_final = new List<Zone>();
+                system_back.askFinalScore(scores_final, zones_final);
 
                 if (my_player != null)
                 {
                     foreach (PlayerScoreParam score in scores_final)
                     {
-                        players_mapping[score.id_player].Score = score.points_gagnes;
+                        players_mapping[(int)score.id_player].Score = score.points_gagnes;
                         Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
                     }
 
@@ -354,7 +360,7 @@ public class DisplaySystem : MonoBehaviour
                         {
                             n_sup += 1;
                         }
-                    
+
                     }
                     score_board.setEndOfGame(my_player, 1 + n_sup);
                 }
@@ -388,7 +394,7 @@ public class DisplaySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool mouse_consumed = false;
+        bool mouse_consumed = act_system_state == DisplaySystemState.endOfGame;
         if (!mouse_consumed && Input.GetMouseButtonUp(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -586,8 +592,20 @@ public class DisplaySystem : MonoBehaviour
         meeples_hand.Clear();
         meeple_distrib.Clear();
 
+        int final_count = system_back.askTilesInit(tiles_init);
+        int L = tiles_init.Count;
+        TuileRepre tl;
+        for (int i = 0; i < L; i++)
+        {
+            tl = instantiateTileOfId(tiles_init[i].id_tile);
+            if (tiles_init[i].tile_flags)
+                system_back.getTilePossibilities(tl.Id, tl.possibilitiesPosition);
+            tiles_drawned.Enqueue(tl);
+            lifespan_tiles_drawned.Enqueue(tiles_init[i].tile_flags);
+        }
+
         system_back.askMeeplesInit(meeples_init);
-        int L = meeples_init.Count;
+        L = meeples_init.Count;
         for (int i = 0; i < L; i++)
         {
             // TODO should instantiate dependnat on the type
@@ -598,20 +616,9 @@ public class DisplaySystem : MonoBehaviour
             meeple_distrib[mp.Id] = meeples_init[i].nb_meeple;
 
             mp.slot_possible.Clear();
-            
+
         }
 
-        int final_count = system_back.askTilesInit(tiles_init);
-        L = tiles_init.Count;
-        TuileRepre tl;
-        for (int i = 0; i < L; i++)
-        {
-            tl = instantiateTileOfId(tiles_init[i].id_tile);
-            if (tiles_init[i].tile_flags)
-                system_back.getTilePossibilities(tl.Id, tl.possibilitiesPosition);
-            tiles_drawned.Enqueue(tl);
-            lifespan_tiles_drawned.Enqueue(tiles_init[i].tile_flags);
-        }
 
         table.resetHandSize(final_count, meeples_hand, meeple_distrib);
     }
@@ -690,10 +697,10 @@ public class DisplaySystem : MonoBehaviour
             }
             table.activeMeepleChanged(act_meeple, n_meeple);
             act_meeple = n_meeple;
-            // if (act_system_state == DisplaySystemState.meeplePosing)
-            // {
-            //     act_tile.showPossibilities(act_player, act_meeple.slot_possible);
-            // }
+            if (act_system_state == DisplaySystemState.meeplePosing && act_meeple != null)
+            {
+                act_tile.showPossibilities(act_player, act_meeple.slot_possible);
+            }
             if (act_player.is_my_player)
                 system_back.sendAction(new DisplaySystemActionMeepleSelection(act_meeple.Id, index));
         }

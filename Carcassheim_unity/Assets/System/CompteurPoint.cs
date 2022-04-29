@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using UnityEngine;
 namespace Assets.system
 {
     internal class CompteurPoints
@@ -17,7 +17,10 @@ namespace Assets.system
 
         public static void Init(Plateau plateau)
         {
-            instance = new CompteurPoints(plateau);
+            if (instance == null)
+                instance = new CompteurPoints(plateau);
+            else
+                instance._plateau = plateau;
         }
 
         public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur)
@@ -28,23 +31,34 @@ namespace Assets.system
 
             //idJoueur = tuile.Slots[idSlot].IdJoueur;
 
-            List<Tuile> parcourue = new List<Tuile> { tuile };
+            List<(Tuile, ulong)> parcourue = new List<(Tuile, ulong)>();
             int result = 0;
             Dictionary<ulong, int> pionParJoueur = new Dictionary<ulong, int>();
             instance.PointsZone(tuile, idSlot, parcourue, ref result, pionParJoueur);
+
+            Debug.Log("Pions Par Joueur : " + pionParJoueur.ToString());
+            Debug.Log("POINTS : " + result);
 
             ulong playerWithMostPawn = ulong.MaxValue;
             int mostPawn = -1;
             List<ulong> playerGainingPoints = new List<ulong>();
             foreach (var item in pionParJoueur)
             {
+                Debug.Log(item);
                 if (item.Value > mostPawn)
+                {
+                    mostPawn = item.Value;
                     playerWithMostPawn = item.Key;
+                }
             }
+            Debug.Log("PION " + mostPawn);
             foreach (var item in pionParJoueur)
             {
                 if (item.Value == mostPawn)
+                {
                     playerGainingPoints.Add(item.Key);
+                    Debug.Log("JOUEUR " + item.Key);
+                }
             }
             idJoueur = playerGainingPoints.ToArray();
 
@@ -52,7 +66,7 @@ namespace Assets.system
         }
 
         private void PointsZone(Tuile tuile, int idSlot,
-            List<Tuile> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
+            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
         {
             bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
@@ -64,12 +78,13 @@ namespace Assets.system
             int c = 0;
             foreach (var item in adj)
             {
-                if (item == null || parcourue.Contains(item))
-                    continue;
-                parcourue.Add(item);
-
                 int pos = positionsInternesProchainesTuiles[c++];
-                int nextSlot = (int)item.IdSlotFromPositionInterne(pos);
+                ulong nextSlot = item.IdSlotFromPositionInterne(pos);
+
+                if (item == null || parcourue.Contains((item, nextSlot)))
+                    continue;
+                parcourue.Add((item, nextSlot));
+
                 ulong idJ = item.Slots[nextSlot].IdJoueur;
 
                 if (idJ != ulong.MaxValue)
@@ -81,7 +96,7 @@ namespace Assets.system
                 }
 
                 result += PointTerrain(item.Slots[nextSlot].Terrain);
-                PointsZone(item, nextSlot, parcourue, ref result, pionParJoueur);
+                PointsZone(item, (int)nextSlot, parcourue, ref result, pionParJoueur);
             }
         }
 
@@ -107,7 +122,7 @@ namespace Assets.system
             foreach (int position in positionsInternes)
             {
                 //direction = (position + (3 * tuile.Rotation)) / 3;
-                direction = (4 + position / 3 - tuile.Rotation) % 4;
+                direction = (4 + (position / 3) - tuile.Rotation) % 4;
 
                 Tuile elem = _plateau.GetTuile(x + Plateau.PositionAdjacentes[direction, 0],
                                       y + Plateau.PositionAdjacentes[direction, 1]);
@@ -118,8 +133,19 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 3);
+                    var trucComplique = ((position - 3 * tuile.Rotation) + 18 + 3 * elem.Rotation) % 12;
+                    switch (trucComplique % 3)
+                    {
+                        case 0:
+                            trucComplique = (trucComplique + 2);
+                            break;
+                        case 2:
+                            trucComplique = (trucComplique - 2);
+                            break;
+                        default:
+                            break;
+                    }
+                    positionsInternesProchainesTuilesTemp.Add(trucComplique);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();

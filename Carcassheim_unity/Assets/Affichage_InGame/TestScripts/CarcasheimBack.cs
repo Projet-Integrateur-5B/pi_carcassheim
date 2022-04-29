@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.system;
 
 
 public enum WinCondition
@@ -44,32 +46,6 @@ public struct TileInitParam
     }
     public int id_tile;
     public bool tile_flags;
-};
-
-public struct Zone
-{
-    public Zone(PositionRepre pos, int id_tuile, int id_slot)
-    {
-        this.pos = pos;
-        this.id_tuile = id_tuile;
-        this.id_slot = id_slot;
-    }
-    public PositionRepre pos;
-    public int id_tuile;
-    public int id_slot;
-};
-
-public struct PlayerScoreParam
-{
-    public PlayerScoreParam(int id_player, int points_gagnes, Zone[] zone)
-    {
-        this.id_player = id_player;
-        this.points_gagnes = points_gagnes;
-        this.zone = zone;
-    }
-    public int id_player;
-    public int points_gagnes;
-    public Zone[] zone;
 };
 
 public struct MeeplePosParam
@@ -124,7 +100,8 @@ public abstract class CarcasheimBack : MonoBehaviour
 
     public abstract int getMyPlayer();
 
-    public abstract void askScores(List<PlayerScoreParam> players_scores);
+    public abstract void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones);
+    public abstract void askFinalScore(List<PlayerScoreParam> playerScores, List<Zone> zones);
 
     public abstract void askTimerTour(out int min, out int sec);
 
@@ -134,7 +111,6 @@ public abstract class CarcasheimBack : MonoBehaviour
 
     public abstract void askWinCondition(ref WinCondition win_cond, List<int> parameters);
 
-    public abstract void askFinalScore(List<PlayerScoreParam> playerScores);
 
     public abstract void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos);
 }

@@ -103,24 +103,45 @@ public abstract class Miscellaneous : MonoBehaviour
         s_state = b;
     }
 
-    public void Connected()
-    {
-        ColorUtility.TryParseHtmlString("#90EE90", out colState);
-        Button tmpStat = Miscellaneous.FindObject(absolute_parent, "ShowStat").GetComponent<Button>();
-        Button tmpJouer = Miscellaneous.FindObject(absolute_parent, "ShowRoomSelection").GetComponent<Button>();
-        Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().color = colState;
-        Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().text = "Connecte";
-        Miscellaneous.FindObject(absolute_parent, "ShowConnection").SetActive(false);
-        tmpJouer.interactable = tmpStat.interactable = true;
-        tmpJouer.GetComponentInChildren<Text>().color = tmpStat.GetComponentInChildren<Text>().color = Color.white;
+	public void Connected()
+	{
+		ColorUtility.TryParseHtmlString("#90EE90", out colState);
+		Button tmpStat = Miscellaneous.FindObject(absolute_parent, "ShowStat").GetComponent<Button>();
+		Button tmpJouer = Miscellaneous.FindObject(absolute_parent, "ShowRoomSelection").GetComponent<Button>();
+		Button tmpConnection = Miscellaneous.FindObject(absolute_parent, "ShowConnection").GetComponent<Button>();
+		Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().color = colState;
+		Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().text = "Connecte";
+		tmpConnection.gameObject.SetActive(false);
+		tmpJouer.interactable = tmpStat.interactable = true;
+		tmpJouer.GetComponentInChildren<Text>().color = tmpStat.GetComponentInChildren<Text>().color = Color.white;
+		// Remonte les boutons après la connexion 
+		// ! (NE PAS CHANGER)
+		Transform buttons = Miscellaneous.FindObject(absolute_parent, "Buttons").transform;
+		for (int i = 1; i < buttons.childCount - 1; i++)
+			buttons.GetChild(i).transform.position += new Vector3(0, 150 - i * 10, 0);
 
-        // Remonte les boutons après la connexion 
-        Transform buttons = Miscellaneous.FindObject(absolute_parent, "Buttons").transform;
-        // buttons.GetChild(1).transform.position = buttons.GetChild(1).transform.position + new Vector3(0, 150, 0);
-        // buttons.GetChild(2).transform.position = buttons.GetChild(2).transform.position + new Vector3(0, 150, 0);
-        // buttons.GetChild(3).transform.position = buttons.GetChild(3).transform.position + new Vector3(0, 150, 0);
-        // buttons.GetChild(4).transform.position = buttons.GetChild(4).transform.position + new Vector3(0, 150, 0);
-    }
+        // Probleme de hover quand connecté sur home menu par défaut suite à l'intégration (sémaphore ??)
+        // PATCH provisoire (A CHANGER):
+        GameObject TridentGo = GameObject.Find("Other").transform.Find("Trident").gameObject;
+        if (TridentGo.activeSelf == true) 
+                TridentGo.SetActive(false);
+        //tridentHover(buttons.GetChild(1).GetComponent<Component>(),  GameObject.Find("Other").transform.Find("Trident").gameObject);
+	}
+
+	public void tridentHover(Component c, GameObject GoT)
+	{
+		if (!(c.transform.parent.name == "ForgottenPwdUser" || c.transform.parent.name == "CGU"))
+		{
+			GoT.SetActive(true);
+			GameObject curBtn = c.gameObject;
+			float width = curBtn.GetComponent<RectTransform>().rect.width;
+			float height = curBtn.GetComponent<RectTransform>().rect.height;
+			GameObject TF = GoT.transform.Find("TridentFront").gameObject;
+			GameObject TB = GoT.transform.Find("TridentBack").gameObject;
+			TF.transform.position = curBtn.transform.position + new Vector3(width / 2 + 90, 0, 0);
+			TB.transform.position = curBtn.transform.position - new Vector3(width / 2 + 20, 0, 0);
+		}
+	}
 
     public void SetMenuChanged(bool b)
     {
@@ -152,7 +173,6 @@ public abstract class Miscellaneous : MonoBehaviour
 
     public void ChangeMenu(string close, string goTo)
     {
-        Debug.Log("Close " + close + " to " + goTo);
         s_menuHasChanged = true;
 
 

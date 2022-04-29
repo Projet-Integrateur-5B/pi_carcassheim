@@ -4,6 +4,29 @@ using UnityEngine;
 
 namespace Assets.system
 {
+    public struct Zone
+    {
+        public Zone(ulong[] id_players, Tuple<int, int, ulong>[] positions)
+        {
+
+            this.id_players = id_players;
+            this.positions = positions;
+        }
+
+        public ulong[] id_players;
+        public Tuple<int, int, ulong>[] positions;
+    };
+
+    public struct PlayerScoreParam
+    {
+        public PlayerScoreParam(ulong id_player, int points_gagnes)
+        {
+            this.id_player = id_player;
+            this.points_gagnes = points_gagnes;
+        }
+        public ulong id_player;
+        public int points_gagnes;
+    };
     public class Plateau
     {
         public static readonly int[,] PositionAdjacentes;
@@ -20,6 +43,7 @@ namespace Assets.system
         public Plateau(Dictionary<ulong, Tuile> dicoTuiles)
         {
             _tuiles = new List<Tuile>();
+            CompteurPoints.Init(this);
             _dicoTuile = dicoTuiles;
         }
 
@@ -160,15 +184,24 @@ namespace Assets.system
 
         public Position[] PositionsPlacementPossible(Tuile tuile)
         {
-            if (_tuiles.Count == 0)
+            var listTuiles = new List<Tuile>();
+
+            foreach (var item in _tuiles)
+            {
+                if (item.TuileFantome)
+                    continue;
+                listTuiles.Add(item);
+            }
+
+            if (listTuiles.Count == 0)
                 return new Position[] { new Position(0, 0, 0) };
 
             List<Position> resultat = new List<Position>();
 
             int x, y, rot;
 
-            List <Position> checked_pos = new List<Position>();
-            foreach (var t in _tuiles)
+            List<Position> checked_pos = new List<Position>();
+            foreach (var t in listTuiles)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -202,14 +235,10 @@ namespace Assets.system
 
         public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
         {
-            if (GetTuile(x, y) != null)
+            Tuile tl = GetTuile(x, y);
+            if (tl != null && !tl.TuileFantome)
             {
                 return false;
-            }
-            foreach (var item in _tuiles)
-            {
-                if (item.X == x && item.Y == y)
-                    return false;
             }
 
             Tuile[] tuilesAdjacentes = TuilesAdjacentes(x, y);
@@ -278,20 +307,44 @@ namespace Assets.system
             return TuilesAdjacentes(t.X, t.Y);
         }
 
-        public bool ZoneFermee(ulong idTuile, ulong idSlot)
+        public bool VerifZoneFermeeTuile(int x, int y, List<PlayerScoreParam> gain, List<Zone> zones)
         {
-            return ZoneFermee(tuileDeModelId(idTuile), idSlot);
+            Tuile tl = GetTuile(x, y);
+            bool point_change = false;
+            for (ulong i = 0; i < (ulong)tl.NombreSlot; i++)
+            {
+                if (ZoneFermeeForSlot(x, y, i))
+                {
+                    Debug.Log("Une Zone a ete fermee");
+                    ulong[] gagnants;
+                    int point = CompteurPoints.CompterZoneFerme(x, y, (int)i, out gagnants);
+                    foreach (ulong id_joueur in gagnants)
+                    {
+                        gain.Add(new PlayerScoreParam(id_joueur, point));
+                        point_change = true;
+                    }
+                    Zone z = new Zone();
+                    z.id_players = gagnants;
+                    z.positions = new Tuple<int, int, ulong>[1];
+                    z.positions[0] = new Tuple<int, int, ulong>(x, y, i);
+                    zones.Add(z);
+                }
+
+            }
+            return point_change;
         }
 
-        public bool ZoneFermee(Tuile tuile, ulong idSlot)
+        public bool ZoneFermeeForSlot(int x, int y, ulong idSlot)
+        {
+            return ZoneFermeeForSlot(GetTuile(x, y), idSlot);
+        }
+
+        public bool ZoneFermeeForSlot(Tuile tuile, ulong idSlot)
         {
             if (!_tuiles.Contains(tuile)) // ERROR
                 return false;
 
-            List<Tuile> tuilesFormantZone = new List<Tuile>
-            {
-                tuile
-            };
+            List<Tuile> tuilesFormantZone = new List<Tuile>();
 
             return ZoneFermeeAux(tuile, idSlot, tuilesFormantZone);
         }
@@ -323,7 +376,7 @@ namespace Assets.system
         private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, ulong idSlot,
             out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
         {
-            Debug.Log("Verif tuile " + tuile.Id.ToString() +" for slot "+idSlot.ToString());
+            //Debug.Log("Verif tuile " + tuile.Id.ToString() + " for slot " + idSlot.ToString());
             emplacementVide = false;
             int[] positionsInternes;
             try
@@ -333,7 +386,7 @@ namespace Assets.system
             catch (Exception e)
             {
                 Debug.Log("idSlot = " + idSlot);
-                throw e;
+                throw new Exception(e.Message + " (probablement la faute de Justin)");
             }
             List<int> positionsInternesProchainesTuilesTemp = new List<int>();
             List<Tuile> resultat = new List<Tuile>();
@@ -345,7 +398,7 @@ namespace Assets.system
                 //direction = (position + (3 * tuile.Rotation)) / 3;
                 direction = (4 + position / 3 - tuile.Rotation) % 4;
 
-                Debug.Log("Direction vers la prochaine Tuile de la zone = " + direction);
+                //Debug.Log("Direction vers la prochaine Tuile de la zone = " + direction);
 
                 Tuile elem = GetTuile(x + PositionAdjacentes[direction, 0],
                                       y + PositionAdjacentes[direction, 1]);
@@ -356,8 +409,20 @@ namespace Assets.system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 3);
+                    var trucComplique = ((position - 3 * tuile.Rotation) + 18 + 3 * elem.Rotation) % 12;
+                    switch (trucComplique % 3)
+                    {
+                        case 0:
+                            trucComplique = (trucComplique + 2) % 12;
+                            break;
+                        case 2:
+                            trucComplique = (trucComplique + 10) % 12;
+                            break;
+                        default:
+                            break;
+                    }
+                    positionsInternesProchainesTuilesTemp.Add(trucComplique);
+                    //positionsInternesProchainesTuilesTemp.Add((((direction + 2) % 4) * 3 + (position % 3) + 3 * elem.Rotation) % 12);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();
@@ -365,9 +430,9 @@ namespace Assets.system
             return resultat.ToArray();
         }
 
-        public void PoserPion(ulong idJoueur, ulong idTuile, ulong idSlot)
+        public void PoserPion(ulong idJoueur, int x, int y, ulong idSlot)
         {
-            PoserPion(idJoueur, tuileDeModelId(idTuile), idSlot);
+            PoserPion(idJoueur, GetTuile(x, y), idSlot);
         }
 
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
@@ -375,15 +440,21 @@ namespace Assets.system
             tuile.Slots[idSlot].IdJoueur = idJoueur;
         }
 
+        public int[] EmplacementPionPossible(int x, int y, ulong idJoueur, ulong id_meeple)
+        {
+            return EmplacementPionPossible(x, y, idJoueur);
+        }
+
         public int[] EmplacementPionPossible(int x, int y, ulong idJoueur)
         {
-            Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
+            //Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
             Tuile tuile = GetTuile(x, y);
             List<int> resultat = new List<int>();
             List<(Tuile, ulong)> parcourus = new List<(Tuile, ulong)>();
-            Debug.Log("NombreSlot = " + tuile.NombreSlot);
+            //Debug.Log("NombreSlot = " + tuile.NombreSlot);
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
+                Debug.Log("LOOKING SLOT " + i);
                 if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
                     resultat.Add(i);
                 parcourus.Clear();
@@ -394,36 +465,45 @@ namespace Assets.system
 
         private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<(Tuile, ulong)> parcourus)
         {
-            Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
-                + " liste des tuiles parcourues de longeur: " + parcourus.Count);
+            //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
+            //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
+            Tuile tl_ref = GetTuile(x, y);
+            Debug.Log("READING (" + tl_ref.Id + ") " + x + ", " + y + ", " + tl_ref.Rotation + " :" + idSlot + " : " + tl_ref.Slots[idSlot].Terrain);
             bool vide, resultat = false;
             int[] positionsInternesProchainesTuiles;
-            Tuile[] adj = TuilesAdjacentesAuSlot(GetTuile(x, y), idSlot, out vide, out positionsInternesProchainesTuiles);
+            Tuile[] adj = TuilesAdjacentesAuSlot(tl_ref, idSlot, out vide, out positionsInternesProchainesTuiles);
 
-            Debug.Log("methode TuilesAdjacentesAuSlot appelee, adj de longueur: " + adj.Length);
+            //Debug.Log("methode TuilesAdjacentesAuSlot appelee, adj de longueur: " + adj.Length);
             foreach (var item in adj)
             {
-                Debug.Log("Tuile dans adj :" + item.ToString());
+                //Debug.Log("Tuile dans adj :" + item.ToString());
             }
 
             if (adj.Length == 0)
                 return false;
-            int c = 0;
+            int c = -1;
             foreach (var t in adj)
             {
+                c++;
                 if (t == null || parcourus.Contains((t, idSlot)))
                     continue;
                 parcourus.Add((t, idSlot));
 
-                int pos = positionsInternesProchainesTuiles[c++];
+                int pos = positionsInternesProchainesTuiles[c];
                 ulong nextSlot = t.IdSlotFromPositionInterne(pos);
                 ulong idJ = t.Slots[nextSlot].IdJoueur;
 
-                Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
-                
+                //Debug.Log("Verification sur " + t.ToString() + ". idSlot : " + nextSlot + " " + t.Slots.ToString());
+
                 if (idJ != ulong.MaxValue)
+                {
+                    Debug.Log("Zone " + x + ", " + y + ", " + idSlot + " appartient à " + idJ);
                     return true;
+                }
+                Debug.Log("FROM " + x + ", " + y + ", " + idSlot + " to " + t.X + ", " + t.Y + ", " + nextSlot);
                 resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);
+                if (resultat)
+                    return resultat;
             }
 
             return resultat;
@@ -431,9 +511,11 @@ namespace Assets.system
 
         public bool PionPosable(int x, int y, ulong idSlot, ulong idJoueur, ulong idMeeple)
         {
+            if (idSlot > 12)
+                return false;
             Tuile tuile = GetTuile(x, y);
 
-            Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
+            // Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
 
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;

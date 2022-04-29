@@ -210,21 +210,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             image.color = new Color32(r, g, b, f); // transparence et couleur
     }
 
-    public void tridentHover(Component c)
-    {
-        if (!(c.transform.parent.name == "ForgottenPwdUser" || c.transform.parent.name == "CGU"))
-        {
-            TridentGo.SetActive(true);
-            GameObject curBtn = c.gameObject;
-            float width = curBtn.GetComponent<RectTransform>().rect.width;
-            float height = curBtn.GetComponent<RectTransform>().rect.height;
-            GameObject TF = TridentGo.transform.Find("TridentFront").gameObject;
-            GameObject TB = TridentGo.transform.Find("TridentBack").gameObject;
-            TF.transform.position = curBtn.transform.position + new Vector3(width / 2 + 90, 0, 0);
-            TB.transform.position = curBtn.transform.position - new Vector3(width / 2 + 20, 0, 0);
-        }
-    }
-
     public void resetHoverPreviousGo()
     {
         if (previousGo != null && boolPC == true)
@@ -258,13 +243,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
     public void changeHover()
     {
+        
         if ((boolSelectionChange && boolPC) == true)
         {
             if (TridentGo.activeSelf == true) // TRIDENT
                 TridentGo.SetActive(false);
             resetHoverPreviousGo();
             Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
-            //Debug.Log("next" + nextTarget);
+     
             switch (nextTarget.name)
             {
                 case "RawImage": // GIF : A changer (mettre autre chose que zoom)
@@ -274,7 +260,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                     colorImage(nextGo, 0, 0, 0, 0, false);
                     break;
                 case "Text": // BOUTON
-                    tridentHover(nextTarget); // TRIDENT
+                    tridentHover(nextTarget, TridentGo); // TRIDENT
                     textColor(colHover, 3, nextGo);
                     break;
                 case "Background": // TOGGLE
@@ -317,6 +303,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             gameObject.SendMessage(methode, tog);
         else gameObject.SendMessage(methode, inp);
         if (tog == null || inp == null)
-            NewMenuSelectButton();
+            NewMenuSelectButton();    
+            
     }
 }

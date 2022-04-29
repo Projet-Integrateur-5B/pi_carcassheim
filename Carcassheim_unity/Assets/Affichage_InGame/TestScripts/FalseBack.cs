@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
+using Assets.system;
+
 public class FalseBack : CarcasheimBack
 {
     public int tile_number;
@@ -429,7 +431,7 @@ public class FalseBack : CarcasheimBack
                 case XmlNodeType.Text:
                     switch (state)
                     {
-                        case 0: score.id_player = int.Parse(reader.Value); break;
+                        case 0: score.id_player = ulong.Parse(reader.Value); break;
                         case 1: score.points_gagnes = int.Parse(reader.Value); break;
                         default:
                             Debug.Log("Tried to read value when in no state : " + reader.Value);
@@ -442,7 +444,6 @@ public class FalseBack : CarcasheimBack
                     break;
             }
         }
-        score.zone = new Zone[0];
         scores.Add(score);
     }
 
@@ -586,7 +587,7 @@ public class FalseBack : CarcasheimBack
     {
     }
 
-    override public void askScores(List<PlayerScoreParam> players_scores)
+    override public void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones)
     {
         players_scores.AddRange(my_scores[num_turn]);
         num_turn += 1;
@@ -627,13 +628,13 @@ public class FalseBack : CarcasheimBack
         parameters.AddRange(win_param);
     }
 
-    override public void askFinalScore(List<PlayerScoreParam> playerScores)
+    override public void askFinalScore(List<PlayerScoreParam> playerScores, List<Zone> zones)
     {
         //TODO Pareil que askScore
     }
 
     override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
     {
-        
+
     }
 }
