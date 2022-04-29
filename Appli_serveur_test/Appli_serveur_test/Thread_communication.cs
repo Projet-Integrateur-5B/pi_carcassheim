@@ -148,8 +148,9 @@ namespace system
         /// </summary>
         /// <param name="playerId"> Id of the moderator </param>
         /// <param name="socket"> Socket of the moderator (first player) </param>
+        /// <param name="idParty"> Id of the party (first player) </param>
         /// <returns> The id of the game (-1 if error occurs) </returns>
-        public int AddNewGame(ulong playerId, Socket? playerSocket)
+        public int AddNewGame(ulong playerId, Socket? playerSocket, int idParty)
         {
 
             int id_nouv_partie = -1;
@@ -158,12 +159,11 @@ namespace system
             {
                 if (_nb_parties_gerees < 5)
                 {
-                    // Dixaine : numéro de thread, unité : numéro de partie
-                    id_nouv_partie = _id_thread_com * 10 + (_nb_parties_gerees + 1);
+                    id_nouv_partie = idParty;
 
                     lock (this._lock_id_parties_gerees)
                     {
-                        _id_parties_gerees.Add(id_nouv_partie);
+                        _id_parties_gerees.Add(idParty);
                     }
 
                     _nb_parties_gerees++;

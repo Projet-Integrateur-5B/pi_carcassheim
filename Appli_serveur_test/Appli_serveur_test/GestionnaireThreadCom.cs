@@ -18,6 +18,8 @@ namespace system
         private List<int> _lst_localPort_dispo;
         private List<int> _lst_remotePort_dispo;
         private int _compteur_id_thread_com;
+        private int _compteur_id_partie;
+        private Semaphore _s_compteur_id_partie;
 
         private GestionnaireThreadCom() { }
 
@@ -53,6 +55,7 @@ namespace system
                         _instance._lst_localPort_dispo = new List<int>();
                         _instance._lst_remotePort_dispo = new List<int>();
                         _instance._compteur_id_thread_com = 0;
+                        _instance._compteur_id_partie = 0;
 
                         var error_value = Tools.Errors.None;
                         var test = ServerParameters.GetConfig(ref error_value);
@@ -168,8 +171,12 @@ namespace system
                 { // Seulement si un nouveau thread de com a pu être créé
 
                     // Demande de création d'une nouvelle partie dans le bon thread de com
-                    idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket);
-                    if(idNewRoom != -1)
+                    _s_compteur_id_partie.WaitOne();
+                    idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket, _compteur_id_partie);
+                    _compteur_id_partie++;
+                    _s_compteur_id_partie.Release();
+
+                    if (idNewRoom != -1)
                     {
                         portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_remotePort();
                     }
@@ -192,7 +199,11 @@ namespace system
 
                     if (thread_com_libre_trouve)
                     {
-                        idNewRoom = thread_com_iterateur.AddNewGame(idPlayer, socket);
+                        _s_compteur_id_partie.WaitOne();
+                        idNewRoom = thread_com_iterateur.AddNewGame(idPlayer, socket, _compteur_id_partie);
+                        _compteur_id_partie++;
+                        _s_compteur_id_partie.Release();
+
                         if (idNewRoom != -1)
                         {
                             portThreadCom = thread_com_iterateur.Get_remotePort();
@@ -213,7 +224,11 @@ namespace system
                     { // Seulement si un nouveau thread de com a pu être créé
 
                         // Demande de création d'une nouvelle partie dans le bon thread de com
-                        idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket);
+                        _s_compteur_id_partie.WaitOne();
+                        idNewRoom = _instance._lst_obj_threads_com[positionThreadCom].AddNewGame(idPlayer, socket, _compteur_id_partie);
+                        _compteur_id_partie++;
+                        _s_compteur_id_partie.Release();
+
                         if (idNewRoom != -1)
                         {
                             portThreadCom = _instance._lst_obj_threads_com[positionThreadCom].Get_remotePort();
