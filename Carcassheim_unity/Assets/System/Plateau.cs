@@ -537,6 +537,8 @@ namespace Assets.system
             List<(Tuile, ulong)> parcourues = new List<(Tuile, ulong)>();
             var tuile = GetTuile(x, y);
             var result = new Dictionary<ulong, int>();
+            if (tuile.Slots[idSlot].Terrain == TypeTerrain.Pre)
+                return result;
             RemoveAllPawnInZoneAux(tuile, idSlot, parcourues, ref result);
             return result;
         }
