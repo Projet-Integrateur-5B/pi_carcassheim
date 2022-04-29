@@ -81,7 +81,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Debug.Log(e.ToString());
         }
     }
 
@@ -104,7 +104,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Debug.Log(e.ToString());
         }
     }
 
@@ -175,7 +175,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Debug.Log(e.ToString());
         }
     }
 
@@ -240,11 +240,11 @@ public class ClientAsync
 
             // Complete sending the data to the remote device.
             int bytesSent = client.EndSend(ar);
-            Console.WriteLine("Sent total {0} bytes to server.", bytesSent);
+            Debug.Log("Sent total {0} bytes to server." + bytesSent);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.ToString());
+            Debug.Log(e.ToString());
         }
     }
 
