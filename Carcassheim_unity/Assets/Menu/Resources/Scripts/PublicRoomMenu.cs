@@ -39,6 +39,7 @@ public class PublicRoomMenu : Miscellaneous
 			case "PublicRoomMenu":
 				/* Commuication Async */
 				Communication.Instance.SetIsInRoom(1);
+				Communication.Instance.LancementConnexion();
 
 				Action listening = () =>
 				{
