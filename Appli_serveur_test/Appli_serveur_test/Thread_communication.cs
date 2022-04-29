@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using ClassLibrary;
+using Server;
 
 
 namespace system
@@ -210,26 +211,6 @@ namespace system
 
             _lst_serveur_jeu.RemoveAt(indexOfRoom);
         }
-
-        /// <summary>
-        /// Get the parameters needed to communicate with a client
-        /// </summary>
-        /// <param name="socket"> The listening socket that has received communications from player </param>
-        /// <param name="idPlayer"> Id of the player </param>
-        /// <returns> The parameters of the player's socket </returns>
-        public Parameters GetPlayerSocketParameters(Socket? socket, ulong idPlayer)
-        {
-            Parameters playerParameters = new Parameters();
-
-            IPAddress playerIpAddress = ((IPEndPoint)socket.RemoteEndPoint).Address;
-            int playerPort = ((IPEndPoint)socket.RemoteEndPoint).Port;
-
-            playerParameters.ServerIP = playerIpAddress.ToString();
-            playerParameters.ServerPort = playerPort;
-
-            return playerParameters;
-        }
-
 
         // La fonction du joueur dont c'est le tour
         public void DrawAntiCheatPlayer(int idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
