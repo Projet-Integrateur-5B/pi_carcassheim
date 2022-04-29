@@ -757,7 +757,7 @@ public partial class Server
         string[] tuilesEnvoyees = new string[3];
         try
         {
-            Array.Copy(packet.Data, 1, tuilesEnvoyees, 0, 3);
+            Array.Copy(packetReceived.Data, 1, tuilesEnvoyees, 0, 3);
         }
         catch (Exception ex)
         {
@@ -770,7 +770,7 @@ public partial class Server
         
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-        gestionnaire.CallDrawAntiCheatPlayer(packet.IdPlayer, packet.IdRoom, socket, tuilesEnvoyees);
+        gestionnaire.CallDrawAntiCheatPlayer(packetReceived.IdPlayer, packetReceived.IdRoom, socket, tuilesEnvoyees);
         packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     /// <summary>
@@ -798,7 +798,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
         // Réponse d'un autre joueur (anti cheat) -> pas posable
-        gestionnaire.CallDrawAntiCheatVerif(packet.IdRoom, false, 0, new Position(-1,-1,-1));
+        gestionnaire.CallDrawAntiCheatVerif(packetReceived.IdRoom, false, 0, new Position(-1,-1,-1));
         packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     /// <summary>
@@ -834,8 +834,8 @@ public partial class Server
         
         try
         {
-            idTuile = ulong.Parse(packet.Data[0]);
-            pos = new Position(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3]));
+            idTuile = ulong.Parse(packetReceived.Data[0]);
+            pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
         }
         catch (Exception ex)
         {
@@ -850,7 +850,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
         // Réponse d'un autre joueur (anti cheat) -> posable
-        gestionnaire.CallChooseIdTile(packet.IdPlayer, packet.IdRoom, idTuile, pos, socket);
+        gestionnaire.CallChooseIdTile(packetReceived.IdPlayer, packetReceived.IdRoom, idTuile, pos, socket);
         packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     /// <summary>
@@ -885,8 +885,8 @@ public partial class Server
         
         try
         {
-            idTuile = ulong.Parse(packet.Data[0]);
-            pos = new Position(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3]));
+            idTuile = ulong.Parse(packetReceived.Data[0]);
+            pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
         }
         catch (Exception ex)
         {
@@ -901,7 +901,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
         // Réponse d'un autre joueur (anti cheat) -> posable
-        gestionnaire.CallDrawAntiCheatVerif(packet.IdRoom, true, idTuile, pos);
+        gestionnaire.CallDrawAntiCheatVerif(packetReceived.IdRoom, true, idTuile, pos);
         packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     
