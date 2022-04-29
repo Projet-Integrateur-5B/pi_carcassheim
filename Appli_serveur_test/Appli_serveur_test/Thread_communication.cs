@@ -112,7 +112,7 @@ namespace system
                         // On envoie le display à tous sauf au joueur dont c'est l'action (si tuileDrawn on envoit à tous)
                         if (joueur.Key != idPlayer || idMessage == Tools.IdMessage.TuileDraw) 
                         {
-                            ClientAsync.Send(joueur.Value._socket_of_player, packet);
+                            Server.Server.SendToSpecificClient(joueur.Value._socket_of_player, packet);
 
                             // Lancement de l'écoute de la réponse du joueur 
                             ClientAsync.OnPacketReceived += OnPacketReceived;
@@ -566,7 +566,7 @@ namespace system
                 }
             }
 
-            ClientAsync.Send(playerSocket, packet);
+            Server.Server.SendToSpecificClient(playerSocket, packet);
 
             // Lancement de l'écoute des réponse du client async
             ClientAsync.OnPacketReceived += OnPacketReceived;
@@ -662,8 +662,7 @@ namespace system
 
                 }
             }
-
-     
+            
         }
 
         // ===============================

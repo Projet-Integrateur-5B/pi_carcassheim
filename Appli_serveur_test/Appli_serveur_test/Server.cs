@@ -314,8 +314,10 @@ public static partial class Server
 
             // Get required data from the database.
             var packet = GetFromDatabase(ar, listener, original);
+            
             // Send answer to the client.
-            SendBackToClient(ar, packet);
+            if(packet.IdMessage != Tools.IdMessage.NoAnswerNeeded)
+                SendBackToClient(ar, packet);
         }
     }
     
@@ -354,6 +356,32 @@ public static partial class Server
         state.Listener.BeginSend(bytes, 0, size, 0, null, state);
     }
 
+    /// <summary>
+    ///     Sends a packet to a specific <see cref="Socket" />.
+    /// </summary>
+    /// <param name="client">Instance of <see cref="Socket" /> to send to.</param>
+    /// <param name="original">Instance of <see cref="Packet" /> to send.</param>
+    public static void SendToSpecificClient(Socket client, Packet original)
+    {
+        byte[]? bytes = null;
+        var error_value = Tools.Errors.None; // Default error value.
+
+        // Serialize the packet.
+        bytes = original.PacketToByteArray(ref error_value);
+        if (error_value != Tools.Errors.None) // Checking for errors.
+        {
+            // Setting the error value.
+            // TODO : PacketToByteArray => handle error
+            return;
+        }
+
+        var size = bytes.Length;
+        Console.WriteLine("Sending to : " + client.RemoteEndPoint + " on : " + client.LocalEndPoint + 
+                          "\n\t Sent {0} bytes =>\t" + original, size);
+        // Send the packet through the socket.
+        client.BeginSend(bytes, 0, size, 0, null, client);
+    }
+    
     /// <summary>
     ///     Ends asynchronous connection with a client in <see cref="Server" />.
     /// </summary>

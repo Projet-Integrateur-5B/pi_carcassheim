@@ -37,8 +37,31 @@ public partial class Server
             return packet;
         }
 
-        // Check IdMessage : different action
+        // Check Error : different action 
+        if (packet.Error != Tools.Errors.None)
+        {
+            switch (packetReceived.IdMessage)
+            {
+                case Tools.IdMessage.TuileDraw:
+                    ErrorTuileDraw(packetReceived, ref packet, socket);
+                    break;
+                case Tools.IdMessage.TuileVerification:
+                    ErrorTuileVerification(packetReceived, ref packet, socket);
+                    break;
+                case Tools.IdMessage.StartGame:
+                    // TODO : Check s'il renvoit des erreurs
+                    break;
+                
+                case Tools.IdMessage.Default:
+                default:
+                    packet.Error = Tools.Errors.Unknown;
+                    break; 
+            }
 
+            return packet;
+        }
+        
+        // Check IdMessage : different action
         switch (packetReceived.IdMessage)
         {
             case Tools.IdMessage.AccountSignup:
@@ -46,9 +69,6 @@ public partial class Server
                 break;
             case Tools.IdMessage.AccountLogin:
                 AccountLogin(ar, packetReceived, ref packet, socket);
-                break;
-            case Tools.IdMessage.AccountLogout: // impossible
-                AccountLogout(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.AccountStatistics:
                 AccountStatistics(packetReceived, ref packet, socket);
@@ -66,8 +86,8 @@ public partial class Server
             case Tools.IdMessage.RoomSettingsSet:
                 RoomSettingsSet(packetReceived, ref packet, socket);
                 break;
-            case Tools.IdMessage.AskPort:
-                AskPort(packetReceived, ref packet, socket);
+            case Tools.IdMessage.RoomAskPort:
+                RoomAskPort(packetReceived, ref packet, socket);
                 break;
 
             case Tools.IdMessage.PlayerJoin:
@@ -82,9 +102,6 @@ public partial class Server
             case Tools.IdMessage.PlayerKick:
                 PlayerKick(packetReceived, ref packet, socket);
                 break;
-            case Tools.IdMessage.PlayerCheat:
-                PlayerCheat(packetReceived, ref packet, socket);
-                break;
             case Tools.IdMessage.PlayerList:
                 PlayerList(packetReceived, ref packet, socket);
                 break;
@@ -92,34 +109,27 @@ public partial class Server
                 PlayerCurrent(packetReceived, ref packet, socket);
                 break;
 
-            case Tools.IdMessage.StartGame:
-                GameStart(packetReceived, ref packet, socket);
-                break;
-            case Tools.IdMessage.EndGame:
-                GameEnd(packetReceived, ref packet, socket);
-                break;
-            
             case Tools.IdMessage.EndTurn:
                 EndTurn(packetReceived, ref packet, socket);
-                break;
-            case Tools.IdMessage.TimerPlayer:
-                TimerPlayer(ref packet, socket); 
                 break;
 
             case Tools.IdMessage.TuileDraw:
                 TuileDraw(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.TuilePlacement:
-                packet.Error = TuilePlacement(packetReceived, socket);
+                TuilePlacement(packetReceived, ref packet, socket);
                 break;
-            case Tools.IdMessage.PionPlacement:
-                packet.Error = PionPlacement(packetReceived, socket);
+            case Tools.IdMessage.TuileVerification:
+                TuileVerification(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.CancelTuilePlacement:
-                packet.Error = CancelTuilePlacement(packetReceived, ref packet, socket);
+                CancelTuilePlacement(packetReceived, ref packet, socket);
+                break;
+            case Tools.IdMessage.PionPlacement:
+                PionPlacement(packetReceived, ref packet, socket);
                 break;
             case Tools.IdMessage.CancelPionPlacement:
-                packet.Error = CancelPionPlacement(packetReceived, ref packet, socket);
+                CancelPionPlacement(packetReceived, ref packet, socket);
                 break;
 
             case Tools.IdMessage.Default:
@@ -220,30 +230,6 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.Database;
         }
-    }
-    /// <summary>
-    ///     Player is attempting to logout.
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void AccountLogout(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Vérification que la communication est reçue par le serveur main
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening != 10000)
-        {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.BadPort;
-            return;
-        }
-
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-
-        // Attempt to remove a player from all the rooms.
-        gestionnaire.LogoutPlayer(packetReceived.IdPlayer);
     }
     /// <summary>
     ///     Get the player's statistics from the database.
@@ -433,7 +419,7 @@ public partial class Server
     /// <param name="packetReceived"></param>
     /// <param name="packet"></param>
     /// <param name="socket"></param>
-    public static void AskPort(Packet packetReceived, ref Packet packet, Socket socket)
+    public static void RoomAskPort(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par le serveur main
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
@@ -522,7 +508,6 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.RoomLeave;
         }
-        // TODO : ensuite thread serveur detecte fin client et broadcast
     }
     /// <summary>
     ///     Player is being kicked out of the room/game.
@@ -574,7 +559,6 @@ public partial class Server
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.RoomLeave;
         }
-        // TODO : ensuite thread serveur detecte fin client et broadcast
     }
     /// <summary>
     ///     Player switched its status.
@@ -607,39 +591,9 @@ public partial class Server
             return;
         }
 
-        
         // Check if everyone is ready and starts the game.
         packet.Error = gestionnaire.StartGame(packetReceived.IdRoom);
     }
-    /// <summary>
-    ///     Player cheated.
-    /// </summary>
-    /// <remarks>Player might get kicked out the game in case he cheated too much.</remarks>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void PlayerCheat(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-        
-        // Attempt to update the number of times a player has cheated in a specific game.
-        // Count will be incremented but player can keep playing until the limit is reached.
-        var playerStatus = gestionnaire.CheatPlayer(packetReceived.IdRoom, packetReceived.IdPlayer);
-        
-        // Player has reached the limit and must be kicked out.
-        if (playerStatus == Tools.PlayerStatus.Kicked)
-        {
-            // TODO : player is kicked
-        }
-        else if (playerStatus != Tools.PlayerStatus.Success)
-        {
-            // Something went wrong.
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.IllegalPlay;
-        }
-    }
-
     /// <summary>
     /// Lists the id's of each player in the game and its name
     /// </summary>
@@ -673,7 +627,6 @@ public partial class Server
             packet.Error = Tools.Errors.None;
         }
     }
-
     /// <summary>
     /// Asks the idPlayer of the actual player
     /// </summary>
@@ -712,64 +665,6 @@ public partial class Server
 
 
 
-    // useless
-    /// <summary>
-    ///     Starts a room.
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void GameStart(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Vérification que la communication est reçue par un thread de com
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening == 10000)
-        {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.BadPort;
-            return;
-        }
-        
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-
-        // Attemp to start the game.
-        Tools.Errors errors = gestionnaire.StartGame(packetReceived.IdRoom);
-
-        packet.Error = errors;
-    }
-    /// <summary>
-    ///     Ends the game.
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void GameEnd(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // joueur ou serveur ? si serveur alors à modifier
-        
-        // Vérification que la communication est reçue par un thread de com
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening == 10000)
-        {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.BadPort;
-            return;
-        }
-        
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-
-        // Attemp to start the game.
-        gestionnaire.EndGame(packetReceived.IdRoom, packetReceived.IdPlayer);
-        
-        // TODO : check le retour de EndGame
-    }
-    
-    
-    
     /// <summary>
     ///     Ends a player round.
     /// </summary>
@@ -796,28 +691,80 @@ public partial class Server
 
         packet.Error = errors;
     }
+
+
+
     /// <summary>
-    ///     Player's timer has expired.
+    ///     Main player : None of the three tiles drawn from the server side can be placed.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void TimerPlayer(ref Packet packet, Socket socket)
+    public static void ErrorTuileDraw(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Vérification que la communication est reçue par un thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+        
+        if (packetReceived.Data.Length < 3)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+        
+        // Récupère à part les 3 idTuiles dont il est question
+        string[] tuilesEnvoyees = new string[3];
+        try
+        {
+            Array.Copy(packet.Data, 1, tuilesEnvoyees, 0, 3);
+        }
+        catch (Exception ex)
+        {
+            // Something went wrong.
+            Console.WriteLine("ERROR: Parsing the array representing the 3 tiles sended : " + ex);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.Unknown;
+            return;
+        }
+        
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-
-        // Attempt to stop the timer and close the round.
-        gestionnaire.PlayerTimer(packet.IdRoom, packet.IdPlayer);
-        
-        packet.IdMessage = Tools.IdMessage.TimerPlayer;
+        gestionnaire.CallDrawAntiCheatPlayer(packet.IdPlayer, packet.IdRoom, socket, tuilesEnvoyees);
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
-    
-    
-    
-    // id room, id tuile, x, y, rot
-
     /// <summary>
-    ///     tirage d'une tuile
+    ///     Other players : None of the three tiles drawn from the server side can be placed.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    /// <param name="socket">Socket <see cref="Socket" />.</param>
+    public static void ErrorTuileVerification(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par un thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+        
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+        
+        // Réponse d'un autre joueur (anti cheat) -> pas posable
+        gestionnaire.CallDrawAntiCheatVerif(packet.IdRoom, false, 0, new Position(-1,-1,-1));
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+    }
+    /// <summary>
+    ///     Player chose to place a tile.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
@@ -833,31 +780,101 @@ public partial class Server
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-
-        _ = packetReceived;
-        // tirage de 3 tuiles pour le joueur
-        var list = new List<string>(packet.Data.ToList())
+        
+        if (packetReceived.Data.Length < 4)
         {
-            "numero tuile", "numero tuile", "numero tuile"
-        };
-
-        packet.Data = list.ToArray();
-        packet.Error = Tools.Errors.None; // remplacer par Unknown si erreur
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+        
+        var pos = new Position();
+        var idTuile = (ulong) 0;
+        
+        try
+        {
+            idTuile = ulong.Parse(packet.Data[0]);
+            pos = new Position(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3]));
+        }
+        catch (Exception ex)
+        {
+            // Something went wrong.
+            Console.WriteLine("ERROR: Parsing the data into position and idTuile: " + ex);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.Unknown;
+            return;
+        }
+        
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+        
+        // Réponse d'un autre joueur (anti cheat) -> posable
+        gestionnaire.CallChooseIdTile(packet.IdPlayer, packet.IdRoom, idTuile, pos, socket);
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
-
     /// <summary>
-    ///     placement d'une tuile
+    ///     Checks if the specified position is enabled.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static Tools.Errors TuilePlacement(Packet packetReceived, Socket socket)
+    public static void TuileVerification(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            return Tools.Errors.BadPort;
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+        
+        if (packetReceived.Data.Length < 4)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+
+        var pos = new Position();
+        var idTuile = (ulong) 0;
+        
+        try
+        {
+            idTuile = ulong.Parse(packet.Data[0]);
+            pos = new Position(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3]));
+        }
+        catch (Exception ex)
+        {
+            // Something went wrong.
+            Console.WriteLine("ERROR: Parsing the data into position and idTuile: " + ex);
+            packet.Data = Array.Empty<string>();
+            packet.Error = Tools.Errors.Unknown;
+            return;
+        }
+        
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+        
+        // Réponse d'un autre joueur (anti cheat) -> posable
+        gestionnaire.CallDrawAntiCheatVerif(packet.IdRoom, true, idTuile, pos);
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+    }
+    
+    /// <summary>
+    ///     Places a tile.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    /// <param name="socket">Socket <see cref="Socket" />.</param>
+    public static void TuilePlacement(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par un thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet.Error = Tools.Errors.BadPort;
+            return;
         }
 
         // Récupération du singleton gestionnaire
@@ -865,24 +882,47 @@ public partial class Server
 
         // Vérification du coup
         Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4]);
-
-
-        return errors; 
+        packet.Error = errors; 
     }
-
     /// <summary>
-    ///     placement d'un pion
+    ///     Cancels a tile.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static Tools.Errors PionPlacement(Packet packetReceived, Socket socket)
+    public static void CancelTuilePlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            return Tools.Errors.BadPort;
+            packet.Error = Tools.Errors.BadPort;
+            return;
+        }
+
+        // Récupération du singleton gestionnaire
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+        // Vérification du coup
+        Tools.Errors errors = gestionnaire.CallCancelTuilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom);
+        packet.Error = errors;
+    }
+    /// <summary>
+    ///     Places a meeple.
+    /// </summary>
+    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
+    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
+    /// <param name="socket">Socket <see cref="Socket" />.</param>
+    public static void PionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
+    {
+        // Vérification que la communication est reçue par un thread de com
+        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
+        if (portListening == 10000)
+        {
+            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            packet.Error = Tools.Errors.BadPort;
+            return;
         }
 
 
@@ -891,49 +931,23 @@ public partial class Server
 
         // Vérification du coup
         Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
-
-        return errors; 
+        packet.Error = errors; 
     }
-
     /// <summary>
-    ///     annulation d'une tuile
+    ///     Cancels a meeple.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
     /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
     /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static Tools.Errors CancelTuilePlacement(Packet packetReceived, ref Packet packet, Socket socket)
+    public static void CancelPionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
             Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            return Tools.Errors.BadPort;
-        }
-
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-
-        // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallCancelTuilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom);
-
-        return errors;
-    }
-
-    /// <summary>
-    ///     annulation d'un pion
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static Tools.Errors CancelPionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Vérification que la communication est reçue par un thread de com
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening == 10000)
-        {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
-            return Tools.Errors.BadPort;
+            packet.Error = Tools.Errors.BadPort;
+            return;
         }
 
         // Récupération du singleton gestionnaire
@@ -941,7 +955,6 @@ public partial class Server
 
         // Vérification du coup
         Tools.Errors errors = gestionnaire.CallCancelPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom);
-
-        return errors;
+        packet.Error = errors;
     }
 }

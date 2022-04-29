@@ -53,7 +53,7 @@ public static class Tools
         RoomCreate = 11,
         RoomSettingsGet = 12,
         RoomSettingsSet = 13,
-        AskPort = 14,
+        RoomAskPort = 14,
         
         PlayerJoin = 20,
         PlayerLeave = 21,
@@ -71,9 +71,11 @@ public static class Tools
         TuileDraw = 40,
         TuilePlacement = 41,
         TuileVerification = 42,
-        PionPlacement = 43,
-        CancelTuilePlacement = 44,
-        CancelPionPlacement = 45
+        CancelTuilePlacement = 43,
+        PionPlacement = 44,
+        CancelPionPlacement = 45,
+        
+        NoAnswerNeeded = 99
     }
 
     public enum PlayerStatus

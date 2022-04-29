@@ -149,39 +149,6 @@ namespace system
         }
 
         /// <summary>
-        /// Get the port with wich communicate for a given room
-        /// </summary>
-        /// <param name="roomID"> ID of the room </param>
-        /// <returns> The port of the communication thread that manage the room </returns>
-        public int GetPortFromPartyID (int roomID)
-        {
-            int port = -1;
-
-            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
-            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
-            {
-                lock (thread_com_iterateur.Get_lock_id_parties_gerees())
-                {
-                    List<int> lst_id_parties_gerees = thread_com_iterateur.Get_id_parties_gerees();
-
-                    if (lst_id_parties_gerees.Contains(roomID))
-                    {
-
-                        // Port du thread de com
-                        port = thread_com_iterateur.Get_localPort();
-
-
-                        break; // Sortie du foreach
-
-                    }
-                }    
-            }
-
-            return port;
-        }
-
-
-        /// <summary>
         /// Create a new room and return the port of the manager thread
         /// </summary>
         /// <param name="idPlayer"> Id of the player making this request </param>
@@ -379,21 +346,6 @@ namespace system
                         
                     }
                     return playerStatusReturn;
-                }
-            }
-
-            return Tools.PlayerStatus.NotFound;
-        }
-        
-        public Tools.PlayerStatus CheatPlayer(int idRoom, ulong idPlayer)
-        {
-            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
-            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
-            {
-                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
-                {
-                    if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    return thread_serv_ite.SetPlayerTriche(idPlayer);
                 }
             }
 
@@ -614,31 +566,48 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public void EndGame(int idRoom, ulong idPlayer)
+        public void CallDrawAntiCheatPlayer(ulong idPlayer, int idRoom, Socket? playerSocket, string[] tuilesEnvoyees)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
-                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
-                    if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    thread_serv_ite.EndGame();
-                    return; // return valeur correcte
+                    thread_com_iterateur.DrawAntiCheatPlayer(idRoom, idPlayer, playerSocket, tuilesEnvoyees);
+                    break;
                 }
+
             }
         }
         
-        public void PlayerTimer(int idRoom, ulong idPlayer)
+        public void CallDrawAntiCheatVerif(int idRoom, bool isValid, ulong idTuile, Position pos)
         {
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
-                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
-                    if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    thread_serv_ite.TimerPlayer(idPlayer);
-                    return; // return valeur correcte
+                    thread_com_iterateur.DrawAntiCheatVerif(idRoom, isValid, idTuile, pos);
+                    break;
                 }
+
+            }
+        }
+        
+        public void CallChooseIdTile(ulong idPlayer, int idRoom, ulong idTuile, Position pos, Socket? playerSocket)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
+                {
+                    thread_com_iterateur.ChooseIdTile(idRoom, idPlayer, idTuile, pos, playerSocket);
+                    break;
+                }
+
             }
         }
     }
