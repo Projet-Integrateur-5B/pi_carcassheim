@@ -166,12 +166,14 @@ namespace Assets.system
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
+                Debug.Log("line " + j + "/" + taille);
                 players.Add(new PlayerInitParam(
                     (int)playerList[j].id,
                     (int)playerList[j].nbMeeples,
                     playerList[j].name
                     ));
             }
+            Debug.Log("SLOPP");
         }
         override public int askIdTileInitial()
         {
