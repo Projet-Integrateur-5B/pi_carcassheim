@@ -62,7 +62,7 @@ public class JoinByIdMenu : Miscellaneous
 		InputFieldEndEdit(idCM);
 
 		Packet packet = new Packet();
-		packet.IdMessage = Tools.IdMessage.AskPort;
+		packet.IdMessage = Tools.IdMessage.RoomAskPort;
 		packet.IdPlayer = Communication.Instance.idClient;
 		packet.IdRoom = int.Parse(RemoveLastSpace(idCM.text));
 		packet.Data = Array.Empty<string>();
@@ -76,7 +76,7 @@ public class JoinByIdMenu : Miscellaneous
 	{
 
 		bool res = false;
-		if (packet.IdMessage == Tools.IdMessage.AskPort)
+		if (packet.IdMessage == Tools.IdMessage.RoomAskPort)
 		{
 			if (packet.Error == Tools.Errors.None)
 			{
