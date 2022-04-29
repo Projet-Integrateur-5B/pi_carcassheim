@@ -51,7 +51,8 @@ public class PublicRoomMenu : Miscellaneous
 				Packet packet = new Packet();
 				packet.IdMessage = Tools.IdMessage.PlayerJoin;
 				packet.IdPlayer = Communication.Instance.idClient;
-				packet.Data = new[] { Communication.Instance.idRoom.ToString() };
+				packet.IdRoom = Communication.Instance.idRoom;
+				packet.Data = Array.Empty<string>();
 
 				Communication.Instance.SendAsync(packet);
 				break;
@@ -69,7 +70,8 @@ public class PublicRoomMenu : Miscellaneous
 		Packet packet = new Packet();
 		packet.IdMessage = Tools.IdMessage.PlayerLeave;
 		packet.IdPlayer = Communication.Instance.idClient;
-		packet.Data = new[] { Communication.Instance.idRoom.ToString() };
+		packet.IdRoom = Communication.Instance.idRoom;
+		packet.Data = Array.Empty<string>();
 
 		Communication.Instance.SetIsInRoom(1);
 		Communication.Instance.SendAsync(packet);
@@ -90,7 +92,9 @@ public class PublicRoomMenu : Miscellaneous
 		Packet packet = new Packet();
 		packet.IdMessage = Tools.IdMessage.PlayerReady;
 		packet.IdPlayer = Communication.Instance.idClient;
-		packet.Data = new[] {Communication.Instance.idRoom.ToString()};
+		packet.IdRoom = Communication.Instance.idRoom;
+		packet.Data = Array.Empty<string>();
+
 		preparer.color = readyState;
         preparer.text = "PRET A JOUER !";
 
@@ -114,7 +118,8 @@ public class PublicRoomMenu : Miscellaneous
 			Packet packet1 = new Packet();
 			packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
 			packet1.IdPlayer = Communication.Instance.idClient;
-			packet1.Data = new[] { Communication.Instance.idRoom.ToString() };
+			packet.IdRoom = Communication.Instance.idRoom;
+			packet.Data = Array.Empty<string>();
 
 			Communication.Instance.SendAsync(packet1);
 		}

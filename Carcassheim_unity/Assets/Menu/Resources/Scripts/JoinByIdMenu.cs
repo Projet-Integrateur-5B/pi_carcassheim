@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using System;
 
 public class JoinByIdMenu : Miscellaneous
 {
@@ -63,7 +64,8 @@ public class JoinByIdMenu : Miscellaneous
 		Packet packet = new Packet();
 		packet.IdMessage = Tools.IdMessage.AskPort;
 		packet.IdPlayer = Communication.Instance.idClient;
-		packet.Data = new string[] { RemoveLastSpace(idCM.text) };
+		packet.IdRoom = int.Parse(RemoveLastSpace(idCM.text));
+		packet.Data = Array.Empty<string>();
 
 		Communication.Instance.SetRoom(int.Parse(idCM.text));
 		Communication.Instance.SetIsInRoom(0);

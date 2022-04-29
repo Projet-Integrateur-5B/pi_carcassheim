@@ -76,7 +76,8 @@ namespace Assets.system
             int id_meeple = param.id_meeple;
             int slot_pos = param.slot_pos;
             
-            SendPosition((ulong)tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation, id_meeple, slot_pos);
+            SendPosition(tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation);
+            SendMeepple(tile_id, id_meeple, slot_pos);
         }
 
         override public void getTile(out TurnPlayParam param)
@@ -355,7 +356,8 @@ namespace Assets.system
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
 
-            //TODO reload l'ancien socket
+            Communication.Instance.isInRoom = 0;
+            
         }
 
         public void OnPacketReceived(object sender, Packet packet)
@@ -388,7 +390,7 @@ namespace Assets.system
 
         public void OnTuileReceived(Packet packet)
         {
-            ulong id_tuile;
+            int id_tuile;
             Tuile tuile;
             int i;
             Position[] position;
@@ -397,14 +399,14 @@ namespace Assets.system
 
             for (i = 0; i < 3; i++)
             {
-                id_tuile = Convert.ToUInt64(packet.Data[i]);
-                tuile = dico_tuile[id_tuile];
+                id_tuile = Convert.ToInt32(packet.Data[i]);
+                tuile = dico_tuile[(ulong)id_tuile];
                 position = lePlateau.PositionsPlacementPossible(tuile);
 
                 tileParam = new TileInitParam
                 {
                     tile_flags = false,
-                    id_tile = (int)id_tuile
+                    id_tile = id_tuile
                 };
 
                 if (position != null)
@@ -427,7 +429,7 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        private void SendAllPosition(Position[] position, ulong id_tuile)
+        private void SendAllPosition(Position[] position, int id_tuile)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.TuileVerification;
@@ -451,21 +453,37 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        public void SendPosition(ulong id_tuile, int X, int Y, int ROT, int id_meeple, int slot_pos)
+        public void SendPosition(int id_tuile, int X, int Y, int ROT)
         {//ToDo Retirer Meeple et slot et le changer
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.TuilePlacement;
+            packet.IdRoom = (int)_id_partie;
             packet.IdPlayer = _mon_id;
 
-            packet.Data = new string[7];
+            packet.Data = new string[]
+            {
+                packet.Data[0] = id_tuile.ToString(),
+                packet.Data[1] = X.ToString(),
+                packet.Data[2] = Y.ToString(),
+                packet.Data[3] = ROT.ToString()
+            };
 
-            packet.Data[0] = _id_partie.ToString();
-            packet.Data[1] = id_tuile.ToString();
-            packet.Data[2] = X.ToString();
-            packet.Data[3] = Y.ToString();
-            packet.Data[4] = ROT.ToString();
-            //packet.Data[5] = id_meeple.ToString();
-            //packet.Data[6] = slot_pos.ToString();
+            Communication.Instance.SendAsync(packet);
+        }
+
+        public void SendMeepple(int id_tuile,int id_meeple, int slot_pos)
+        {
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.PionPlacement;
+            packet.IdRoom = (int)_id_partie;
+            packet.IdPlayer = _mon_id;
+
+            packet.Data = new string[]
+            {
+                packet.Data[0] = id_tuile.ToString(),
+                packet.Data[1] = id_meeple.ToString(),
+                packet.Data[2] = slot_pos.ToString()
+            };
 
             Communication.Instance.SendAsync(packet);
         }

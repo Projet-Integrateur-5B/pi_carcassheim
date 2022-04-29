@@ -1,10 +1,8 @@
 using Assets.System;
 using ClassLibrary;
-using system;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,8 +12,6 @@ public class CreateRoomMenu : Miscellaneous
 	public Semaphore s_listAction;
 	private void Start()
     {
-		this.gameObject.AddComponent<Communication_inRoom>();
-
 		listAction = new List<bool>();
 		s_listAction = new Semaphore(1, 1);
 
@@ -71,8 +67,8 @@ public class CreateRoomMenu : Miscellaneous
 			if (packet.Error == Tools.Errors.None)
 			{
 				res = true;
-				Communication.Instance.SetRoom(int.Parse(packet.Data[0]));
-				Communication.Instance.SetPort(int.Parse(packet.Data[1]));
+				Communication.Instance.SetRoom(packet.IdRoom);
+				Communication.Instance.SetPort(int.Parse(packet.Data[0]));
 				Communication.Instance.SetIsInRoom(1);
 			}
 
