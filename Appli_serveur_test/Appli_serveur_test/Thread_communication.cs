@@ -113,11 +113,6 @@ namespace system
                         if (joueur.Key != idPlayer || idMessage == Tools.IdMessage.TuileDraw) 
                         {
                             Server.Server.SendToSpecificClient(joueur.Value._socket_of_player, packet);
-
-                            // Lancement de l'écoute de la réponse du joueur 
-                            ClientAsync.OnPacketReceived += OnPacketReceived;
-                            ClientAsync.Receive(joueur.Value._socket_of_player);
-
                         }
                     }
                 }
@@ -567,11 +562,6 @@ namespace system
             }
 
             Server.Server.SendToSpecificClient(playerSocket, packet);
-
-            // Lancement de l'écoute des réponse du client async
-            ClientAsync.OnPacketReceived += OnPacketReceived;
-            ClientAsync.Receive(playerSocket);
-
         }
 
         public Tools.PlayerStatus PlayerLeave(ulong idPlayer, int idRoom)
