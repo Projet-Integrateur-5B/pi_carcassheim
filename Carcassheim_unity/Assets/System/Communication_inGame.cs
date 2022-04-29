@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Assert.system;
 using Assets.System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Assets.system
 {
@@ -19,8 +20,8 @@ namespace Assets.system
         private ulong _mon_id;
 
 
-        private int id_tile_init;
-        bool id_tile_init_received = false;
+        private int id_tile_init = 20;
+        bool id_tile_init_received = true/*false*/;
 
         private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
         private int _nb_tuiles = -1;
@@ -40,6 +41,8 @@ namespace Assets.system
         bool player_received = false;
         private ulong nextPlayer;
         private Position[] allposition;
+
+        private Semaphore s_InGame;
 
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
@@ -107,8 +110,10 @@ namespace Assets.system
             // Id tuile,
             // FLAG => true : garder la tuile; false: jeter la tuile
             // RETURN nombre de tuile dans la main au final
+
             tiles.AddRange(tiles_drawed);
             tiles_drawed.Clear();
+
             return 1;
             // (| f) (| f) (| f) (| f) >>(| t)
         }
@@ -281,11 +286,12 @@ namespace Assets.system
             // ======================
             // ==== DANS LA GAME ====
             // ======================
+            Communication.Instance.StartListening(OnPacketReceived);
+            s_InGame = new Semaphore(1, 1);
+
             dico_tuile = LireXML2.Read("config_back.xml");
             lePlateau = new Plateau(dico_tuile);
             tiles_drawed = new List<TileInitParam>();
-
-            Communication.Instance.StartListening(OnPacketReceived);
 
             _id_partie = (ulong)Communication.Instance.idRoom;
             _mon_id = Communication.Instance.idClient;
@@ -294,23 +300,45 @@ namespace Assets.system
             _nb_tuiles = -1;
             _score_max = RoomInfo.Instance.scoreMax;
             _timer_max_joueur = (int)RoomInfo.Instance.timerJoueur; // En secondes
+
+            s_InGame.WaitOne();
             win_cond_received = true;
+            s_InGame.Release();
 
             _nb_joueur_max = RoomInfo.Instance.nbJoueurMax;
             _timer = (int)RoomInfo.Instance.timerPartie; // En secondes
+
+            s_InGame.WaitOne();
             timer_tour_received = true;
+            s_InGame.Release();
+
             _meeples = RoomInfo.Instance.meeples; // Nombre de meeples par joueur
 
-            Packet packet = new Packet();
-            packet.IdPlayer = Communication.Instance.idClient;
-            packet.IdRoom = Communication.Instance.idRoom;
-            packet.IdMessage = Tools.IdMessage.PlayerList;
-            packet.Data = Array.Empty<string>();
+            Action playerlist = () =>
+            {
+                Packet packet = new Packet();
+                packet.IdPlayer = Communication.Instance.idClient;
+                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdMessage = Tools.IdMessage.PlayerList;
+                packet.Data = Array.Empty<string>();
 
-            Communication.Instance.SendAsync(packet);
+                Communication.Instance.SendAsync(packet);
+            };
+            Task.Run(playerlist);
 
-            packet.IdMessage = Tools.IdMessage.PlayerCurrent;
-            Communication.Instance.SendAsync(packet);
+            Action playercurrent = () =>
+            {
+                Packet packet = new Packet();
+                packet.IdPlayer = Communication.Instance.idClient;
+                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdMessage = Tools.IdMessage.PlayerCurrent;
+                packet.Data = Array.Empty<string>();
+
+                Communication.Instance.SendAsync(packet);
+            };
+            Task.Run(playercurrent);
+
+
             Debug.Log("On est dans la game");
 
             /*
@@ -382,16 +410,17 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
+                /*
                 id_tile_init = Convert.ToInt32(packet.Data[0]);
+                s_InGame.WaitOne();
                 id_tile_init_received = true;
+                s_InGame.Release();
 
-                Debug.Log("packet.Data[1]) = " + packet.Data[1] + " (packet.Data[2]) = " + packet.Data[2] + "(packet.Data[3])) = " + packet.Data[3]);
-                lePlateau.PoserTuileFantome((ulong)id_tile_init,
-                    Convert.ToInt32(packet.Data[1]),
-                    Convert.ToInt32(packet.Data[2]),
-                    Convert.ToInt32(packet.Data[3]));
-                /* TODO placement */
+                lePlateau.Poser1ereTuile((ulong)id_tile_init);
+                */
+                lePlateau.Poser1ereTuile(20);
             }
+            checkGameBegin();
         }
 
         public void OnTuileReceived(Packet packet)
@@ -496,7 +525,6 @@ namespace Assets.system
 
         public void OnPlayerListReceive(Packet packet)
         {
-            Debug.Log("132156456156456156156126156451261594561549456");
             int i, compteur = 0, taille_data = packet.Data.Length;
             playerList = new Player[taille_data / 2];
 
@@ -504,9 +532,10 @@ namespace Assets.system
             {
                 playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
             }
-            player_received = true;
 
-            checkGameBegin();
+            s_InGame.WaitOne();
+            player_received = true;
+            s_InGame.Release();
         }
 
         public void OnPlayerCurrentReceive(Packet packet)
@@ -517,12 +546,16 @@ namespace Assets.system
         public void checkGameBegin()
         {
             Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received);
+            s_InGame.WaitOne();
             if (player_received && win_cond_received && id_tile_init_received && timer_tour_received)
             {
-                Debug.Log("CALLED checkGameBegin in");
+                s_InGame.Release();
+                Debug.Log("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101");
                 system_display.gameBegin();
-                Debug.Log("Game commence");
+                Debug.Log("020202020202020202020202020202020202020202020202020202020202020202002020202020202020202020202020202020202020");
+                return;
             }
+            s_InGame.Release();
         }
     }
 }
