@@ -86,6 +86,7 @@ public static class Tools
         Full = 3,
         Found = 4,
         Permissions = 5,
+        LastPlayerReady = 6,
         NotFound = -1
     }
     

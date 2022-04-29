@@ -334,14 +334,24 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
+                    
+                    var before = thread_serv_ite.EveryoneIsReady();
                     Tools.PlayerStatus playerStatusReturn = thread_serv_ite.SetPlayerStatus(idPlayer);
+                    var after = thread_serv_ite.EveryoneIsReady();
+                    
                     if(playerStatusReturn == Tools.PlayerStatus.Success)
                     {
-                        if (thread_serv_ite.EveryoneIsReady() != true)
+                        if (after == false)
                         {
                             // Envoie de quoi afficher le player ready à tt le mondes
                             thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerReady, idPlayer);
                         }
+
+                        if (before == false && after == true)
+                        {
+                            playerStatusReturn = Tools.PlayerStatus.LastPlayerReady;
+                        }
+                            
                         // Si tout le monde est prêt, inutile de broadcast le ready : la game va se lancer presque immédiatement
                         
                     }

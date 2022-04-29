@@ -583,7 +583,12 @@ public partial class Server
 
         // Attempt to update a player status within the room.
         var playerStatus = gestionnaire.ReadyPlayer(packetReceived.IdRoom, packetReceived.IdPlayer);
-        if (playerStatus != Tools.PlayerStatus.Success)
+        if (playerStatus == Tools.PlayerStatus.LastPlayerReady)
+        {
+            packet.Data = Array.Empty<string>();
+            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+        }
+        else if (playerStatus != Tools.PlayerStatus.Success)
         {
             // Something went wrong.
             packet.Data = Array.Empty<string>();
