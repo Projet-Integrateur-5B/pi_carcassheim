@@ -439,12 +439,6 @@ public partial class Server
             return;
         }
 
-        if (packetReceived.Data.Length < 1)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
-
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
