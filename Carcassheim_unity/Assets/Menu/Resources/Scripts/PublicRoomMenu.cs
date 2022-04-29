@@ -118,8 +118,8 @@ public class PublicRoomMenu : Miscellaneous
 			Packet packet1 = new Packet();
 			packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
 			packet1.IdPlayer = Communication.Instance.idClient;
-			packet.IdRoom = Communication.Instance.idRoom;
-			packet.Data = Array.Empty<string>();
+			packet1.IdRoom = Communication.Instance.idRoom;
+			packet1.Data = Array.Empty<string>();
 
 			Communication.Instance.SendAsync(packet1);
 		}

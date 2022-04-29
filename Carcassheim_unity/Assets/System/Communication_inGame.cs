@@ -296,11 +296,12 @@ namespace Assets.system
 
             Packet packet = new Packet();
             packet.IdPlayer = Communication.Instance.idClient;
-            packet.Data = new string[] { Communication.Instance.idRoom.ToString() };
+            packet.IdRoom = Communication.Instance.idRoom;
             packet.IdMessage = Tools.IdMessage.PlayerList;
+            packet.Data = Array.Empty<string>();
 
             Communication.Instance.SendAsync(packet);
-            Thread.Sleep(500);
+
             packet.IdMessage = Tools.IdMessage.PlayerCurrent;
             Communication.Instance.SendAsync(packet);
             Debug.Log("On est dans la game");
