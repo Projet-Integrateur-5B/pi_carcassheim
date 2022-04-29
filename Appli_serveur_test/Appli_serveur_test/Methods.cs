@@ -355,11 +355,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void RoomSettingsGet(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of Thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
@@ -391,11 +394,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void RoomSettingsSet(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
@@ -461,6 +467,9 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void PlayerJoin(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par le thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
@@ -487,11 +496,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void PlayerLeave(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
@@ -518,6 +530,9 @@ public partial class Server
     /// /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void PlayerKick(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
@@ -568,18 +583,21 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void PlayerReady(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
         }
 
         // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance(); 
 
         // Attempt to update a player status within the room.
         var playerStatus = gestionnaire.ReadyPlayer(packetReceived.IdRoom, packetReceived.IdPlayer);
@@ -607,6 +625,9 @@ public partial class Server
     /// <param name="socket"></param>
     public static void PlayerList(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par le thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
@@ -640,6 +661,9 @@ public partial class Server
     /// <param name="socket"></param>
     public static void PlayerCurrent(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par le thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
@@ -678,16 +702,19 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void EndTurn(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-        
+
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
@@ -707,16 +734,19 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void ErrorTuileDraw(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-        
+
         if (packetReceived.Data.Length < 3)
         {
             packet.Error = Tools.Errors.BadData;
@@ -751,16 +781,19 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void ErrorTuileVerification(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
         }
-        
+
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
@@ -776,11 +809,15 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void TuileDraw(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
@@ -824,11 +861,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void TuileVerification(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Data = Array.Empty<string>();
             packet.Error = Tools.Errors.BadPort;
             return;
@@ -873,11 +913,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void TuilePlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Error = Tools.Errors.BadPort;
             return;
         }
@@ -897,11 +940,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void CancelTuilePlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Error = Tools.Errors.BadPort;
             return;
         }
@@ -921,11 +967,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void PionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Error = Tools.Errors.BadPort;
             return;
         }
@@ -946,11 +995,14 @@ public partial class Server
     /// <param name="socket">Socket <see cref="Socket" />.</param>
     public static void CancelPionPlacement(Packet packetReceived, ref Packet packet, Socket socket)
     {
+        // Réponse sur le même idRoom
+        packet.IdRoom = packetReceived.IdRoom;
+
         // Vérification que la communication est reçue par un thread de com
         int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
         if (portListening == 10000)
         {
-            Console.WriteLine("ERROR: Thread_com received message instead of serveur_main, IdMessage : " + packetReceived.IdMessage);
+            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
             packet.Error = Tools.Errors.BadPort;
             return;
         }
