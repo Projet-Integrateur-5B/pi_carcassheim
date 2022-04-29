@@ -537,7 +537,7 @@ public class DisplaySystem : MonoBehaviour
         WinCondition win = WinCondition.WinByTime;
         List<int> param = new List<int>();
         system_back.askWinCondition(ref win, param);
-        Debug.Log("HERE");
+        Debug.Log("HERE " + win + " " + param);
 
         List<PlayerInitParam> players_init = new List<PlayerInitParam>();
         system_back.askPlayersInit(players_init);

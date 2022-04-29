@@ -23,7 +23,7 @@ namespace Assets.system
         private int id_tile_init = 20;
         bool id_tile_init_received = true/*false*/;
 
-        private int _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
+        private int _mode = 0; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
         private int _nb_tuiles = -1;
         private int _score_max = -1;
         private int _timer_max_joueur = -1; // En secondes
@@ -198,6 +198,7 @@ namespace Assets.system
             // 0 TUILE => nb de tuile
             // 1 TEMPS => nb de min, puis nb de sec
             // 2 SCORE => score � atteindre
+            Debug.Log("MODE :! " + _mode);
             switch (_mode)
             {
                 case 1:
@@ -300,6 +301,7 @@ namespace Assets.system
             _mon_id = Communication.Instance.idClient;
 
             _mode = (int)RoomInfo.Instance.mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
+
             _nb_tuiles = -1;
             _score_max = RoomInfo.Instance.scoreMax;
             _timer_max_joueur = (int)RoomInfo.Instance.timerJoueur; // En secondes

@@ -966,6 +966,9 @@ MonoBehaviour:
   timerTourTMP: {fileID: 4226845754553438280}
   nbPointsTMP: {fileID: 5213960476696113149}
   master: {fileID: 0}
+  win_condition_time: {fileID: 5307231525030357815, guid: fddb8af7d6f78bb4fabe5924d82569ab, type: 3}
+  win_condition_tile: {fileID: 6586004404826727515, guid: 27062c56c5ed8b84486af475d48b49a1, type: 3}
+  win_condition_point: {fileID: 8376245823366532049, guid: f763abc40fae3274d82c39540bee7018, type: 3}
 --- !u!114 &5923606125052412701
 MonoBehaviour:
   m_ObjectHideFlags: 0
