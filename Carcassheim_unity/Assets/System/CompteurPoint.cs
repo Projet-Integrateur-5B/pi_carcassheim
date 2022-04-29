@@ -95,18 +95,52 @@ namespace Assets.system
                         pionParJoueur.Add(idJ, 1);
                 }
 
-                result += PointTerrain(item.Slots[nextSlot].Terrain);
+                result += PointTerrain(item, nextSlot);
                 PointsZone(item, (int)nextSlot, parcourue, ref result, pionParJoueur);
             }
         }
 
-        private static int PointTerrain(TypeTerrain terrain)
+        private static int PointTerrain(Tuile tuile, ulong idSlot)
         {
-            if (terrain == TypeTerrain.VilleBlason)
-                return 2;
-            return 1;
+            int result = 1;
+            TypeTerrain terrain = tuile.Slots[idSlot].Terrain;
+            switch (terrain)
+            {
+                case TypeTerrain.Ville:
+                    break;
+                case TypeTerrain.VilleBlason:
+                    result = 2;
+                    break;
+                case TypeTerrain.Pre:
+                    result = PointChamps(tuile, idSlot);
+                    break;
+                case TypeTerrain.Abbaye:
+                    break;
+                case TypeTerrain.Auberge:
+                    break;
+                case TypeTerrain.Cathedrale:
+                    break;
+                case TypeTerrain.Riviere:
+                    break;
+                case TypeTerrain.Route:
+                    break;
+                default:
+                    break;
+            }
+            return result;
         }
 
+        private static int PointChamps(Tuile tuile, ulong idSlot)
+        {
+            Slot[] slots = tuile.Slots;
+            foreach (var item in slots[idSlot].LinkOtherSlots)
+            {
+                var t = slots[item].Terrain;
+                if (t == TypeTerrain.VilleBlason || t == TypeTerrain.Pre)
+                    return 1;
+            }
+            return 0;
+        }
 
         private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, int idSlot,
             out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
