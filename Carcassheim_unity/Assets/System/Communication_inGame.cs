@@ -43,6 +43,7 @@ namespace Assets.system
         private Position[] allposition;
 
         private Semaphore s_InGame;
+        private bool testGameBegin = true;
 
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
@@ -539,9 +540,10 @@ namespace Assets.system
         public void checkGameBegin()
         {
             s_InGame.WaitOne();
-            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received)
+            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin)
             {
                 s_InGame.Release();
+                testGameBegin = false;
                 Debug.Log("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101");
                 system_display.gameBegin();
                 Debug.Log("020202020202020202020202020202020202020202020202020202020202020202002020202020202020202020202020202020202020");
