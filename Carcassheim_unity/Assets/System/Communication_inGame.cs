@@ -534,6 +534,7 @@ namespace Assets.system
             for (i = 0; i < taille_data; i += 2)
             {
                 playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
+                compteur++;
             }
 
             s_InGame.WaitOne();
@@ -555,7 +556,7 @@ namespace Assets.system
                 s_InGame.Release();
                 testGameBegin = false;
                 Debug.Log("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101");
-                system_display.gameBegin();
+                system_display.setNextState(DisplaySystemState.gameStart);
                 Debug.Log("020202020202020202020202020202020202020202020202020202020202020202002020202020202020202020202020202020202020");
                 return;
             }

@@ -12,7 +12,8 @@ public enum DisplaySystemState
     noState,
     idleState,
     endOfGame,
-    scoreChange
+    scoreChange,
+    gameStart
 };
 
 public class DisplaySystem : MonoBehaviour
@@ -288,7 +289,7 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.turnStart:
                 act_player = players_mapping[system_back.getNextPlayer()];
                 Debug.Log("Tour de " + act_player.Name + " " + act_player.Id.ToString());
-                if (old_state != DisplaySystemState.noState)
+                if (old_state != DisplaySystemState.gameStart)
                     player_list.nextPlayer(act_player);
                 if (my_player == null && act_player.is_my_player)
                     banner.setPlayer(act_player);
@@ -338,6 +339,9 @@ public class DisplaySystem : MonoBehaviour
                         }
                     }
                 }
+                break;
+            case DisplaySystemState.gameStart:
+                gameBegin();
                 break;
             case DisplaySystemState.endOfGame:
                 table.Focus = false;
