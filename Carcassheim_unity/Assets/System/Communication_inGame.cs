@@ -302,7 +302,7 @@ namespace Assets.system
 
             _mode = (int)RoomInfo.Instance.mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
-            _nb_tuiles = -1;
+            _nb_tuiles = RoomInfo.Instance.nbTuile;
             _score_max = RoomInfo.Instance.scoreMax;
             _timer_max_joueur = (int)RoomInfo.Instance.timerJoueur; // En secondes
 
@@ -475,19 +475,19 @@ namespace Assets.system
             packet.IdMessage = Tools.IdMessage.TuileVerification;
             packet.IdPlayer = _mon_id;
 
-            int i, taille = position.Length;
-            int taille_data = 2 + taille * 3;
+            int i,compteur = 0, taille = position.Length;
+            int taille_data = 1 + taille * 3;
             packet.Data = new string[taille_data];
 
-            packet.Data[0] = _id_partie.ToString();
-            packet.Data[1] = id_tuile.ToString();
+            packet.IdRoom = (int)_id_partie;
+            packet.Data[0] = id_tuile.ToString();
 
-            for (i = 2; i < taille_data - 2; i += 3)
+            for (i = 1; i < taille_data; i += 3)
             {
-                packet.Data[i] = position[taille_data / 3].X.ToString();
-                packet.Data[i + 1] = position[(taille_data / 3)].Y.ToString();
-                packet.Data[i + 2] = position[(taille_data / 3)].ROT.ToString();
-
+                packet.Data[i] = position[compteur].X.ToString();
+                packet.Data[i + 1] = position[compteur].Y.ToString();
+                packet.Data[i + 2] = position[compteur].ROT.ToString();
+                compteur++;
             }
 
             Communication.Instance.SendAsync(packet);

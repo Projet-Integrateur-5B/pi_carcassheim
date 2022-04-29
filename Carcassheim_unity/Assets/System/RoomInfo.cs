@@ -39,7 +39,7 @@ namespace Assets.System
         public ulong idModerateur { get; set; }
         public int nbJoueur { get; set; }
         public int nbJoueurMax { get; set; }
-
+        public int nbTuile { get; set; }
         public int meeples { get; set; }
         public int scoreMax { get; set; }
 
@@ -107,7 +107,7 @@ namespace Assets.System
                 nbJoueurMax = int.Parse(values[2]);
                 //privé 3
                 mode = (Tools.Mode)int.Parse(values[4]);
-                //nbtuile 5
+                nbTuile = int.Parse(values[5]);
                 meeples = int.Parse(values[6]);
                 timerPartie = (Tools.Timer)int.Parse(values[7]);
                 timerJoueur = (Tools.Timer)int.Parse(values[8]);
