@@ -337,10 +337,14 @@ namespace system
                     Tools.PlayerStatus playerStatusReturn = thread_serv_ite.SetPlayerStatus(idPlayer);
                     if(playerStatusReturn == Tools.PlayerStatus.Success)
                     {
-                        if (thread_serv_ite.EveryoneIsReady() != true)
+                        if (thread_serv_ite.EveryoneIsReady() == false)
                         {
                             // Envoie de quoi afficher le player ready à tt le mondes
                             thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerReady, idPlayer);
+                        }
+                        else
+                        {
+                            return Tools.PlayerStatus.GameStart;
                         }
                         // Si tout le monde est prêt, inutile de broadcast le ready : la game va se lancer presque immédiatement
                         
