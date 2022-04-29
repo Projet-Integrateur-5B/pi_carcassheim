@@ -486,7 +486,10 @@ namespace Assets.system
             {
                 c++;
                 if (t == null || parcourus.Contains((t, idSlot)))
+                {
+                    c++;
                     continue;
+                }
                 parcourus.Add((t, idSlot));
 
                 int pos = positionsInternesProchainesTuiles[c];
