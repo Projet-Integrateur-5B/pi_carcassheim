@@ -485,7 +485,10 @@ namespace Assets.system
             foreach (var t in adj)
             {
                 if (t == null || parcourus.Contains((t, idSlot)))
+                {
+                    c++;
                     continue;
+                }
                 parcourus.Add((t, idSlot));
 
                 int pos = positionsInternesProchainesTuiles[c++];
