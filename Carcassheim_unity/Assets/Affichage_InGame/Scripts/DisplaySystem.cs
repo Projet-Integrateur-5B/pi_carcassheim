@@ -394,7 +394,7 @@ public class DisplaySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool mouse_consumed = act_system_state == DisplaySystemState.endOfGame;
+        bool mouse_consumed = (act_system_state != DisplaySystemState.tilePosing && act_system_state != DisplaySystemState.meeplePosing);
         if (!mouse_consumed && Input.GetMouseButtonUp(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
