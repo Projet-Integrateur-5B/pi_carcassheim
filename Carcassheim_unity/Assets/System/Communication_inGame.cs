@@ -19,7 +19,6 @@ namespace Assets.system
 
         private ulong _mon_id;
 
-
         private int id_tile_init = 20;
         bool id_tile_init_received = true/*false*/;
 
@@ -310,13 +309,6 @@ namespace Assets.system
             return;
         }
 
-        //====================================================================================================
-
-        void Awake()
-        {
-
-        }
-
         // Start is called before the first frame update
         void Start()
         {
@@ -376,70 +368,11 @@ namespace Assets.system
             };
             Task.Run(playerlist);
 
-            Action playercurrent = () =>
-            {
-                Packet packet = new Packet();
-                packet.IdPlayer = Communication.Instance.idClient;
-                packet.IdRoom = Communication.Instance.idRoom;
-                packet.IdMessage = Tools.IdMessage.PlayerCurrent;
-                packet.Data = Array.Empty<string>();
-
-                Communication.Instance.SendAsync(packet);
-            };
-            Task.Run(playercurrent);
-
-            Action tuiledraw = () =>
-            {
-                Packet packet = new Packet();
-                packet.IdPlayer = Communication.Instance.idClient;
-                packet.IdRoom = Communication.Instance.idRoom;
-                packet.IdMessage = Tools.IdMessage.TuileDraw;
-                packet.Data = Array.Empty<string>();
-
-                Communication.Instance.SendAsync(packet);
-            };
-            Task.Run(tuiledraw);
+            /* Demmande Current et TuileDraw */
+            OnEndTurnReceive();
 
             s_WaitInit.Release();
             Debug.Log("On est dans la game");
-
-            /*
-            Action listening = () =>
-            {
-                ClientAsync.StartClient(socket);
-            };
-            Task.Run(listening);
-            */
-
-
-
-            // Boucle d'�coute du serveur
-
-            // Type de r�ceptions :
-            //          - mise � jour affichage (coup d'un autre joueur, m�me non valid�)
-            //          - r�ception d'un WarningCheat
-            //          - indication de la part du serveur que c'est au client de jouer
-            //                  -> d�but de la phase d'interactions entres placements du joueur et le serveur
-            //                  -> se base sur des fonctions d'attente personnalis�es, o� le script attend que le joueur place ses tuiles/pions
-
-
-            // Description de la phase d'interaction  :
-            //      - R�ception des 3 tuiles 
-            //      - V�rification qu'une des 3 est posable, si ce n'est pas le cas on pr�vient le serveur et on demande d'autres tuiles
-            //      - Affichage de la tuile ainsi choisie par le client (la premi�re � �tre posable)
-            //          -> MaJ graphique (tuile choisie)
-            //      - (Attente d'une action du joueur : pose d'une tuile)
-            //      - Envoie la pose de tuile au serveur et observe sa r�ponse (si le coup est ill�gal par exemple)
-            //          -> MaJ graphique (tuile pos�e)
-            //      - (Attente d'une action du joueur : pose d'un pion)
-            //      - Envoie la pose de pion au serveur et observe sa r�ponse (si le coup est ill�gal par exemple)
-            //          -> MaJ graphique (pion pos�)
-            //      - (Attente d'une action du joueur : validation de son tour)
-            //      - Envoie la validation du tour au serveur et observe sa r�ponse (si le coup est ill�gal par exemple)
-            //          -> MaJ graphique (tour termin�)
-
-
-
         }
 
         // Update is called once per frame
@@ -453,7 +386,6 @@ namespace Assets.system
             socket.Close();
 
             Communication.Instance.isInRoom = 0;
-
         }
 
         public void OnPacketReceived(object sender, Packet packet)
@@ -485,10 +417,14 @@ namespace Assets.system
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
                 system_display.execAction(dsa);
             }
+            else if(packet.IdMessage == Tools.IdMessage.EndTurn)
+            {
+                OnEndTurnReceive();
+            }
             checkGameBegin();
         }
 
-        public bool OnTuileReceived(Packet packet)
+        private bool OnTuileReceived(Packet packet)
         {
             Debug.Log("I HAVE BEEN RECEIVED");
             int id_tuile;
@@ -524,6 +460,7 @@ namespace Assets.system
                         tuile_ok = true;
                     }
                 }
+
                 nb_tile_for_turn += 1;
                 tiles_drawed.Add(tileParam);
                 if (tuile_ok)
@@ -534,6 +471,54 @@ namespace Assets.system
             packet.Error = Tools.Errors.Data;
             Communication.Instance.SendAsync(packet);
             return tuile_ok;
+        }
+
+        public void OnPlayerListReceive(Packet packet)
+        {
+            int i, compteur = 0, taille_data = packet.Data.Length;
+            playerList = new Player[taille_data / 2];
+
+            for (i = 0; i < taille_data; i += 2)
+            {
+                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
+                compteur++;
+            }
+
+            s_InGame.WaitOne();
+            player_received = true;
+            s_InGame.Release();
+        }
+
+        public void OnPlayerCurrentReceive(Packet packet)
+        {
+            nextPlayer = packet.IdPlayer;
+        }
+
+        private void OnEndTurnReceive()
+        {
+            Action playercurrent = () =>
+            {
+                Packet packet = new Packet();
+                packet.IdPlayer = Communication.Instance.idClient;
+                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdMessage = Tools.IdMessage.PlayerCurrent;
+                packet.Data = Array.Empty<string>();
+
+                Communication.Instance.SendAsync(packet);
+            };
+            Task.Run(playercurrent);
+
+            Action tuiledraw = () =>
+            {
+                Packet packet = new Packet();
+                packet.IdPlayer = Communication.Instance.idClient;
+                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdMessage = Tools.IdMessage.TuileDraw;
+                packet.Data = Array.Empty<string>();
+
+                Communication.Instance.SendAsync(packet);
+            };
+            Task.Run(tuiledraw);
         }
 
         public void SendPosition(int id_tuile, int X, int Y, int ROT, Tools.IdMessage idMessage)
@@ -569,27 +554,6 @@ namespace Assets.system
             };
 
             Communication.Instance.SendAsync(packet);
-        }
-
-        public void OnPlayerListReceive(Packet packet)
-        {
-            int i, compteur = 0, taille_data = packet.Data.Length;
-            playerList = new Player[taille_data / 2];
-
-            for (i = 0; i < taille_data; i += 2)
-            {
-                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
-                compteur++;
-            }
-
-            s_InGame.WaitOne();
-            player_received = true;
-            s_InGame.Release();
-        }
-
-        public void OnPlayerCurrentReceive(Packet packet)
-        {
-            nextPlayer = packet.IdPlayer;
         }
 
         public void checkGameBegin()
