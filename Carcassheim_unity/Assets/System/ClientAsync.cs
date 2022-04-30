@@ -163,7 +163,7 @@ public class ClientAsync
             foreach (var packet in state.Packets)
             {
                 var debug = "Reading from : " + client.RemoteEndPoint +
-                        "\n\t Read {0} bytes =>\t" + packet +
+                        "\n\t Read {"+ client.RemoteEndPoint +"} bytes =>\t" + packet +
                         "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
 
                 Debug.Log(debug);
@@ -227,10 +227,9 @@ public class ClientAsync
 
         // Begin sending the data to the remote device.
         var size = bytes.Length;
-        Debug.Log("Sent {0} bytes =>\t" + original + " " + size);
 
-        var debug = "Sent total {0} bytes to server." + size +
-                        "\n\t Sent {0} bytes =>\t" + original;
+        var debug = "Sent total {"+ size +"} bytes to server."+
+                        "\n\t bytes =>\t" + original;
 
         Debug.Log(debug);
 
