@@ -227,6 +227,12 @@ public class ClientAsync
         // Begin sending the data to the remote device.
         var size = bytes.Length;
         Console.WriteLine("Sent {0} bytes =>\t" + original, size);
+
+        var debug = "Sent total {0} bytes to server." + size +
+                        "\n\t Sent {0} bytes =>\t" + original;
+
+        Debug.Log(debug);
+
         clientSocket.BeginSend(bytes, 0, size, 0,
             SendCallback, clientSocket);
     }
@@ -240,7 +246,6 @@ public class ClientAsync
 
             // Complete sending the data to the remote device.
             int bytesSent = client.EndSend(ar);
-            Debug.Log("Sent total {0} bytes to server." + bytesSent);
         }
         catch (Exception e)
         {

@@ -40,12 +40,16 @@ namespace Assets.system
         private Player[] playerList;
         bool player_received = false;
         private ulong nextPlayer;
+
         private Position[] allposition;
+        private Semaphore s_allposition;
 
         private Semaphore s_InGame;
         private bool testGameBegin = true;
 
         private bool first_turn_received = false;
+
+        private int nb_tile_for_turn = 0;
 
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
@@ -114,8 +118,10 @@ namespace Assets.system
             // FLAG => true : garder la tuile; false: jeter la tuile
             // RETURN nombre de tuile dans la main au final
 
-            tiles.AddRange(tiles_drawed);
+            for (int i = 0; i < nb_tile_for_turn; i++)
+                tiles.Add(tiles_drawed[i]);
             tiles_drawed.Clear();
+            nb_tile_for_turn = 0;
 
             return 1;
             // (| f) (| f) (| f) (| f) >>(| t)
@@ -133,6 +139,7 @@ namespace Assets.system
             // tile_id est un argument !!!
             // ajouter avec new Position,(X, Y, Rotation) avec rotation = (0: Nord, 1: Est, 2: Sud, 3: Ouest)
             // mettre une position par rotation
+            s_allposition.WaitOne();
             int i, taille = allposition.Length;
             for (i = 0; i < taille; i++)
             {
@@ -142,6 +149,7 @@ namespace Assets.system
                     allposition[i].ROT
                     ));
             }
+            s_allposition.Release();
         }
 
         //=======================================================
@@ -294,6 +302,7 @@ namespace Assets.system
             // ======================
             Communication.Instance.StartListening(OnPacketReceived);
             s_InGame = new Semaphore(1, 1);
+            s_allposition = new Semaphore(1, 1);
 
             dico_tuile = LireXML2.Read("config_back.xml");
             lePlateau = new Plateau(dico_tuile);
@@ -405,8 +414,8 @@ namespace Assets.system
         {
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
-                OnTuileReceived(packet);
-                if (!first_turn_received)
+                bool one_valid = OnTuileReceived(packet);
+                if (one_valid && !first_turn_received)
                 {
                     first_turn_received = true;
                     checkGameBegin();
@@ -435,20 +444,19 @@ namespace Assets.system
             checkGameBegin();
         }
 
-        public void OnTuileReceived(Packet packet)
+        public bool OnTuileReceived(Packet packet)
         {
             int id_tuile;
             Tuile tuile;
             int i;
-            Position[] position;
             bool tuile_ok = false;
             TileInitParam tileParam;
+            Position[] positions;
 
             for (i = 0; i < 3; i++)
             {
                 id_tuile = Convert.ToInt32(packet.Data[i]);
-                tuile = dico_tuile[(ulong)id_tuile];
-                position = lePlateau.PositionsPlacementPossible(tuile);
+                positions = lePlateau.PositionsPlacementPossible((ulong)id_tuile);
 
                 tileParam = new TileInitParam
                 {
@@ -456,48 +464,30 @@ namespace Assets.system
                     id_tile = id_tuile
                 };
 
-                if (position != null)
+                if (positions != null)
                 {
-                    if (position.Length >= 0)
+                    if (positions.Length >= 0)
                     {
-                        Debug.Log("Les positions de la " + i + "�me tuile : " + position.ToString());
-                        SendAllPosition(position, id_tuile);
+                        Debug.Log("Les positions de la " + i + "ème tuile : " + positions[0].X + ", " + positions[0].Y + ", " + positions[0].ROT);
+                        SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT);
                         tileParam.tile_flags = true;
-                        allposition = position;
+
+                        s_allposition.WaitOne();
+                        allposition = positions;
+                        s_allposition.Release();
+
+                        tuile_ok = true;
                     }
                 }
-
+                nb_tile_for_turn += 1;
                 tiles_drawed.Add(tileParam);
                 if (tuile_ok)
-                    return;
+                    return tuile_ok;
             }
 
             packet.Error = Tools.Errors.Data;
             Communication.Instance.SendAsync(packet);
-        }
-
-        private void SendAllPosition(Position[] position, int id_tuile)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.TuileVerification;
-            packet.IdPlayer = _mon_id;
-
-            int i, compteur = 0, taille = position.Length;
-            int taille_data = 1 + taille * 3;
-            packet.Data = new string[taille_data];
-
-            packet.IdRoom = (int)_id_partie;
-            packet.Data[0] = id_tuile.ToString();
-
-            for (i = 1; i < taille_data; i += 3)
-            {
-                packet.Data[i] = position[compteur].X.ToString();
-                packet.Data[i + 1] = position[compteur].Y.ToString();
-                packet.Data[i + 2] = position[compteur].ROT.ToString();
-                compteur++;
-            }
-
-            Communication.Instance.SendAsync(packet);
+            return tuile_ok;
         }
 
         public void SendPosition(int id_tuile, int X, int Y, int ROT)
@@ -563,10 +553,8 @@ namespace Assets.system
             if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && first_turn_received)
             {
                 testGameBegin = false;
-                s_InGame.Release();
-                Debug.Log("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101");
                 system_display.setNextState(DisplaySystemState.gameStart);
-                Debug.Log("020202020202020202020202020202020202020202020202020202020202020202002020202020202020202020202020202020202020");
+
                 return;
             }
             s_InGame.Release();
