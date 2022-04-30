@@ -219,7 +219,7 @@ namespace system
             {
                 if (threadJeu.Get_ID() == idRoom)
                 {
-                    threadJeu.SetACBarrier();
+                    threadJeu.SetACBarrier(); // Sets the barrier if inexistant
 
                     // On attend que tous les autres joueurs aient exécuté leur rôle d'arbitre
                     threadJeu.WaitACBarrier();
@@ -262,6 +262,8 @@ namespace system
                             threadJeu.SetValid_AC_drawedTilesValid();
                         }
                     }
+
+                    threadJeu.SetACBarrier(); // Sets the barrier if inexistant
 
                     // Signale que le rôle d'arbitre de ce joueur a été joué
                     threadJeu.WaitACBarrier();

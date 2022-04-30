@@ -64,6 +64,8 @@ namespace system
         // Attributs anticheat
         private bool _AC_drawedTilesValid;
         private Barrier _AC_barrierAllVerifDone;
+        private bool _AC_barrierUp; // Indique si la barrière existe
+        private Semaphore _s_AC_barrierUp;
 
         // Semaphores moteur
         private Semaphore _s_nombre_joueur;
@@ -122,6 +124,11 @@ namespace system
             {
                 _AC_drawedTilesValid = true;
             }
+        }
+
+        public bool Get_AC_barrierUp()
+        {
+            return _AC_barrierUp;
         }
 
         public Position Get_posTuileTourActu()
@@ -357,6 +364,10 @@ namespace system
             _s_posPionTourActu = new Semaphore(1, 1);
             _s_posTuileTourActu = new Semaphore(1, 1);
 
+            _AC_drawedTilesValid = false;
+            _AC_barrierUp = false;
+            _s_AC_barrierUp = new Semaphore(1, 1);
+
         }
 
         // ===================
@@ -488,7 +499,13 @@ namespace system
         public void SetACBarrier()
         {
             _s_nombre_joueur.WaitOne();
-            _AC_barrierAllVerifDone = new Barrier((int)_nombre_joueur);
+            _s_AC_barrierUp.WaitOne();
+            if(_AC_barrierUp == false)
+            {
+                _AC_barrierAllVerifDone = new Barrier((int)_nombre_joueur);
+                _AC_barrierUp = true;
+            }
+            _s_AC_barrierUp.Release();
             _s_nombre_joueur.Release();
         }
         public void WaitACBarrier()
@@ -497,7 +514,10 @@ namespace system
         }
         public void DisposeACBarrier()
         {
+            _s_AC_barrierUp.WaitOne();
             _AC_barrierAllVerifDone.Dispose();
+            _AC_barrierUp = false;
+            _s_AC_barrierUp.Release();
         }
 
         public bool EveryoneIsReady()
