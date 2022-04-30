@@ -123,7 +123,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             changeHover();
         }
 
-        if ((nextGo.GetComponent<InputField>() || eventSystem.currentSelectedGameObject.GetComponent<InputField>()) && GameObject.Find("InputFieldEndEdit"))
+        if ((nextGo.GetComponent<InputField>() || (eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.GetComponent<InputField>()) && GameObject.Find("InputFieldEndEdit")))
         {
             if (TridentGo.activeSelf == true) // Desactive car aucune selection
                 TridentGo.SetActive(false);

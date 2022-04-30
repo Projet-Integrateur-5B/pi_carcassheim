@@ -285,7 +285,7 @@ namespace Assets.system
                     DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
                     SendPosition(action_tsc.tile_id,
                         action_tsc.new_pos.X, action_tsc.new_pos.Y, action_tsc.new_pos.Rotation
-                        ,Tools.IdMessage.TuilePlacement);
+                        , Tools.IdMessage.TuilePlacement);
                     break;
 
                 case DisplaySystemActionTypes.tileSelection:
@@ -415,9 +415,9 @@ namespace Assets.system
             {
                 DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
-                system_display.execAction(dsa);
+                system_display.execDirtyAction(dsa);
             }
-            else if(packet.IdMessage == Tools.IdMessage.EndTurn)
+            else if (packet.IdMessage == Tools.IdMessage.EndTurn)
             {
                 OnEndTurnReceive();
             }

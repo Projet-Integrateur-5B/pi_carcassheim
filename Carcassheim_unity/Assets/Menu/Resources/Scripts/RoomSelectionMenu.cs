@@ -173,7 +173,7 @@ public class RoomSelectionMenu : Miscellaneous
 
             if (res)
             {
-                ChangeMenu("JoinByIdMenu", "PublicRoomMenu");
+                ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");
             }
 
             s_listAction.WaitOne();

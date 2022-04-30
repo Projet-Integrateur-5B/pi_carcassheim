@@ -7526,7 +7526,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 514128156}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0a5b51cb0ec6554fa2392d60e7d4c8b, type: 3}
   m_Name: 
@@ -7536,6 +7536,8 @@ MonoBehaviour:
   - {fileID: 156552237}
   event_on_validate:
   - {fileID: 594820983}
+  tab_enabled: 0
+  enter_enabled: 1
 --- !u!1 &516565916
 GameObject:
   m_ObjectHideFlags: 0
@@ -8869,10 +8871,10 @@ RectTransform:
   m_Father: {fileID: 1107871331}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!328 &631025255
 VideoPlayer:
@@ -8891,7 +8893,7 @@ VideoPlayer:
   m_TargetMaterialRenderer: {fileID: 0}
   m_TargetMaterialProperty: _MainTex
   m_RenderMode: 2
-  m_AspectRatio: 2
+  m_AspectRatio: 5
   m_DataSource: 0
   m_PlaybackSpeed: 0.85
   m_AudioOutputMode: 2
@@ -28309,6 +28311,8 @@ MonoBehaviour:
   - {fileID: 1941421837}
   event_on_validate:
   - {fileID: 489226058}
+  tab_enabled: 0
+  enter_enabled: 1
 --- !u!1 &2143632440
 GameObject:
   m_ObjectHideFlags: 0

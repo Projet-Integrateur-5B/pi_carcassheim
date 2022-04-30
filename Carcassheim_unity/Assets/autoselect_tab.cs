@@ -11,6 +11,9 @@ public class autoselect_tab : MonoBehaviour
     [SerializeField] List<Button> event_on_validate;
 
     private int index_field = -1;
+
+    [SerializeField] bool tab_enabled = true;
+    [SerializeField] bool enter_enabled = true;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,13 +23,13 @@ public class autoselect_tab : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Tab) && inputs.Count > 0)
+        if (tab_enabled && Input.GetKeyUp(KeyCode.Tab) && inputs.Count > 0)
         {
             index_field = (index_field + 1) % inputs.Count;
             inputs[index_field].Select();
             inputs[index_field].ActivateInputField();
         }
-        if (Input.GetKeyUp(KeyCode.Return) && index_field > 0)
+        if (enter_enabled && Input.GetKeyUp(KeyCode.Return) && index_field != -1)
         {
             foreach (Button bt in event_on_validate)
             {
@@ -43,9 +46,9 @@ public class autoselect_tab : MonoBehaviour
 
     void OnEnable()
     {
-        if (inputs.Count > 0)
+        index_field = 0;
+        if (tab_enabled && inputs.Count > 0)
         {
-            index_field = 0;
             inputs[index_field].Select();
             inputs[index_field].ActivateInputField();
         }

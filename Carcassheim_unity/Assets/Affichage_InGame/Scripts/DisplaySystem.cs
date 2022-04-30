@@ -114,6 +114,10 @@ public class DisplaySystem : MonoBehaviour
             setNextState(action.required_state);
     }
 
+    public void execDirtyAction(DisplaySystemAction action)
+    {
+        queue_actions.Enqueue(action);
+    }
 
     public void execAction(DisplaySystemAction action)
     {
