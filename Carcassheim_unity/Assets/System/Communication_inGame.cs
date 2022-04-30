@@ -48,6 +48,8 @@ namespace Assets.system
 
         private bool first_turn_received = true;
 
+        private TurnPlayParam play_of_this_turn;
+
         private int nb_tile_for_turn = 0;
 
         private Semaphore s_WaitInit;
@@ -102,7 +104,8 @@ namespace Assets.system
         override public void getTile(out TurnPlayParam param)
         {
             //TODO PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
-            param = new TurnPlayParam(-1, null, -1, -1);
+            param = play_of_this_turn;
+
         }
 
         //=======================================================
@@ -278,6 +281,7 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
+            Debug.Log("ACTION ENVOYE");
             //TODO ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
             switch (action.action_type)
             {
@@ -369,7 +373,7 @@ namespace Assets.system
             Task.Run(playerlist);
 
             /* Demmande Current et TuileDraw */
-            OnEndTurnReceive();
+            OnEndTurnReceive(null);
 
             s_WaitInit.Release();
             Debug.Log("On est dans la game");
@@ -419,7 +423,7 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.EndTurn)
             {
-                OnEndTurnReceive();
+                OnEndTurnReceive(packet);
             }
             checkGameBegin();
         }
@@ -494,7 +498,7 @@ namespace Assets.system
             nextPlayer = packet.IdPlayer;
         }
 
-        private void OnEndTurnReceive()
+        private void OnEndTurnReceive(Packet packet)
         {
             Action playercurrent = () =>
             {
@@ -519,6 +523,19 @@ namespace Assets.system
                 Communication.Instance.SendAsync(packet);
             };
             Task.Run(tuiledraw);
+
+            if (packet != null)
+            {
+                int id_tile = int.Parse(packet.Data[0]);
+                int x_tile = int.Parse(packet.Data[1]);
+                int y_tile = int.Parse(packet.Data[2]);
+                int r_tile = int.Parse(packet.Data[3]);
+                int id_meeple = int.Parse(packet.Data[4]);
+                int pos_meeple = int.Parse(packet.Data[5]);
+                play_of_this_turn = new TurnPlayParam(id_tile, new PositionRepre(x_tile, y_tile, r_tile), id_meeple, pos_meeple);
+                system_display.setNextState(DisplaySystemState.idleState);
+            }
+
         }
 
         public void SendPosition(int id_tuile, int X, int Y, int ROT, Tools.IdMessage idMessage)
