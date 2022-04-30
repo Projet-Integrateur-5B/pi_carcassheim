@@ -45,6 +45,8 @@ namespace Assets.system
         private Semaphore s_InGame;
         private bool testGameBegin = true;
 
+        private bool first_turn_received = false;
+
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
         //====================================================================================================
@@ -257,27 +259,27 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
-            /*
-            // TODO ENVOYER AU !!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
-            switch (action.state)
-            {
-                case DisplaySystemActionTypes.tileSetCoord:
-                    DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord) action;
-                    break;
-                case tileSelection:
-                    DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection) action;
-                    break;
-                case meepleSetCoord:
-                    DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord) action;
-                    break;
-                case meepleSelection:
-                    DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection) action;
-                    break;
-                case StateSelection:
-                    DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection) action;
-                    break;
-            }
-            */
+
+            //TODO ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
+            // switch (action.state)
+            // {
+            //     case DisplaySystemActionTypes.tileSetCoord:
+            //         DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
+            //         break;
+            //     case DisplaySystemActionTypes.tileSelection:
+            //         DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection)action;
+            //         break;
+            //     case DisplaySystemActionTypes.meepleSetCoord:
+            //         DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
+            //         break;
+            //     case DisplaySystemActionTypes.meepleSelection:
+            //         DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection)action;
+            //         break;
+            //     case DisplaySystemActionTypes.StateSelection:
+            //         DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection)action;
+            //         break;
+            // }
+
             return;
         }
 
@@ -404,6 +406,11 @@ namespace Assets.system
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 OnTuileReceived(packet);
+                if (!first_turn_received)
+                {
+                    first_turn_received = true;
+                    checkGameBegin();
+                }
             }
             else if (packet.IdMessage == Tools.IdMessage.PlayerList)
             {
@@ -475,7 +482,7 @@ namespace Assets.system
             packet.IdMessage = Tools.IdMessage.TuileVerification;
             packet.IdPlayer = _mon_id;
 
-            int i,compteur = 0, taille = position.Length;
+            int i, compteur = 0, taille = position.Length;
             int taille_data = 1 + taille * 3;
             packet.Data = new string[taille_data];
 
@@ -553,10 +560,10 @@ namespace Assets.system
         {
             Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received);
             s_InGame.WaitOne();
-            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin)
+            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && first_turn_received)
             {
-                s_InGame.Release();
                 testGameBegin = false;
+                s_InGame.Release();
                 Debug.Log("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101");
                 system_display.setNextState(DisplaySystemState.gameStart);
                 Debug.Log("020202020202020202020202020202020202020202020202020202020202020202002020202020202020202020202020202020202020");
