@@ -571,6 +571,8 @@ namespace system
             _s_plateau.WaitOne();
             _plateau.Poser1ereTuile(_idTuileInit);
             _s_plateau.Release();
+            // Retrait de cette tuile de la liste de tuiles
+            RetirerTuileGame(_idTuileInit);
 
             // Initialise les meeples de tt le monde
             InitializePlayerMeeples();
