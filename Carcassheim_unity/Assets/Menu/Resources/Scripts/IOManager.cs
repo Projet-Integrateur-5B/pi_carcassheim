@@ -86,12 +86,16 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         // Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
         foreach (Transform menu in GameObject.Find("SubMenus").transform)
         {
-            foreach (Transform btn in menu.Find("Buttons").transform)
-                if (btn.GetComponent<Button>())
-                    btn.GetComponent<Button>().onClick.AddListener(delegate
-                    {
-                        MethodCall(btn.name, null, null);
-                    });
+            Transform buttons = menu.Find("Buttons");
+            if (buttons != null)
+            {
+                foreach (Transform btn in buttons)
+                    if (btn.GetComponent<Button>())
+                        btn.GetComponent<Button>().onClick.AddListener(delegate
+                        {
+                            MethodCall(btn.name, null, null);
+                        });
+            }
             if (menu.Find("Toggle Group"))
                 foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
                     if (tog.GetComponent<Toggle>())
@@ -143,31 +147,31 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             }
         }
 
-            // Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
-            /* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
-                    { */
-            /* lockMouse(false); */
-            /* 			nextGo = eventSystem.currentSelectedGameObject;
-                        resetHoverPreviousGo(); */
-            // EVITE SPAM CLIC
-            /* 			Invoke("ResetCooldown", 5.0f);
-                        cooldown = true; */
-            /* } */
+        // Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
+        /* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
+                { */
+        /* lockMouse(false); */
+        /* 			nextGo = eventSystem.currentSelectedGameObject;
+                    resetHoverPreviousGo(); */
+        // EVITE SPAM CLIC
+        /* 			Invoke("ResetCooldown", 5.0f);
+                    cooldown = true; */
+        /* } */
 
-            /* --------------------- PATCH INPUTFIELD --------------------- */
-            // il faut mieux gérer l'inputfield pour la saisie (entree et escape)
-            /* 		if (IF!=null) 
-                        if(IF.isFocused)
-                            {
-                                previousGo = nextGo;
-                                nextGo = eventSystem.currentSelectedGameObject;
-                                changeHover();
-                                lockMouse(true);
-                                if(Input.GetKey(KeyCode.Return)) // touche enter
-                                    lockMouse(false); 
-                            } */
-            /* ------------------ FIN PATCH INPUTFIELD -------------------- */
-        }
+        /* --------------------- PATCH INPUTFIELD --------------------- */
+        // il faut mieux gérer l'inputfield pour la saisie (entree et escape)
+        /* 		if (IF!=null) 
+                    if(IF.isFocused)
+                        {
+                            previousGo = nextGo;
+                            nextGo = eventSystem.currentSelectedGameObject;
+                            changeHover();
+                            lockMouse(true);
+                            if(Input.GetKey(KeyCode.Return)) // touche enter
+                                lockMouse(false); 
+                        } */
+        /* ------------------ FIN PATCH INPUTFIELD -------------------- */
+    }
 
     private void lockMouse(bool b)
     {
