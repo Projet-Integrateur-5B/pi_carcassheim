@@ -194,6 +194,7 @@ public class ClientAsync
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
 
+            Communication.Instance.isListening = true;
             while (true)
             {
                 Debug.Log("------------------------- Lancement Ecoute Infini -------------------------");
@@ -208,6 +209,7 @@ public class ClientAsync
         catch (Exception e)
         {
             Debug.Log(e.ToString());
+            Communication.Instance.isListening = false;
         }
     }
 
