@@ -7512,6 +7512,8 @@ MonoBehaviour:
   inputs:
   - {fileID: 240506295}
   - {fileID: 156552237}
+  event_on_validate:
+  - {fileID: 594820983}
 --- !u!1 &516565916
 GameObject:
   m_ObjectHideFlags: 0
@@ -27829,6 +27831,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputs:
   - {fileID: 1941421837}
+  event_on_validate:
+  - {fileID: 489226058}
 --- !u!1 &2143632440
 GameObject:
   m_ObjectHideFlags: 0

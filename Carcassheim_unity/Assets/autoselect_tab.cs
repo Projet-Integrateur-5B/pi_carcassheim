@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class autoselect_tab : MonoBehaviour
 {
     [SerializeField] List<InputField> inputs;
 
-    private int index_field = 0;
+    [SerializeField] List<Button> event_on_validate;
+
+    private int index_field = -1;
     // Start is called before the first frame update
     void Start()
     {
@@ -23,6 +26,18 @@ public class autoselect_tab : MonoBehaviour
             inputs[index_field].Select();
             inputs[index_field].ActivateInputField();
         }
+        if (Input.GetKeyUp(KeyCode.Return) && index_field > 0)
+        {
+            foreach (Button bt in event_on_validate)
+            {
+                bt.onClick?.Invoke();
+            }
+        }
+    }
+
+    void test()
+    {
+        Debug.Log("debug");
     }
 
 
@@ -34,6 +49,11 @@ public class autoselect_tab : MonoBehaviour
             inputs[index_field].Select();
             inputs[index_field].ActivateInputField();
         }
+    }
+
+    void OnDisable()
+    {
+        index_field = -1;
     }
 
 }
