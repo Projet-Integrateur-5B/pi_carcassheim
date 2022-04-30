@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using Newtonsoft.Json;
 
 namespace ClassLibrary
@@ -47,18 +48,18 @@ namespace ClassLibrary
         public enum IdMessage : byte
         {
             Default = 0,
-        
+
             AccountSignup = 1,
             AccountLogin = 2,
             AccountLogout = 3,
             AccountStatistics = 4,
-        
+
             RoomList = 10,
             RoomCreate = 11,
             RoomSettingsGet = 12,
             RoomSettingsSet = 13,
             RoomAskPort = 14,
-        
+
             PlayerJoin = 20,
             PlayerLeave = 21,
             PlayerKick = 22,
@@ -66,19 +67,19 @@ namespace ClassLibrary
             PlayerCheat = 24,
             PlayerList = 25,
             PlayerCurrent = 26,
-        
+
             StartGame = 30,
             EndGame = 31,
             EndTurn = 32,
             TimerPlayer = 33,
-        
+
             TuileDraw = 40,
             TuilePlacement = 41,
             TuileVerification = 42,
             CancelTuilePlacement = 43,
             PionPlacement = 44,
             CancelPionPlacement = 45,
-        
+
             NoAnswerNeeded = 99
         }
 
@@ -146,7 +147,7 @@ namespace ClassLibrary
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.Log(e.ToString());
                 // Setting the error value.
                 error = Errors.Socket;
             }
@@ -197,7 +198,7 @@ namespace ClassLibrary
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                Debug.Log(e.ToString());
                 // Setting the error value.
                 error = Errors.Socket;
             }

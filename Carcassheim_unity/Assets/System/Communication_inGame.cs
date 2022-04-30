@@ -47,7 +47,7 @@ namespace Assets.system
         private Semaphore s_InGame;
         private bool testGameBegin = true;
 
-        private bool first_turn_received = false;
+        private bool first_turn_received = true;
 
         private int nb_tile_for_turn = 0;
 
@@ -94,7 +94,7 @@ namespace Assets.system
                 param.id_meeple.ToString(),
                 param.slot_pos.ToString()
             };
-            
+
             Communication.Instance.SendAsync(packet);
         }
 
@@ -301,6 +301,10 @@ namespace Assets.system
 
         //====================================================================================================
 
+        void Awake()
+        {
+            dico_tuile = LireXML2.Read("config_back.xml");
+        }
 
         // Start is called before the first frame update
         void Start()
@@ -312,7 +316,6 @@ namespace Assets.system
             s_InGame = new Semaphore(1, 1);
             s_allposition = new Semaphore(1, 1);
 
-            dico_tuile = LireXML2.Read("config_back.xml");
             lePlateau = new Plateau(dico_tuile);
             tiles_drawed = new List<TileInitParam>();
 
@@ -446,8 +449,8 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
-                DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]), 
-                    new PositionRepre( int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
+                DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
+                    new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
                 system_display.execAction(dsa);
             }
             checkGameBegin();
