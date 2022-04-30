@@ -234,7 +234,7 @@ public class backLocal : CarcasheimBack
                 else
                     index = tiles[compteur_de_tour];
                 tile_drawn.Add((ulong)index);
-                possibilities_tile_act_turn.AddRange(_plateau.PositionPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
+                possibilities_tile_act_turn.AddRange(_plateau.PositionsPlacementPossible(tile_drawn[tile_drawn.Count - 1]));
                 nb_tile_drawn += 1;
             } while (possibilities_tile_act_turn.Count <= 0);// && nb_tile_drawn < win_tile_nb);
             last_generated_tile_tour = compteur_de_tour;
