@@ -177,7 +177,7 @@ namespace Assets.system
             return Tuile.Copy(_dicoTuile[id_tuile]);
         }
 
-        public Position[] PositionPlacementPossible(ulong idTuile)
+        public Position[] PositionsPlacementPossible(ulong idTuile)
         {
             return PositionsPlacementPossible(tuileDeModelId(idTuile));
         }

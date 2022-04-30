@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 public enum DisplaySystemActionTypes
 {
-    tileSetCoord,
-    tileSelection,
-    meepleSetCoord,
-    meepleSelection,
-    StateSelection
+    tileSetCoord = 0,
+    tileSelection = 1,
+    meepleSetCoord = 2,
+    meepleSelection = 3,
+    StateSelection = 4
 };
 
 

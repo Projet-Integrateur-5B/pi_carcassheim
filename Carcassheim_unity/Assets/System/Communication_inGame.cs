@@ -47,6 +47,10 @@ namespace Assets.system
         private Semaphore s_InGame;
         private bool testGameBegin = true;
 
+        private bool first_turn_received = false;
+
+        private int nb_tile_for_turn = 0;
+
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
         //====================================================================================================
@@ -114,8 +118,10 @@ namespace Assets.system
             // FLAG => true : garder la tuile; false: jeter la tuile
             // RETURN nombre de tuile dans la main au final
 
-            tiles.AddRange(tiles_drawed);
+            for (int i = 0; i < nb_tile_for_turn; i++)
+                tiles.Add(tiles_drawed[i]);
             tiles_drawed.Clear();
+            nb_tile_for_turn = 0;
 
             return 1;
             // (| f) (| f) (| f) (| f) >>(| t)
@@ -261,27 +267,27 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
-            /*
-            // TODO ENVOYER AU !!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
-            switch (action.state)
-            {
-                case DisplaySystemActionTypes.tileSetCoord:
-                    DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord) action;
-                    break;
-                case tileSelection:
-                    DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection) action;
-                    break;
-                case meepleSetCoord:
-                    DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord) action;
-                    break;
-                case meepleSelection:
-                    DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection) action;
-                    break;
-                case StateSelection:
-                    DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection) action;
-                    break;
-            }
-            */
+
+            //TODO ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
+            // switch (action.state)
+            // {
+            //     case DisplaySystemActionTypes.tileSetCoord:
+            //         DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
+            //         break;
+            //     case DisplaySystemActionTypes.tileSelection:
+            //         DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection)action;
+            //         break;
+            //     case DisplaySystemActionTypes.meepleSetCoord:
+            //         DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
+            //         break;
+            //     case DisplaySystemActionTypes.meepleSelection:
+            //         DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection)action;
+            //         break;
+            //     case DisplaySystemActionTypes.StateSelection:
+            //         DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection)action;
+            //         break;
+            // }
+
             return;
         }
 
@@ -415,7 +421,12 @@ namespace Assets.system
         {
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
-                OnTuileReceived(packet);
+                bool one_valid = OnTuileReceived(packet);
+                if (one_valid && !first_turn_received)
+                {
+                    first_turn_received = true;
+                    checkGameBegin();
+                }
             }
             else if (packet.IdMessage == Tools.IdMessage.PlayerList)
             {
@@ -434,7 +445,7 @@ namespace Assets.system
             checkGameBegin();
         }
 
-        public void OnTuileReceived(Packet packet)
+        public bool OnTuileReceived(Packet packet)
         {
             int id_tuile;
             Tuile tuile;
@@ -446,8 +457,7 @@ namespace Assets.system
             for (i = 0; i < 3; i++)
             {
                 id_tuile = Convert.ToInt32(packet.Data[i]);
-                tuile = dico_tuile[(ulong)id_tuile];
-                positions = lePlateau.PositionsPlacementPossible(tuile);
+                positions = lePlateau.PositionsPlacementPossible((ulong)id_tuile);
 
                 tileParam = new TileInitParam
                 {
@@ -459,7 +469,7 @@ namespace Assets.system
                 {
                     if (positions.Length >= 0)
                     {
-                        Debug.Log("Les positions de la " + i + "ème tuile : " + positions[0].X+", " + positions[0].Y + ", " + positions[0].ROT);
+                        Debug.Log("Les positions de la " + i + "ème tuile : " + positions[0].X + ", " + positions[0].Y + ", " + positions[0].ROT);
                         SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT);
                         tileParam.tile_flags = true;
 
@@ -470,14 +480,15 @@ namespace Assets.system
                         tuile_ok = true;
                     }
                 }
-
+                nb_tile_for_turn += 1;
                 tiles_drawed.Add(tileParam);
                 if (tuile_ok)
-                    return;
+                    return tuile_ok;
             }
 
             packet.Error = Tools.Errors.Data;
             Communication.Instance.SendAsync(packet);
+            return tuile_ok;
         }
 
         public void SendPosition(int id_tuile, int X, int Y, int ROT)
@@ -540,11 +551,9 @@ namespace Assets.system
         {
             Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received);
             s_InGame.WaitOne();
-            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin)
+            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && first_turn_received)
             {
-                s_InGame.Release();
                 testGameBegin = false;
-
                 system_display.setNextState(DisplaySystemState.gameStart);
 
                 return;
