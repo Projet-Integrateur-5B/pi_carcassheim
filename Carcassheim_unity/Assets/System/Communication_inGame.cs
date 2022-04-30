@@ -514,7 +514,7 @@ namespace Assets.system
         public void SendPosition(int id_tuile, int X, int Y, int ROT)
         {//ToDo Retirer Meeple et slot et le changer
             Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.TuilePlacement;
+            packet.IdMessage = Tools.IdMessage.TuileVerification;
             packet.IdRoom = (int)_id_partie;
             packet.IdPlayer = _mon_id;
 
