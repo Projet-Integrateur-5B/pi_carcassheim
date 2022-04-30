@@ -70,6 +70,9 @@ public class DisplaySystem : MonoBehaviour
 
     [SerializeField] private bool DEBUG = false;
 
+    private bool DIRTY_ACTIONS = true;
+    private Queue<DisplaySystemAction> queue_actions = new Queue<DisplaySystemAction>();
+
 
 
     // Start is called before the first frame update
@@ -98,11 +101,31 @@ public class DisplaySystem : MonoBehaviour
         //gameBegin();
     }
 
+    public void peekActionValid()
+    {
+        if (!DIRTY_ACTIONS || queue_actions.Count == 0)
+            return;
+        DisplaySystemAction action = queue_actions.Peek();
+        if (action.required_state == act_system_state)
+        {
+            execAction(queue_actions.Dequeue());
+        }
+        else if (act_system_state != DisplaySystemState.StateTransition)
+            setNextState(action.required_state);
+    }
+
 
     public void execAction(DisplaySystemAction action)
     {
         if (act_player != my_player)
         {
+            if (DIRTY_ACTIONS && (queue_actions.Count > 0 || (action.required_state != DisplaySystemState.noState && action.required_state != act_system_state)))
+            {
+                if (action.required_state != act_system_state && queue_actions.Count == 0)
+                    setNextState(action.required_state);
+                queue_actions.Enqueue(action);
+                return;
+            }
             switch (action.action_type)
             {
                 case DisplaySystemActionTypes.tileSetCoord:
@@ -529,6 +552,8 @@ public class DisplaySystem : MonoBehaviour
                 }
                 break;
         }
+
+        peekActionValid();
     }
 
     public void gameBegin()

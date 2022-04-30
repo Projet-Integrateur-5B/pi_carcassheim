@@ -98,7 +98,7 @@ namespace Assets.system
                                 {
                                     temp.Add(item.ToArray());
                                 }
-                                Debug.Log("TUILE " + currentId.ToString());
+                                //Debug.Log("TUILE " + currentId.ToString());
                                 current = new Tuile((ulong)currentId, slots.ToArray(), temp.ToArray());
                                 result.Add((ulong)currentId, current);
                             }
@@ -145,7 +145,7 @@ namespace Assets.system
                         readingNom = false;
                         if (xmlReader.Name == "terrain")
                         {
-                            Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
+                            //Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
                             IdVersTerrain.Add(currentId, DictionaireTemp[currentNom]);
                         }
                         break;
@@ -227,7 +227,7 @@ namespace Assets.system
             }
 
             slot = new Slot(IdVersTerrain[idTerrain], tempSlotLink.ToArray());
-            Debug.Log("END SLOT OF" + IdVersTerrain[idTerrain].ToString() + " of " + pos_debug);
+            //Debug.Log("END SLOT OF" + IdVersTerrain[idTerrain].ToString() + " of " + pos_debug);
             return result;
         }
     }

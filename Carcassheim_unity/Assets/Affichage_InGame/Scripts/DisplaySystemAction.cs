@@ -15,6 +15,7 @@ public enum DisplaySystemActionTypes
 public abstract class DisplaySystemAction
 {
     public DisplaySystemActionTypes action_type;
+    public DisplaySystemState required_state = DisplaySystemState.noState;
 }
 
 public class DisplaySystemActionTileSetCoord : DisplaySystemAction
@@ -22,8 +23,10 @@ public class DisplaySystemActionTileSetCoord : DisplaySystemAction
     public int tile_id;
     public PositionRepre new_pos;
 
+
     public DisplaySystemActionTileSetCoord(int tile_id, PositionRepre new_pos)
     {
+        required_state = DisplaySystemState.tilePosing;
         action_type = DisplaySystemActionTypes.tileSetCoord;
         this.tile_id = tile_id;
         this.new_pos = new_pos;
@@ -51,6 +54,7 @@ public class DisplaySystemActionMeepleSetCoord : DisplaySystemAction
     public DisplaySystemActionMeepleSetCoord(int tile_id, PositionRepre tile_pos, int meeple_id, int slot_pos)
     {
         action_type = DisplaySystemActionTypes.meepleSetCoord;
+        required_state = DisplaySystemState.meeplePosing;
         this.tile_id = tile_id;
         this.tile_pos = tile_pos;
         this.meeple_id = meeple_id;
