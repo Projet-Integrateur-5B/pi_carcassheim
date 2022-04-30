@@ -30,6 +30,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     private InputField IF = null;
     private static bool boolPC = true;
 
+    [SerializeField] GameObject loading_screen;
+
     void Start()
     {
         absolute_parent_ref = absolute_parent;
@@ -328,5 +330,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         else gameObject.SendMessage(methode, inp);
         if (tog == null || inp == null)
             NewMenuSelectButton();
+    }
+
+    void OnDisable()
+    {
+        TridentGo.SetActive(false);
+        loading_screen.SetActive(true);
     }
 }
