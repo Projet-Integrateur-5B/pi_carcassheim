@@ -308,6 +308,10 @@ namespace Assets.system
             lePlateau = new Plateau(dico_tuile);
             tiles_drawed = new List<TileInitParam>();
 
+            id_tile_init = RoomInfo.Instance.id_tile_init;
+            lePlateau.Poser1ereTuile((ulong)id_tile_init);
+            id_tile_init_received = true;
+
             _id_partie = (ulong)Communication.Instance.idRoom;
             _mon_id = Communication.Instance.idClient;
 
@@ -431,15 +435,9 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
-                /*
-                id_tile_init = Convert.ToInt32(packet.Data[0]);
-                s_InGame.WaitOne();
-                id_tile_init_received = true;
-                s_InGame.Release();
-
-                lePlateau.Poser1ereTuile((ulong)id_tile_init);
-                */
-                lePlateau.Poser1ereTuile(20);
+                DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]), 
+                    new PositionRepre( int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
+                system_display.execAction(dsa);
             }
             checkGameBegin();
         }
