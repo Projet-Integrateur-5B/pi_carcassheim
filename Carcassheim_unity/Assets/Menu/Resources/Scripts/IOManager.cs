@@ -117,21 +117,26 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             changeHover();
         }
 
-        if (nextGo.GetComponent<InputField>() && GameObject.Find("InputFieldEndEdit"))
+        if ((nextGo.GetComponent<InputField>() || eventSystem.currentSelectedGameObject.GetComponent<InputField>()) && GameObject.Find("InputFieldEndEdit"))
         {
             if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
             {
+                if (nextGo.name == "InputFieldEndEdit")
+                    nextGo = eventSystem.currentSelectedGameObject;
                 if (nextGo.transform.GetSiblingIndex() > 0)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() - 1).gameObject;
                 else nextGo = nextGo.transform.parent.GetChild(GameObject.Find("InputFieldEndEdit").transform.childCount - 1).gameObject;
+                eventSystem.SetSelectedGameObject(nextGo);
             }
             else if (Input.GetKeyDown(KeyCode.Tab))
             {
+                if (nextGo.name == "InputFieldEndEdit")
+                    nextGo = eventSystem.currentSelectedGameObject;
                 if (nextGo.transform.GetSiblingIndex() < GameObject.Find("InputFieldEndEdit").transform.childCount - 1)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() + 1).gameObject;
                 else nextGo = nextGo.transform.parent.GetChild(0).gameObject;
+                eventSystem.SetSelectedGameObject(nextGo);
             }
-            eventSystem.SetSelectedGameObject(nextGo);
         }
 
 
