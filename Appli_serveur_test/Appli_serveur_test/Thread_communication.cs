@@ -112,7 +112,7 @@ namespace system
             // Generate packet
             Packet packet = new Packet();
             packet.IdMessage = idMessage;
-
+            packet.IdRoom = roomId;
             packet.IdPlayer = idPlayer;
 
             packet.Data = data;
