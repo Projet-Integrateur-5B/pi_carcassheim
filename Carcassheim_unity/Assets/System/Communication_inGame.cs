@@ -304,7 +304,10 @@ namespace Assets.system
 
             id_tile_init = RoomInfo.Instance.id_tile_init;
             lePlateau.Poser1ereTuile((ulong)id_tile_init);
+
+            s_InGame.WaitOne();
             id_tile_init_received = true;
+            s_InGame.Release();
 
             _id_partie = (ulong)Communication.Instance.idRoom;
             _mon_id = Communication.Instance.idClient;
