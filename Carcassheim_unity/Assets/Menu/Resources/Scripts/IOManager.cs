@@ -123,11 +123,13 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             {
                 if (nextGo.transform.GetSiblingIndex() > 0)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() - 1).gameObject;
+                else nextGo = nextGo.transform.parent.GetChild(GameObject.Find("InputFieldEndEdit").transform.childCount - 1).gameObject;
             }
             else if (Input.GetKeyDown(KeyCode.Tab))
             {
                 if (nextGo.transform.GetSiblingIndex() < GameObject.Find("InputFieldEndEdit").transform.childCount - 1)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() + 1).gameObject;
+                else nextGo = nextGo.transform.parent.GetChild(0).gameObject;
             }
             eventSystem.SetSelectedGameObject(nextGo);
         }
