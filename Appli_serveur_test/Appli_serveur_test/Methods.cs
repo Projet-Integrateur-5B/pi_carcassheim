@@ -929,7 +929,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3], packetReceived.Data[4]);
+        Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
         packet.Error = errors; 
     }
     /// <summary>
