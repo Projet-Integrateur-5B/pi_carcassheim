@@ -128,7 +128,7 @@ public class ConnectionMenu : Miscellaneous
 			listAction.Add(res);
 			s_listAction.Release();
 		}
-    }
+	}
 
     private void Update()
     {

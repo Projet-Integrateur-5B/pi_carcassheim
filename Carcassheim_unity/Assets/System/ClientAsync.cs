@@ -118,6 +118,8 @@ public class ClientAsync
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
 
+            Communication.Instance.isListening = true;
+
             // Begin receiving the data from the remote device.
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
                 new AsyncCallback(ReceiveCallback), state);
@@ -125,6 +127,7 @@ public class ClientAsync
         catch (Exception e)
         {
             Debug.Log(e.ToString());
+            Communication.Instance.isListening = false;
         }
     }
 
@@ -173,10 +176,13 @@ public class ClientAsync
 
             Task.WhenAll(tasks).Wait();
             state.Packets.Clear();
+
+            Communication.Instance.isListening = false;
         }
         catch (Exception e)
         {
             Debug.Log(e.ToString());
+            Communication.Instance.isListening = false;
         }
     }
 
