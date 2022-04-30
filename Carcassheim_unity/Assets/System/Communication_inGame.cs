@@ -51,6 +51,8 @@ namespace Assets.system
 
         private int nb_tile_for_turn = 0;
 
+        private Semaphore s_WaitInit;
+
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
         //====================================================================================================
@@ -303,7 +305,7 @@ namespace Assets.system
 
         void Awake()
         {
-            dico_tuile = LireXML2.Read("config_back.xml");
+            
         }
 
         // Start is called before the first frame update
@@ -312,11 +314,16 @@ namespace Assets.system
             // ======================
             // ==== DANS LA GAME ====
             // ======================
+            s_WaitInit = new Semaphore(1, 1);
+            s_WaitInit.WaitOne();
+
+            dico_tuile = LireXML2.Read("config_back.xml");
+            lePlateau = new Plateau(dico_tuile);
+
             Communication.Instance.StartListening(OnPacketReceived);
             s_InGame = new Semaphore(1, 1);
             s_allposition = new Semaphore(1, 1);
 
-            lePlateau = new Plateau(dico_tuile);
             tiles_drawed = new List<TileInitParam>();
 
             id_tile_init = RoomInfo.Instance.id_tile_init;
@@ -372,7 +379,7 @@ namespace Assets.system
             };
             Task.Run(playercurrent);
 
-
+            s_WaitInit.Release();
             Debug.Log("On est dans la game");
 
             /*
@@ -430,6 +437,8 @@ namespace Assets.system
 
         public void OnPacketReceived(object sender, Packet packet)
         {
+            s_WaitInit.WaitOne();
+            s_WaitInit.Release();
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 bool one_valid = OnTuileReceived(packet);
@@ -511,10 +520,10 @@ namespace Assets.system
 
             packet.Data = new string[]
             {
-                packet.Data[0] = id_tuile.ToString(),
-                packet.Data[1] = X.ToString(),
-                packet.Data[2] = Y.ToString(),
-                packet.Data[3] = ROT.ToString()
+                id_tuile.ToString(),
+                X.ToString(),
+                Y.ToString(),
+                ROT.ToString()
             };
 
             Communication.Instance.SendAsync(packet);
@@ -529,9 +538,9 @@ namespace Assets.system
 
             packet.Data = new string[]
             {
-                packet.Data[0] = id_tuile.ToString(),
-                packet.Data[1] = id_meeple.ToString(),
-                packet.Data[2] = slot_pos.ToString()
+                id_tuile.ToString(),
+                id_meeple.ToString(),
+                slot_pos.ToString()
             };
 
             Communication.Instance.SendAsync(packet);
