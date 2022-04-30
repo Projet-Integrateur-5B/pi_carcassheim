@@ -80,14 +80,22 @@ namespace Assets.system
         // END TURN
         override public void sendTile(TurnPlayParam param)
         {
-            //TODO ENVOYER !!AU SERVEUR!! LE COUP valid� PAR LE JOUEUR ELU => Serveur
-            int tile_id = param.id_tile;
-            PositionRepre tile_pos = param.tile_pos;
-            int id_meeple = param.id_meeple;
-            int slot_pos = param.slot_pos;
+            Packet packet = new Packet();
+            packet.IdMessage = Tools.IdMessage.EndTurn;
+            packet.IdRoom = (int)_id_partie;
+            packet.IdPlayer = _mon_id;
 
-            SendPosition(tile_id, tile_pos.X, tile_pos.Y, tile_pos.Rotation);
-            SendMeepple(tile_id, id_meeple, slot_pos);
+            packet.Data = new string[]
+            {
+                param.id_tile.ToString(),
+                param.tile_pos.X.ToString(),
+                param.tile_pos.Y.ToString(),
+                param.tile_pos.Rotation.ToString(),
+                param.id_meeple.ToString(),
+                param.slot_pos.ToString()
+            };
+            
+            Communication.Instance.SendAsync(packet);
         }
 
         override public void getTile(out TurnPlayParam param)
