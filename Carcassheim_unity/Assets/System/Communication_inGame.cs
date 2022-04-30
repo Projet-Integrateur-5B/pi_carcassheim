@@ -279,26 +279,29 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
-
             //TODO ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
-            // switch (action.state)
-            // {
-            //     case DisplaySystemActionTypes.tileSetCoord:
-            //         DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
-            //         break;
-            //     case DisplaySystemActionTypes.tileSelection:
-            //         DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection)action;
-            //         break;
-            //     case DisplaySystemActionTypes.meepleSetCoord:
-            //         DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
-            //         break;
-            //     case DisplaySystemActionTypes.meepleSelection:
-            //         DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection)action;
-            //         break;
-            //     case DisplaySystemActionTypes.StateSelection:
-            //         DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection)action;
-            //         break;
-            // }
+            switch (action.action_type)
+            {
+                case DisplaySystemActionTypes.tileSetCoord:
+                    DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
+                    SendPosition(action_tsc.tile_id,
+                        action_tsc.new_pos.X, action_tsc.new_pos.Y, action_tsc.new_pos.Rotation
+                        ,Tools.IdMessage.TuilePlacement);
+
+                    break;
+                case DisplaySystemActionTypes.tileSelection:
+                    DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection)action;
+                    break;
+                case DisplaySystemActionTypes.meepleSetCoord:
+                    DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
+                    break;
+                case DisplaySystemActionTypes.meepleSelection:
+                    DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection)action;
+                    break;
+                case DisplaySystemActionTypes.StateSelection:
+                    DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection)action;
+                    break;
+            }
 
             return;
         }
@@ -493,7 +496,7 @@ namespace Assets.system
                     if (positions.Length >= 0)
                     {
                         Debug.Log("Les positions de la " + i + "ème tuile : " + positions[0].X + ", " + positions[0].Y + ", " + positions[0].ROT);
-                        SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT);
+                        SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT, Tools.IdMessage.TuileVerification);
                         tileParam.tile_flags = true;
 
                         s_allposition.WaitOne();
@@ -514,10 +517,10 @@ namespace Assets.system
             return tuile_ok;
         }
 
-        public void SendPosition(int id_tuile, int X, int Y, int ROT)
+        public void SendPosition(int id_tuile, int X, int Y, int ROT, Tools.IdMessage idMessage)
         {//ToDo Retirer Meeple et slot et le changer
             Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.TuileVerification;
+            packet.IdMessage = idMessage;
             packet.IdRoom = (int)_id_partie;
             packet.IdPlayer = _mon_id;
 
