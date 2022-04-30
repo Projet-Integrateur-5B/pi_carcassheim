@@ -86,12 +86,16 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         // Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
         foreach (Transform menu in GameObject.Find("SubMenus").transform)
         {
-            foreach (Transform btn in menu.Find("Buttons").transform)
-                if (btn.GetComponent<Button>())
-                    btn.GetComponent<Button>().onClick.AddListener(delegate
-                    {
-                        MethodCall(btn.name, null, null);
-                    });
+            Transform buttons = menu.Find("Buttons");
+            if (buttons != null)
+            {
+                foreach (Transform btn in buttons)
+                    if (btn.GetComponent<Button>())
+                        btn.GetComponent<Button>().onClick.AddListener(delegate
+                        {
+                            MethodCall(btn.name, null, null);
+                        });
+            }
             if (menu.Find("Toggle Group"))
                 foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
                     if (tog.GetComponent<Toggle>())
@@ -119,12 +123,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             changeHover();
         }
 
-      if (nextGo.GetComponent<InputField>() && GameObject.Find("InputFieldEndEdit"))
+        if (nextGo.GetComponent<InputField>() && GameObject.Find("InputFieldEndEdit"))
         {
             if (TridentGo.activeSelf == true) // Desactive car aucune selection
-                TridentGo.SetActive(false); 
-         
-             if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
+                TridentGo.SetActive(false);
+
+            if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
             {
                 if (nextGo.name == "InputFieldEndEdit")
                     nextGo = eventSystem.currentSelectedGameObject;
@@ -139,14 +143,15 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                     nextGo = eventSystem.currentSelectedGameObject;
                 if (nextGo.transform.GetSiblingIndex() < GameObject.Find("InputFieldEndEdit").transform.childCount - 1)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() + 1).gameObject;
-            } else if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftControl))
+            }
+            else if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftControl))
                 nextGo = nextGo.transform.parent.GetChild(0).gameObject;
 
 
-            eventSystem.SetSelectedGameObject(nextGo); 
+            eventSystem.SetSelectedGameObject(nextGo);
         }
-             
-        
+
+
 
 
         // Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)

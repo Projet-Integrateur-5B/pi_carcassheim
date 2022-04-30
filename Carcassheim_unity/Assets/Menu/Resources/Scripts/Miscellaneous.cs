@@ -35,6 +35,20 @@ public abstract class Miscellaneous : MonoBehaviour
         nextMenu = Miscellaneous.FindObject(absolute_parent, "HomeMenu"); // Menu courant au lancement du jeu
     }
 
+    static protected RoomLine CreateRoomLine(RoomLine roomline_model, string id, string host, string nb_player, string nb_player_max, string endgame)
+    {
+        RoomLine rm = Instantiate<RoomLine>(roomline_model, roomline_model.parent_area);
+        rm.Id = ulong.Parse(id);
+        rm.Host = host;
+        rm.NbPlayer = int.Parse(nb_player);
+        rm.NbPlayerMax = int.Parse(nb_player_max);
+        //rm.Victory = int.Parse(endgame);
+        rm.victory_text.text = endgame;
+        rm.model = null;
+        rm.EnableOnList();
+        return rm;
+    }
+
     public static GameObject FindObject(GameObject parent, string name)
     {
         Transform[] trs = parent.GetComponentsInChildren<Transform>(true);
@@ -103,45 +117,45 @@ public abstract class Miscellaneous : MonoBehaviour
         s_state = b;
     }
 
-	public void Connected()
-	{
-		ColorUtility.TryParseHtmlString("#90EE90", out colState);
-		Button tmpStat = Miscellaneous.FindObject(absolute_parent, "ShowStat").GetComponent<Button>();
-		Button tmpJouer = Miscellaneous.FindObject(absolute_parent, "ShowRoomSelection").GetComponent<Button>();
-		Button tmpConnection = Miscellaneous.FindObject(absolute_parent, "ShowConnection").GetComponent<Button>();
-		Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().color = colState;
-		Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().text = "Connecte";
-		tmpConnection.gameObject.SetActive(false);
-		tmpJouer.interactable = tmpStat.interactable = true;
-		tmpJouer.GetComponentInChildren<Text>().color = tmpStat.GetComponentInChildren<Text>().color = Color.white;
-		// Remonte les boutons après la connexion 
-		// ! (NE PAS CHANGER)
-		Transform buttons = Miscellaneous.FindObject(absolute_parent, "Buttons").transform;
-		for (int i = 1; i < buttons.childCount - 1; i++)
-			buttons.GetChild(i).transform.position += new Vector3(0, 150 - i * 10, 0);
+    public void Connected()
+    {
+        ColorUtility.TryParseHtmlString("#90EE90", out colState);
+        Button tmpStat = Miscellaneous.FindObject(absolute_parent, "ShowStat").GetComponent<Button>();
+        Button tmpJouer = Miscellaneous.FindObject(absolute_parent, "ShowRoomSelection").GetComponent<Button>();
+        Button tmpConnection = Miscellaneous.FindObject(absolute_parent, "ShowConnection").GetComponent<Button>();
+        Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().color = colState;
+        Miscellaneous.FindObject(absolute_parent, "Etat de connexion").GetComponent<Text>().text = "Connecte";
+        tmpConnection.gameObject.SetActive(false);
+        tmpJouer.interactable = tmpStat.interactable = true;
+        tmpJouer.GetComponentInChildren<Text>().color = tmpStat.GetComponentInChildren<Text>().color = Color.white;
+        // Remonte les boutons après la connexion 
+        // ! (NE PAS CHANGER)
+        Transform buttons = Miscellaneous.FindObject(absolute_parent, "Buttons").transform;
+        for (int i = 1; i < buttons.childCount - 1; i++)
+            buttons.GetChild(i).transform.position += new Vector3(0, 150 - i * 10, 0);
 
         // Probleme de hover quand connecté sur home menu par défaut suite à l'intégration (sémaphore ??)
         // PATCH provisoire (A CHANGER):
         GameObject TridentGo = GameObject.Find("Other").transform.Find("Trident").gameObject;
-        if (TridentGo.activeSelf == true) 
-                TridentGo.SetActive(false);
+        if (TridentGo.activeSelf == true)
+            TridentGo.SetActive(false);
         //tridentHover(buttons.GetChild(1).GetComponent<Component>(),  GameObject.Find("Other").transform.Find("Trident").gameObject);
-	}
+    }
 
-	public void tridentHover(Component c, GameObject GoT)
-	{
-		if (!(c.transform.parent.name == "ForgottenPwdUser" || c.transform.parent.name == "CGU"))
-		{
-			GoT.SetActive(true);
-			GameObject curBtn = c.gameObject;
-			float width = curBtn.GetComponent<RectTransform>().rect.width;
-			float height = curBtn.GetComponent<RectTransform>().rect.height;
-			GameObject TF = GoT.transform.Find("TridentFront").gameObject;
-			GameObject TB = GoT.transform.Find("TridentBack").gameObject;
-			TF.transform.position = curBtn.transform.position + new Vector3(width / 2 + 90, 0, 0);
-			TB.transform.position = curBtn.transform.position - new Vector3(width / 2 + 20, 0, 0);
-		}
-	}
+    public void tridentHover(Component c, GameObject GoT)
+    {
+        if (!(c.transform.parent.name == "ForgottenPwdUser" || c.transform.parent.name == "CGU"))
+        {
+            GoT.SetActive(true);
+            GameObject curBtn = c.gameObject;
+            float width = curBtn.GetComponent<RectTransform>().rect.width;
+            float height = curBtn.GetComponent<RectTransform>().rect.height;
+            GameObject TF = GoT.transform.Find("TridentFront").gameObject;
+            GameObject TB = GoT.transform.Find("TridentBack").gameObject;
+            TF.transform.position = curBtn.transform.position + new Vector3(width / 2 + 90, 0, 0);
+            TB.transform.position = curBtn.transform.position - new Vector3(width / 2 + 20, 0, 0);
+        }
+    }
 
     public void SetMenuChanged(bool b)
     {
