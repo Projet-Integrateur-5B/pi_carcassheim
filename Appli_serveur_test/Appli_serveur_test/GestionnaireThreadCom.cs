@@ -462,14 +462,10 @@ namespace system
                     if (thread_serv_ite.EveryoneIsReady())
                     {
                         // Lancement de la game
-                        thread_serv_ite.StartGame();
+                        ulong idTuileInit = thread_serv_ite.StartGame();
+                        string[] dataStartGame = new string[] { idTuileInit.ToString() };
                         // Préviens tous les joueurs (broadcast start)
-                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame);
-                        Thread.Sleep(200);
-                        // Broadcast tuile initiale
-                        string[] dataToSend = new string[] { thread_serv_ite.Get_idTuileInit().ToString(), 0.ToString(),
-                            0.ToString(), 0.ToString() };
-                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuilePlacement, dataToSend);
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame, dataStartGame);
                         Thread.Sleep(200);
                         // Envoi des 3 tuiles de début de tour
                         ulong idPlayerActu = thread_serv_ite.Get_ActualPlayerId();

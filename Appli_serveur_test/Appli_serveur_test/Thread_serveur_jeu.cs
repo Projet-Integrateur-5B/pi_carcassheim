@@ -533,7 +533,7 @@ namespace system
         // Méthodes moteur de jeu
         // =======================
 
-        public void StartGame()
+        public ulong StartGame()
         {
             _statut_partie = Tools.GameStatus.Running;
 
@@ -590,13 +590,14 @@ namespace system
             _DateTime_player = DateTime.Now;
             _timer_player.AutoReset = true;
             _timer_player.Enabled = true;
-            
+
             // TODO :
             // synchronisation de la methode
             // genere les tuiles
             // envoie 3 tuiles au player 1
             // start timer
             // return valeur d'erreur pour la méthode parent
+            return _idTuileInit;
         }
         
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
