@@ -115,6 +115,7 @@ namespace Assets.system
                     result = PointChamps(tuile, idSlot);
                     break;
                 case TypeTerrain.Abbaye:
+                    result = PointAbbaye(tuile);
                     break;
                 case TypeTerrain.Auberge:
                     break;
@@ -130,6 +131,20 @@ namespace Assets.system
             return result;
         }
 
+        private static int PointAbbaye(Tuile tuile)
+        {
+            int result = 0;
+
+            for (int i = 0; i < 4; i++)
+            {
+                int x = Plateau.PositionAdjacentes[i, 0] + tuile.X;
+                int y = Plateau.PositionAdjacentes[i, 1] + tuile.Y;
+                if (instance._plateau.GetTuile(x, y) != null)
+                    result++;
+            }
+
+            return result;
+        }
         private static int PointChamps(Tuile tuile, ulong idSlot)
         {
             Slot[] slots = tuile.Slots;
