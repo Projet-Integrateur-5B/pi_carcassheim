@@ -349,14 +349,7 @@ namespace system
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
-                    // Vérification qu'une tuile n'a pas déjà été placée auparavant 
-                    if (thread_serv_ite.Get_posTuileTourActu().IsExisting() == true)
-                    {
-                        // Permission refusée de poser une tuile
-                        errors = Tools.Errors.Permission;
-                        break;
-                    }
-                    else if (thread_serv_ite.Get_idTuileChoisie() != UInt64.Parse(idTuile)) // Vérifie qu'il s'agit de la même qu'il essaie de poser
+                    if (thread_serv_ite.Get_idTuileChoisie() != UInt64.Parse(idTuile)) // Vérifie qu'il s'agit de la même qu'il essaie de poser
                     {
                         // Coup illégal : tentative de pose d'une autre tuile que celle choisie
                         errors = Tools.Errors.IllegalPlay;
