@@ -750,9 +750,8 @@ public partial class Server
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
-        // Réponse d'un autre joueur (anti cheat) -> posable
-        gestionnaire.CallChooseIdTile(packetReceived.IdPlayer, packetReceived.IdRoom, idTuile, pos, socket);
-        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+        gestionnaire.CallDrawTile(packetReceived.IdPlayer, packetReceived.IdRoom, socket);
+        
     }
     /// <summary>
     ///     Checks if the specified position is enabled.

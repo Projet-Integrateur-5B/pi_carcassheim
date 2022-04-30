@@ -467,10 +467,8 @@ namespace system
                         // Préviens tous les joueurs (broadcast start)
                         thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame, dataStartGame);
                         Thread.Sleep(200);
-                        // Envoi des 3 tuiles de début de tour
-                        ulong idPlayerActu = thread_serv_ite.Get_ActualPlayerId();
+                        // Stockage des 3 tuiles qui seront envoyées lors de la demande de tuileDraw
                         thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
-                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, idPlayerActu, thread_serv_ite.GetThreeLastTiles());
                         return Tools.Errors.None; // return valeur correcte
                     }
                     else // Des joueurs ne sont pas prêts
@@ -481,6 +479,18 @@ namespace system
             }
 
             return errors;
+        }
+
+        public void CallDrawTile(ulong idPlayer, int idRoom, Socket? playerSocket)
+        {
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu threadJeu in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != threadJeu.Get_ID()) continue;
+                    thread_com_iterateur.SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
+                }                  
+            }          
         }
 
         public void CallTileVerif(ulong idPlayer, Socket? playerSocket, Tools.Errors errors, int idRoom, ulong idTuile, Position posTuile)

@@ -86,6 +86,20 @@ namespace system
         // Méthodes communication
         // ========================
 
+        public void SendUnicast(int idRoom, Tools.IdMessage idMessage, Socket? playerSocket, ulong idPlayer, string[] data)
+        {
+            // Generate packet
+            Packet packet = new Packet();
+            packet.IdMessage = idMessage;
+            packet.IdPlayer = idPlayer;
+            packet.IdRoom = idRoom;
+            packet.Data = data;
+
+            // Send to the client
+            Server.Server.SendToSpecificClient(playerSocket, packet);
+
+        }
+
         /// <summary>
         /// Broadcasts a message to all except the player initiating the request
         /// </summary>
@@ -235,14 +249,14 @@ namespace system
                                 // Les tuiles s'avèrent valides, on a affaire à un tricheur
                                 PlayerCheated(idPlayer, playerSocket, idRoom);
                                 // On renvoie les 3 mêmes tuiles
-                                SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                                SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
                             }
                             else
                             {
                                 // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
                                 threadJeu.ShuffleTilesGame();
                                 threadJeu.Set_tuilesEnvoyees(threadJeu.GetThreeLastTiles());
-                                SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                                SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
 
                             }
 
@@ -281,7 +295,7 @@ namespace system
                                 // Les tuiles s'avèrent non-valide OU l'id de la tuile choisie n'est pas la première à être valide
                                 PlayerCheated(idPlayer, playerSocket, idRoom);
                                 // On renvoie les 3 mêmes tuiles
-                                SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                                SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
 
                             }
 
@@ -315,7 +329,7 @@ namespace system
 
                         // Renvoie les 3 tuiles
                         string[] tuilesAEnvoyer = threadJeu.GetThreeLastTiles();
-                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                        SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
                     }
 
                     break;
@@ -521,11 +535,9 @@ namespace system
                         }
                         else // Si la partie n'est pas terminée
                         {
-                            ulong idPlayerActu = thread_serv_ite.Get_ActualPlayerId();
-                            // Envoie des 3 tuiles au suivant
+                            // Mélange des tuiles pour le prochain tirage
                             thread_serv_ite.ShuffleTilesGame();
                             thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
-                            SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, idPlayerActu, thread_serv_ite.GetThreeLastTiles());
                         }
 
                         return Tools.Errors.None;

@@ -624,7 +624,7 @@ namespace system
 
             // Génération des attributs d'anti cheat
             _AC_drawedTilesValid = false;
-
+            Set_tuilesEnvoyees(GetThreeLastTiles());
             
 
             // Initialise la tuile placée de ce tour inexistante
