@@ -538,6 +538,9 @@ namespace system
                             // Mélange des tuiles pour le prochain tirage
                             thread_serv_ite.ShuffleTilesGame();
                             thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
+
+                            // Envoi de l'information du endturn
+                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn);
                         }
 
                         return Tools.Errors.None;
