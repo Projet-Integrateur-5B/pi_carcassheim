@@ -4,6 +4,8 @@ using UnityEngine;
 using System.Xml;
 using System;
 using TMPro;
+using System.IO;
+using UnityEngine.Networking;
 public class FalseBack : CarcasheimBack
 {
         public int tile_number;
@@ -509,7 +511,23 @@ public class FalseBack : CarcasheimBack
         void read_scenario()
         {
                 bool finished = false;
-                using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/scenario" + scenario.ToString() + ".xml"))
+
+                #if UNITY_EDITOR
+                var path = Path.Combine(Application.streamingAssetsPath, "scenario" + scenario.ToString() + ".xml");
+                #elif UNITY_ANDROID
+                var path = Path.Combine("jar:file://" + Application.dataPath + "!/assets", "scenario" + scenario.ToString() + ".xml");
+                #endif
+
+                StringReader xmlData = null;
+
+                if (path.Contains("://")){
+                        UnityWebRequest www = UnityWebRequest.Get(path);
+                        www.SendWebRequest();
+                        path = www.url;
+                        xmlData = new StringReader(www.downloadHandler.text);
+                }
+        
+                using (XmlReader reader = (xmlData == null) ? XmlReader.Create(path) : XmlReader.Create(xmlData)) 
                 {
                         while (!finished && reader.Read())
                         {
