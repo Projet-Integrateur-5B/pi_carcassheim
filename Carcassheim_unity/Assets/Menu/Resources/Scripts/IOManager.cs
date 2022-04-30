@@ -73,7 +73,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         Cursor.SetCursor(_cursorTexture, _cursorHotspot, _cursorMode);
         //Fetch the current EventSystem. Make sure your Scene has one.
         eventSystem = EventSystem.current;
-        nextGo = FirstActiveChild(GameObject.Find("Buttons"));
+        if (GameObject.Find("InputFieldEndEdit") != null)
+            nextGo = FirstActiveChild(GameObject.Find("InputFieldEndEdit"));
+        else nextGo = FirstActiveChild(GameObject.Find("Buttons"));
         eventSystem.SetSelectedGameObject(nextGo);
         ColorUtility.TryParseHtmlString("#1e90ff", out colHover);
         ColorUtility.TryParseHtmlString("#FFA500", out FCcolor);
@@ -243,14 +245,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
 
     public void changeHover()
     {
-        
+
         if ((boolSelectionChange && boolPC) == true)
         {
             if (TridentGo.activeSelf == true) // TRIDENT
                 TridentGo.SetActive(false);
             resetHoverPreviousGo();
             Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
-     
+
             switch (nextTarget.name)
             {
                 case "RawImage": // GIF : A changer (mettre autre chose que zoom)
@@ -280,16 +282,22 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         if (HasMenuChanged() == true)
         {
             string previousMenu = GetPreviousMenu().name.Remove(GetPreviousMenu().name.Length - 4);
-            foreach (Transform child in GameObject.Find("Buttons").transform)
+            if (GameObject.Find("InputFieldEndEdit") != null)
+                nextGo = FirstActiveChild(GameObject.Find("InputFieldEndEdit"));
+            else
             {
-                nextGo = FirstActiveChild(GameObject.Find("Buttons"));
-                if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
+                foreach (Transform child in GameObject.Find("Buttons").transform)
                 {
-                    nextGo = child.gameObject;
-                    break;
+                    if (GameObject.Find("InputFieldEndEdit") != null)
+                        nextGo = FirstActiveChild(GameObject.Find("InputFieldEndEdit"));
+                    else nextGo = FirstActiveChild(GameObject.Find("Buttons"));
+                    if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
+                    {
+                        nextGo = child.gameObject;
+                        break;
+                    }
                 }
             }
-
             SetMenuChanged(false);
             selectionChange();
         }
@@ -303,7 +311,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             gameObject.SendMessage(methode, tog);
         else gameObject.SendMessage(methode, inp);
         if (tog == null || inp == null)
-            NewMenuSelectButton();    
-            
+            NewMenuSelectButton();
     }
 }
