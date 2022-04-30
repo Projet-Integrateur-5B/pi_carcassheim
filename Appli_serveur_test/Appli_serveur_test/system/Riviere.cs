@@ -44,7 +44,7 @@ namespace system
 
         private void InitialiserRiviere(Tuile[] tuilesRiviere)
         {
-            _plateau.PoserTuile(tuilesRiviere[0], 0, 0, 0);
+            _plateau.Poser1ereTuile(tuilesRiviere[0].Id);
 
             var rand = new Random();
             int x, y;
@@ -74,7 +74,7 @@ namespace system
                 
                 _plateau.PoserTuile(current, Position);
                 */
-                _plateau.PoserTuile(current, x, y, rot);
+                _plateau.PoserTuileFantome(current.Id, x, y, rot);
                 lastDirection = 1 - current.LienSlotPosition[slotR][1 - randI] / 3;
             }
         }

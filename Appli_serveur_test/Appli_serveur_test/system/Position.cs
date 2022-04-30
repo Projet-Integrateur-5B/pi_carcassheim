@@ -17,7 +17,7 @@
 
         public bool IsExisting()
         {
-            if(_x == -1 && _y == -1 && _rot == -1)
+            if (_x == -1 && _y == -1 && _rot == -1)
             {
                 return false;
             }
@@ -34,7 +34,37 @@
 
         public override string ToString()
         {
-            return _x.ToString() + _y.ToString() + _rot.ToString();
+            string r = "";
+            switch (ROT)
+            {
+                case 0:
+                    r = "nord";
+                    break;
+                case 1:
+                    r = "est";
+                    break;
+                case 2:
+                    r = "sud";
+                    break;
+                case 3:
+                    r = "ouest";
+                    break;
+                default:
+                    r = "lol";
+                    break;
+
+            }
+            return "(" + _x.ToString() + ", " + _y.ToString() + ", " + r + ")";
         }
+
+        /*public static explicit operator(PositionRepr) (Position p)
+        {
+            return new PositionRepr(p._x, p._y, p._rot);
+        }
+
+        public static explicit operator(Position) (PositionRepr p)
+        {
+            return new Position(p._x, p._y, p._rot);
+        }*/
     }
 }

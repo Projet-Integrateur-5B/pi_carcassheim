@@ -47,7 +47,7 @@ namespace system
             var result = new Dictionary<ulong, Tuile>();
             IdVersTerrain = new Dictionary<int, TypeTerrain>();
 
-            using (XmlReader reader = XmlReader.Create(@file))
+            using (XmlReader reader = XmlReader.Create(file))
             {
                 ReadTerrain(reader);
                 bool readingId = false;
@@ -144,7 +144,7 @@ namespace system
                         readingNom = false;
                         if (xmlReader.Name == "terrain")
                         {
-                            // Debug.Log("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
+                            Console.WriteLine("END TERRAIN : " + currentId.ToString() + ", " + currentNom);
                             IdVersTerrain.Add(currentId, DictionaireTemp[currentNom]);
                         }
                         break;
@@ -225,8 +225,8 @@ namespace system
                 }
             }
 
-            slot = new Slot((ulong)idTerrain, tempSlotLink.ToArray());
-            // Debug.Log("END SLOT OF" + idTerrain.ToString() + " of " + pos_// Debug);
+            slot = new Slot(IdVersTerrain[idTerrain], tempSlotLink.ToArray());
+            Console.WriteLine("END SLOT OF" + IdVersTerrain[idTerrain].ToString() + " of " + pos_debug);
             return result;
         }
     }

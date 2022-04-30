@@ -984,7 +984,8 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Vérification du coup
-        Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
+        Position pos_XY_Tuile = new Position(Int32.Parse(packetReceived.Data[0]), Int32.Parse(packetReceived.Data[1]), 0);
+        Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, pos_XY_Tuile, packetReceived.Data[2], packetReceived.Data[3]);
         packet.Error = errors; 
     }
     /// <summary>

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace system
 {
     internal class CompteurPoints
@@ -17,25 +16,56 @@ namespace system
 
         public static void Init(Plateau plateau)
         {
-            instance = new CompteurPoints(plateau);
+            if (instance == null)
+                instance = new CompteurPoints(plateau);
+            else
+                instance._plateau = plateau;
         }
 
-        public static int CompterZoneFerme(ulong idTuile, int idSlot, ulong idJoueur)
+        public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur)
         {
-            Tuile tuile = instance._plateau.DicoTuile[idTuile];
+            Tuile tuile = instance._plateau.GetTuile(x, y);
             if (tuile.NombreSlot <= idSlot)
                 throw new ArgumentException("idSlot trop grand");
 
-            idJoueur = tuile.Slots[idSlot].IdJoueur;
+            //idJoueur = tuile.Slots[idSlot].IdJoueur;
 
-            List<Tuile> parcourue = new List<Tuile> { tuile };
+            List<(Tuile, ulong)> parcourue = new List<(Tuile, ulong)>();
             int result = 0;
-            instance.PointsZone(tuile, idSlot, parcourue, ref result);
+            Dictionary<ulong, int> pionParJoueur = new Dictionary<ulong, int>();
+            instance.PointsZone(tuile, idSlot, parcourue, ref result, pionParJoueur);
 
-            return 0;
+            Console.WriteLine("Pions Par Joueur : " + pionParJoueur.ToString());
+            Console.WriteLine("POINTS : " + result);
+
+            ulong playerWithMostPawn = ulong.MaxValue;
+            int mostPawn = -1;
+            List<ulong> playerGainingPoints = new List<ulong>();
+            foreach (var item in pionParJoueur)
+            {
+                Console.WriteLine(item);
+                if (item.Value > mostPawn)
+                {
+                    mostPawn = item.Value;
+                    playerWithMostPawn = item.Key;
+                }
+            }
+            Console.WriteLine("PION " + mostPawn);
+            foreach (var item in pionParJoueur)
+            {
+                if (item.Value == mostPawn)
+                {
+                    playerGainingPoints.Add(item.Key);
+                    Console.WriteLine("JOUEUR " + item.Key);
+                }
+            }
+            idJoueur = playerGainingPoints.ToArray();
+
+            return result;
         }
 
-        private void PointsZone(Tuile tuile, int idSlot, List<Tuile> parcourue, ref int result)
+        private void PointsZone(Tuile tuile, int idSlot,
+            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
         {
             bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
@@ -47,23 +77,31 @@ namespace system
             int c = 0;
             foreach (var item in adj)
             {
-                if (item == null || parcourue.Contains(item))
-                    continue;
-                parcourue.Add(item);
-
-
                 int pos = positionsInternesProchainesTuiles[c++];
-                int nextSlot = (int)item.IdSlotFromPositionInterne(pos);
+                ulong nextSlot = item.IdSlotFromPositionInterne(pos);
+
+                if (item == null || parcourue.Contains((item, nextSlot)))
+                    continue;
+                parcourue.Add((item, nextSlot));
+
                 ulong idJ = item.Slots[nextSlot].IdJoueur;
 
+                if (idJ != ulong.MaxValue)
+                {
+                    if (pionParJoueur.ContainsKey(idJ))
+                        pionParJoueur[idJ]++;
+                    else
+                        pionParJoueur.Add(idJ, 1);
+                }
+
                 result += PointTerrain(item.Slots[nextSlot].Terrain);
-                PointsZone(item, nextSlot, parcourue, ref result);
+                PointsZone(item, (int)nextSlot, parcourue, ref result, pionParJoueur);
             }
         }
 
         private static int PointTerrain(TypeTerrain terrain)
         {
-            if (terrain == TypeTerrain.Ville)
+            if (terrain == TypeTerrain.VilleBlason)
                 return 2;
             return 1;
         }
@@ -83,7 +121,7 @@ namespace system
             foreach (int position in positionsInternes)
             {
                 //direction = (position + (3 * tuile.Rotation)) / 3;
-                direction = (position / 3 + tuile.Rotation) % 3;
+                direction = (4 + (position / 3) - tuile.Rotation) % 4;
 
                 Tuile elem = _plateau.GetTuile(x + Plateau.PositionAdjacentes[direction, 0],
                                       y + Plateau.PositionAdjacentes[direction, 1]);
@@ -94,8 +132,19 @@ namespace system
                 else if (!resultat.Contains(elem))
                 {
                     resultat.Add(elem);
-                    positionsInternesProchainesTuilesTemp.Add(
-                        (position + 6 + (elem.Rotation - tuile.Rotation)) % 3);
+                    var trucComplique = ((position - 3 * tuile.Rotation) + 18 + 3 * elem.Rotation) % 12;
+                    switch (trucComplique % 3)
+                    {
+                        case 0:
+                            trucComplique = (trucComplique + 2);
+                            break;
+                        case 2:
+                            trucComplique = (trucComplique - 2);
+                            break;
+                        default:
+                            break;
+                    }
+                    positionsInternesProchainesTuilesTemp.Add(trucComplique);
                 }
             }
             positionsInternesProchainesTuiles = positionsInternesProchainesTuilesTemp.ToArray();

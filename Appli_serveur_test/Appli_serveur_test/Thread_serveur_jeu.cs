@@ -59,7 +59,7 @@ namespace system
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
         private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
-        private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, idTuile, idSlot}
+        private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, posTuile X, posTuile Y, idSlot}
 
         // Attributs anticheat
         private bool _AC_drawedTilesValid;
@@ -569,7 +569,7 @@ namespace system
 
             // Pose la première tuile de la partie
             _s_plateau.WaitOne();
-            _plateau.PoserTuile(_idTuileInit, new Position(0, 0, 0));
+            _plateau.Poser1ereTuile(_idTuileInit);
             _s_plateau.Release();
 
             // Initialise les meeples de tt le monde
@@ -677,13 +677,13 @@ namespace system
             _s_plateau.Release();
         }
 
-        public Tools.Errors PionPlacement(ulong idPlayer, ulong idTuile, int idMeeple, int slotPos)
+        public Tools.Errors PionPlacement(ulong idPlayer, Position posTuile, ulong idMeeple, int slotPos)
         {
             _s_plateau.WaitOne();
             // Si placement légal, on le sauvegarde
-            if (isPionPlacementLegal(idTuile, slotPos, idPlayer))
+            if (isPionPlacementLegal(posTuile, slotPos, idPlayer, idMeeple))
             {
-                string[] posPion = new string[] { idPlayer.ToString(), idTuile.ToString(), slotPos.ToString() };
+                string[] posPion = new string[] { idPlayer.ToString(), posTuile.X.ToString(), posTuile.Y.ToString(), slotPos.ToString() };
                 _s_posPionTourActu.WaitOne();
                 _posPionTourActu = posPion;
                 _s_posPionTourActu.Release();
@@ -705,9 +705,9 @@ namespace system
             return _plateau.PlacementLegal(idTuile, posX, posY, rotat);
         }
 
-        public bool isPionPlacementLegal(ulong idTuile, int idSlot, ulong idPlayer)
+        public bool isPionPlacementLegal(Position posTuile, int idSlot, ulong idPlayer, ulong idMeeple)
         {
-            return _plateau.PionPosable(idTuile, (ulong)idSlot, idPlayer);
+            return _plateau.PionPosable(posTuile.X, posTuile.Y, (ulong)idSlot, idPlayer, idMeeple);
         }
 
         public void RetirerTuileTourActu()
@@ -804,11 +804,11 @@ namespace system
             
             try
             {
-                _plateau.PoserTuile(_idTuileChoisie, _posTuileTourActu);
+                _plateau.PoserTuileFantome(_idTuileChoisie, _posTuileTourActu);
 
                 if (_posPionTourActu.Length != 0) // Si un pion a été posé durant le tour
                 {
-                    _plateau.PoserPion(idPlayer, _idTuileChoisie, UInt64.Parse(_posPionTourActu[2]));
+                    _plateau.PoserPion(idPlayer, _posTuileTourActu.X, _posTuileTourActu.Y, UInt64.Parse(_posPionTourActu[2]));
 
                     // Retrait d'un pion au joueur
                     _s_dico_joueur.WaitOne();
@@ -823,13 +823,25 @@ namespace system
             }          
             _s_plateau.Release();
 
+            // Validation de la position
 
-            // Vérification des fermetures de chemins (mise à jour des points)
-            int pointsGagnes = CompteurPoints.CompterZoneFerme(_idTuileChoisie, Int32.Parse(_posPionTourActu[2]), idPlayer);
-            _s_dico_joueur.WaitOne();
-            _dico_joueur[idPlayer].AddPoints((uint)pointsGagnes);
-            _s_dico_joueur.Release();
+            _plateau.ValiderTour();
 
+            // Vérification des fermetures de chemins et mise à jour des points
+            List<PlayerScoreParam> lstPlayerScoreGain = new List<PlayerScoreParam>();
+            if(_plateau.VerifZoneFermeeTuile(_posTuileTourActu.X, _posTuileTourActu.Y, lstPlayerScoreGain, null))
+            {
+                // Mise à jour des points 
+                _s_dico_joueur.WaitOne();
+
+                foreach(var score in lstPlayerScoreGain)
+                {
+                    _dico_joueur[score.id_player].AddPoints((uint)score.points_gagnes);
+                }
+
+                _s_dico_joueur.Release();
+
+            }
 
             RetirerTuileGame(_idTuileChoisie);
 

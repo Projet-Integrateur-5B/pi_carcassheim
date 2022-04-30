@@ -516,7 +516,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CallVerifyPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom, string idTuile, string idMeeple, string slotPos)
+        public Tools.Errors CallVerifyPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom, Position posTuile, string idMeeple, string slotPos)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -527,7 +527,7 @@ namespace system
                 // Thread de com gérant la partie trouvé
                 if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
-                    errors = thread_com_iterateur.VerifyPionPlacement(idPlayer, playerSocket, idRoom, idTuile, idMeeple, slotPos);
+                    errors = thread_com_iterateur.VerifyPionPlacement(idPlayer, playerSocket, idRoom, posTuile, idMeeple, slotPos);
                     break;
                 }
 
