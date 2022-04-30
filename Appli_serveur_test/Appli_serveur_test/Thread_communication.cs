@@ -212,66 +212,88 @@ namespace system
             _lst_serveur_jeu.RemoveAt(indexOfRoom);
         }
 
-        // La fonction du joueur dont c'est le tour
-        public void DrawAntiCheatPlayer(int idRoom, ulong idPlayer, Socket? playerSocket, string[] tuilesEnvoyees)
+        public void TileVerifAntiCheat(ulong idPlayer, Socket? playerSocket, Tools.Errors errors, int idRoom, ulong idTuile, Position posTuile)
         {
             foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
             {
-                if (threadJeu.Get_ID() == idRoom)
+                if(threadJeu.Get_ID() == idRoom)
                 {
-                    threadJeu.SetACBarrier(); // Sets the barrier if inexistant
-
-                    // On attend que tous les autres joueurs aient exécuté leur rôle d'arbitre
-                    threadJeu.WaitACBarrier();
-
-                    // Vérification de la validité des tuiles piochées
-                    if (threadJeu.Get_AC_drawedTilesValid())
+                    if (errors == Tools.Errors.Data) // Aucune tuile n'est pas posable selon ce client
                     {
-                        // Les tuiles s'avèrent valides, on a affaire à un tricheur
-                        PlayerCheated(idPlayer, playerSocket, idRoom);
-                        // On renvoie les 3 mêmes tuiles
-                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
-                    }
-                    else
-                    {
-                        // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
-                        threadJeu.ShuffleTilesGame();
-                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
-
-                    }
-
-                    threadJeu.DisposeACBarrier();
-
-                    break;
-                }
-            }
-        }
-
-        // La fonction pour les autres joueurs, qui ne servent que d'arbitre
-        public void DrawAntiCheatVerif(int idRoom, bool isValid, ulong idTuile, Position pos)
-        {
-            foreach (Thread_serveur_jeu threadJeu in Get_list_server_thread())
-            {
-                if (threadJeu.Get_ID() == idRoom)
-                {
-                    if (isValid)
-                    {
-                        bool isLegal = threadJeu.isTilePlacementLegal(idTuile, pos.X, pos.Y, pos.ROT);
-                        if (isLegal) // S'il s'avère que le coup est valide, on passe l'attribut à true
+                        if(idPlayer != threadJeu.Get_ActualPlayerId()) // Autre joueur
                         {
-                            threadJeu.SetValid_AC_drawedTilesValid();
+                            threadJeu.SetACBarrier(); // Sets the barrier if inexistant
+
+                            // On attend que tous les autres joueurs aient exécuté leur rôle d'arbitre
+                            threadJeu.WaitACBarrier();
                         }
+                        else // Joueur actuel
+                        {
+                            // Vérification de la validité des tuiles piochées
+                            if (threadJeu.Get_AC_drawedTilesValid())
+                            {
+                                // Les tuiles s'avèrent valides, on a affaire à un tricheur
+                                PlayerCheated(idPlayer, playerSocket, idRoom);
+                                // On renvoie les 3 mêmes tuiles
+                                SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                            }
+                            else
+                            {
+                                // En effet aucune tuile n'est valide, nous renvoyons trois nouvelles tuiles
+                                threadJeu.ShuffleTilesGame();
+                                threadJeu.Set_tuilesEnvoyees(threadJeu.GetThreeLastTiles());
+                                SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+
+                            }
+
+                            threadJeu.DisposeACBarrier();
+                        }
+                        
                     }
+                    else if (errors == Tools.Errors.None) // Une tuile est posable selon ce client
+                    {
 
-                    threadJeu.SetACBarrier(); // Sets the barrier if inexistant
+                        threadJeu.SetACBarrier(); // Sets the barrier if inexistant
 
-                    // Signale que le rôle d'arbitre de ce joueur a été joué
-                    threadJeu.WaitACBarrier();
+                        if (idPlayer != threadJeu.Get_ActualPlayerId()) // Réponse des autres joueurs (sert de vérif)
+                        {
+                            bool isLegal = threadJeu.isTilePlacementLegal(idTuile, posTuile.X, posTuile.Y, posTuile.ROT);
+                            if (isLegal) // S'il s'avère que le coup est valide, on passe l'attribut à true
+                            {
+                                threadJeu.SetValid_AC_drawedTilesValid(idTuile);
+                            }  
+                        }
 
-                    break;
+                        // Signale que le rôle d'arbitre de ce joueur a été joué
+                        threadJeu.WaitACBarrier();
+
+                        if (idPlayer == threadJeu.Get_ActualPlayerId())  // Réponse du joueur actuel
+                        {
+                            // Vérification de la validité des tuiles piochées ET de l'id de la première tuile valide
+                            if (threadJeu.Get_AC_drawedTilesValid() && idTuile == threadJeu.Get_AC_idFirstValidTile())
+                            {
+                                // Tout est bon, définition de la tuile choisie
+                                ChooseIdTile(idRoom, idPlayer, idTuile, posTuile, playerSocket);
+
+                            }
+                            else
+                            {
+                                // Les tuiles s'avèrent non-valide OU l'id de la tuile choisie n'est pas la première à être valide
+                                PlayerCheated(idPlayer, playerSocket, idRoom);
+                                // On renvoie les 3 mêmes tuiles
+                                SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+
+                            }
+
+                            threadJeu.DisposeACBarrier();
+                        }
+
+                        
+                    }
                 }
             }
         }
+
 
         public void ChooseIdTile(int idRoom, ulong idPlayer, ulong idTuile, Position exemplePos, Socket? playerSocket)
         {
@@ -502,6 +524,7 @@ namespace system
                             ulong idPlayerActu = thread_serv_ite.Get_ActualPlayerId();
                             // Envoie des 3 tuiles au suivant
                             thread_serv_ite.ShuffleTilesGame();
+                            thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
                             SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, idPlayerActu, thread_serv_ite.GetThreeLastTiles());
                         }
 
@@ -578,64 +601,6 @@ namespace system
             }
 
             return Tools.PlayerStatus.NotFound;
-        }
-
-        // ===============================
-        // Méthode réseau de réception
-        // ===============================
-
-        public void OnPacketReceived(object sender, Packet packet, Socket? socket)
-        {
-            if(packet.Error != Tools.Errors.None) // Gestion des erreurs
-            {
-                switch (packet.IdMessage)
-                {
-                    // Cas où aucune des 3 tuiles n'est posable
-                    case Tools.IdMessage.TuileDraw:
-                        // Récupère à part les 3 idTuiles dont il est question
-                        string[] tuilesEnvoyees = new string[3];
-                        try
-                        {
-                            Array.Copy(packet.Data, 1, tuilesEnvoyees, 0, 3);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("ERROR: Parsing the array representing the 3 tiles sended : " + ex);
-                        }
-                        
-                        DrawAntiCheatPlayer(packet.IdRoom, packet.IdPlayer, socket, tuilesEnvoyees);
-                        break;
-
-                    // Réponse d'un autre joueur (anti cheat) -> pas posable
-                    case Tools.IdMessage.TuileVerification:
-                        DrawAntiCheatVerif(packet.IdRoom, false, (ulong)0, new Position(-1,-1,-1));
-                        break;
-
-                    case Tools.IdMessage.StartGame:
-                        // TODO : Check s'il renvoit des erreurs
-                        break;
-                }
-            }
-            else // Gestion des réponses saines
-            {
-                switch (packet.IdMessage)
-                {
-                    // Joueur choisi une des tuiles posables
-                    case Tools.IdMessage.TuileDraw:
-                        Position exemplePosValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
-                        ChooseIdTile(packet.IdRoom, packet.IdPlayer, UInt64.Parse(packet.Data[1]), exemplePosValid, socket);
-                        break;
-
-
-                    // Réponse d'un autre joueur (anti cheat) -> posable
-                    case Tools.IdMessage.TuileVerification:
-                        Position posValid = new Position(Int32.Parse(packet.Data[2]), Int32.Parse(packet.Data[3]), Int32.Parse(packet.Data[4]));
-                        DrawAntiCheatVerif(packet.IdRoom, true, UInt64.Parse(packet.Data[1]), posValid);
-                        break;
-
-                }
-            }
-            
         }
 
         // ===============================

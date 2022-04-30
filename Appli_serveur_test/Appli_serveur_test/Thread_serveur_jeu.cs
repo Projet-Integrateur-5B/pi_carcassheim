@@ -62,6 +62,8 @@ namespace system
         private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, posTuile X, posTuile Y, idSlot}
 
         // Attributs anticheat
+        private ulong _AC_idFirstValidTile;
+        private Semaphore _s_AC_idFirstValidTile;
         private bool _AC_drawedTilesValid;
         private Barrier _AC_barrierAllVerifDone;
         private bool _AC_barrierUp; // Indique si la barrière existe
@@ -118,12 +120,38 @@ namespace system
         {
             return _AC_drawedTilesValid;
         }
-        public void SetValid_AC_drawedTilesValid()
+
+        /// <summary>
+        ///     Pass the attribute indicating if a tile is valid to true and stores the id of the first valid tile if prior to the actual one
+        /// </summary>
+        /// <param name="idTuile"></param>
+        public void SetValid_AC_drawedTilesValid(ulong idTuile)
         {
             if(_AC_drawedTilesValid != true)
             {
                 _AC_drawedTilesValid = true;
             }
+
+            _s_AC_idFirstValidTile.WaitOne();
+            for(int i = 0; i<3; i++)
+            {
+                if(idTuile == UInt64.Parse(_tuilesEnvoyees[i])) // Si l'idTuile arrive avant l'idFirstValid déjà stocké
+                {
+                    _AC_idFirstValidTile = idTuile;
+                    break;
+                }
+                if(_AC_idFirstValidTile == UInt64.Parse(_tuilesEnvoyees[i])) // Si l'idFirstValid arrive avant le nouveau idTuile
+                {
+                    break;
+                }
+            }
+            _s_AC_idFirstValidTile.Release();
+            
+        }
+
+        public ulong Get_AC_idFirstValidTile()
+        {
+            return _AC_idFirstValidTile;
         }
 
         public bool Get_AC_barrierUp()
@@ -144,6 +172,14 @@ namespace system
         public void Set_idTuileChoisie(ulong idTuile)
         {
             this._idTuileChoisie = idTuile;
+        }
+
+        public void Set_tuilesEnvoyees(string[] tuilesEnvoyees)
+        {
+            _s_tuilesEnvoyees.WaitOne();
+            Array.Copy(tuilesEnvoyees, _tuilesEnvoyees, 3);
+            _tuilesEnvoyees = tuilesEnvoyees;
+            _s_tuilesEnvoyees.Release();
         }
 
         public ulong Get_idTuileChoisie()
@@ -352,7 +388,16 @@ namespace system
             _timer_game_value = Tools.Timer.Heure; // Une heure par défaut
             _timer_player_value = Tools.Timer.Minute;
             _meeples = Tools.Meeple.Huit;
+
+
+            // Initialisation des attributs moteurs
             _idTuileInit = 22; // Initialise sans dlc rivière
+            _tuilesEnvoyees = Array.Empty<string>();
+
+            // Initialisation attributs anticheat
+            _AC_idFirstValidTile = 0;
+            _AC_barrierUp = false;
+            _AC_drawedTilesValid = false;
 
             // Initialisation des semaphores d'attributs moteurs
             _s_offsetActualPlayer = new Semaphore(1, 1);
@@ -363,10 +408,9 @@ namespace system
             _s_plateau = new Semaphore(1, 1);
             _s_posPionTourActu = new Semaphore(1, 1);
             _s_posTuileTourActu = new Semaphore(1, 1);
-
-            _AC_drawedTilesValid = false;
-            _AC_barrierUp = false;
+            
             _s_AC_barrierUp = new Semaphore(1, 1);
+            _s_AC_idFirstValidTile = new Semaphore(1, 1);
 
         }
 

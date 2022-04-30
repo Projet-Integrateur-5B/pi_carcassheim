@@ -36,30 +36,6 @@ public partial class Server
             packet.Error = Tools.Errors.Permission;
             return packet;
         }
-
-        // Check Error : different action 
-        if (packet.Error != Tools.Errors.None)
-        {
-            switch (packetReceived.IdMessage)
-            {
-                case Tools.IdMessage.TuileDraw:
-                    ErrorTuileDraw(packetReceived, ref packet, socket);
-                    break;
-                case Tools.IdMessage.TuileVerification:
-                    ErrorTuileVerification(packetReceived, ref packet, socket);
-                    break;
-                case Tools.IdMessage.StartGame:
-                    // TODO : Check s'il renvoit des erreurs
-                    break;
-                
-                case Tools.IdMessage.Default:
-                default:
-                    packet.Error = Tools.Errors.Unknown;
-                    break; 
-            }
-
-            return packet;
-        }
         
         // Check IdMessage : different action
         switch (packetReceived.IdMessage)
@@ -727,81 +703,6 @@ public partial class Server
 
 
     /// <summary>
-    ///     Main player : None of the three tiles drawn from the server side can be placed.
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void ErrorTuileDraw(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Réponse sur le même idRoom
-        packet.IdRoom = packetReceived.IdRoom;
-
-        // Vérification que la communication est reçue par un thread de com
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening == 10000)
-        {
-            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.BadPort;
-            return;
-        }
-
-        if (packetReceived.Data.Length < 3)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
-        
-        // Récupère à part les 3 idTuiles dont il est question
-        string[] tuilesEnvoyees = new string[3];
-        try
-        {
-            Array.Copy(packetReceived.Data, 1, tuilesEnvoyees, 0, 3);
-        }
-        catch (Exception ex)
-        {
-            // Something went wrong.
-            Console.WriteLine("ERROR: Parsing the array representing the 3 tiles sended : " + ex);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.Unknown;
-            return;
-        }
-        
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-        gestionnaire.CallDrawAntiCheatPlayer(packetReceived.IdPlayer, packetReceived.IdRoom, socket, tuilesEnvoyees);
-        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
-    }
-    /// <summary>
-    ///     Other players : None of the three tiles drawn from the server side can be placed.
-    /// </summary>
-    /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
-    /// <param name="packet">Instance of <see cref="Packet" /> to send.</param>
-    /// <param name="socket">Socket <see cref="Socket" />.</param>
-    public static void ErrorTuileVerification(Packet packetReceived, ref Packet packet, Socket socket)
-    {
-        // Réponse sur le même idRoom
-        packet.IdRoom = packetReceived.IdRoom;
-
-        // Vérification que la communication est reçue par un thread de com
-        int portListening = ((IPEndPoint)socket.LocalEndPoint).Port;
-        if (portListening == 10000)
-        {
-            Console.WriteLine("ERROR: Serveur_main received message instead of thread_com, IdMessage : " + packetReceived.IdMessage);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.BadPort;
-            return;
-        }
-
-        // Récupération du singleton gestionnaire
-        GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-        
-        // Réponse d'un autre joueur (anti cheat) -> pas posable
-        gestionnaire.CallDrawAntiCheatVerif(packetReceived.IdRoom, false, 0, new Position(-1,-1,-1));
-        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
-    }
-    /// <summary>
     ///     Player chose to place a tile.
     /// </summary>
     /// <param name="packetReceived">Instance of <see cref="Packet" /> to received.</param>
@@ -899,9 +800,8 @@ public partial class Server
         
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-        
-        // Réponse d'un autre joueur (anti cheat) -> posable
-        gestionnaire.CallDrawAntiCheatVerif(packetReceived.IdRoom, true, idTuile, pos);
+
+        gestionnaire.CallTileVerif(packetReceived.IdPlayer, socket, packetReceived.Error, packetReceived.IdRoom, idTuile, pos);
         packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     

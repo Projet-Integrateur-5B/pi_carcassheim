@@ -469,6 +469,7 @@ namespace system
                         Thread.Sleep(200);
                         // Envoi des 3 tuiles de début de tour
                         ulong idPlayerActu = thread_serv_ite.Get_ActualPlayerId();
+                        thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
                         thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, idPlayerActu, thread_serv_ite.GetThreeLastTiles());
                         return Tools.Errors.None; // return valeur correcte
                     }
@@ -481,7 +482,20 @@ namespace system
 
             return errors;
         }
-        
+
+        public void CallTileVerif(ulong idPlayer, Socket? playerSocket, Tools.Errors errors, int idRoom, ulong idTuile, Position posTuile)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
+                {
+                    thread_com_iterateur.TileVerifAntiCheat(idPlayer, playerSocket, errors, idRoom, idTuile, posTuile);
+                }
+            }
+        }
+
         /// <summary>
         /// Verify the placement of the tile
         /// </summary>
@@ -586,36 +600,6 @@ namespace system
 
             }
             return errors; // return valeur correcte
-        }
-
-        public void CallDrawAntiCheatPlayer(ulong idPlayer, int idRoom, Socket? playerSocket, string[] tuilesEnvoyees)
-        {
-            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
-            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
-            {
-                // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
-                {
-                    thread_com_iterateur.DrawAntiCheatPlayer(idRoom, idPlayer, playerSocket, tuilesEnvoyees);
-                    break;
-                }
-
-            }
-        }
-        
-        public void CallDrawAntiCheatVerif(int idRoom, bool isValid, ulong idTuile, Position pos)
-        {
-            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
-            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
-            {
-                // Thread de com gérant la partie trouvé
-                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
-                {
-                    thread_com_iterateur.DrawAntiCheatVerif(idRoom, isValid, idTuile, pos);
-                    break;
-                }
-
-            }
         }
         
         public void CallChooseIdTile(ulong idPlayer, int idRoom, ulong idTuile, Position pos, Socket? playerSocket)
