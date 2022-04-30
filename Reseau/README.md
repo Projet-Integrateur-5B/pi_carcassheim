@@ -5,7 +5,7 @@
 
 ### Equipe
 
-> **Responsable & Développeur** : Matthieu FREITAG <br>
+> **Responsable** : Matthieu FREITAG <br>
 > **Développeur** : Victor HAHNSCHUTZ
 ----
 ### Architecture
