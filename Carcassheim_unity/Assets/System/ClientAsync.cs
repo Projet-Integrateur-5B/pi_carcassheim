@@ -15,7 +15,7 @@ public class StateObject
     // Client socket.
     public Socket workSocket = null;
     // Size of receive buffer.
-    public const int BufferSize = 256;
+    public const int BufferSize = Packet.MaxPacketSize;
     // Receive buffer.
     public byte[] buffer = new byte[BufferSize];
     // Received data string.
@@ -74,7 +74,7 @@ public class ClientAsync
             // Complete the connection.
             client.EndConnect(ar);
 
-            Console.WriteLine("Client is connected to {0}", client.RemoteEndPoint);
+            Debug.Log("Client is connected to {0} " + client.RemoteEndPoint);
 
             // Signal that the connection has been made.
             connectDone.Set();
@@ -99,7 +99,7 @@ public class ClientAsync
             Socket client = (Socket)ar.AsyncState;
             client.EndDisconnect(ar);
 
-            Console.WriteLine("Client is disconnected to {0}", client.RemoteEndPoint);
+            Debug.Log("Client is disconnected to {0} " + client.RemoteEndPoint);
 
         }
         catch (Exception e)
@@ -139,6 +139,7 @@ public class ClientAsync
 
             // Read data from the remote device.
             int bytesRead = client.EndReceive(ar);
+
 
             // Nothing to read here.
             if (bytesRead <= 0)
@@ -226,7 +227,7 @@ public class ClientAsync
 
         // Begin sending the data to the remote device.
         var size = bytes.Length;
-        Console.WriteLine("Sent {0} bytes =>\t" + original, size);
+        Debug.Log("Sent {0} bytes =>\t" + original + " " + size);
 
         var debug = "Sent total {0} bytes to server." + size +
                         "\n\t Sent {0} bytes =>\t" + original;

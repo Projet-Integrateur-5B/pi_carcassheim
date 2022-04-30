@@ -181,6 +181,8 @@ namespace ClassLibrary
             {
                 // Converts a byte array to a JSON string.
                 var packetAsJson = Encoding.ASCII.GetString(byteArray);
+                Debug.Log(packetAsJson.Length);
+                Debug.Log(packetAsJson);
 
                 // Splits the different packets received.
                 var packetAsJsonList = packetAsJson.Split('}');
