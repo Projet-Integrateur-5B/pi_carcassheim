@@ -123,11 +123,10 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             changeHover();
         }
 
-        if (nextGo.GetComponent<InputField>() && GameObject.Find("InputFieldEndEdit"))
+        if ((nextGo.GetComponent<InputField>() || eventSystem.currentSelectedGameObject.GetComponent<InputField>()) && GameObject.Find("InputFieldEndEdit"))
         {
             if (TridentGo.activeSelf == true) // Desactive car aucune selection
                 TridentGo.SetActive(false);
-
             if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
             {
                 if (nextGo.name == "InputFieldEndEdit")
@@ -143,40 +142,34 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                     nextGo = eventSystem.currentSelectedGameObject;
                 if (nextGo.transform.GetSiblingIndex() < GameObject.Find("InputFieldEndEdit").transform.childCount - 1)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() + 1).gameObject;
+                else nextGo = nextGo.transform.parent.GetChild(0).gameObject;
+                eventSystem.SetSelectedGameObject(nextGo);
             }
-            else if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftControl))
-                nextGo = nextGo.transform.parent.GetChild(0).gameObject;
-
-
-            eventSystem.SetSelectedGameObject(nextGo);
         }
-
-
-
 
         // Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
         /* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
-				{ */
+                { */
         /* lockMouse(false); */
         /* 			nextGo = eventSystem.currentSelectedGameObject;
-					resetHoverPreviousGo(); */
+                    resetHoverPreviousGo(); */
         // EVITE SPAM CLIC
         /* 			Invoke("ResetCooldown", 5.0f);
-					cooldown = true; */
+                    cooldown = true; */
         /* } */
 
         /* --------------------- PATCH INPUTFIELD --------------------- */
         // il faut mieux gérer l'inputfield pour la saisie (entree et escape)
         /* 		if (IF!=null) 
-					if(IF.isFocused)
-						{
-							previousGo = nextGo;
-							nextGo = eventSystem.currentSelectedGameObject;
-							changeHover();
-							lockMouse(true);
-							if(Input.GetKey(KeyCode.Return)) // touche enter
-								lockMouse(false); 
-						} */
+                    if(IF.isFocused)
+                        {
+                            previousGo = nextGo;
+                            nextGo = eventSystem.currentSelectedGameObject;
+                            changeHover();
+                            lockMouse(true);
+                            if(Input.GetKey(KeyCode.Return)) // touche enter
+                                lockMouse(false); 
+                        } */
         /* ------------------ FIN PATCH INPUTFIELD -------------------- */
     }
 

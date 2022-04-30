@@ -18,6 +18,8 @@ namespace Assets.System
         private bool[] isConnected = {false,false};
         public int isInRoom = 0;
 
+        public bool isListening = false;
+
         public static Communication Instance
         {
             get
@@ -110,6 +112,10 @@ namespace Assets.System
         {
             if (!isConnected[isInRoom])
                 LancementConnexion();
+
+            if(!isListening)
+                NewListening();
+
             if(lesSockets[isInRoom] != null)
                 ClientAsync.Send(lesSockets[isInRoom],packet);
         }

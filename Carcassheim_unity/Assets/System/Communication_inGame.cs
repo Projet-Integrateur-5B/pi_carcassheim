@@ -384,6 +384,18 @@ namespace Assets.system
             };
             Task.Run(playercurrent);
 
+            Action tuiledraw = () =>
+            {
+                Packet packet = new Packet();
+                packet.IdPlayer = Communication.Instance.idClient;
+                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdMessage = Tools.IdMessage.TuileDraw;
+                packet.Data = Array.Empty<string>();
+
+                Communication.Instance.SendAsync(packet);
+            };
+            Task.Run(tuiledraw);
+
             s_WaitInit.Release();
             Debug.Log("On est dans la game");
 
@@ -512,6 +524,7 @@ namespace Assets.system
                     return tuile_ok;
             }
 
+            packet.IdMessage = Tools.IdMessage.TuileVerification;
             packet.Error = Tools.Errors.Data;
             Communication.Instance.SendAsync(packet);
             return tuile_ok;

@@ -123,11 +123,11 @@ public class ConnectionMenu : Miscellaneous
                 res = true;
             }
 
-            s_listAction.WaitOne();
-            listAction.Add(res);
-            s_listAction.Release();
-        }
-    }
+			s_listAction.WaitOne();
+			listAction.Add(res);
+			s_listAction.Release();
+		}
+	}
 
     private void Update()
     {
