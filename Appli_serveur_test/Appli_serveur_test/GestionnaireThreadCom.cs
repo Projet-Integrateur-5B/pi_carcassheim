@@ -144,7 +144,7 @@ namespace system
                         room_list.Add(thread_serv_ite.Get_Moderateur().ToString());
                         room_list.Add(thread_serv_ite.NbJoueurs.ToString());
                         room_list.Add(thread_serv_ite.NbJoueursMax.ToString());
-                        room_list.Add(thread_serv_ite.Get_Mode().ToString());
+                        room_list.Add(((int)thread_serv_ite.Get_Mode()).ToString());
                     }            
                 }
             }
