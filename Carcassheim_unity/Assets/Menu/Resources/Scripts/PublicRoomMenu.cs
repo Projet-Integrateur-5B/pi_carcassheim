@@ -109,6 +109,7 @@ public class PublicRoomMenu : Miscellaneous
         {
 			if(packet.Error == Tools.Errors.None)
             {
+				RoomInfo.Instance.id_tile_init = int.Parse(packet.Data[0]);
 				s_listAction.WaitOne();
 				listAction.Add("loadScene");
 				s_listAction.Release();

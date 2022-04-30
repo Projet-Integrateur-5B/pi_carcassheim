@@ -40,7 +40,9 @@ namespace Assets.system
         private Player[] playerList;
         bool player_received = false;
         private ulong nextPlayer;
+
         private Position[] allposition;
+        private Semaphore s_allposition;
 
         private Semaphore s_InGame;
         private bool testGameBegin = true;
@@ -131,6 +133,7 @@ namespace Assets.system
             // tile_id est un argument !!!
             // ajouter avec new Position,(X, Y, Rotation) avec rotation = (0: Nord, 1: Est, 2: Sud, 3: Ouest)
             // mettre une position par rotation
+            s_allposition.WaitOne();
             int i, taille = allposition.Length;
             for (i = 0; i < taille; i++)
             {
@@ -140,6 +143,7 @@ namespace Assets.system
                     allposition[i].ROT
                     ));
             }
+            s_allposition.Release();
         }
 
         //=======================================================
@@ -292,6 +296,7 @@ namespace Assets.system
             // ======================
             Communication.Instance.StartListening(OnPacketReceived);
             s_InGame = new Semaphore(1, 1);
+            s_allposition = new Semaphore(1, 1);
 
             dico_tuile = LireXML2.Read("config_back.xml");
             lePlateau = new Plateau(dico_tuile);
@@ -433,15 +438,15 @@ namespace Assets.system
             int id_tuile;
             Tuile tuile;
             int i;
-            Position[] position;
             bool tuile_ok = false;
             TileInitParam tileParam;
+            Position[] positions;
 
             for (i = 0; i < 3; i++)
             {
                 id_tuile = Convert.ToInt32(packet.Data[i]);
                 tuile = dico_tuile[(ulong)id_tuile];
-                position = lePlateau.PositionsPlacementPossible(tuile);
+                positions = lePlateau.PositionsPlacementPossible(tuile);
 
                 tileParam = new TileInitParam
                 {
@@ -449,14 +454,19 @@ namespace Assets.system
                     id_tile = id_tuile
                 };
 
-                if (position != null)
+                if (positions != null)
                 {
-                    if (position.Length >= 0)
+                    if (positions.Length >= 0)
                     {
-                        Debug.Log("Les positions de la " + i + "�me tuile : " + position.ToString());
-                        SendAllPosition(position, id_tuile);
+                        Debug.Log("Les positions de la " + i + "ème tuile : " + positions[0].X+", " + positions[0].Y + ", " + positions[0].ROT);
+                        SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT);
                         tileParam.tile_flags = true;
-                        allposition = position;
+
+                        s_allposition.WaitOne();
+                        allposition = positions;
+                        s_allposition.Release();
+
+                        tuile_ok = true;
                     }
                 }
 
@@ -466,30 +476,6 @@ namespace Assets.system
             }
 
             packet.Error = Tools.Errors.Data;
-            Communication.Instance.SendAsync(packet);
-        }
-
-        private void SendAllPosition(Position[] position, int id_tuile)
-        {
-            Packet packet = new Packet();
-            packet.IdMessage = Tools.IdMessage.TuileVerification;
-            packet.IdPlayer = _mon_id;
-
-            int i,compteur = 0, taille = position.Length;
-            int taille_data = 1 + taille * 3;
-            packet.Data = new string[taille_data];
-
-            packet.IdRoom = (int)_id_partie;
-            packet.Data[0] = id_tuile.ToString();
-
-            for (i = 1; i < taille_data; i += 3)
-            {
-                packet.Data[i] = position[compteur].X.ToString();
-                packet.Data[i + 1] = position[compteur].Y.ToString();
-                packet.Data[i + 2] = position[compteur].ROT.ToString();
-                compteur++;
-            }
-
             Communication.Instance.SendAsync(packet);
         }
 
@@ -557,9 +543,9 @@ namespace Assets.system
             {
                 s_InGame.Release();
                 testGameBegin = false;
-                Debug.Log("0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101");
+
                 system_display.setNextState(DisplaySystemState.gameStart);
-                Debug.Log("020202020202020202020202020202020202020202020202020202020202020202002020202020202020202020202020202020202020");
+
                 return;
             }
             s_InGame.Release();

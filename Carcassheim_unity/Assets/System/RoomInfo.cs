@@ -40,6 +40,7 @@ namespace Assets.System
         public int nbJoueur { get; set; }
         public int nbJoueurMax { get; set; }
         public int nbTuile { get; set; }
+        public int id_tile_init { get; set; }
         public int meeples { get; set; }
         public int scoreMax { get; set; }
 
