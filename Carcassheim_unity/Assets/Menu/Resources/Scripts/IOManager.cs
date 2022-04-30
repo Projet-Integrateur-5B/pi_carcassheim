@@ -117,9 +117,12 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             changeHover();
         }
 
-        if (nextGo.GetComponent<InputField>() && GameObject.Find("InputFieldEndEdit"))
+      if (nextGo.GetComponent<InputField>() && GameObject.Find("InputFieldEndEdit"))
         {
-            if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
+            if (TridentGo.activeSelf == true) // Desactive car aucune selection
+                TridentGo.SetActive(false); 
+         
+             if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftShift))
             {
                 if (nextGo.transform.GetSiblingIndex() > 0)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() - 1).gameObject;
@@ -128,9 +131,14 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             {
                 if (nextGo.transform.GetSiblingIndex() < GameObject.Find("InputFieldEndEdit").transform.childCount - 1)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() + 1).gameObject;
-            }
-            eventSystem.SetSelectedGameObject(nextGo);
+            } else if (Input.GetKeyDown(KeyCode.Tab) && Input.GetKey(KeyCode.LeftControl))
+                nextGo = nextGo.transform.parent.GetChild(0).gameObject;
+
+
+            eventSystem.SetSelectedGameObject(nextGo); 
         }
+             
+        
 
 
         // Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
