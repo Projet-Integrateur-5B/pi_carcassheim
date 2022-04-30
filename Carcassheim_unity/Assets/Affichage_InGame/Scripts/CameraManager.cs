@@ -76,6 +76,22 @@ public class CameraManager : MonoBehaviour
         {
             zoomMotion(-2.5f);
         }
+
+        if (Input.touchCount == 2)
+        {
+            Touch firstTouch = Input.GetTouch(0);
+            Touch secondTouch = Input.GetTouch(1);
+
+            Vector2 firstTouchPrevPos = firstTouch.position - firstTouch.deltaPosition;
+            Vector2 secondTouchPrevPos = secondTouch.position - secondTouch.deltaPosition;
+
+            float prevMagnitude = (firstTouchPrevPos - secondTouchPrevPos).magnitude;
+            float curMagnitude = (firstTouch.position - secondTouch.position).magnitude;
+
+            float diff = curMagnitude - prevMagnitude;
+
+            zoomMotion(diff * 0.02f);
+        }
     }
 
 
