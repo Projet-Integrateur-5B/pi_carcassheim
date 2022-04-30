@@ -724,12 +724,6 @@ public partial class Server
             return;
         }
         
-        if (packetReceived.Data.Length < 4)
-        {
-            packet.Error = Tools.Errors.BadData;
-            return;
-        }
-        
         var pos = new Position();
         var idTuile = (ulong) 0;
         
