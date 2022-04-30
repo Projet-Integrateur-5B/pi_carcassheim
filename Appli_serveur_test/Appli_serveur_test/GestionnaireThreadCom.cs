@@ -481,16 +481,20 @@ namespace system
             return errors;
         }
 
-        public void CallDrawTile(ulong idPlayer, int idRoom, Socket? playerSocket)
+        public string[] CallDrawTile(ulong idPlayer, int idRoom, Socket? playerSocket)
         {
+            string[] stringReturnEmpty = Array.Empty<string>();
+
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu threadJeu in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != threadJeu.Get_ID()) continue;
-                    thread_com_iterateur.SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
+                    return threadJeu.GetThreeLastTiles();
                 }                  
-            }          
+            }
+
+            return stringReturnEmpty;
         }
 
         public void CallTileVerif(ulong idPlayer, Socket? playerSocket, Tools.Errors errors, int idRoom, ulong idTuile, Position posTuile)

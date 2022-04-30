@@ -727,7 +727,14 @@ public partial class Server
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
-        gestionnaire.CallDrawTile(packetReceived.IdPlayer, packetReceived.IdRoom, socket);
+        string[] tilesToSend = gestionnaire.CallDrawTile(packetReceived.IdPlayer, packetReceived.IdRoom, socket);
+        packet.Data = tilesToSend;
+
+        if (tilesToSend.Length == 0)
+        {
+            packet.Error = Tools.Errors.Unknown;
+        }
+        
         
     }
     /// <summary>
