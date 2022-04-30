@@ -724,23 +724,6 @@ public partial class Server
             return;
         }
         
-        var pos = new Position();
-        var idTuile = (ulong) 0;
-        
-        try
-        {
-            idTuile = ulong.Parse(packetReceived.Data[0]);
-            pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
-        }
-        catch (Exception ex)
-        {
-            // Something went wrong.
-            Console.WriteLine("ERROR: Parsing the data into position and idTuile: " + ex);
-            packet.Data = Array.Empty<string>();
-            packet.Error = Tools.Errors.Unknown;
-            return;
-        }
-        
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
         
