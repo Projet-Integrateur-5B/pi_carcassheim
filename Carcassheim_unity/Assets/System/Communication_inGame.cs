@@ -287,17 +287,21 @@ namespace Assets.system
                     SendPosition(action_tsc.tile_id,
                         action_tsc.new_pos.X, action_tsc.new_pos.Y, action_tsc.new_pos.Rotation
                         ,Tools.IdMessage.TuilePlacement);
-
                     break;
+
                 case DisplaySystemActionTypes.tileSelection:
                     DisplaySystemActionTileSelection action_ts = (DisplaySystemActionTileSelection)action;
                     break;
+
                 case DisplaySystemActionTypes.meepleSetCoord:
                     DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
+                    SendMeepple(action_msc.tile_id, action_msc.meeple_id, action_msc.slot_pos);
                     break;
+
                 case DisplaySystemActionTypes.meepleSelection:
                     DisplaySystemActionMeepleSelection action_ms = (DisplaySystemActionMeepleSelection)action;
                     break;
+
                 case DisplaySystemActionTypes.StateSelection:
                     DisplaySystemActionStateSelection action_ss = (DisplaySystemActionStateSelection)action;
                     break;
@@ -454,8 +458,10 @@ namespace Assets.system
 
         public void OnPacketReceived(object sender, Packet packet)
         {
+            /* Permet d'attendre la fin de l'initialisation de la class */
             s_WaitInit.WaitOne();
             s_WaitInit.Release();
+
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 bool one_valid = OnTuileReceived(packet);
