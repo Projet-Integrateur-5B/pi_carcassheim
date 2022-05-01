@@ -255,7 +255,7 @@ namespace system
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
                     thread_serv_ite.Set_Settings(idPlayer, settings);
-                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.RoomSettingsGet, idPlayer, settings);
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.RoomSettingsGet, idPlayer, thread_serv_ite.Get_Settings());
                     return;
                 }
             }
