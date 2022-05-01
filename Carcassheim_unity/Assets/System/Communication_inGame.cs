@@ -589,7 +589,7 @@ namespace Assets.system
             if (turn_received && player_received)
             {
                 Debug.Log("Nouveau tour");
-                players_received = false;
+                player_received = false;
                 turn_received = false;
                 system_display.setNextState(DisplaySystemState.turnStart);
             }
@@ -603,6 +603,7 @@ namespace Assets.system
             {
                 testGameBegin = false;
                 players_received = false;
+                player_received = false;
                 turn_received = false;
                 system_display.setNextState(DisplaySystemState.gameStart);
                 first_turn_is_launch = true;
