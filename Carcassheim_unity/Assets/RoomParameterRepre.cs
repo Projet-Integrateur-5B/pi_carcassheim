@@ -62,8 +62,8 @@ public class RoomParameterRepre : MonoBehaviour
     void Start()
     {
         RoomInfo room = RoomInfo.Instance;
-        id_room.text = Communication.Instance.idRoom.ToString();
-        bool interactif = Communication.Instance.idClient != room.idModerateur;
+        id_room.text = Communication.Instance.IdRoom.ToString();
+        bool interactif = Communication.Instance.IdClient != room.idModerateur;
         foreach (Selectable selectable in menu_activate)
         {
             selectable.interactable = interactif;
