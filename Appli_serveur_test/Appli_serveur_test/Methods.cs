@@ -814,6 +814,12 @@ public partial class Server
         // Vérification du coup
         Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
         packet.Error = errors; 
+
+        // Si aucune erreur, inutile de répondre
+        if(packet.Error == Tools.Errors.None)
+        {
+            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+        }
     }
     /// <summary>
     ///     Cancels a tile.
