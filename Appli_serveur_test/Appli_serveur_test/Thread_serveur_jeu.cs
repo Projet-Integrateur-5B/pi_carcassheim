@@ -258,8 +258,10 @@ namespace system
         {
             if (idPlayer == Get_Moderateur())
             {
+                Console.WriteLine("avant");
                 lock (_lock_settings)
                 {
+                    Console.WriteLine("IN");
                     try
                     {
                         _nombre_joueur_max = Convert.ToUInt32(settings[0]);
@@ -343,7 +345,7 @@ namespace system
                         return;
                     }
                 }
-
+                Console.WriteLine("apres");
             }
         }
 
