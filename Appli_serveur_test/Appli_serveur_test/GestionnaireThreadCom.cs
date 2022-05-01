@@ -600,7 +600,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors CallEndTurn(ulong idPlayer, int idRoom)
+        public Tools.Errors CallEndTurn(ulong idPlayer, int idRoom, string[] data)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -612,7 +612,7 @@ namespace system
                 if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
                     Console.WriteLine("CallEndTurn : idRoom was found !");
-                    errors = thread_com_iterateur.Com_EndTurn(idPlayer, idRoom);
+                    errors = thread_com_iterateur.Com_EndTurn(idPlayer, idRoom, data);
                     break;
                 }
 

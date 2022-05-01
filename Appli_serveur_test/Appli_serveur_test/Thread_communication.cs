@@ -523,7 +523,7 @@ namespace system
             return errors;
         }
 
-        public Tools.Errors Com_EndTurn(ulong idPlayer, int idRoom)
+        public Tools.Errors Com_EndTurn(ulong idPlayer, int idRoom, string[] data)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -564,17 +564,6 @@ namespace system
                             thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
 
                             Console.WriteLine("Com_EndTurn : before broadcast !");
-                            
-                            var idTuile = thread_serv_ite.Get_idTuileChoisie();
-                            var posTuile = thread_serv_ite.Get_posTuileTourActu();
-                            var posPion = thread_serv_ite.Get_posPionTourActu();
-                            var data = new string[6];
-                            data[0] = idTuile.ToString();
-                            data[1] = posTuile.X.ToString();
-                            data[2] = posTuile.Y.ToString();
-                            data[3] = posTuile.ROT.ToString();
-                            data[4] = "-1";
-                            data[5] = "-1";
 
                             // Envoi de l'information du endturn
                             SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);

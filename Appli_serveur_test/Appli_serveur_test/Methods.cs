@@ -695,7 +695,7 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.IdRoom);
+        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.IdRoom, packetReceived.Data);
 
         packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
         packet.Error = errors;
