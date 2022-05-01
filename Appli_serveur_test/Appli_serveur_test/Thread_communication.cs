@@ -573,8 +573,9 @@ namespace system
                             data[1] = posTuile.X.ToString();
                             data[2] = posTuile.Y.ToString();
                             data[3] = posTuile.ROT.ToString();
-                            data[4] = posPion[0];
-                            
+                            data[4] = "-1";
+                            data[5] = "-1";
+
                             // Envoi de l'information du endturn
                             SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
                         }
