@@ -389,14 +389,12 @@ public partial class Server
             return;
         }
 
-        var settings = packetReceived.Data.Skip(0).ToArray();
-        Console.WriteLine(settings);
-        
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attempt to update a room.
-        gestionnaire.UpdateRoom(packetReceived.IdRoom, packetReceived.IdPlayer, settings);
+        gestionnaire.UpdateRoom(packetReceived.IdRoom, packetReceived.IdPlayer, packetReceived.Data);
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     /// <summary>
     ///     Client is asking the port of a room

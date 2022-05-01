@@ -254,9 +254,7 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    Console.WriteLine("avant : " + settings.Length);
                     thread_serv_ite.Set_Settings(idPlayer, settings);
-                    Console.WriteLine("apres : " + settings.Length);
                     thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.RoomSettingsGet, idPlayer, settings);
                     return;
                 }
