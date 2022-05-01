@@ -276,7 +276,10 @@ namespace system
                             if (isLegal) // S'il s'avère que le coup est valide, on passe l'attribut à true
                             {
                                 threadJeu.SetValid_AC_drawedTilesValid(idTuile);
-                            }  
+                            }
+                            Console.WriteLine("* VerifAC : idPlayer=" + idPlayer.ToString() + " currentPlayer=" + 
+                                threadJeu.Get_ActualPlayerId().ToString() + " verified tile of id=" + idTuile.ToString() + 
+                                " and has decreted it as " + isLegal.ToString());
                         }
 
                         // Signale que le rôle d'arbitre de ce joueur a été joué
