@@ -128,6 +128,7 @@ namespace system
         /// <param name="idTuile"></param>
         public void SetValid_AC_drawedTilesValid(ulong idTuile)
         {
+            Console.WriteLine("** DEBUG : MaJ idFirstValid -> new prop = " + idTuile.ToString() + " | actual = " + _AC_idFirstValidTile.ToString());
             if(_AC_drawedTilesValid != true)
             {
                 _AC_drawedTilesValid = true;
