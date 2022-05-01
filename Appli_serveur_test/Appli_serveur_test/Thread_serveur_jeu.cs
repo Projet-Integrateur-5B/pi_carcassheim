@@ -725,6 +725,8 @@ namespace system
 
         public Tools.Errors TilePlacement(ulong idPlayer, ulong idTuile, int posX, int posY, int rotat)
         {
+            Console.WriteLine("DEBUG_TuilePlacement : Entrée dans Serveur_jeu");
+
             _s_plateau.WaitOne();
             // Si placement légal, on le sauvegarde
             if (isTilePlacementLegal(idTuile, posX, posY, rotat)){

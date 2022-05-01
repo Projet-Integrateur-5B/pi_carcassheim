@@ -343,6 +343,8 @@ namespace system
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
 
+            Console.WriteLine("DEBUG_TuilePlacement : Entrée dans Thread_comm");
+
             // Parcours des threads de jeu pour trouver celui qui gère la partie cherchée
 
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)

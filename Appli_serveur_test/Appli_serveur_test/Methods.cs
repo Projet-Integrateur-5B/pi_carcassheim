@@ -811,6 +811,8 @@ public partial class Server
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
+        Console.WriteLine("DEBUG_TuilePlacement : Entrée dans Methods");
+
         // Vérification du coup
         Tools.Errors errors = gestionnaire.CallVerifyTilePlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data[0], packetReceived.Data[1], packetReceived.Data[2], packetReceived.Data[3]);
         packet.Error = errors; 
