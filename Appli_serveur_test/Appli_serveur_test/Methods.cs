@@ -795,7 +795,8 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         gestionnaire.CallTileVerif(packetReceived.IdPlayer, socket, packetReceived.Error, packetReceived.IdRoom, idTuile, pos);
-        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+
+        packet.IdPlayer = packetReceived.IdPlayer;
     }
     
     /// <summary>

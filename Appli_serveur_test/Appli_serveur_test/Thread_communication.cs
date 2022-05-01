@@ -289,7 +289,6 @@ namespace system
                             {
                                 // Tout est bon, définition de la tuile choisie
                                 ChooseIdTile(idRoom, idPlayer, idTuile, posTuile, playerSocket);
-
                             }
                             else
                             {
@@ -307,6 +306,8 @@ namespace system
 
                         
                     }
+
+                    break;
                 }
             }
         }
