@@ -631,10 +631,11 @@ namespace system
                         // All is good, same play than the stored one
                         return Tools.Errors.None;
                     }
-                    else
+                    else // ? New ? pawn
                     {
-                        // Verify placement
-                        errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
+                        // Check if pawn is set or not (-1 -1) then verify placement
+                        if(idMeeple != -1 && slotPos != -1)
+                            errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
                     }
                 }
                 else
@@ -644,8 +645,9 @@ namespace system
 
                     if(errors == Tools.Errors.None)
                     {
-                        // Check if the pawn placement is valid
-                        errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
+                        // Check if pawn is set or not (-1 -1) then verify placement
+                        if (idMeeple != -1 && slotPos != -1)
+                            errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
                     }
                 }
             }
