@@ -106,6 +106,7 @@ namespace Assets.system
         override public void getTile(out TurnPlayParam param)
         {
             //TODO PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
+            Debug.Log("GET TILE " + play_of_this_turn.id_tile + " MA POS " + play_of_this_turn.tile_pos);
             param = play_of_this_turn;
         }
 
@@ -419,9 +420,9 @@ namespace Assets.system
             {
                 OnEndTurnReceive(packet);
             }
-            else if(packet.IdMessage == Tools.IdMessage.TuileVerification)
+            else if (packet.IdMessage == Tools.IdMessage.TuileVerification)
             {
-                if(packet.Error == Tools.Errors.None)
+                if (packet.Error == Tools.Errors.None)
                 {
                     if (first_turn_is_launch && !turn_received)
                     {
@@ -433,7 +434,7 @@ namespace Assets.system
                         turn_received = true;
                         checkGameBegin();
                     }
-                }   
+                }
             }
         }
 
@@ -547,6 +548,9 @@ namespace Assets.system
                 int id_meeple = int.Parse(packet.Data[4]);
                 int pos_meeple = int.Parse(packet.Data[5]);
                 play_of_this_turn = new TurnPlayParam(id_tile, new PositionRepre(x_tile, y_tile, r_tile), id_meeple, pos_meeple);
+                if (id_tile != -1)
+                    lePlateau.PoserTuileFantome((ulong)id_tile, new Position(x_tile, y_tile, r_tile));
+                lePlateau.ValiderTour();
                 system_display.setNextState(DisplaySystemState.idleState);
             }
 
