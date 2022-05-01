@@ -111,10 +111,10 @@ public class RoomSelectionMenu : Miscellaneous
     {
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.RoomList;
-        packet.IdPlayer = Communication.Instance.idClient;
+        packet.IdPlayer = Communication.Instance.IdClient;
         packet.Data = Array.Empty<string>();
 
-        Communication.Instance.SetIsInRoom(0);
+        Communication.Instance.IsInRoom = 0;
         Communication.Instance.SendAsync(packet);
     }
 
@@ -135,7 +135,7 @@ public class RoomSelectionMenu : Miscellaneous
             if (packet.Error == Tools.Errors.None)
             {
                 res = true;
-                Communication.Instance.SetPort(int.Parse(packet.Data[0]));
+                Communication.Instance.PortRoom = int.Parse(packet.Data[0]);
             }
 
             s_listAction.WaitOne();

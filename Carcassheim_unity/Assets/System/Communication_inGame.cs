@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace Assets.system
 {
-
     public class Communication_inGame : CarcasheimBack
     {
 
@@ -334,8 +333,8 @@ namespace Assets.system
             id_tile_init_received = true;
             s_InGame.Release();
 
-            _id_partie = (ulong)Communication.Instance.idRoom;
-            _mon_id = Communication.Instance.idClient;
+            _id_partie = (ulong)Communication.Instance.IdRoom;
+            _mon_id = Communication.Instance.IdClient;
 
             _mode = (int)RoomInfo.Instance.mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
 
@@ -359,8 +358,8 @@ namespace Assets.system
             Action playerlist = () =>
             {
                 Packet packet = new Packet();
-                packet.IdPlayer = Communication.Instance.idClient;
-                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdPlayer = Communication.Instance.IdClient;
+                packet.IdRoom = Communication.Instance.IdRoom;
                 packet.IdMessage = Tools.IdMessage.PlayerList;
                 packet.Data = Array.Empty<string>();
 
@@ -385,7 +384,7 @@ namespace Assets.system
             socket.Shutdown(SocketShutdown.Both);
             socket.Close();
 
-            Communication.Instance.isInRoom = 0;
+            Communication.Instance.IsInRoom = 0;
         }
 
         public void OnPacketReceived(object sender, Packet packet)
@@ -417,9 +416,12 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
-                DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
+                if(packet.Error == Tools.Errors.None)
+                {
+                    DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
-                system_display.execDirtyAction(dsa);
+                    system_display.execDirtyAction(dsa);
+                }
             }
             else if (packet.IdMessage == Tools.IdMessage.EndTurn)
             {
@@ -500,8 +502,8 @@ namespace Assets.system
             Action playercurrent = () =>
             {
                 Packet packet = new Packet();
-                packet.IdPlayer = Communication.Instance.idClient;
-                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdPlayer = Communication.Instance.IdClient;
+                packet.IdRoom = Communication.Instance.IdRoom;
                 packet.IdMessage = Tools.IdMessage.PlayerCurrent;
                 packet.Data = Array.Empty<string>();
 
@@ -512,8 +514,8 @@ namespace Assets.system
             Action tuiledraw = () =>
             {
                 Packet packet = new Packet();
-                packet.IdPlayer = Communication.Instance.idClient;
-                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdPlayer = Communication.Instance.IdClient;
+                packet.IdRoom = Communication.Instance.IdRoom;
                 packet.IdMessage = Tools.IdMessage.TuileDraw;
                 packet.Data = Array.Empty<string>();
 

@@ -63,12 +63,12 @@ public class JoinByIdMenu : Miscellaneous
 
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.RoomAskPort;
-        packet.IdPlayer = Communication.Instance.idClient;
+        packet.IdPlayer = Communication.Instance.IdClient;
         packet.IdRoom = int.Parse(RemoveLastSpace(idCM.text));
         packet.Data = Array.Empty<string>();
 
-        Communication.Instance.SetRoom(packet.IdRoom);
-        Communication.Instance.SetIsInRoom(0);
+        Communication.Instance.IdRoom = packet.IdRoom;
+        Communication.Instance.IsInRoom = 0;
         Communication.Instance.SendAsync(packet);
     }
 
@@ -81,7 +81,7 @@ public class JoinByIdMenu : Miscellaneous
             if (packet.Error == Tools.Errors.None)
             {
                 res = true;
-                Communication.Instance.SetPort(int.Parse(packet.Data[0]));
+                Communication.Instance.PortRoom = int.Parse(packet.Data[0]);
             }
 
             s_listAction.WaitOne();

@@ -24,7 +24,7 @@ public class PublicRoomMenu : Miscellaneous
     {
         listAction = new List<string>();
         s_listAction = new Semaphore(1, 1);
-        RoomInfo.Instance.idPartie = Communication.Instance.idRoom;
+        RoomInfo.Instance.idPartie = Communication.Instance.IdRoom;
 
         OnMenuChange += OnStart;
 
@@ -38,7 +38,7 @@ public class PublicRoomMenu : Miscellaneous
         {
             case "PublicRoomMenu":
                 /* Commuication Async */
-                Communication.Instance.SetIsInRoom(1);
+                Communication.Instance.IsInRoom = 1;
                 Communication.Instance.LancementConnexion();
 
                 Action listening = () =>
@@ -51,8 +51,8 @@ public class PublicRoomMenu : Miscellaneous
                 /* Communication pour que le serveur set le port */
                 Packet packet = new Packet();
                 packet.IdMessage = Tools.IdMessage.PlayerJoin;
-                packet.IdPlayer = Communication.Instance.idClient;
-                packet.IdRoom = Communication.Instance.idRoom;
+                packet.IdPlayer = Communication.Instance.IdClient;
+                packet.IdRoom = Communication.Instance.IdRoom;
                 packet.Data = Array.Empty<string>();
 
                 Communication.Instance.SendAsync(packet);
@@ -70,11 +70,11 @@ public class PublicRoomMenu : Miscellaneous
     {
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.PlayerLeave;
-        packet.IdPlayer = Communication.Instance.idClient;
-        packet.IdRoom = Communication.Instance.idRoom;
+        packet.IdPlayer = Communication.Instance.IdClient;
+        packet.IdRoom = Communication.Instance.IdRoom;
         packet.Data = Array.Empty<string>();
 
-        Communication.Instance.SetIsInRoom(1);
+        Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);
 
         HidePopUpOptions();
@@ -94,14 +94,14 @@ public class PublicRoomMenu : Miscellaneous
 
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.PlayerReady;
-        packet.IdPlayer = Communication.Instance.idClient;
-        packet.IdRoom = Communication.Instance.idRoom;
+        packet.IdPlayer = Communication.Instance.IdClient;
+        packet.IdRoom = Communication.Instance.IdRoom;
         packet.Data = Array.Empty<string>();
 
         preparer.color = readyState;
         preparer.text = "PRET A JOUER !";
 
-        Communication.Instance.SetIsInRoom(1);
+        Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);
     }
 
@@ -121,8 +121,8 @@ public class PublicRoomMenu : Miscellaneous
         {
             Packet packet1 = new Packet();
             packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
-            packet1.IdPlayer = Communication.Instance.idClient;
-            packet1.IdRoom = Communication.Instance.idRoom;
+            packet1.IdPlayer = Communication.Instance.IdClient;
+            packet1.IdRoom = Communication.Instance.IdRoom;
             packet1.Data = Array.Empty<string>();
 
             Communication.Instance.SendAsync(packet1);

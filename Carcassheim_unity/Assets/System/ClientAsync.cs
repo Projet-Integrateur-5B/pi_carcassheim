@@ -53,7 +53,7 @@ public class ClientAsync
         Socket clientSocket = new Socket(ipAddress.AddressFamily,
             SocketType.Stream, ProtocolType.Tcp);
 
-        Communication.Instance.SetSocket(clientSocket);
+        Communication.Instance.LeSocket = clientSocket;
 
         // Connect to the remote endpoint.
         clientSocket.BeginConnect(remoteEP,
@@ -114,7 +114,7 @@ public class ClientAsync
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
 
-            Communication.Instance.isListening = true;
+            Communication.Instance.IsListening = true;
 
             // Begin receiving the data from the remote device.
             clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
@@ -123,7 +123,7 @@ public class ClientAsync
         catch (Exception e)
         {
             Debug.LogError(e.ToString());
-            Communication.Instance.isListening = false;
+            Communication.Instance.IsListening = false;
         }
     }
 
@@ -177,12 +177,12 @@ public class ClientAsync
             Task.WhenAll(tasks).Wait();
             state.Packets.Clear();
 
-            Communication.Instance.isListening = false;
+            Communication.Instance.IsListening = false;
         }
         catch (Exception e)
         {
             Debug.LogError(e.ToString());
-            Communication.Instance.isListening = false;
+            Communication.Instance.IsListening = false;
         }
     }
 
@@ -196,7 +196,7 @@ public class ClientAsync
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
 
-            Communication.Instance.isListening = true;
+            Communication.Instance.IsListening = true;
             while (mustLoop)
             {
                 Debug.Log("------------------------- Lancement Ecoute Infini -------------------------");
@@ -211,7 +211,7 @@ public class ClientAsync
         catch (Exception e)
         {
             Debug.LogError(e.ToString());
-            Communication.Instance.isListening = false;
+            Communication.Instance.IsListening = false;
         }
     }
 

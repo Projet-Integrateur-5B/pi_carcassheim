@@ -47,7 +47,7 @@ public class CreateRoomMenu : Miscellaneous
 
 		Packet packet = new Packet();
 		packet.IdMessage = Tools.IdMessage.RoomCreate;
-		packet.IdPlayer = Communication.Instance.idClient;
+		packet.IdPlayer = Communication.Instance.IdClient;
 		packet.Data = Array.Empty<string>();
 
 		Communication.Instance.SendAsync(packet);
@@ -67,9 +67,9 @@ public class CreateRoomMenu : Miscellaneous
 			if (packet.Error == Tools.Errors.None)
 			{
 				res = true;
-				Communication.Instance.SetRoom(packet.IdRoom);
-				Communication.Instance.SetPort(int.Parse(packet.Data[0]));
-				Communication.Instance.SetIsInRoom(1);
+				Communication.Instance.IdRoom = packet.IdRoom;
+				Communication.Instance.PortRoom = int.Parse(packet.Data[0]);
+				Communication.Instance.IsInRoom = 1;
 			}
 
 			s_listAction.WaitOne();

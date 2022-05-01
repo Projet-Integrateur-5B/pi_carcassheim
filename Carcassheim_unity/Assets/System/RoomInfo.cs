@@ -122,7 +122,7 @@ namespace Assets.System
         private void SendModification()
         {
             Packet packet = new Packet();
-            packet.IdPlayer = Communication.Instance.idClient;
+            packet.IdPlayer = Communication.Instance.IdClient;
             packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
 
             s_RoomInfo.WaitOne();

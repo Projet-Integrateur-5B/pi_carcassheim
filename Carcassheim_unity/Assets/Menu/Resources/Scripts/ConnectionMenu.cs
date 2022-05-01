@@ -118,7 +118,7 @@ public class ConnectionMenu : Miscellaneous
         {
             if (packet.Error == Tools.Errors.None)
             {
-                Communication.Instance.idClient = packet.IdPlayer;
+                Communication.Instance.IdClient = packet.IdPlayer;
                 res = true;
             }
 
