@@ -36,7 +36,7 @@ namespace Assets.system
         private Plateau lePlateau;
 
         private Player[] playerList;
-        bool player_received = false;
+        bool players_received = false;
         private ulong nextPlayer;
 
         private Position[] allposition;
@@ -51,6 +51,8 @@ namespace Assets.system
         private TurnPlayParam play_of_this_turn;
 
         private int nb_tile_for_turn = 0;
+
+        private bool player_received = false;
 
         private Semaphore s_WaitInit;
 
@@ -395,8 +397,9 @@ namespace Assets.system
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 bool one_valid = OnTuileReceived(packet);
-                if (first_turn_is_launch)
+                if (first_turn_is_launch && !turn_received)
                 {
+                    turn_received = true;
                     checkTurnStart();
                 }
                 else if (one_valid && !turn_received)
@@ -489,13 +492,14 @@ namespace Assets.system
             }
 
             s_InGame.WaitOne();
-            player_received = true;
+            players_received = true;
             s_InGame.Release();
         }
 
         public void OnPlayerCurrentReceive(Packet packet)
         {
             nextPlayer = packet.IdPlayer;
+            player_received = true;
         }
 
         private void OnEndTurnReceive(Packet packet)
@@ -582,10 +586,10 @@ namespace Assets.system
         public void checkTurnStart()
         {
             Debug.Log("TURN START ? " + player_received + " " + turn_received);
-            if (player_received && turn_received)
+            if (turn_received && player_received)
             {
                 Debug.Log("Nouveau tour");
-                player_received = false;
+                players_received = false;
                 turn_received = false;
                 system_display.setNextState(DisplaySystemState.turnStart);
             }
@@ -593,12 +597,12 @@ namespace Assets.system
 
         public void checkGameBegin()
         {
-            Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received + " " + turn_received);
+            Debug.Log("CALLED checkGameBegin " + players_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received + " " + turn_received);
             s_InGame.WaitOne();
-            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received)
+            if (players_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received && player_received)
             {
                 testGameBegin = false;
-                player_received = false;
+                players_received = false;
                 turn_received = false;
                 system_display.setNextState(DisplaySystemState.gameStart);
                 first_turn_is_launch = true;
