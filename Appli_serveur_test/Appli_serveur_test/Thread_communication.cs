@@ -350,10 +350,13 @@ namespace system
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
+                Console.WriteLine("VerifyTilePlacement : ID was found");
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
+                    Console.WriteLine("VerifyTilePlacement : current player");
                     if (thread_serv_ite.Get_idTuileChoisie() != UInt64.Parse(idTuile)) // Vérifie qu'il s'agit de la même qu'il essaie de poser
                     {
+                        Console.WriteLine("VerifyTilePlacement : CHEAT");
                         // Coup illégal : tentative de pose d'une autre tuile que celle choisie
                         errors = Tools.Errors.IllegalPlay;
                         PlayerCheated(idPlayer, playerSocket, idRoom);
@@ -363,7 +366,8 @@ namespace system
                     {
                         // Vérification du placement
                         errors = thread_serv_ite.TilePlacement(idPlayer, UInt64.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
-
+                        Console.WriteLine("DEBUG_TuilePlacement : error = " + errors);g
+                        
                         if (errors == Tools.Errors.None) // Si coup légal
                         {
                             Console.WriteLine("DEBUG_TuilePlacement : Broadcast (avant)");
@@ -374,11 +378,19 @@ namespace system
 
                             Console.WriteLine("DEBUG_TuilePlacement : Broadcast (après)");
                         }
+                        else
+                        {
+                            Console.WriteLine("VerifyTilePlacement : TilePlacement ERROR");
+                        }
                             
                         break;
                     }
 
                      
+                }
+                else
+                {
+                    Console.WriteLine("VerifyTilePlacement : not current player");
                 }
 
             }

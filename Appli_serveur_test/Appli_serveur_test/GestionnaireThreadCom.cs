@@ -534,6 +534,7 @@ namespace system
                 // Thread de com gérant la partie trouvé
                 if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
+                    Console.WriteLine("CallVerifyTilePlacement : Room was found");
                     errors = thread_com_iterateur.VerifyTilePlacement(idPlayer, playerSocket, idRoom, idTuile, posX, posY, rotat);
                     break;
                 }

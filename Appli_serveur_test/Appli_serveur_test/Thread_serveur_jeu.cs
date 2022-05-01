@@ -731,6 +731,8 @@ namespace system
             // Si placement légal, on le sauvegarde
             if (isTilePlacementLegal(idTuile, posX, posY, rotat)){
 
+                Console.WriteLine("TilePlacement : isTilePlacementLegal OK");
+                
                 _s_posTuileTourActu.WaitOne();
                 _posTuileTourActu = new Position(posX, posY, rotat);
                 _s_posTuileTourActu.Release();
@@ -740,7 +742,7 @@ namespace system
             else // Si non, renvoie l'erreur illegalPlay + envoi message cheat
             {
                 // Le thread de com s'occupera d'appeller le setplayerstatus pour indiquer la triche
-
+                Console.WriteLine("TilePlacement : isTilePlacementLegal IllegalPlay");
                 return Tools.Errors.IllegalPlay;
             }
             _s_plateau.Release();

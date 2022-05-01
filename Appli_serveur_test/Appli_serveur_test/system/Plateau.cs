@@ -237,12 +237,15 @@ namespace system
             Tuile tl = GetTuile(x, y);
             if (tl != null && !tl.TuileFantome)
             {
+                Console.WriteLine("PlacementLegal : tl != null : " + tl != null + " !tl.TuileFantome : " + !tl.TuileFantome);
+                Console.WriteLine("PlacementLegal : return false");
                 return false;
             }
 
             Tuile[] tuilesAdjacentes = TuilesAdjacentes(x, y);
 
             bool auMoinsUne = true;
+            Console.WriteLine("PlacementLegal : for");
             for (int i = 0; i < 4; i++)
             {
                 Tuile t = tuilesAdjacentes[i];
@@ -256,7 +259,10 @@ namespace system
                 TypeTerrain[] faceTuile2 = t.TerrainSurFace((t.Rotation + i + 2) % 4);
 
                 if (!CorrespondanceTerrains(faceTuile1, faceTuile2))
+                {
+                    Console.WriteLine("PlacementLegal : CorrespondanceTerrains : return false");
                     return false;
+                }
                 else
                 {
                     //Debug.Log("Correspondance : " + ((t.Rotation + i + 2) % 4));
@@ -496,7 +502,7 @@ namespace system
 
                 if (idJ != ulong.MaxValue)
                 {
-                    Console.WriteLine("Zone " + x + ", " + y + ", " + idSlot + " appartient à " + idJ);
+                    Console.WriteLine("Zone " + x + ", " + y + ", " + idSlot + " appartient Ã  " + idJ);
                     return true;
                 }
                 Console.WriteLine("FROM " + x + ", " + y + ", " + idSlot + " to " + t.X + ", " + t.Y + ", " + nextSlot);
