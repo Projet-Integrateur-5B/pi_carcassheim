@@ -120,6 +120,13 @@ public static class Tools
         Score = 2
     }
 
+    public enum Extensions
+    {
+        None = 0,
+        Riviere = 1,
+        Abbaye = 2
+    }
+
     /// <summary>
     ///     Converts an instance of <see cref="Packet" /> to a byte array (serialized).
     /// </summary>

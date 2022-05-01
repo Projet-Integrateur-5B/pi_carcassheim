@@ -60,6 +60,7 @@ namespace system
         private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
         private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, posTuile X, posTuile Y, idSlot}
+        private int _extensionsGame; // Indications sur les extensions utilisees dans cette partie
 
         // Attributs anticheat
         private ulong _AC_idFirstValidTile;
@@ -243,6 +244,7 @@ namespace system
             settingsList.Add(((int)_timer_game_value).ToString());
             settingsList.Add(((int)_timer_player_value).ToString());
             settingsList.Add(_score_max.ToString());
+            settingsList.Add(_extensionsGame.ToString());
 
             return settingsList.ToArray();
         }
@@ -332,6 +334,7 @@ namespace system
                         }
 
                         _score_max = int.Parse(settings[7]);
+                        _extensionsGame = int.Parse(settings[8]);
 
                     }
                     catch (Exception ex)
@@ -628,6 +631,8 @@ namespace system
             _AC_drawedTilesValid = false;
             Set_tuilesEnvoyees(GetThreeLastTiles());
             
+            // Initialisation des extensions
+            _extensionsGame = (int) Tools.Extensions.None;
 
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
@@ -723,7 +728,7 @@ namespace system
             _s_tuilesGame.Release();
 
         }
-
+        
 
         public Tools.Errors TilePlacement(ulong idPlayer, ulong idTuile, int posX, int posY, int rotat)
         {
@@ -774,7 +779,7 @@ namespace system
                 return Tools.Errors.IllegalPlay;
             }
         }
-
+        
 
         public bool isTilePlacementLegal(ulong idTuile, int posX, int posY, int rotat)
         {
