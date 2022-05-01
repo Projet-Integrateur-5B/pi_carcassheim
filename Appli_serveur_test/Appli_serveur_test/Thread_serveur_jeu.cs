@@ -169,7 +169,9 @@ namespace system
 
         public string[] Get_posPionTourActu()
         {
-            return _posPionTourActu;
+            string[] returnString = new string[5];
+            Array.Copy(_posPionTourActu, returnString, 5);
+            return returnString;
         }
 
         public void Set_idTuileChoisie(ulong idTuile)

@@ -523,7 +523,7 @@ namespace system
             return errors;
         }
 
-        public Tools.Errors Com_EndTurn(ulong idPlayer, int idRoom, string[] data)
+        public Tools.Errors Com_EndTurn(ulong idPlayer, int idRoom, Socket? playerSocket, string[] data)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -540,7 +540,13 @@ namespace system
                     if(thread_serv_ite.Get_posTuileTourActu().IsExisting())
                     {
                         Console.WriteLine("Com_EndTurn : tuile valid !");
-                        
+
+                        // Check if sended play is coherent to our stored move (tile and pawn placement) OR valid nonetheless
+                        Tools.Errors errorsEquivalence = CheckEquivalenceData(data, thread_serv_ite, idPlayer, playerSocket, idRoom);
+
+                        if (errorsEquivalence != Tools.Errors.None)
+                            return errorsEquivalence;
+
                         // Fin du tour actuel
                         Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                         // Mise à jour du status de la game
@@ -586,6 +592,73 @@ namespace system
                 }
 
             }
+
+            return errors;
+        }
+
+        /// <summary>
+        ///     Checks if the data is equivalent to the last play stored. If not, check the validity of it.
+        /// </summary>
+        /// <param name="dataReceived"></param>
+        /// <param name="threadJeu"></param>
+        /// <param name="idPlayer"></param>
+        /// <param name="playerSocket"></param>
+        /// <param name="idRoom"></param>
+        /// <returns> None if equivalent OR valid nonetheless, illegalPlay else </returns>
+        public Tools.Errors CheckEquivalenceData(string[] dataReceived, Thread_serveur_jeu threadJeu, ulong idPlayer, Socket? playerSocket, int idRoom)
+        {
+            Tools.Errors errors = Tools.Errors.None;
+
+            // Parses the data
+            ulong idTuile = UInt64.Parse(dataReceived[0]);
+            Position posTuile = new Position(Int32.Parse(dataReceived[1]), Int32.Parse(dataReceived[2]), Int32.Parse(dataReceived[3]));
+            int idMeeple = Int32.Parse(dataReceived[4]);
+            int slotPos = Int32.Parse(dataReceived[5]);
+
+            // Checks if it's the good id tile (the same that has been drawed)
+            if(idTuile == threadJeu.Get_idTuileChoisie())
+            {
+                Position lastTilePosServer = threadJeu.Get_posTuileTourActu();
+                // Checks if the pos of the tile is the same that the stored one
+                if (posTuile.X == lastTilePosServer.X && posTuile.Y == lastTilePosServer.Y && posTuile.ROT == lastTilePosServer.ROT)
+                {
+                    string[] lastPawnPosServer = threadJeu.Get_posPionTourActu();
+
+                    // Checks if the pawn is the same that the stored one
+                    if(idMeeple == Int32.Parse(lastPawnPosServer[3]) && slotPos == Int32.Parse(lastPawnPosServer[4]))
+                    {
+                        // All is good, same play than the stored one
+                        return Tools.Errors.None;
+                    }
+                    else
+                    {
+                        // Verify placement
+                        errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
+                    }
+                }
+                else
+                {
+                    // Checks if valid nonetheless
+                    errors = threadJeu.TilePlacement(idPlayer, idTuile, posTuile.X, posTuile.Y, posTuile.ROT);
+
+                    if(errors == Tools.Errors.None)
+                    {
+                        // Check if the pawn placement is valid
+                        errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
+                    }
+                }
+            }
+            else
+            {
+                errors = Tools.Errors.IllegalPlay;
+            }
+
+
+            if (errors == Tools.Errors.IllegalPlay)
+            {
+                PlayerCheated(idPlayer, playerSocket, idRoom);
+            }
+
 
             return errors;
         }
