@@ -366,9 +366,13 @@ namespace system
 
                         if (errors == Tools.Errors.None) // Si coup légal
                         {
+                            Console.WriteLine("DEBUG_TuilePlacement : Broadcast (avant)");
+
                             // Envoi de l'information à tous pour l'affichage
                             string[] dataToSend = new string[] { idTuile, posX, posY, rotat };
                             SendBroadcast(idRoom, Tools.IdMessage.TuilePlacement, idPlayer, dataToSend);
+
+                            Console.WriteLine("DEBUG_TuilePlacement : Broadcast (après)");
                         }
                             
                         break;
