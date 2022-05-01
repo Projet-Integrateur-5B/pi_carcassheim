@@ -203,6 +203,10 @@ public class DisplaySystem : MonoBehaviour
         state_transition.Enqueue(next_state);
         DisplaySystemState old_state = act_system_state;
         act_system_state = DisplaySystemState.StateTransition;
+        if (state_transition.Count == 1)
+        {
+            prev_system_state = old_state;
+        }
     }
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
@@ -309,7 +313,6 @@ public class DisplaySystem : MonoBehaviour
                 board.hideTilePossibilities();
                 break;
         }
-        prev_system_state = old_state;
     }
 
 
@@ -554,6 +557,7 @@ public class DisplaySystem : MonoBehaviour
                 stateEnter(act_system_state, prev_system_state);
                 if (state_transition.Count > 0)
                 {
+                    prev_system_state = act_system_state;
                     act_system_state = DisplaySystemState.StateTransition;
                 }
                 break;
