@@ -127,6 +127,7 @@ namespace system
                         // On envoie le display à tous sauf au joueur dont c'est l'action (si tuileDrawn on envoit à tous)
                         if (joueur.Key != idPlayer || idMessage == Tools.IdMessage.TuileDraw) 
                         {
+                            Console.WriteLine("SendBroadcast : to " + joueur.Value._id_player + "!");
                             Server.Server.SendToSpecificClient(joueur.Value._socket_of_player, packet);
                         }
                     }
@@ -510,17 +511,24 @@ namespace system
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
+                Console.WriteLine("Com_EndTurn : idRoom was found !");
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
+                    Console.WriteLine("Com_EndTurn : actual player !");
+                    
                     // Vérifie qu'il a au moins placé une tuile validée
                     if(thread_serv_ite.Get_posTuileTourActu().IsExisting())
                     {
+                        Console.WriteLine("Com_EndTurn : tuile valid !");
+                        
                         // Fin du tour actuel
                         Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                         // Mise à jour du status de la game
                         Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
                         if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                         {
+                            Console.WriteLine("Com_EndTurn : game stopped !");
+                            
                             ulong idPlayerWinner = thread_serv_ite.GetWinner();
                             string[] dataToSend = new string[] { idPlayerWinner.ToString() };
                             SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
@@ -528,20 +536,32 @@ namespace system
                         }
                         else // Si la partie n'est pas terminée
                         {
+                            Console.WriteLine("Com_EndTurn : game still running !");
+                            
                             // Mélange des tuiles pour le prochain tirage
                             thread_serv_ite.ShuffleTilesGame();
                             thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
 
+                            Console.WriteLine("Com_EndTurn : before broadcast !");
+                            
                             // Envoi de l'information du endturn
                             SendBroadcast(idRoom, Tools.IdMessage.EndTurn);
                         }
 
                         return Tools.Errors.None;
                     }
+                    else
+                    {
+                        Console.WriteLine("Com_EndTurn : tuile not valid !");
+                    }
 
                     // S'il n'a pas posé de tuile : erreur Permission
 
                     
+                }
+                else
+                {
+                    Console.WriteLine("Com_EndTurn : not the actual player !");
                 }
 
             }

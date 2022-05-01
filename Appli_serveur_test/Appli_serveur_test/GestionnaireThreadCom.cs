@@ -608,6 +608,7 @@ namespace system
                 // Thread de com gérant la partie trouvé
                 if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
                 {
+                    Console.WriteLine("CallEndTurn : idRoom was found !");
                     errors = thread_com_iterateur.Com_EndTurn(idPlayer, idRoom);
                     break;
                 }
