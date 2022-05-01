@@ -128,6 +128,7 @@ namespace system
         /// <param name="idTuile"></param>
         public void SetValid_AC_drawedTilesValid(ulong idTuile)
         {
+            Console.WriteLine("** DEBUG : MaJ idFirstValid -> new prop = " + idTuile.ToString() + " | actual = " + _AC_idFirstValidTile.ToString());
             if(_AC_drawedTilesValid != true)
             {
                 _AC_drawedTilesValid = true;
@@ -179,7 +180,6 @@ namespace system
         {
             _s_tuilesEnvoyees.WaitOne();
             Array.Copy(tuilesEnvoyees, _tuilesEnvoyees, 3);
-            _tuilesEnvoyees = tuilesEnvoyees;
             _s_tuilesEnvoyees.Release();
         }
 
@@ -393,9 +393,10 @@ namespace system
 
             // Initialisation des attributs moteurs
             _idTuileInit = 22; // Initialise sans dlc rivière
-            _tuilesEnvoyees = Array.Empty<string>();
+            _tuilesEnvoyees = new string[3];
 
             // Initialisation attributs anticheat
+            _posPionTourActu = Array.Empty<string>();
             _AC_idFirstValidTile = 0;
             _AC_barrierUp = false;
             _AC_drawedTilesValid = false;
@@ -697,7 +698,7 @@ namespace system
 
             // Met à jour le stockage des 3 tuiles envoyées
             _s_tuilesEnvoyees.WaitOne();
-            _tuilesEnvoyees = tuilesTirees.ToArray();
+            Array.Copy(tuilesTirees.ToArray(), _tuilesEnvoyees, 3);
             _s_tuilesEnvoyees.Release();
             
             return tuilesTirees.ToArray();
@@ -758,7 +759,8 @@ namespace system
             {
                 string[] posPion = new string[] { idPlayer.ToString(), posTuile.X.ToString(), posTuile.Y.ToString(), slotPos.ToString() };
                 _s_posPionTourActu.WaitOne();
-                _posPionTourActu = posPion;
+                _posPionTourActu = new string[posPion.Length];
+                Array.Copy(posPion, _posPionTourActu, posPion.Length);
                 _s_posPionTourActu.Release();
 
                 _s_plateau.Release();
@@ -794,7 +796,7 @@ namespace system
         public void RetirerPionTourActu()
         {
             _s_posPionTourActu.WaitOne();
-            _posPionTourActu = new string[] { };
+            _posPionTourActu = Array.Empty<string>();
             _s_posPionTourActu.Release();
         }
 
@@ -851,7 +853,7 @@ namespace system
             _s_posTuileTourActu.Release();
 
             _s_posPionTourActu.WaitOne();
-            _posPionTourActu = new string[] { };
+            _posPionTourActu = Array.Empty<string>();
             _s_posPionTourActu.Release();
 
             // Passe au joueur suivant
@@ -926,7 +928,7 @@ namespace system
             _s_posTuileTourActu.Release();
 
             _s_posPionTourActu.WaitOne();
-            _posPionTourActu = new string[] { };
+            _posPionTourActu = Array.Empty<string>();
             _s_posPionTourActu.Release();
 
             // Passe au joueur suivant

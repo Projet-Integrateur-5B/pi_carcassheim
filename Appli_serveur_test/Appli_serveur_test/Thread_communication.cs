@@ -293,6 +293,8 @@ namespace system
                             }
                             else
                             {
+                                Console.WriteLine("** AC_Verif - TRICHEUR : idPremière tuile valide = " + threadJeu.Get_AC_idFirstValidTile() + " | idTuile = "
+                                    + idTuile);
                                 // Les tuiles s'avèrent non-valide OU l'id de la tuile choisie n'est pas la première à être valide
                                 PlayerCheated(idPlayer, playerSocket, idRoom);
                                 // On renvoie les 3 mêmes tuiles
@@ -325,6 +327,7 @@ namespace system
                     }
                     else
                     {
+                        Console.WriteLine("** ChooseIdTile - TRICHEUR : placement suivant illégal -> " + idTuile.ToString() + " " + exemplePos.ToString());
                         // La tuile n'est pas vraiment posable
                         PlayerCheated(idPlayer, playerSocket, idRoom);
 
@@ -359,7 +362,6 @@ namespace system
                         Console.WriteLine("VerifyTilePlacement : CHEAT");
                         // Coup illégal : tentative de pose d'une autre tuile que celle choisie
                         errors = Tools.Errors.IllegalPlay;
-                        PlayerCheated(idPlayer, playerSocket, idRoom);
                         break;
                     }
                     else
