@@ -624,8 +624,9 @@ namespace system
                 {
                     string[] lastPawnPosServer = threadJeu.Get_posPionTourActu();
 
+
                     // Checks if the pawn is the same that the stored one
-                    if(idMeeple == Int32.Parse(lastPawnPosServer[3]) && slotPos == Int32.Parse(lastPawnPosServer[4]))
+                    if(lastPawnPosServer.Length != 0 && idMeeple == Int32.Parse(lastPawnPosServer[3]) && slotPos == Int32.Parse(lastPawnPosServer[4]))
                     {
                         // All is good, same play than the stored one
                         return Tools.Errors.None;

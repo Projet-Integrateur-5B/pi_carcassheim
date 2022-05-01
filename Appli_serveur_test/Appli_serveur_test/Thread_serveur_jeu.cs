@@ -169,8 +169,17 @@ namespace system
 
         public string[] Get_posPionTourActu()
         {
-            string[] returnString = new string[5];
-            Array.Copy(_posPionTourActu, returnString, 5);
+            string[] returnString;
+            if (_posPionTourActu.Length > 0)
+            {
+                returnString = new string[5];
+                Array.Copy(_posPionTourActu, returnString, 5);
+            }
+            else
+            {
+                returnString = Array.Empty<string>();
+            }
+                
             return returnString;
         }
 
@@ -763,7 +772,7 @@ namespace system
             // Si placement légal, on le sauvegarde
             if (isPionPlacementLegal(posTuile, slotPos, idPlayer, idMeeple))
             {
-                string[] posPion = new string[] { idPlayer.ToString(), posTuile.X.ToString(), posTuile.Y.ToString(), slotPos.ToString() };
+                string[] posPion = new string[] { idPlayer.ToString(), posTuile.X.ToString(), posTuile.Y.ToString(), idMeeple.ToString(), slotPos.ToString() };
                 _s_posPionTourActu.WaitOne();
                 _posPionTourActu = new string[posPion.Length];
                 Array.Copy(posPion, _posPionTourActu, posPion.Length);
