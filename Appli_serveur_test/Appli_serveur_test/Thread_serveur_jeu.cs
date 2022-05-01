@@ -630,9 +630,6 @@ namespace system
             // Génération des attributs d'anti cheat
             _AC_drawedTilesValid = false;
             Set_tuilesEnvoyees(GetThreeLastTiles());
-            
-            // Initialisation des extensions
-            _extensionsGame = (int) Tools.Extensions.None;
 
             // Initialise la tuile placée de ce tour inexistante
             _posTuileTourActu = new Position();
