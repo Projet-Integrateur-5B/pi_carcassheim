@@ -280,6 +280,7 @@ namespace system
                             Console.WriteLine("* VerifAC : idPlayer=" + idPlayer.ToString() + " currentPlayer=" + 
                                 threadJeu.Get_ActualPlayerId().ToString() + " verified tile of id=" + idTuile.ToString() + 
                                 " and has decreted it as " + isLegal.ToString());
+                            Console.WriteLine("* VerifAC_suite : position tried = " + posTuile.ToString());
                         }
 
                         // Signale que le rôle d'arbitre de ce joueur a été joué
