@@ -726,7 +726,7 @@ namespace system
         public Tools.Errors TilePlacement(ulong idPlayer, ulong idTuile, int posX, int posY, int rotat)
         {
             Console.WriteLine("DEBUG_TuilePlacement : Entrée dans Serveur_jeu");
-
+            
             _s_plateau.WaitOne();
             // Si placement légal, on le sauvegarde
             if (isTilePlacementLegal(idTuile, posX, posY, rotat)){
@@ -737,15 +737,16 @@ namespace system
                 _posTuileTourActu = new Position(posX, posY, rotat);
                 _s_posTuileTourActu.Release();
 
+                _s_plateau.Release();
                 return Tools.Errors.None;
             }
             else // Si non, renvoie l'erreur illegalPlay + envoi message cheat
             {
                 // Le thread de com s'occupera d'appeller le setplayerstatus pour indiquer la triche
                 Console.WriteLine("TilePlacement : isTilePlacementLegal IllegalPlay");
+                _s_plateau.Release();
                 return Tools.Errors.IllegalPlay;
             }
-            _s_plateau.Release();
         }
 
         public Tools.Errors PionPlacement(ulong idPlayer, Position posTuile, ulong idMeeple, int slotPos)
@@ -759,15 +760,16 @@ namespace system
                 _posPionTourActu = posPion;
                 _s_posPionTourActu.Release();
 
+                _s_plateau.Release();
                 return Tools.Errors.None;
             }
             else // Si non, renvoie l'erreur illegalPlay + envoi message cheat
             {
                 // Le thread de com s'occupera d'appeller le setplayerstatus pour indiquer la triche
 
+                _s_plateau.Release();
                 return Tools.Errors.IllegalPlay;
             }
-            _s_plateau.Release();
         }
 
 

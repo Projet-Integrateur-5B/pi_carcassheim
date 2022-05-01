@@ -366,7 +366,7 @@ namespace system
                     {
                         // Vérification du placement
                         errors = thread_serv_ite.TilePlacement(idPlayer, UInt64.Parse(idTuile), Int32.Parse(posX), Int32.Parse(posY), Int32.Parse(rotat));
-                        Console.WriteLine("DEBUG_TuilePlacement : error = " + errors);g
+                        Console.WriteLine("DEBUG_TuilePlacement : error = " + errors);
                         
                         if (errors == Tools.Errors.None) // Si coup légal
                         {
