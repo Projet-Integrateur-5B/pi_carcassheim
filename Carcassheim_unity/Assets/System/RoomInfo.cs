@@ -32,20 +32,17 @@ namespace Assets.System
             }
         }
 
-
         /* Les Informations de la Room */
-        public ulong idPartie { get; set; }
-
+        public int idPartie { get; set; }
         public ulong idModerateur { get; set; }
         public int nbJoueur { get; set; }
         public int nbJoueurMax { get; set; }
         public int nbTuile { get; set; }
-        public int id_tile_init { get; set; }
+        public int idTileInit { get; set; }
         public int meeples { get; set; }
         public int scoreMax { get; set; }
-
+        public bool isPrivate { get; set; }
         public Tools.Mode mode { get; set; }
-
         public Tools.Timer timerJoueur { get; set; }
         public Tools.Timer timerPartie { get; set; }
 
@@ -75,7 +72,7 @@ namespace Assets.System
             }
         }
         
-        public Player[] GetPlayes()
+        public Player[] GetPlayers()
         {
             int taille = Players.Count;
             Player[] result = new Player[taille];
@@ -106,7 +103,7 @@ namespace Assets.System
                 idModerateur = ulong.Parse(values[0]);
                 nbJoueur = int.Parse(values[1]);
                 nbJoueurMax = int.Parse(values[2]);
-                //privé 3
+                isPrivate = bool.Parse(values[3]);
                 mode = (Tools.Mode)int.Parse(values[4]);
                 nbTuile = int.Parse(values[5]);
                 meeples = int.Parse(values[6]);
@@ -120,6 +117,32 @@ namespace Assets.System
             {
                 Debug.LogException(ex);
             }
+        }
+
+        private void SendModification()
+        {
+            Packet packet = new Packet();
+            packet.IdPlayer = Communication.Instance.idClient;
+            packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
+
+            s_RoomInfo.WaitOne();
+
+            packet.IdRoom = idPartie;
+            packet.Data = new string[]
+            {
+                idModerateur.ToString(),
+                nbJoueur.ToString(),
+                nbJoueurMax.ToString(),
+                isPrivate.ToString(),
+                mode.ToString(),
+                nbTuile.ToString(),
+                meeples.ToString(),
+                timerPartie.ToString(),
+                timerJoueur.ToString(),
+                scoreMax.ToString()
+            };
+
+            s_RoomInfo.Release();
         }
         
     }

@@ -47,6 +47,7 @@ namespace Assets.system
         private bool testGameBegin = true;
 
         private bool first_turn_received = false;
+        private bool first_turn_is_launch = false;
 
         private TurnPlayParam play_of_this_turn;
 
@@ -314,9 +315,6 @@ namespace Assets.system
         // Start is called before the first frame update
         void Start()
         {
-            // ======================
-            // ==== DANS LA GAME ====
-            // ======================
             s_WaitInit = new Semaphore(1, 1);
             s_WaitInit.WaitOne();
 
@@ -329,7 +327,7 @@ namespace Assets.system
 
             tiles_drawed = new List<TileInitParam>();
 
-            id_tile_init = RoomInfo.Instance.id_tile_init;
+            id_tile_init = RoomInfo.Instance.idTileInit;
             lePlateau.Poser1ereTuile((ulong)id_tile_init);
 
             s_InGame.WaitOne();
@@ -399,7 +397,11 @@ namespace Assets.system
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
                 bool one_valid = OnTuileReceived(packet);
-                if (one_valid && !first_turn_received)
+                if (first_turn_is_launch)
+                {
+                    system_display.setNextState(DisplaySystemState.turnStart);
+                }
+                else if (one_valid && !first_turn_received)
                 {
                     first_turn_received = true;
                     checkGameBegin();
@@ -415,7 +417,6 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
-                Debug.Log(packet.Data.Length);
                 DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
                 system_display.execDirtyAction(dsa);
@@ -424,12 +425,10 @@ namespace Assets.system
             {
                 OnEndTurnReceive(packet);
             }
-            checkGameBegin();
         }
 
         private bool OnTuileReceived(Packet packet)
         {
-            // Debug.Log("I HAVE BEEN RECEIVED");
             int id_tuile;
             Tuile tuile;
             int i;
@@ -452,7 +451,6 @@ namespace Assets.system
                 {
                     if (positions.Length >= 0)
                     {
-                        Debug.Log("Les positions de la " + i + "ème tuile : " + positions[0].X + ", " + positions[0].Y + ", " + positions[0].ROT);
                         SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT, Tools.IdMessage.TuileVerification);
                         tileParam.tile_flags = true;
 
@@ -525,6 +523,12 @@ namespace Assets.system
 
             if (packet != null)
             {
+                if(packet.Data.Length < 6)
+                {
+                    Debug.LogError("[ERREUR] : OnEndTurnReceive packet size < 6 : " + packet.Data.Length);
+                    return;
+                }
+
                 int id_tile = int.Parse(packet.Data[0]);
                 int x_tile = int.Parse(packet.Data[1]);
                 int y_tile = int.Parse(packet.Data[2]);
@@ -580,6 +584,7 @@ namespace Assets.system
             {
                 testGameBegin = false;
                 system_display.setNextState(DisplaySystemState.gameStart);
+                first_turn_is_launch = true;
 
                 return;
             }
