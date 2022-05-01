@@ -9,18 +9,53 @@ using UnityEngine;
 using Assets.System;
 using System.Threading.Tasks;
 
-// State object for receiving data from remote device.
+
+/// <summary>
+///     State object for receiving data from remote device.
+/// </summary>
 public class StateObject
 {
-    // Client socket.
+    /// <summary>
+    ///    Représente le <see cref="Socket" /> du joueur.
+    /// </summary>
+    /// <value>Par Défaut = null</value>
+    /// <returns> <see cref="Socket" /> </returns>
     public Socket workSocket = null;
-    // Size of receive buffer.
+
+    /// <summary>
+    ///     Représente la taille maximale du buffeur. 
+    /// </summary>
+    /// <value>Par Défaut = <see cref="Packet.MaxPacketSize" /></value>
+    /// <returns> const <see cref="int" /> </returns>
     public const int BufferSize = Packet.MaxPacketSize;
-    // Receive buffer.
+
+    /// <summary>
+    ///     Représente le buffeur. 
+    /// </summary>
+    /// <value>Par Défaut = <see cref="byte"/>[<see cref="BufferSize"/>] </value>
+    /// <returns> <see cref="byte"/>[] </returns>
     public byte[] buffer = new byte[BufferSize];
     // Received data string.
+
+    /// <summary>
+    ///     Représente la chaine de caractère reçu.
+    /// </summary>
+    /// <value>Par Défaut = <see cref="StringBuilder"/> </value>
+    /// <returns> <see cref="StringBuilder"/> </returns>
     public StringBuilder sb = new StringBuilder();
-    public List<Packet>? Packets { get; set; }
+
+    /// <summary>
+    ///     Représente la liste des Packet.
+    /// </summary>
+    /// <value>Par Défaut = null </value>
+    /// <returns> <see cref="List"/> de <see cref="Packet"/> </returns>
+    public List<Packet> Packets { get; set; }
+
+    /// <summary>
+    ///     Représente la liste des données.
+    /// </summary>
+    /// <value>Par Défaut = <see cref="Array.Empty"/> </value>
+    /// <returns> <see cref="string"/>[] </returns>
     public string[] Data { get; set; } = Array.Empty<string>();
 }
 

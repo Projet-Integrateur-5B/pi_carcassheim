@@ -155,7 +155,7 @@ namespace Assets.System
 
             s_RoomInfo.WaitOne();
 
-            packet.IdRoom = _idPartie;
+            packet.IdRoom = Communication.Instance.IdRoom;
             int flags_extension = (abbayeOn ? (int)Tools.Extensions.Abbaye : 0)
                                 + (riverOn ? (int)Tools.Extensions.Riviere : 0);
             packet.Data = new string[]
