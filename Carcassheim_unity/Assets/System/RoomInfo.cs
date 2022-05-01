@@ -139,11 +139,11 @@ namespace Assets.System
 
                 s_RoomInfo.Release();
 
-                repre_parameter?.setParameters(isPrivate, mode, timerJoueur, timerPartie, scoreMax, nbTuile, abbayeOn, riverOn);
+                repre_parameter?.addParameters(isPrivate, mode, timerJoueur, timerPartie, scoreMax, nbTuile, abbayeOn, riverOn);
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                Debug.LogError(ex);
             }
         }
 
@@ -174,6 +174,8 @@ namespace Assets.System
             };
 
             s_RoomInfo.Release();
+
+            Communication.Instance.SendAsync(packet);
         }
 
     }
