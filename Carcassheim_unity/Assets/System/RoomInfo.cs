@@ -75,7 +75,7 @@ namespace Assets.System
 
         private void Start()
         {
-            nbJoueur = 0;
+            _nbJoueur = 0;
 
             Players = new Dictionary<ulong, Player>();
             s_RoomInfo = new Semaphore(1, 1);
