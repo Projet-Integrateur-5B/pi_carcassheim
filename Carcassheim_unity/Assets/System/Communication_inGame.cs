@@ -45,7 +45,7 @@ namespace Assets.system
         private Semaphore s_InGame;
         private bool testGameBegin = true;
 
-        private bool first_turn_received = false;
+        private bool turn_received = false;
         private bool first_turn_is_launch = false;
 
         private TurnPlayParam play_of_this_turn;
@@ -397,11 +397,11 @@ namespace Assets.system
                 bool one_valid = OnTuileReceived(packet);
                 if (first_turn_is_launch)
                 {
-                    system_display.setNextState(DisplaySystemState.turnStart);
+                    checkTurnStart();
                 }
-                else if (one_valid && !first_turn_received)
+                else if (one_valid && !turn_received)
                 {
-                    first_turn_received = true;
+                    turn_received = true;
                     checkGameBegin();
                 }
             }
@@ -412,10 +412,12 @@ namespace Assets.system
             else if (packet.IdMessage == Tools.IdMessage.PlayerCurrent)
             {
                 OnPlayerCurrentReceive(packet);
+                if (!first_turn_is_launch)
+                    checkTurnStart();
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
-                if(packet.Error == Tools.Errors.None)
+                if (packet.Error == Tools.Errors.None)
                 {
                     DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
@@ -524,7 +526,7 @@ namespace Assets.system
 
             if (packet != null)
             {
-                if(packet.Data.Length < 6)
+                if (packet.Data.Length < 6)
                 {
                     Debug.LogError("[ERREUR] : OnEndTurnReceive packet size < 6 : " + packet.Data.Length);
                     return;
@@ -577,13 +579,27 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
+        public void checkTurnStart()
+        {
+            Debug.Log("TURN START ? " + player_received + " " + turn_received);
+            if (player_received && turn_received)
+            {
+                Debug.Log("Nouveau tour");
+                player_received = false;
+                turn_received = false;
+                system_display.setNextState(DisplaySystemState.turnStart);
+            }
+        }
+
         public void checkGameBegin()
         {
-            Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received + " " + first_turn_received);
+            Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received + " " + turn_received);
             s_InGame.WaitOne();
-            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && first_turn_received)
+            if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received)
             {
                 testGameBegin = false;
+                player_received = false;
+                turn_received = false;
                 system_display.setNextState(DisplaySystemState.gameStart);
                 first_turn_is_launch = true;
 
