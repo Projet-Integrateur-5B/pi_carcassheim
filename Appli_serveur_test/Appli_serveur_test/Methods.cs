@@ -692,14 +692,22 @@ public partial class Server
             return;
         }
 
+        if (packetReceived.Data.Length < 6)
+        {
+            packet.Error = Tools.Errors.BadData;
+            return;
+        }
+
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Attemp to start the game.
-        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.IdRoom, packetReceived.Data);
+        Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.IdRoom, socket, packetReceived.Data);
 
-        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
         packet.Error = errors;
+
+        if (errors == Tools.Errors.None)
+            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
 
 
