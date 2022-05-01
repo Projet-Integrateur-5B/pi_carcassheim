@@ -390,7 +390,7 @@ namespace system
                 }
                 else
                 {
-                    Console.WriteLine("VerifyTilePlacement : not current player");
+                    Console.WriteLine("VerifyTilePlacement : not current player " + thread_serv_ite.Get_ActualPlayerId());
                 }
 
             }

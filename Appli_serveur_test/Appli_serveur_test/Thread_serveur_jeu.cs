@@ -104,6 +104,7 @@ namespace system
             _s_dico_joueur.WaitOne();
             ulong[] idPlayer_array = _dico_joueur.Keys.ToArray();
             _s_dico_joueur.Release();
+            Console.WriteLine("Get_ActualPlayerId : " + _offsetActualPlayer);
             return idPlayer_array[_offsetActualPlayer];
         }
 
