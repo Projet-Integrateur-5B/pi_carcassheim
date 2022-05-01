@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace Assets.System
 {
-    
+
     public class RoomInfo : MonoBehaviour
-    { 
+    {
         private static RoomInfo _instance;
         public static RoomInfo Instance
         {
@@ -33,26 +33,49 @@ namespace Assets.System
         }
 
         /* Les Informations de la Room */
-        public int idPartie { get; set; }
-        public ulong idModerateur { get; set; }
-        public int nbJoueur { get; set; }
-        public int nbJoueurMax { get; set; }
-        public int nbTuile { get; set; }
-        public int idTileInit { get; set; }
-        public int meeples { get; set; }
-        public int scoreMax { get; set; }
-        public bool isPrivate { get; set; }
-        public Tools.Mode mode { get; set; }
-        public Tools.Timer timerJoueur { get; set; }
-        public Tools.Timer timerPartie { get; set; }
 
-        private Dictionary<ulong,Player> Players;
+        private int _idPartie;
+        private ulong _idModerateur;
+        private int _nbJoueur;
+        private int _nbJoueurMax;
+        private int _nbTuile;
+        private int _idTileInitial;
+        private int _meeples;
+
+        private int _scoreMax;
+        private bool _isPrivate;
+        private Tools.Mode _mode;
+        private int _timerJoueur;
+        private int _timerPartie;
+
+        bool _riverOn;
+        bool _abbayeOn;
+
+        public int idPartie { get; set; }
+
+        public ulong idModerateur { get => _idModerateur; set { _idModerateur = value; SendModification(); } }
+        public int nbJoueur { get => _nbJoueur; set { _nbJoueur = value; SendModification(); } }
+        public int nbJoueurMax { get => _nbJoueurMax; set { _nbJoueurMax = value; SendModification(); } }
+        public int nbTuile { get => _nbTuile; set { _nbTuile = value; SendModification(); } }
+        public int idTileInit { get => _idTileInitial; set { _idTileInitial = value; SendModification(); } }
+        public int meeples { get => _meeples; set { _meeples = value; SendModification(); } }
+        public int scoreMax { get => _scoreMax; set { _scoreMax = value; SendModification(); } }
+        public bool isPrivate { get => _isPrivate; set { _isPrivate = value; SendModification(); } }
+        public Tools.Mode mode { get => _mode; set { _mode = value; SendModification(); } }
+        public int timerJoueur { get => _timerJoueur; set { _timerJoueur = value; SendModification(); } }
+        public int timerPartie { get => _timerPartie; set { _timerPartie = value; SendModification(); } }
+        public bool riverOn { get => _riverOn; set { _riverOn = value; SendModification(); } }
+        public bool abbayeOn { get => _abbayeOn; set { _abbayeOn = value; SendModification(); } }
+
+        public RoomParameterRepre repre_parameter;
+
+        private Dictionary<ulong, Player> Players;
 
         private Semaphore s_RoomInfo;
 
         private void Start()
         {
-            nbJoueur = 0;
+            _nbJoueur = 0;
 
             Players = new Dictionary<ulong, Player>();
             s_RoomInfo = new Semaphore(1, 1);
@@ -71,16 +94,16 @@ namespace Assets.System
                 _instance = this;
             }
         }
-        
+
         public Player[] GetPlayers()
         {
             int taille = Players.Count;
             Player[] result = new Player[taille];
-            Players.Values.CopyTo(result,0);
+            Players.Values.CopyTo(result, 0);
             return result;
         }
 
-        public void AddPlayer(ulong idPlayer,Player player)
+        public void AddPlayer(ulong idPlayer, Player player)
         {
             if (!Players.ContainsKey(idPlayer))
             {
@@ -90,7 +113,7 @@ namespace Assets.System
         }
         public void RemovePlayer(ulong idPlayer)
         {
-            if(Players.Remove(idPlayer))
+            if (Players.Remove(idPlayer))
                 nbJoueur--;
         }
 
@@ -100,22 +123,27 @@ namespace Assets.System
             {
                 s_RoomInfo.WaitOne();
 
-                idModerateur = ulong.Parse(values[0]);
-                nbJoueur = int.Parse(values[1]);
-                nbJoueurMax = int.Parse(values[2]);
-                isPrivate = bool.Parse(values[3]);
-                mode = (Tools.Mode)int.Parse(values[4]);
-                nbTuile = int.Parse(values[5]);
-                meeples = int.Parse(values[6]);
-                timerPartie = (Tools.Timer)int.Parse(values[7]);
-                timerJoueur = (Tools.Timer)int.Parse(values[8]);
-                scoreMax = int.Parse(values[9]);
+                _idModerateur = ulong.Parse(values[0]);
+                _nbJoueur = int.Parse(values[1]);
+                _nbJoueurMax = int.Parse(values[2]);
+                _isPrivate = bool.Parse(values[3]);
+                _mode = (Tools.Mode)int.Parse(values[4]);
+                _nbTuile = int.Parse(values[5]);
+                _meeples = int.Parse(values[6]);
+                _timerPartie = int.Parse(values[7]);
+                _timerJoueur = int.Parse(values[8]);
+                _scoreMax = int.Parse(values[9]);
+                int flags_extension = int.Parse(values[10]);
+                _riverOn = (flags_extension & (int)Tools.Extensions.Riviere) > 0;
+                _abbayeOn = (flags_extension & (int)Tools.Extensions.Abbaye) > 0;
 
                 s_RoomInfo.Release();
+
+                repre_parameter?.addParameters(isPrivate, mode, timerJoueur, timerPartie, scoreMax, nbTuile, abbayeOn, riverOn);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Debug.LogException(ex);
+                Debug.LogError(ex);
             }
         }
 
@@ -127,7 +155,9 @@ namespace Assets.System
 
             s_RoomInfo.WaitOne();
 
-            packet.IdRoom = idPartie;
+            packet.IdRoom = _idPartie;
+            int flags_extension = (abbayeOn ? (int)Tools.Extensions.Abbaye : 0)
+                                + (riverOn ? (int)Tools.Extensions.Riviere : 0);
             packet.Data = new string[]
             {
                 idModerateur.ToString(),
@@ -139,14 +169,17 @@ namespace Assets.System
                 meeples.ToString(),
                 timerPartie.ToString(),
                 timerJoueur.ToString(),
-                scoreMax.ToString()
+                scoreMax.ToString(),
+                flags_extension.ToString()
             };
 
             s_RoomInfo.Release();
+
+            Communication.Instance.SendAsync(packet);
         }
-        
+
     }
 }
 
-    
-        
+
+

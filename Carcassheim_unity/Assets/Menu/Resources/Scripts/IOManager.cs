@@ -61,8 +61,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         _jid.absolute_parent = absolute_parent;
         _proom = gameObject.AddComponent(typeof(PublicRoomMenu)) as PublicRoomMenu;
         _proom.absolute_parent = absolute_parent;
-        _rparam = gameObject.AddComponent(typeof(RoomParameters)) as RoomParameters;
-        _rparam.absolute_parent = absolute_parent;
         _croom = gameObject.AddComponent(typeof(CreateRoomMenu)) as CreateRoomMenu;
         _croom.absolute_parent = absolute_parent;
         _rcreated = gameObject.AddComponent(typeof(RoomIsCreated)) as RoomIsCreated;
@@ -123,7 +121,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             changeHover();
         }
 
-        if ((nextGo.GetComponent<InputField>() || (eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.GetComponent<InputField>()) && GameObject.Find("InputFieldEndEdit")))
+        if (((nextGo != null && nextGo.GetComponent<InputField>()) || (eventSystem.currentSelectedGameObject != null && eventSystem.currentSelectedGameObject.GetComponent<InputField>()) && GameObject.Find("InputFieldEndEdit")))
         {
             if (TridentGo.activeSelf == true) // Desactive car aucune selection
                 TridentGo.SetActive(false);

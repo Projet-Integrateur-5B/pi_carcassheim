@@ -203,10 +203,6 @@ public class DisplaySystem : MonoBehaviour
         state_transition.Enqueue(next_state);
         DisplaySystemState old_state = act_system_state;
         act_system_state = DisplaySystemState.StateTransition;
-        if (state_transition.Count == 1)
-        {
-            stateLeave(old_state, next_state);
-        }
     }
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
@@ -554,10 +550,10 @@ public class DisplaySystem : MonoBehaviour
                 break;
             case DisplaySystemState.StateTransition:
                 act_system_state = state_transition.Dequeue();
+                stateLeave(prev_system_state, act_system_state);
                 stateEnter(act_system_state, prev_system_state);
                 if (state_transition.Count > 0)
                 {
-                    stateLeave(act_system_state, state_transition.Peek());
                     act_system_state = DisplaySystemState.StateTransition;
                 }
                 break;
