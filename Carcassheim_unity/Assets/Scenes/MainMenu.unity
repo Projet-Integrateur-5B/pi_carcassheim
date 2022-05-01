@@ -24216,8 +24216,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 171, y: -435}
-  m_SizeDelta: {x: 240, y: 110}
+  m_AnchoredPosition: {x: 157.72147, y: -421.72144}
+  m_SizeDelta: {x: 266.557, y: 136.5571}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1799391704
 MonoBehaviour:
@@ -25844,10 +25844,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36dc56fc521470b44ae25f78cb352c2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id_room: {fileID: 952150805}
   time_tour_slider: {fileID: 791392870}
   room_access_toggle: {fileID: 1432515254}
   room_extension_rivier: {fileID: 632571086}
   room_extension_abbaye: {fileID: 1964843638}
+  room_access_private: {fileID: 1240071164}
+  room_access_public: {fileID: 373438968}
   room_winmode_drop: {fileID: 1280460033}
   menu_activate:
   - {fileID: 791392870}
@@ -26678,7 +26681,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 06a42d242824da04a87a3fe3ba33bdb1, type: 3}
-    m_FontSize: 40
+    m_FontSize: 38
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
