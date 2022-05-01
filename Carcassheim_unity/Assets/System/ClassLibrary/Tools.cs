@@ -110,9 +110,16 @@ namespace ClassLibrary
 
         public enum Mode
         {
-            Default = 0
+            Default = 0,
+            Time = 1,
+            Point = 2
         }
 
+        public enum Extensions
+        {
+            Riviere = 1,
+            Abbaye = 2
+        }
         /// <summary>
         ///     Converts an instance of <see cref="Packet" /> to a byte array (serialized).
         /// </summary>
@@ -166,7 +173,7 @@ namespace ClassLibrary
         /// </returns>
         /// <exception cref="InvalidEnumArgumentException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        public static List<Packet>? ByteArrayToPacket(this byte[] byteArray, ref Errors error)
+        public static List<Packet> ByteArrayToPacket(this byte[] byteArray, ref Errors error)
         {
             // Check if enum "Errors" do exist.
             if (!Enum.IsDefined(typeof(Errors), error))
