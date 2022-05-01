@@ -179,7 +179,6 @@ namespace system
         {
             _s_tuilesEnvoyees.WaitOne();
             Array.Copy(tuilesEnvoyees, _tuilesEnvoyees, 3);
-            _tuilesEnvoyees = tuilesEnvoyees;
             _s_tuilesEnvoyees.Release();
         }
 
@@ -393,7 +392,7 @@ namespace system
 
             // Initialisation des attributs moteurs
             _idTuileInit = 22; // Initialise sans dlc rivière
-            _tuilesEnvoyees = Array.Empty<string>();
+            _tuilesEnvoyees = new string[3];
 
             // Initialisation attributs anticheat
             _posPionTourActu = Array.Empty<string>();
@@ -698,7 +697,7 @@ namespace system
 
             // Met à jour le stockage des 3 tuiles envoyées
             _s_tuilesEnvoyees.WaitOne();
-            _tuilesEnvoyees = tuilesTirees.ToArray();
+            Array.Copy(tuilesTirees.ToArray(), _tuilesEnvoyees, 3);
             _s_tuilesEnvoyees.Release();
             
             return tuilesTirees.ToArray();
