@@ -362,7 +362,6 @@ namespace system
                         Console.WriteLine("VerifyTilePlacement : CHEAT");
                         // Coup illégal : tentative de pose d'une autre tuile que celle choisie
                         errors = Tools.Errors.IllegalPlay;
-                        PlayerCheated(idPlayer, playerSocket, idRoom);
                         break;
                     }
                     else
