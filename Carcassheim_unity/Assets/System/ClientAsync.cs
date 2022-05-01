@@ -81,7 +81,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
+            Debug.LogError(e.ToString());
         }
     }
 
@@ -104,7 +104,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
+            Debug.LogError(e.ToString());
         }
     }
 
@@ -126,7 +126,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
+            Debug.LogError(e.ToString());
             Communication.Instance.isListening = false;
         }
     }
@@ -166,7 +166,7 @@ public class ClientAsync
             foreach (var packet in state.Packets)
             {
                 var debug = "Reading from : " + client.RemoteEndPoint +
-                        "\n\t Read {"+ client.RemoteEndPoint +"} bytes =>\t" + packet +
+                        "\n\t Read {" + client.RemoteEndPoint + "} bytes =>\t" + packet +
                         "\n\t Data buffer =>\t\t" + string.Join(" ", state.Data);
 
                 Debug.Log(debug);
@@ -181,7 +181,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
+            Debug.LogError(e.ToString());
             Communication.Instance.isListening = false;
         }
     }
@@ -208,7 +208,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
+            Debug.LogError(e.ToString());
             Communication.Instance.isListening = false;
         }
     }
@@ -221,7 +221,7 @@ public class ClientAsync
 
     public static void Send(Socket clientSocket, Packet original)
     {
-        Debug.Log("/////////////////////////////////////// original.IdMessage : " + original.IdMessage + " ////////////////////////////////////////");
+        //  Debug.Log("/////////////////////////////////////// original.IdMessage : " + original.IdMessage + " ////////////////////////////////////////");
         byte[]? bytes = null;
         var error_value = Tools.Errors.None;
 
@@ -236,7 +236,7 @@ public class ClientAsync
         // Begin sending the data to the remote device.
         var size = bytes.Length;
 
-        var debug = "Sent total {"+ size +"} bytes to server."+
+        var debug = "Sent total {" + size + "} bytes to server." +
                         "\n\t bytes =>\t" + original;
 
         Debug.Log(debug);
@@ -257,7 +257,7 @@ public class ClientAsync
         }
         catch (Exception e)
         {
-            Debug.Log(e.ToString());
+            Debug.LogError(e.ToString());
         }
     }
 

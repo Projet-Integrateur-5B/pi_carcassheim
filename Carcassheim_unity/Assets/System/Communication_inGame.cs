@@ -46,7 +46,7 @@ namespace Assets.system
         private Semaphore s_InGame;
         private bool testGameBegin = true;
 
-        private bool first_turn_received = true;
+        private bool first_turn_received = false;
 
         private TurnPlayParam play_of_this_turn;
 
@@ -187,29 +187,27 @@ namespace Assets.system
         override public void askPlayersInit(List<PlayerInitParam> players)
         {
             //TODO PARTAGER ID JOUEUR, NOM JOUEUR, NB DE MEEPLE => Display
-            Debug.Log("JOUEUR DDEANDE");
+            // Debug.Log("JOUEUR DEMANDE");
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
-                Debug.Log("line " + j + "/" + taille);
                 players.Add(new PlayerInitParam(
                     (int)playerList[j].id,
                     (int)playerList[j].nbMeeples,
                     playerList[j].name
                     ));
             }
-            Debug.Log("SLOPP");
         }
         override public int askIdTileInitial()
         {
-            Debug.Log("TUILE DEMANDE");
+            // Debug.Log("TUILE INIT DEMANDE");
             // TODO PARTAGER ID DE LA TUILE INITIAL EN POSITION (0, 0) => Display
             return id_tile_init;
         }
 
         override public void askTimerTour(out int min, out int sec)
         {
-            Debug.Log("TIMER DDEANDE");
+            // Debug.Log("TIMER DEMANDE");
             // TODO PARTAGER LE TEMPS DISPONIBLE PAR TOUR => Display
             min = _timer / 60;
             sec = _timer % 60;
@@ -217,12 +215,12 @@ namespace Assets.system
 
         override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
         {
-            Debug.Log("WIN COND DEMANDED");
+            // Debug.Log("WIN COND DEMANDED");
             // TODO PARTAGER CONDITION DE VICTOIRE => Display
             // 0 TUILE => nb de tuile
             // 1 TEMPS => nb de min, puis nb de sec
             // 2 SCORE => score � atteindre
-            Debug.Log("MODE :! " + _mode);
+            // Debug.Log("MODE :! " + _mode);
             switch (_mode)
             {
                 case 1:
@@ -243,7 +241,7 @@ namespace Assets.system
 
         override public int getMyPlayer()
         {
-            Debug.Log("MON JOUEUR DDEANDE");
+            // Debug.Log("MON JOUEUR DEMANDE");
             // TODO PARTAGER ID DU JOUEUR SUR CE CLIENT => Display
             return (int)_mon_id;
         }
@@ -417,6 +415,7 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
+                Debug.Log(packet.Data.Length);
                 DisplaySystemAction dsa = new DisplaySystemActionTileSetCoord(int.Parse(packet.Data[0]),
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])));
                 system_display.execDirtyAction(dsa);
@@ -430,7 +429,7 @@ namespace Assets.system
 
         private bool OnTuileReceived(Packet packet)
         {
-            Debug.Log("I HAVE BEEN RECEIVED");
+            // Debug.Log("I HAVE BEEN RECEIVED");
             int id_tuile;
             Tuile tuile;
             int i;
@@ -575,7 +574,7 @@ namespace Assets.system
 
         public void checkGameBegin()
         {
-            Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received);
+            Debug.Log("CALLED checkGameBegin " + player_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received + " " + first_turn_received);
             s_InGame.WaitOne();
             if (player_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && first_turn_received)
             {

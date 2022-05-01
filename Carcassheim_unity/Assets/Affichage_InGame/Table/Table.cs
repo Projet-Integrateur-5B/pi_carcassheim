@@ -257,7 +257,7 @@ public class Table : MonoBehaviour
             case TableState.MeepleState:
                 if (hit.parent != meeple_zone.transform)
                 {
-                    Debug.Log("Parent of hit is " + hit.parent.name + " instead of " + meeple_zone.name);
+                    Debug.LogWarning("Parent of hit is " + hit.parent.name + " instead of " + meeple_zone.name);
                     break;
                 }
                 display_system.setSelectedMeeple(hit.GetComponent<MeepleColliderStat>().Index);
@@ -265,13 +265,13 @@ public class Table : MonoBehaviour
             case TableState.TileState:
                 if (hit.parent != tile_zone.transform)
                 {
-                    Debug.Log("Parent of hit is " + hit.parent.name + " instead of " + tile_zone.name);
+                    Debug.LogWarning("Parent of hit is " + hit.parent.name + " instead of " + tile_zone.name);
                     break;
                 }
                 display_system.setSelectedTile(hit.GetComponent<ColliderStat>().Index);
                 return true;
             default:
-                Debug.Log("Shouldn't have been an input in " + act_table_state.ToString());
+                Debug.LogWarning("Shouldn't have been an input in " + act_table_state.ToString());
                 break;
         }
         return true;

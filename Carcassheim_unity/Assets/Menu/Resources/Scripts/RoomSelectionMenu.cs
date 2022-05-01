@@ -36,7 +36,6 @@ public class RoomSelectionMenu : Miscellaneous
     private void TableauRoom()
     {
         RoomLine model = FindObject(gameObject, "ROOMLINE").GetComponent<RoomLine>();
-        Debug.Log(model);
         List_of_Rooms.Clear();
 
 

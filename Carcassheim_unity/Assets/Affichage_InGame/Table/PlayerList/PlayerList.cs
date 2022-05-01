@@ -115,7 +115,7 @@ public class PlayerList : MonoBehaviour
     {
         if (_players.Count < 2)
         {
-            Debug.Log("No player to cycle trough");
+            Debug.LogWarning("No player to cycle trough");
             return false;
         }
 

@@ -234,7 +234,7 @@ public class PlateauRepre : MonoBehaviour
         }
         else
         {
-            Debug.Log("Shouldn't have been an input");
+            Debug.LogWarning("Shouldn't have been an input in plateau");
         }
 
         return true;

@@ -106,6 +106,7 @@ public class DisplaySystem : MonoBehaviour
         if (!DIRTY_ACTIONS || queue_actions.Count == 0)
             return;
         DisplaySystemAction action = queue_actions.Peek();
+        Debug.Log("ACTION 1 of " + queue_actions.Count + " PEEKED FOUND IN GOOD STATE ? " + (action.required_state == act_system_state));
         if (action.required_state == act_system_state)
         {
             execAction(queue_actions.Dequeue());
@@ -116,6 +117,7 @@ public class DisplaySystem : MonoBehaviour
 
     public void execDirtyAction(DisplaySystemAction action)
     {
+        Debug.Log("EXEC DIRTY ACTION");
         queue_actions.Enqueue(action);
     }
 
@@ -125,6 +127,7 @@ public class DisplaySystem : MonoBehaviour
         {
             if (DIRTY_ACTIONS && (queue_actions.Count > 0 || (action.required_state != DisplaySystemState.noState && action.required_state != act_system_state)))
             {
+                Debug.Log("ADDING ACTION WHEN SHOULD NOT IN EXEC ACTION");
                 if (action.required_state != act_system_state && queue_actions.Count == 0)
                     setNextState(action.required_state);
                 queue_actions.Enqueue(action);
@@ -134,9 +137,11 @@ public class DisplaySystem : MonoBehaviour
             {
                 case DisplaySystemActionTypes.tileSetCoord:
                     DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
+                    Debug.Log("TILE PLACEMENT ACTION TILE ID OF " + act_tile.Id + " VS " + action_tsc.tile_id + " SETTING AT " + action_tsc.new_pos);
                     if (act_tile != null && act_tile.Id == action_tsc.tile_id)
                     {
-                        board.setTileAt(action_tsc.new_pos, act_tile);
+                        if (!board.setTileAt(action_tsc.new_pos, act_tile))
+                            Debug.Log("BOARD DIDN'T POSED THE TILE");
                         table.tilePositionChanged(act_tile);
                     }
                     break;
@@ -186,6 +191,11 @@ public class DisplaySystem : MonoBehaviour
                     break;
             }
         }
+        else
+        {
+            Debug.Log("NO ACTION ARE EXECUTED FOR AN ELECTED PLAYER");
+        }
+
     }
 
     public void setNextState(DisplaySystemState next_state)
@@ -252,7 +262,6 @@ public class DisplaySystem : MonoBehaviour
                             tiles_hand.Add(instantiateTileOfId(play_param.id_tile));
                             index = tiles_hand.Count - 1;
                         }
-                        Debug.Log("Changing tile");
                         setSelectedTile(index, true);
                     }
                     board.finalizeTurn(play_param.tile_pos, act_tile);
@@ -315,7 +324,6 @@ public class DisplaySystem : MonoBehaviour
         {
             case DisplaySystemState.turnStart:
                 act_player = players_mapping[system_back.getNextPlayer()];
-                Debug.Log("Tour de " + act_player.Name + " " + act_player.Id.ToString());
                 if (old_state != DisplaySystemState.gameStart)
                     player_list.nextPlayer(act_player);
                 if (my_player == null && act_player.is_my_player)
@@ -349,7 +357,6 @@ public class DisplaySystem : MonoBehaviour
                 foreach (PlayerScoreParam score in scores)
                 {
                     players_mapping[(int)score.id_player].Score = score.points_gagnes;
-                    Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
                     foreach (Zone z in zones)
                     {
                         foreach (System.Tuple<int, int, ulong> pos in z.positions)
@@ -381,7 +388,6 @@ public class DisplaySystem : MonoBehaviour
                     foreach (PlayerScoreParam score in scores_final)
                     {
                         players_mapping[(int)score.id_player].Score = score.points_gagnes;
-                        Debug.Log("score for " + score.id_player + " " + score.points_gagnes);
                     }
 
                     int n_sup = 0;
@@ -466,7 +472,7 @@ public class DisplaySystem : MonoBehaviour
                                 table.tilePositionChanged(act_tile);
                             }
                             else
-                                Debug.Log("Tuile non placée à " + tile_indic.position.ToString());
+                                Debug.LogWarning("Tuile non placée à " + tile_indic.position.ToString());
                             system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
                         }
                         break;
@@ -476,7 +482,7 @@ public class DisplaySystem : MonoBehaviour
                         {
                             slot = hit.transform.parent.GetComponent<SlotIndic>();
                             if (hit.transform.parent.parent != act_tile.pivotPoint)
-                                Debug.Log("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tile.pivotPoint.name);
+                                Debug.LogWarning("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tile.pivotPoint.name);
                             else
                             {
                                 bool meeple_position_is_null = act_meeple.ParentTile == null;
@@ -494,7 +500,7 @@ public class DisplaySystem : MonoBehaviour
                         {
                             PositionRepre rotation;
                             if (hit.transform.parent != act_tile.pivotPoint)
-                                Debug.Log("Tried to rotate " + hit.transform.parent.name + " instead of act tile");
+                                Debug.LogWarning("Tried to rotate " + hit.transform.parent.name + " instead of act tile");
                             else if (act_tile.nextRotation(out rotation))
                             {
                                 board.setTileAt(rotation, act_tile);
@@ -503,7 +509,7 @@ public class DisplaySystem : MonoBehaviour
                         }
                         break;
                     default:
-                        Debug.Log("Hit " + hit.transform.tag + " collider in system");
+                        Debug.LogWarning("Hit " + hit.transform.tag + " collider in system when should not find one");
                         break;
                 }
             }
@@ -562,15 +568,12 @@ public class DisplaySystem : MonoBehaviour
 
     public void gameBegin()
     {
-        Debug.Log("HERE");
         WinCondition win = WinCondition.WinByTime;
         List<int> param = new List<int>();
         system_back.askWinCondition(ref win, param);
-        Debug.Log("HERE " + win + " " + param);
 
         List<PlayerInitParam> players_init = new List<PlayerInitParam>();
         system_back.askPlayersInit(players_init);
-        Debug.Log("HERE");
         my_player = null;
         int my_player_id = system_back.getMyPlayer();
 
@@ -587,7 +590,6 @@ public class DisplaySystem : MonoBehaviour
         }
 
         int first_tile = system_back.askIdTileInitial();
-        Debug.Log("HERE");
         TuileRepre tl = instantiateTileOfId(first_tile);
         board.setTileAt(new PositionRepre(0, 0, 0), tl);
 
@@ -608,7 +610,7 @@ public class DisplaySystem : MonoBehaviour
         model = Resources.Load<TuileRepre>("tile" + id.ToString());
         if (model == null)
         {
-            Debug.Log("Tried to log unknown tile " + id.ToString());
+            Debug.LogWarning("Tried to log unknown tile " + id.ToString());
             model = tuile_model;
         }
         TuileRepre tl = Instantiate<TuileRepre>(model);
@@ -715,7 +717,7 @@ public class DisplaySystem : MonoBehaviour
         }
         else
         {
-            Debug.Log("Invalid tile access " + index.ToString() + " " + act_system_state.ToString());
+            Debug.LogWarning("Invalid tile access " + index.ToString() + " " + act_system_state.ToString());
         }
     }
 
@@ -743,7 +745,7 @@ public class DisplaySystem : MonoBehaviour
         }
         else
         {
-            Debug.Log("Invalid meeple access " + index.ToString() + " " + act_system_state.ToString());
+            Debug.LogWarning("Invalid meeple access " + index.ToString() + " " + act_system_state.ToString());
         }
     }
 }

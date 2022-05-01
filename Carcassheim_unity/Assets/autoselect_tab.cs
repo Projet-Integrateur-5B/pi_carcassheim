@@ -38,11 +38,6 @@ public class autoselect_tab : MonoBehaviour
         }
     }
 
-    void test()
-    {
-        Debug.Log("debug");
-    }
-
 
     void OnEnable()
     {

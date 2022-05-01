@@ -61,7 +61,6 @@ public class ConnectionMenu : Miscellaneous
         HidePopUpOptions();
         ResetWarningTextCM();
         ChangeMenu("ConnectionMenu", "HomeMenu");
-        Debug.Log("here");
     }
 
     public void ForgottenPwdUser()
@@ -94,7 +93,7 @@ public class ConnectionMenu : Miscellaneous
 
     public void InputFieldEndEdit(InputField inp)
     {
-        Debug.Log("Input submitted" + " : " + inp.text);
+        // Debug.Log("Input submitted" + " : " + inp.text);
     }
 
     public void Connect()
@@ -123,11 +122,11 @@ public class ConnectionMenu : Miscellaneous
                 res = true;
             }
 
-			s_listAction.WaitOne();
-			listAction.Add(res);
-			s_listAction.Release();
-		}
-	}
+            s_listAction.WaitOne();
+            listAction.Add(res);
+            s_listAction.Release();
+        }
+    }
 
     private void Update()
     {

@@ -129,7 +129,6 @@ public class RoomLine : MonoBehaviour, IPointerClickHandler
     {
         if (eventData.clickCount == 2)
         {
-            Debug.Log("double click");
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.RoomAskPort;
             packet.IdPlayer = Communication.Instance.idClient;
