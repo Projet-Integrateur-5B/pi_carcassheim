@@ -24,7 +24,7 @@ public class PublicRoomMenu : Miscellaneous
     {
         listAction = new List<string>();
         s_listAction = new Semaphore(1, 1);
-        RoomInfo.Instance.idPartie = (ulong)Communication.Instance.idRoom;
+        RoomInfo.Instance.idPartie = Communication.Instance.idRoom;
 
         OnMenuChange += OnStart;
 
@@ -111,7 +111,7 @@ public class PublicRoomMenu : Miscellaneous
         {
             if (packet.Error == Tools.Errors.None)
             {
-                RoomInfo.Instance.id_tile_init = int.Parse(packet.Data[0]);
+                RoomInfo.Instance.idTileInit = int.Parse(packet.Data[0]);
                 s_listAction.WaitOne();
                 listAction.Add("loadScene");
                 s_listAction.Release();

@@ -19,7 +19,6 @@ namespace Assets.System
         public int isInRoom = 0;
 
         public bool isListening = false;
-
         public static Communication Instance
         {
             get

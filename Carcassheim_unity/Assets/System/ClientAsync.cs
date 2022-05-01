@@ -33,17 +33,13 @@ public class Parameters
 
 public class ClientAsync
 {
-
-    // The port number for the remote device.
-    //public static Socket clientSocket { get; private set; }
-
-    // ManualResetEvent instances signal completion.
     public static ManualResetEvent connectDone = new ManualResetEvent(false);
     private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
-
     public delegate void OnPacketReceivedHandler(object sender, Packet packet);
     public static event OnPacketReceivedHandler OnPacketReceived;
+
+    private static bool mustLoop = false;
 
     public static void Connection(Parameters parameters)
     {
@@ -146,7 +142,11 @@ public class ClientAsync
 
             // Nothing to read here.
             if (bytesRead <= 0)
+            {
+                mustLoop = false;
                 return;
+            }
+                
 
             // Get the last received bytes.
             var packetAsBytes = new byte[bytesRead];
@@ -190,12 +190,14 @@ public class ClientAsync
     {
         try
         {
+            mustLoop = true;
+
             // Create the state object.
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
 
             Communication.Instance.isListening = true;
-            while (true)
+            while (mustLoop)
             {
                 Debug.Log("------------------------- Lancement Ecoute Infini -------------------------");
                 receiveDone.Reset();
@@ -221,7 +223,6 @@ public class ClientAsync
 
     public static void Send(Socket clientSocket, Packet original)
     {
-        //  Debug.Log("/////////////////////////////////////// original.IdMessage : " + original.IdMessage + " ////////////////////////////////////////");
         byte[]? bytes = null;
         var error_value = Tools.Errors.None;
 
@@ -229,8 +230,8 @@ public class ClientAsync
         bytes = original.PacketToByteArray(ref error_value);
         if (error_value != Tools.Errors.None)
         {
-            // TODO : PacketToByteArray => handle error
-            // return Tools.Errors.Data;
+            Debug.LogError("[ERREUR] : Send PacketToByteArray not None : " + error_value);
+            return;
         }
 
         // Begin sending the data to the remote device.
@@ -238,7 +239,6 @@ public class ClientAsync
 
         var debug = "Sent total {" + size + "} bytes to server." +
                         "\n\t bytes =>\t" + original;
-
         Debug.Log(debug);
 
         clientSocket.BeginSend(bytes, 0, size, 0,
