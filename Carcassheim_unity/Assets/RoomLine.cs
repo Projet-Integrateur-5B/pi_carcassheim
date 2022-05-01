@@ -120,9 +120,14 @@ public class RoomLine : MonoBehaviour, IPointerClickHandler
             Vector2 dim = parent_area.sizeDelta;
             dim.y -= 100;
             parent_area.sizeDelta = dim;
-            room_created_index -= 1;
             Destroy(gameObject);
         }
+    }
+
+    void OnDestroy()
+    {
+        if (this != model)
+            room_created_index -= 1;
     }
 
     public virtual void OnPointerClick(PointerEventData eventData)

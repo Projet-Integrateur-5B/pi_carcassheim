@@ -105,7 +105,6 @@ namespace Assets.system
         {
             //TODO PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
             param = play_of_this_turn;
-
         }
 
         //=======================================================
