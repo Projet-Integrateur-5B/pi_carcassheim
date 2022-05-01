@@ -396,17 +396,7 @@ namespace Assets.system
 
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
-                bool one_valid = OnTuileReceived(packet);
-                if (first_turn_is_launch && !turn_received)
-                {
-                    turn_received = true;
-                    checkTurnStart();
-                }
-                else if (one_valid && !turn_received)
-                {
-                    turn_received = true;
-                    checkGameBegin();
-                }
+                OnTuileReceived(packet);
             }
             else if (packet.IdMessage == Tools.IdMessage.PlayerList)
             {
@@ -415,8 +405,6 @@ namespace Assets.system
             else if (packet.IdMessage == Tools.IdMessage.PlayerCurrent)
             {
                 OnPlayerCurrentReceive(packet);
-                if (!first_turn_is_launch)
-                    checkTurnStart();
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
@@ -430,6 +418,22 @@ namespace Assets.system
             else if (packet.IdMessage == Tools.IdMessage.EndTurn)
             {
                 OnEndTurnReceive(packet);
+            }
+            else if(packet.IdMessage == Tools.IdMessage.TuileVerification)
+            {
+                if(packet.Error == Tools.Errors.None)
+                {
+                    if (first_turn_is_launch && !turn_received)
+                    {
+                        turn_received = true;
+                        checkTurnStart();
+                    }
+                    else if (!turn_received)
+                    {
+                        turn_received = true;
+                        checkGameBegin();
+                    }
+                }   
             }
         }
 
