@@ -149,6 +149,8 @@ namespace Assets.System
 
         private void SendModification()
         {
+            if (Communication.Instance.IdClient != idModerateur)
+                return;
             Packet packet = new Packet();
             packet.IdPlayer = Communication.Instance.IdClient;
             packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
