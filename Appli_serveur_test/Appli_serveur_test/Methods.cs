@@ -697,6 +697,7 @@ public partial class Server
         // Attemp to start the game.
         Tools.Errors errors = gestionnaire.CallEndTurn(packetReceived.IdPlayer, packetReceived.IdRoom);
 
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
         packet.Error = errors;
     }
 

@@ -543,6 +543,7 @@ namespace system
                         Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                         // Mise à jour du status de la game
                         Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+
                         if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                         {
                             Console.WriteLine("Com_EndTurn : game stopped !");
@@ -562,8 +563,18 @@ namespace system
 
                             Console.WriteLine("Com_EndTurn : before broadcast !");
                             
+                            var idTuile = thread_serv_ite.Get_idTuileChoisie();
+                            var posTuile = thread_serv_ite.Get_posTuileTourActu();
+                            var posPion = thread_serv_ite.Get_posPionTourActu();
+                            var data = new string[6];
+                            data[0] = idTuile.ToString();
+                            data[1] = posTuile.X.ToString();
+                            data[2] = posTuile.Y.ToString();
+                            data[3] = posTuile.ROT.ToString();
+                            data[4] = posPion[0];
+                            
                             // Envoi de l'information du endturn
-                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn);
+                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
                         }
 
                         return Tools.Errors.None;
