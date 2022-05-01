@@ -404,6 +404,9 @@ namespace system
             _AC_barrierUp = false;
             _AC_drawedTilesValid = false;
 
+            // Init des locks
+            _lock_settings = new object();
+
             // Initialisation des semaphores d'attributs moteurs
             _s_offsetActualPlayer = new Semaphore(1, 1);
             _tuilesGame = new List<ulong>();
