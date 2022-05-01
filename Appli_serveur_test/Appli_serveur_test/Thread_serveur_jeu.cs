@@ -677,7 +677,7 @@ namespace system
             
             Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
             _timer_game.Stop();
-            EndGame();
+            //EndGame();
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
@@ -688,7 +688,7 @@ namespace system
             var idPlayer = Get_ActualPlayerId();
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
             _timer_player.Stop();
-            EndTurn(idPlayer);
+            //EndTurn(idPlayer);
         }
 
         /// <summary>
