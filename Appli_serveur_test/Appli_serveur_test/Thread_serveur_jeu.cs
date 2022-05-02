@@ -640,8 +640,11 @@ namespace system
             // Génération des tuiles de la game
             _s_tuilesGame.WaitOne();
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
-            if(_extensionsGame is 1 or 3)
+            if (_extensionsGame is 1 or 3)
+            {
+                Console.WriteLine("extension RIVIERE is ON");
                 _rivieresGame = Random_sort_rivieres();
+            }
             _s_tuilesGame.Release();
 
             // Génération des attributs d'anti cheat

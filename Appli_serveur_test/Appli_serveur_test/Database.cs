@@ -324,7 +324,7 @@ public class Database
 
         int taille = res.Result.Length;
         int i;
-        
+        Console.WriteLine(taille);
         for(i = 0; i < taille; i+=2)
         {
             try
