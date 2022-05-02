@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 
-/// <summary>
-///    Options Menu.
-/// </summary>
 public class OptionsMenu : Miscellaneous
 {
 	private Button _btnSon, _btnMusique;
@@ -81,24 +78,24 @@ public class OptionsMenu : Miscellaneous
 
 		//tableaux contenant tous les textes du menu
 		all_textes = Resources.FindObjectsOfTypeAll<Text>();
-		//on enleve de ce tableau les Text avec le tag no_trad (mots qu'on a pas besoin de traduire) et modif (les textes modifi�es par le script) et les textes vides
+		//on enleve de ce tableau les Text avec le tag no_trad (mots qu'on a pas besoin de traduire) et modif (les textes modifies par le script) et les textes vides
 		all_textes = Array.FindAll(all_textes, i => i.tag != "no_trad" && i.tag != "modif" && !string.IsNullOrEmpty(i.text)).ToArray();
 
-		//on convertit le tableau en liste (pour faciliter les op�rations)
+		//on convertit le tableau en liste (pour faciliter les oprations)
 		l_all_textes = all_textes.ToList<Text>();
 
 		/*foreach (Text a in l_all_textes)
 			Debug.Log(a.text);*/
 
-		//liste contenant tous les textes en fran�ais
+		//liste contenant tous les textes en franais
 		fr_textes = new List<string>();
 		foreach (Text a in l_all_textes)
 			fr_textes.Add(a.text);
 
-		//liste contenant tous les textes en anglais (tres sensible � l'ordre des gameobject)
+		//liste contenant tous les textes en anglais (tres sensible  l'ordre des gameobject)
 		en_textes = new List<string> {"STATUS", "Room ID -> X", "OPTIONS", "Extensions", "Year ...", "Join by ID", "CREDITS", "CONNECT", "River", "Enter your password ...", "Time per round", "Enter your Username ...", "PUBLIC ROOM", "CREATE", "JOIN ROOM", "ID to enter", "QUIT", "Abbey", "The room is created !", "Enter your password ...", "Email / Username", "Accept ", "Enter your Email/Pseudo ...", "Confirm your password ...", "CREATE AN ACCOUNT", "month ...", "STATUS", "Day ...", "Endgame", "Enter an ID ...", "PLAY SOLO", "ID", "Max players", "Password", "Enter your Email ...", "CREATE AN ACCOUNT", "Public", "HELP", "STATS", "Option A", "PLAY MULTI", "Show password", "JOIN ROOM MENU", "Show password", "Private", "Create your account", "Confirm password", "Room settings", "JOIN BY ID", "Ending condition", "Options", "Public", "GCU", "Email", "Create your room", "Forgot your username/password?", "Username", "Room ", "Number of players ", "Password", "Private", "LOG IN", "Date of birth", "Hosts", "READY", "Players", "Tile", "ID", "Players", "Hosts", "Endgame", "Max players" };
-		//liste contenant tous les textes en allemand (tres sensible � l'ordre des gameobject)
-		de_textes = new List<string> {"STATUS", "Raum-ID -> X", "OPTIONEN", "Erweiterungen", "Jahr ...", "Beitritt nach ID", "CREDITS", "VERBINDEN", "Fluss", "Geben Sie Ihr Passwort ein ...", "Zeit pro Runde", "Geben Sie Ihren Benutzernamen ein ...", "�FFENTLICHER RAUM", "ANLEGEN", "RAUM ANMELDEN", "ID zum Betreten", "BEENDEN", "Abtei", "Der Raum wird erstellt!", "Geben Sie Ihr Passwort ein ...", "E-Mail / Benutzername", "Akzeptieren ", "Geben Sie Ihre Email/Pseudo ein ...", "Best�tigen Sie Ihr Passwort ...", "EIN KONTO ERSTELLEN", "Monat ...", "STATUS", "Tag ...", "Endgame", "Eine ID eingeben ...", "SOLO SPIELEN", "KENNUNG", "Max Spieler", "Kennwort", "Geben Sie Ihre E-Mail ein ...", "EIN KONTO ERSTELLEN", "�ffentlich", "HILFE", "STATISTIKEN", "Option A", "MULTI SPIELEN", "Passwort anzeigen", "ZIMMERMEN� BETRETEN", "Passwort anzeigen", "Privat", "Erstellen Sie Ihr Konto", "Best�tigen Sie Ihr Passwort", "Raum-Einstellungen", "JOIN BY ID", "Bedingung zum Beenden", "Optionen", "�ffentlich", "GCU", "E-Mail", "Erstellen Sie Ihren Raum", "Haben Sie Ihren Benutzernamen/Passwort vergessen?", "Benutzername", "Raum ", "Anzahl der Spieler ", "Kennwort", "Privat", "ANMELDEN", "Geburtsdatum", "Gastgeber", "READY", "Spieler", "Kachel", "ID", "Spieler", "Gastgeber", "Endspiel", "Maximale Spieler" };
+		//liste contenant tous les textes en allemand (tres sensible  l'ordre des gameobject)
+		de_textes = new List<string> {"STATUS", "Raum-ID -> X", "OPTIONEN", "Erweiterungen", "Jahr ...", "Beitritt nach ID", "CREDITS", "VERBINDEN", "Fluss", "Geben Sie Ihr Passwort ein ...", "Zeit pro Runde", "Geben Sie Ihren Benutzernamen ein ...", "FFENTLICHER RAUM", "ANLEGEN", "RAUM ANMELDEN", "ID zum Betreten", "BEENDEN", "Abtei", "Der Raum wird erstellt!", "Geben Sie Ihr Passwort ein ...", "E-Mail / Benutzername", "Akzeptieren ", "Geben Sie Ihre Email/Pseudo ein ...", "Besttigen Sie Ihr Passwort ...", "EIN KONTO ERSTELLEN", "Monat ...", "STATUS", "Tag ...", "Endgame", "Eine ID eingeben ...", "SOLO SPIELEN", "KENNUNG", "Max Spieler", "Kennwort", "Geben Sie Ihre E-Mail ein ...", "EIN KONTO ERSTELLEN", "ffentlich", "HILFE", "STATISTIKEN", "Option A", "MULTI SPIELEN", "Passwort anzeigen", "ZIMMERMEN BETRETEN", "Passwort anzeigen", "Privat", "Erstellen Sie Ihr Konto", "Besttigen Sie Ihr Passwort", "Raum-Einstellungen", "JOIN BY ID", "Bedingung zum Beenden", "Optionen", "ffentlich", "GCU", "E-Mail", "Erstellen Sie Ihren Raum", "Haben Sie Ihren Benutzernamen/Passwort vergessen?", "Benutzername", "Raum ", "Anzahl der Spieler ", "Kennwort", "Privat", "ANMELDEN", "Geburtsdatum", "Gastgeber", "READY", "Spieler", "Kachel", "ID", "Spieler", "Gastgeber", "Endspiel", "Maximale Spieler" };
 
 		//les 3 textes qui se modifient
 
@@ -120,7 +117,7 @@ public class OptionsMenu : Miscellaneous
 			//francais
 			langue = 0;
 
-			//on met a jour les textes en fran�ais
+			//on met a jour les textes en franais
 			for (int i = 0; i < l_all_textes.Count; i++)
 				l_all_textes[i].text = fr_textes[i];
 
@@ -209,11 +206,6 @@ public class OptionsMenu : Miscellaneous
 		txt.text = Mathf.RoundToInt(sb.value * 100) + "%";
 	}
 
-	/// <summary>
-	/// Display volume <see cref = "OptionsMenu"/> class.
-	/// </summary>
-	/// <param name = "b">Boolean for sound or music.</param>
-	/// <param name = "value">Value to display.</param>
 	public void DisplayVolume(int b, float value)
 	{
 		if (value > 0)
@@ -252,9 +244,6 @@ public class OptionsMenu : Miscellaneous
 			Volume(_musicCtrl, _pourcentMusique, _musicSlider);
 	}
 
-	/// <summary>
-	/// Default music/sound <see cref = "OptionsMenu"/> class.
-	/// </summary>
 	public void DefaultMusicSound()
 	{
 		_soundSlider.maxValue = _musicSlider.maxValue = 1;
@@ -263,28 +252,18 @@ public class OptionsMenu : Miscellaneous
 		Volume(_musicCtrl, _pourcentMusique, _musicSlider);
 	}
 
-	/// <summary>
-	/// Sound slider callback <see cref = "OptionsMenu"/> class.
-	/// </summary>
-	/// <param name = "value">Value to display.</param>
-	 //Will be called when Scrollbar changes
+	//Will be called when Scrollbar changes
 	public void SoundSliderCallBack(float value)
 	{
 		DisplayVolume(0, value);
 	}
 
-	/// <summary>
-	/// Music slider callback (Will be called when Scrollbar changes) <see cref = "OptionsMenu"/> class.
-	/// </summary>
-	/// <param name = "value">Value to display.</param>
+	//Will be called when Scrollbar changes
 	public void MusicSliderCallBack(float value)
 	{
 		DisplayVolume(1, value);
 	}
 
-	/// <summary>
-	/// Switch sound <see cref = "OptionsMenu"/> class.
-	/// </summary>
 	public void SwitchSound()
 	{
 		if (_soundSlider.value != 0)
@@ -300,9 +279,6 @@ public class OptionsMenu : Miscellaneous
 		}
 	}
 
-	/// <summary>
-	/// Switch music <see cref = "OptionsMenu"/> class.
-	/// </summary>
 	public void SwitchMusic()
 	{
 		if (_musicSlider.value != 0)
@@ -317,35 +293,23 @@ public class OptionsMenu : Miscellaneous
 			DisplayVolume(1, _previousMusicVol);
 		}
 	}
-	// -------------- Music/Sound End -----------------------//
 
-	/// <summary>
-	/// Back to main menu <see cref = "OptionsMenu"/> class.
-	/// </summary>
+	// -------------- Music/Sound End -----------------------//
 	public void HideOptions()
 	{
 		ChangeMenu("OptionsMenu", "HomeMenu");
 	}
 
-	/// <summary>
-	/// Fullscreen <see cref = "OptionsMenu"/> class.
-	/// </summary>
 	public void FullScreen()
 	{
 		Screen.fullScreen = !Screen.fullScreen;
 	}
 
-	/// <summary>
-	/// Help Link <see cref = "OptionsMenu"/> class.
-	/// </summary>
 	public void Help()
 	{
 		Application.OpenURL("https://tinyurl.com/SlapDance");
 	}
 
-	/// <summary>
-	/// Change to credits menu <see cref = "OptionsMenu"/> class.
-	/// </summary>
 	public void ShowCredits()
 	{
 		ChangeMenu("OptionsMenu", "CreditsMenu");
