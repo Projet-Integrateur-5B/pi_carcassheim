@@ -996,8 +996,19 @@ namespace system
         public static List<string> tirageTroisTuiles(List<ulong> tuiles)
         {
             List<string> list = new List<string>();
-            for (int i = tuiles.Count - 3; i < tuiles.Count; i++)
-                list.Add(tuiles[i].ToString());
+            if(tuiles.Count > 2)
+            {
+                for (int i = tuiles.Count - 3; i < tuiles.Count; i++)
+                    list.Add(tuiles[i].ToString());
+            }
+            else
+            {
+                foreach(ulong tileId in tuiles)
+                {
+                    list.Add(tileId.ToString());
+                }
+            }
+            
             return list;
         }
         public static List<ulong> suppTuileChoisie(List<ulong> tuiles, ulong idTuile)
