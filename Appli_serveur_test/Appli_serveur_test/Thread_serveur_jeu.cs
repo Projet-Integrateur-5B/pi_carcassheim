@@ -1060,6 +1060,11 @@ namespace system
 
             var db = new Database();
             db.RemplirRivieres(rivieresRaw);
+            
+            foreach (var i in rivieresRaw)
+            { 
+                Console.WriteLine("RIVIERES RAW : " + i);
+            }
 
             rivieres.Add(rivieresRaw.First());
             rivieresRaw.RemoveAt(0);
