@@ -1074,7 +1074,7 @@ namespace system
             while(rivieresRaw.Count > 0)
             {
                 var index = random.Next(0, rivieresRaw.Count);
-                Console.WriteLine("index = " + index);
+                Console.WriteLine("index = " + index + " & Count = " + rivieresRaw.Count);
                 rivieres.Add(rivieresRaw[index]);
                 rivieresRaw.RemoveAt(index);
             }
