@@ -3728,7 +3728,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.192, y: -50}
+  m_AnchoredPosition: {x: 1516.8922, y: -50}
   m_SizeDelta: {x: 518.5676, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &878316816
@@ -4287,6 +4287,7 @@ GameObject:
   - component: {fileID: 1057527971}
   - component: {fileID: 1057527970}
   - component: {fileID: 1057527969}
+  - component: {fileID: 1057527972}
   m_Layer: 5
   m_Name: temps_min
   m_TagString: Untagged
@@ -4450,6 +4451,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1057527967}
   m_CullTransparentMesh: 1
+--- !u!114 &1057527972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057527967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26448639addff1548ac9c9230bfeda6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnValueFinal:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 450522490}
+        m_TargetAssemblyTypeName: backLocal, Assembly-CSharp
+        m_MethodName: set_win_time_min
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1083893196 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8655066103163907471, guid: 57d3e693aabffc0469483a7ea0e6d1e5, type: 3}
@@ -7419,6 +7447,7 @@ GameObject:
   - component: {fileID: 1653703388}
   - component: {fileID: 1653703387}
   - component: {fileID: 1653703386}
+  - component: {fileID: 1653703389}
   m_Layer: 5
   m_Name: point
   m_TagString: Untagged
@@ -7582,6 +7611,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1653703384}
   m_CullTransparentMesh: 1
+--- !u!114 &1653703389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1653703384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26448639addff1548ac9c9230bfeda6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnValueFinal:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 450522490}
+        m_TargetAssemblyTypeName: backLocal, Assembly-CSharp
+        m_MethodName: set_win_point_nb
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1684596779
 GameObject:
   m_ObjectHideFlags: 0
@@ -7617,7 +7673,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 918.192, y: -50}
+  m_AnchoredPosition: {x: 1385.8583, y: -50}
   m_SizeDelta: {x: 461.1437, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1684596781
@@ -10223,6 +10279,7 @@ GameObject:
   - component: {fileID: 2144558713}
   - component: {fileID: 2144558712}
   - component: {fileID: 2144558711}
+  - component: {fileID: 2144558714}
   m_Layer: 5
   m_Name: temps_sec
   m_TagString: Untagged
@@ -10386,6 +10443,33 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2144558709}
   m_CullTransparentMesh: 1
+--- !u!114 &2144558714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2144558709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26448639addff1548ac9c9230bfeda6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnValueFinal:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 450522490}
+        m_TargetAssemblyTypeName: backLocal, Assembly-CSharp
+        m_MethodName: set_win_time_sec
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1001 &300291018697069928
 PrefabInstance:
   m_ObjectHideFlags: 0

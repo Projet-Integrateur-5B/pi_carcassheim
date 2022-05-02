@@ -187,7 +187,7 @@ public abstract class Miscellaneous : MonoBehaviour
 
     public void ChangeMenu(string close, string goTo)
     {
-        Debug.Log("CHANGED");
+        // Debug.Log("CHANGED");
         s_menuHasChanged = true;
 
 
