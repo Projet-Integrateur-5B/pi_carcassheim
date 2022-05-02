@@ -295,7 +295,8 @@ namespace system
                                 break;
                         }
 
-                        _nb_tuiles = int.Parse(settings[3]);
+                        // DEBUG
+                        //_nb_tuiles = int.Parse(settings[3]);
 
                         switch (int.Parse(settings[4]))
                         {
@@ -646,6 +647,9 @@ namespace system
             _s_offsetActualPlayer.WaitOne();
             _offsetActualPlayer = 0;
             _s_offsetActualPlayer.Release();
+
+            // DEBUG pour parties + courtes et tests
+            _nb_tuiles = 10;
 
             // Génération des tuiles de la game
             _s_tuilesGame.WaitOne();
