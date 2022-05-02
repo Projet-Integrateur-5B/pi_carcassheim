@@ -41,11 +41,11 @@ public class backLocal : CarcasheimBack
 
     private ulong tile_init_normal = 20;
 
-    private ulong tile_init_river = 30;
+    private ulong tile_init_river = 24;
 
-    private ulong tile_final_river = 10;
+    private ulong tile_final_river = 35;
 
-    private bool river_on = false;
+    private bool river_on = true;
 
     private List<ulong> tiles_for_river;
     List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
