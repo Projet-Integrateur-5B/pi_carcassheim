@@ -193,7 +193,8 @@ namespace system
         public void Set_tuilesEnvoyees(string[] tuilesEnvoyees)
         {
             _s_tuilesEnvoyees.WaitOne();
-            Array.Copy(tuilesEnvoyees, _tuilesEnvoyees, 3);
+            _tuilesEnvoyees = new string[tuilesEnvoyees.Length];
+            Array.Copy(tuilesEnvoyees, _tuilesEnvoyees, tuilesEnvoyees.Length);
             _s_tuilesEnvoyees.Release();
         }
 
@@ -736,7 +737,8 @@ namespace system
 
             // Met à jour le stockage des 3 tuiles envoyées
             _s_tuilesEnvoyees.WaitOne();
-            Array.Copy(tuilesTirees.ToArray(), _tuilesEnvoyees, 3);
+            _tuilesEnvoyees = new string[tuilesTirees.Count];
+            Array.Copy(tuilesTirees.ToArray(), _tuilesEnvoyees, tuilesTirees.Count);
             _s_tuilesEnvoyees.Release();
             
             return tuilesTirees.ToArray();
