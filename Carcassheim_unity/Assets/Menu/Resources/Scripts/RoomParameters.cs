@@ -4,16 +4,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+///     Room Parameters menu 
+/// </summary>
 public class RoomParameters : Miscellaneous
 {
-	private Transform S_container, T_container; 
-	private Slider S_time_round; 
+	/// <summary>
+	///     variables used to get some GameObjects 
+	/// </summary>
+	private Transform S_container, T_container;
+	/// <summary>
+	///     variables used to get the time slider
+	/// </summary>
+	private Slider S_time_round;
+	/// <summary>
+	///     variables used to get all parameters toggles 
+	/// </summary>
 	private Toggle T_temps, T_points, T_tuiles, T_public, T_riviere, T_abbaye, T_cathedrale;
-	private static float duree_round; //duree d'un round (valeur du slider)
-	//variables définissant les valeurs des toggle
+	/// <summary>
+	///     variables that represents the duration of a round (value of the slider)
+	/// </summary>
+	private static float duree_round;
+	/// <summary>
+	///     variables that represents the values of the toggles
+	/// </summary>
 	private static bool fin_temps = true, fin_points = false, fin_tuiles = false, is_public = true, ext_riviere = true, ext_abbaye = true, ext_cathedrale = true;
 	//ATTENTION : cocher une extension la desactive du jeu
 
+	/// <summary>
+	///     some initialization 
+	/// </summary>
 	void Start()
 	{
 		S_container = GameObject.Find("SubMenus").transform.Find("RoomParametersMenu").transform.Find("Sliders").transform;
@@ -41,7 +61,9 @@ public class RoomParameters : Miscellaneous
 		//Debug.Log("PUBLIC ? : " + is_public + " FIN TEMPS ? : " + fin_temps + " FIN POINTS ? : " + fin_points + " FIN TUILES ? : " + fin_tuiles + " RIVIERE ? : " + ext_riviere + " ABBAYE ? : " + ext_abbaye + " CATHEDRALE ? : " + ext_cathedrale + " DUREE ? : " + duree_round);
 	}
 
-	//fonction pour predefinir les valeurs du slider
+	/// <summary>
+	///    predefine the values of the slider 
+	/// </summary>
 	public void TempsParRound(float value)
 	{
 		if(value >= 20 && value <= 30)
@@ -54,12 +76,19 @@ public class RoomParameters : Miscellaneous
 		duree_round = S_time_round.value;
 	}
 
+	/// <summary>
+	///     Go to Public room menu 
+	/// </summary>
 	public void HideRoomParameters()
 	{
 		HidePopUpOptions();
 		ChangeMenu("RoomParametersMenu", "PublicRoomMenu");
 	}
 
+	/// <summary>
+	///     <param name="curT">The used toggle .</param>
+	///     put the right value to bool according to the used toggle 
+	/// </summary>
 	public void ToggleValueChangedRPM(Toggle curT)
 	{
 		if (curT.isOn)

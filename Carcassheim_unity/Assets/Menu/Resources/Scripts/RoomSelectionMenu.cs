@@ -7,14 +7,24 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+
+/// <summary>
+///     RoomSelection menu
+/// </summary>
 public class RoomSelectionMenu : Miscellaneous
 {
     private Transform roomSelectMenu, panelRooms;
 
     //il faut qu'on recoive le nombre de room
 
+    /// <summary>
+    ///     number of room 
+    /// </summary>
     private static int nombreRoom = 5;
 
+    /// <summary>
+    ///     list that contains all game rooms
+    /// </summary>
     List<RoomLine> List_of_Rooms = new List<RoomLine>();
 
     public List<string> listAction;
@@ -85,24 +95,38 @@ public class RoomSelectionMenu : Miscellaneous
         }
     }
 
+
+    /// <summary>
+    ///     Go to Home menu 
+    /// </summary>
     public void HideRoomSelection()
     {
         HidePopUpOptions();
         ChangeMenu("RoomSelectionMenu", "HomeMenu");
     }
-
+    
+    
+    /// <summary>
+    ///     Go to Join By Id menu 
+    /// </summary>
     public void ShowJoinById()
     {
         HidePopUpOptions();
         ChangeMenu("RoomSelectionMenu", "JoinByIdMenu");
     }
 
+    /// <summary>
+    ///     Go to Public Room menu 
+    /// </summary>
     public void ShowJoinPublicRoom()
     {
         HidePopUpOptions();
         ChangeMenu("RoomSelectionMenu", "PublicRoomMenu");
     }
 
+    /// <summary>
+    ///     Go to Create Room menu 
+    /// </summary>
     public void ShowCreateRoom()
     {
         HidePopUpOptions();
