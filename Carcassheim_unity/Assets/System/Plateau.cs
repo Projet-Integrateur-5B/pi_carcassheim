@@ -123,7 +123,109 @@ namespace Assets.system
             tuile.Y = y;
             tuile.Rotation = rot;
             _tuiles.Add(tuile);
+
+            if (tuile.Riviere)
+            {
+                int temp;
+                CheckDirectionRiviere(tuile, x, y, rot, out temp);
+                if (temp != 0)
+                    _lastRiverTurn = temp;
+                Debug.Log("Derniere tournant de la riviere : " + _lastRiverTurn);
+            }
         }
+
+        public void CheckDirectionRiviere(Tuile tuile, int x, int y, int rot, out int turn)
+        {
+            turn = 0;
+            int pos1, pos2, dir1 = -1, dir2 = -1;
+            for (int i = 0; i < tuile.Slots.Length; i++)
+            {
+                if (tuile.Slots[i].Terrain == TypeTerrain.Riviere)
+                {
+                    var tab = tuile.LienSlotPosition[i];
+                    if (tab.Length == 1)
+                    {
+                        turn = 0;
+                        return;
+                    }
+                    pos1 = tab[0];
+                    pos2 = tab[1];
+
+                    dir1 = pos1 / 3;
+                    dir2 = pos2 / 3;
+                    break;
+                }
+            }
+            if ((dir1 + dir2) % 2 == 0)
+            {
+                turn = 0;
+                return;
+            }
+
+            int x1 = x + PositionAdjacentes[(dir1 + 4 - rot) % 4, 0];
+            int y1 = y + PositionAdjacentes[(dir1 + 4 - rot) % 4, 1];
+            if (GetTuile(x1, y1) == null)
+                (dir1, dir2) = (dir2, dir1);
+
+            turn = dir1 - dir2;
+            if (turn == -3)
+                turn = -1;
+            else if (turn == 3)
+                turn = 1;
+        }
+
+            //turn = 0;
+            //int rot = tuile.Rotation;
+            //int dirInit = -1, dirNext = -1;
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    int x1 = x + PositionAdjacentes[i, 0];
+            //    int y1 = y + PositionAdjacentes[i, 1];
+
+            //    if (GetTuile(x1, y1) != null)
+            //    {
+            //        dirInit = i + tuile.Rotation;
+            //        Debug.Log("tuile trouve en (" + x1 + " : " + y1 + ") direction :" + i);
+            //        Debug.LogWarning("x = " + x + " y = " + y);
+            //        break;
+            //    }
+            //}
+            //int j = 0;
+            //foreach (var item in tuile.Slots)
+            //{
+            //    if (item.Terrain == TypeTerrain.Riviere)
+            //    {
+            //        if (tuile.LienSlotPosition.Length == 1)
+            //            return;
+
+            //        int direction = tuile.LienSlotPosition[j][0];
+            //        direction = direction / 3;
+            //        direction += rot;
+            //        direction = direction % 4;
+
+            //        if (direction == dirInit)
+            //        {
+            //            direction = tuile.LienSlotPosition[j][1];
+            //            direction = direction / 3;
+            //            direction += rot;
+            //            direction = direction % 4;
+            //        }
+            //        dirNext = direction;
+            //    }
+            //    j++;
+            //}
+
+            //switch ((4 + dirInit - dirNext) % 4)
+            //{
+            //    case GAUCHE:
+            //        turn = GAUCHE;
+            //        break;
+            //    case DROITE:
+            //        turn = DROITE;
+            //        break;
+            //}
+            //Debug.Log("Direction intiale :" + dirInit + "      prochaine direction " + dirNext);
+        //}
 
         public void PoserTuileFantome(ulong idTuile, Position pos)
         {
@@ -269,10 +371,22 @@ namespace Assets.system
                     return false;
                 if (riviere && !RiviereDansFace(faceTuile2))
                     return false;
-                else
+
+                if (riviere)
                 {
-                    //Debug.Log("Correspondance : " + ((t.Rotation + i + 2) % 4));
-                }
+                    int currentTurn;
+                    CheckDirectionRiviere(tuile, x, y, rotation, out currentTurn);
+                    if (currentTurn == _lastRiverTurn && currentTurn != 0)
+                    {
+                        Debug.Log("CURRENT TURN  = " + currentTurn);
+                        return false;
+                    }
+                    else
+                    {
+                        Debug.Log("PAS DE probleme avec le U de la riviere\ncurrentTurn : " + currentTurn + "\n_lastTurn" + _lastRiverTurn);
+                    }
+                }//Debug.Log("Correspondance : " + ((t.Rotation + i + 2) % 4));
+                
                 //Debug.Log("hello " + i + x + y + rotation);
             }
             return auMoinsUne;
