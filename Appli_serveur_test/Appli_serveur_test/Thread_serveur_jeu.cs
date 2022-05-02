@@ -1045,25 +1045,29 @@ namespace system
 
         public static List<ulong> Random_sort_rivieres()
         {
-            List<ulong> list = null;
-            list = new List<ulong>();
-            System.Random MyRand = new System.Random();
-            int x = 0;
-            ulong idTuile = 0, sumDesProbas = 0;
-            
-            Dictionary<ulong, ulong> map = new Dictionary<ulong, ulong>();
+            var random = new Random();
+            var rivieres = new List<ulong>();
+            var rivieresRaw = new List<ulong>();
 
             var db = new Database();
-            db.RemplirRivieres(map);
-            
-            foreach (var item in map)
-            {
-                list.Add(item.Key);
+            db.RemplirRivieres(rivieresRaw);
 
+            rivieres.Add(rivieresRaw.First());
+            rivieresRaw.RemoveAt(0);
+            var tail = rivieresRaw.Last();
+            rivieresRaw.RemoveAt(rivieresRaw.Count-1);
+
+            for(var i=0; i<rivieresRaw.Count;i++)
+            {
+                var index = random.Next(0, rivieresRaw.Count);
+                rivieres.Add(rivieresRaw[index]);
+                rivieresRaw.RemoveAt(index);
             }
+            
+            rivieres.Add(tail);
 
             //Retourner la liste 
-            return list;
+            return rivieres;
         }
 
         /// <summary>

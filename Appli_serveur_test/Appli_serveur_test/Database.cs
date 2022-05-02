@@ -339,21 +339,20 @@ public class Database
         
     }
 
-    public void RemplirRivieres(Dictionary<ulong, ulong> dico)
+    public void RemplirRivieres(List<ulong> rivieres)
     {
-        string commande = "SELECT idm,proba FROM Modele WHERE extnom = 'rivière';";
+        string commande = "SELECT idm FROM Modele WHERE extnom = 'rivière';";
         string[] parametres = Array.Empty<string>();
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
         int taille = res.Result.Length;
         int i;
         
-        for(i = 0; i < taille; i+=3)
+        for(i = 0; i < taille; i++)
         {
-            if(Convert.ToUInt64(res.Result[i+2]) != 1) continue;
             try
             {
-                dico.Add(Convert.ToUInt64(res.Result[i]), Convert.ToUInt64(res.Result[i + 1]));
+                rivieres.Add(Convert.ToUInt64(res.Result[i]));
             }
             catch (Exception ex)
             {
