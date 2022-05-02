@@ -318,7 +318,7 @@ public class Database
     
     public void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
-        string commande = "SELECT idm,proba FROM Modele WHERE extnom = \"\";";
+        string commande = "SELECT idm,proba FROM Modele WHERE extnom = '';";
         string[] parametres = Array.Empty<string>();
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
