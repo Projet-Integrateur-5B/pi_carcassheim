@@ -142,6 +142,7 @@ namespace system
                 if(idTuile == UInt64.Parse(_tuilesEnvoyees[i])) // Si l'idTuile arrive avant l'idFirstValid déjà stocké
                 {
                     _AC_idFirstValidTile = idTuile;
+                    Console.WriteLine("*** DEBUG : MaJ SetValide_AC -> nouv idFirstValid = " + idTuile.ToString());
                     break;
                 }
                 if(_AC_idFirstValidTile == UInt64.Parse(_tuilesEnvoyees[i])) // Si l'idFirstValid arrive avant le nouveau idTuile

@@ -276,7 +276,11 @@ namespace system
                             if (isLegal) // S'il s'avère que le coup est valide, on passe l'attribut à true
                             {
                                 threadJeu.SetValid_AC_drawedTilesValid(idTuile);
-                            }  
+                            }
+                            Console.WriteLine("* VerifAC : idPlayer=" + idPlayer.ToString() + " currentPlayer=" + 
+                                threadJeu.Get_ActualPlayerId().ToString() + " verified tile of id=" + idTuile.ToString() + 
+                                " and has decreted it as " + isLegal.ToString());
+                            Console.WriteLine("* VerifAC_suite : position tried = " + posTuile.ToString());
                         }
 
                         // Signale que le rôle d'arbitre de ce joueur a été joué
@@ -289,7 +293,6 @@ namespace system
                             {
                                 // Tout est bon, définition de la tuile choisie
                                 ChooseIdTile(idRoom, idPlayer, idTuile, posTuile, playerSocket);
-
                             }
                             else
                             {
@@ -307,6 +310,8 @@ namespace system
 
                         
                     }
+
+                    break;
                 }
             }
         }
@@ -631,10 +636,11 @@ namespace system
                         // All is good, same play than the stored one
                         return Tools.Errors.None;
                     }
-                    else
+                    else // ? New ? pawn
                     {
-                        // Verify placement
-                        errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
+                        // Check if pawn is set or not (-1 -1) then verify placement
+                        if(idMeeple != -1 && slotPos != -1)
+                            errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
                     }
                 }
                 else
@@ -644,8 +650,9 @@ namespace system
 
                     if(errors == Tools.Errors.None)
                     {
-                        // Check if the pawn placement is valid
-                        errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
+                        // Check if pawn is set or not (-1 -1) then verify placement
+                        if (idMeeple != -1 && slotPos != -1)
+                            errors = threadJeu.PionPlacement(idPlayer, posTuile, (ulong)idMeeple, slotPos);
                     }
                 }
             }
