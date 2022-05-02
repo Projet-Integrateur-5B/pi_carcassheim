@@ -34,9 +34,7 @@ public class OptionsMenu : Miscellaneous
 
 	//0 FR, 1 EN, 2 DE
 
-	/// <summary>
-	/// Start is called before the first frame update <see cref = "OptionsMenu"/> class.
-	/// </summary>
+	// Start is called before the first frame update
 	void Start()
 	{
 		// INITIALISATION
@@ -112,10 +110,6 @@ public class OptionsMenu : Miscellaneous
 		status = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform.Find("Text").transform.Find("Instructions").gameObject;
 	}
 
-	/// <summary>
-	/// Toggles <see cref = "OptionsMenu"/> class.
-	/// </summary>
-	/// <param name="curT">The current toggle.</param>
 	public void ToggleValueChangedOM(Toggle curT)
 	{
 		if (curT.isOn)
@@ -209,12 +203,6 @@ public class OptionsMenu : Miscellaneous
 	}
 
 	//---------------------------- Music/Sound Begin ----------------------------//
-	/// <summary>
-	/// Volume of the music/sound <see cref = "OptionsMenu"/> class.
-	/// </summary>
-	/// <param name="ads">The ads.</param>
-	/// <param name="txt">The text.</param>
-	/// <param name="sb">The slider bar.</param>
 	public void Volume(AudioSource ads, Text txt, Slider sb)
 	{
 		ads.volume = sb.value;
