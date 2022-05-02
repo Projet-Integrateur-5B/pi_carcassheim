@@ -299,9 +299,12 @@ public class Table : MonoBehaviour
     {
         if (tile.Pos == null)
         {
-            ColliderStat tst = tile_mapping[tile];
-            tile.transform.parent = tile_zone.transform;
-            tile.transform.localPosition = tst.transform.localPosition - tile.pivotPoint.localPosition;
+            if (display_system.State == DisplaySystemState.tilePosing || display_system.State == DisplaySystemState.meeplePosing)
+            {
+                ColliderStat tst = tile_mapping[tile];
+                tile.transform.parent = tile_zone.transform;
+                tile.transform.localPosition = tst.transform.localPosition - tile.pivotPoint.localPosition;
+            }
             tile.model.layer = DisplaySystem.TableLayer;
             if (tile != display_system.act_tile)
                 tile.pivotPoint.rotation = unselected_angle;

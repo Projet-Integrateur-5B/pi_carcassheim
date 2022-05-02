@@ -108,6 +108,7 @@ namespace Assets.system
             //TODO PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
             Debug.Log("GET TILE " + play_of_this_turn.id_tile + " MA POS " + play_of_this_turn.tile_pos);
             param = play_of_this_turn;
+            play_of_this_turn = new TurnPlayParam(-1, null, -1, -1);
         }
 
         //=======================================================
@@ -435,6 +436,10 @@ namespace Assets.system
                         checkGameBegin();
                     }
                 }
+            }
+            else if (packet.IdMessage == Tools.IdMessage.EndGame)
+            {
+                system_display.setNextState(DisplaySystemState.endOfGame);
             }
         }
 
