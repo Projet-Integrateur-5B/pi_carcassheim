@@ -121,7 +121,7 @@ public class backLocal : CarcasheimBack
             }
 
             generatePlayers();
-            system_display.gameBegin();
+            system_display.setNextState(DisplaySystemState.gameStart);
         }
         else
         {
@@ -256,6 +256,7 @@ public class backLocal : CarcasheimBack
             tile_final_river = ulong.MaxValue;
 
         }
+        Debug.Log("tirer");
         river_on = tiles_for_river.Count > 0 && tile_final_river != ulong.MaxValue;
         return (int)result;
     }

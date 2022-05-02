@@ -89,6 +89,9 @@ public class RoomLine : MonoBehaviour, IPointerClickHandler
 
     static int room_created_index = 0;
 
+    bool incremented = false;
+    bool destroyed = false;
+
     [SerializeField] Image background;
     [SerializeField] List<Color> background_color;
 
@@ -97,6 +100,7 @@ public class RoomLine : MonoBehaviour, IPointerClickHandler
     {
         background.color = background_color[room_created_index % 2];
         room_created_index += 1;
+        incremented = true;
     }
 
     // Update is called once per frame
@@ -122,12 +126,26 @@ public class RoomLine : MonoBehaviour, IPointerClickHandler
             parent_area.sizeDelta = dim;
             Destroy(gameObject);
         }
+        destroyed = true;
+    }
+
+    public void killRoomLine()
+    {
+        if (!destroyed)
+        {
+            Debug.Log("KILL ME");
+            destroyed = true;
+            gameObject.SetActive(false);
+        }
     }
 
     void OnDestroy()
     {
-        if (this != model)
+        if (this != model && incremented)
+        {
+            incremented = false;
             room_created_index -= 1;
+        }
     }
 
     public virtual void OnPointerClick(PointerEventData eventData)

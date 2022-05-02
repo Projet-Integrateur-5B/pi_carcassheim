@@ -136,6 +136,7 @@ namespace Assets.System
                 int flags_extension = int.Parse(values[10]);
                 _riverOn = (flags_extension & (int)Tools.Extensions.Riviere) > 0;
                 _abbayeOn = (flags_extension & (int)Tools.Extensions.Abbaye) > 0;
+                Debug.Log("river " + _riverOn + " abba " + _abbayeOn);
 
                 s_RoomInfo.Release();
 
@@ -162,11 +163,9 @@ namespace Assets.System
                                 + (riverOn ? (int)Tools.Extensions.Riviere : 0);
             packet.Data = new string[]
             {
-                idModerateur.ToString(),
-                nbJoueur.ToString(),
                 nbJoueurMax.ToString(),
                 isPrivate.ToString(),
-                mode.ToString(),
+                ((int) mode).ToString(),
                 nbTuile.ToString(),
                 meeples.ToString(),
                 timerPartie.ToString(),
