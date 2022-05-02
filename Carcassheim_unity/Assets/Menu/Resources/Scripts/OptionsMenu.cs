@@ -2,6 +2,9 @@ using Assets.System;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+///    Options Menu.
+/// </summary>
 public class OptionsMenu : Miscellaneous
 {
 	private Button _btnSon, _btnMusique;
@@ -19,7 +22,9 @@ public class OptionsMenu : Miscellaneous
 	private Button _btnSonP, _btnMusiqueP;
 	private Transform panelMenu, PCB; // Options Container Buttons
 	private Sprite _spriteMusicON, _spriteMusicOFF, _spriteSoundON, _spriteSoundOFF, _spriteMusicUnselectedON, _spriteMusicUnselectedOFF, _spriteSoundUnselectedON, _spriteSoundUnselectedOFF;
-	// Start is called before the first frame update
+	/// <summary>
+	/// Start is called before the first frame update <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	void Start()
 	{
 		// INITIALISATION
@@ -29,8 +34,6 @@ public class OptionsMenu : Miscellaneous
 		_btnMusicUnselectedP = _btnMusiqueP.transform.GetChild(0).gameObject;
 		_btnSonP = PCB.Find("SwitchSound").GetComponent<Button>();
 		_btnSonUnselectedP = _btnSonP.transform.GetChild(0).gameObject;
-
-
 		optionsMenu = GameObject.Find("SubMenus").transform.Find("OptionsMenu").transform;
 		OCB = optionsMenu.Find("Buttons").transform;
 		OCS = optionsMenu.Find("Sliders").transform;
@@ -65,6 +68,10 @@ public class OptionsMenu : Miscellaneous
 		lastMusicValue = _musicSlider.value;
 	}
 
+	/// <summary>
+	/// Toggle options <see cref = "OptionsMenu"/> class.
+	/// </summary>
+	/// <param name = "curT">Current toggle.</param>
 	public void ToggleValueChangedOM(Toggle curT)
 	{
 		if (curT.isOn)
@@ -72,12 +79,23 @@ public class OptionsMenu : Miscellaneous
 	}
 
 	//---------------------------- Music/Sound Begin ----------------------------//
+	/// <summary>
+	/// Display volume <see cref = "OptionsMenu"/> class.
+	/// </summary>
+	/// <param name = "ads">Audio source.</param>
+	/// <param name = "txt">Text to display.</param>
+	/// <param name = "sb">Slider bar.</param>
 	public void Volume(AudioSource ads, Text txt, Slider sb)
 	{
 		ads.volume = sb.value;
 		txt.text = Mathf.RoundToInt(sb.value * 100) + "%";
 	}
 
+	/// <summary>
+	/// Display volume <see cref = "OptionsMenu"/> class.
+	/// </summary>
+	/// <param name = "b">Boolean for sound or music.</param>
+	/// <param name = "value">Value to display.</param>
 	public void DisplayVolume(int b, float value)
 	{
 		if (value > 0)
@@ -116,6 +134,9 @@ public class OptionsMenu : Miscellaneous
 			Volume(_musicCtrl, _pourcentMusique, _musicSlider);
 	}
 
+	/// <summary>
+	/// Default music/sound <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void DefaultMusicSound()
 	{
 		_soundSlider.maxValue = _musicSlider.maxValue = 1;
@@ -124,18 +145,28 @@ public class OptionsMenu : Miscellaneous
 		Volume(_musicCtrl, _pourcentMusique, _musicSlider);
 	}
 
-	//Will be called when Scrollbar changes
+	/// <summary>
+	/// Sound slider callback <see cref = "OptionsMenu"/> class.
+	/// </summary>
+	/// <param name = "value">Value to display.</param>
+	 //Will be called when Scrollbar changes
 	public void SoundSliderCallBack(float value)
 	{
 		DisplayVolume(0, value);
 	}
 
-	//Will be called when Scrollbar changes
+	/// <summary>
+	/// Music slider callback (Will be called when Scrollbar changes) <see cref = "OptionsMenu"/> class.
+	/// </summary>
+	/// <param name = "value">Value to display.</param>
 	public void MusicSliderCallBack(float value)
 	{
 		DisplayVolume(1, value);
 	}
 
+	/// <summary>
+	/// Switch sound <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void SwitchSound()
 	{
 		if (_soundSlider.value != 0)
@@ -151,6 +182,9 @@ public class OptionsMenu : Miscellaneous
 		}
 	}
 
+	/// <summary>
+	/// Switch music <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void SwitchMusic()
 	{
 		if (_musicSlider.value != 0)
@@ -165,23 +199,35 @@ public class OptionsMenu : Miscellaneous
 			DisplayVolume(1, _previousMusicVol);
 		}
 	}
-
 	// -------------- Music/Sound End -----------------------//
+
+	/// <summary>
+	/// Back to main menu <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void HideOptions()
 	{
 		ChangeMenu("OptionsMenu", "HomeMenu");
 	}
 
+	/// <summary>
+	/// Fullscreen <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void FullScreen()
 	{
 		Screen.fullScreen = !Screen.fullScreen;
 	}
 
+	/// <summary>
+	/// Help Link <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void Help()
 	{
 		Application.OpenURL("https://tinyurl.com/SlapDance");
 	}
 
+	/// <summary>
+	/// Change to credits menu <see cref = "OptionsMenu"/> class.
+	/// </summary>
 	public void ShowCredits()
 	{
 		ChangeMenu("OptionsMenu", "CreditsMenu");

@@ -5,6 +5,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 
+/// <summary>
+///    Miscellaneous.
+/// </summary>
 public abstract class Miscellaneous : MonoBehaviour
 {
     [SerializeField]

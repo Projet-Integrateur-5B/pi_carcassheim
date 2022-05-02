@@ -1,10 +1,10 @@
 ﻿/// <summary>
-///     Stats menu
+///    Statistiques menu.
 /// </summary>
 public class StatistiquesMenu : Miscellaneous
 {
 	/// <summary>
-	///     Go to HomeMenu
+	/// Hide stats menu <see cref = "StatistiquesMenu"/> class.
 	/// </summary>
 	public void HideStat()
 	{

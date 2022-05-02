@@ -4,6 +4,9 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
+/// <summary>
+///    Input/Output Manager.
+/// </summary>
 public class IOManager : Miscellaneous, IPointerEnterHandler
 {
 	private OptionsMenu _option;
