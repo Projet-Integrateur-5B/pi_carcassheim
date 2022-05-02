@@ -38,6 +38,7 @@ public class AccountMenu : Miscellaneous
 		tmpText = tmpGO.GetComponent<Text>();
 		*/
 		OnMenuChange += OnStart;
+		OnMenuChange += ClearAll;
 	}
 
 	public void OnStart(string pageName)
@@ -181,5 +182,13 @@ public class AccountMenu : Miscellaneous
 				*/
 			}
 		}
+	}
+
+	public void ClearAll(string arg)
+	{
+		pseudoCA = Clear(pseudoCA);
+		emailCA = Clear(emailCA);
+		passwordCA = Clear(passwordCA);
+		confirmPwdCA = Clear(confirmPwdCA);
 	}
 }

@@ -18,7 +18,7 @@ public abstract class Miscellaneous : MonoBehaviour
 	private Color colState;
 	public GameObject Pop_up_Options;
 	public static bool s_isOpenPanel = false;
-    
+
 	/// <summary>
 	///    MonoBehaviour Awake is called when the script instance is being loaded.
 	///    Awake is called only once during the lifetime of the script instance.
@@ -254,4 +254,16 @@ public abstract class Miscellaneous : MonoBehaviour
 		string modif = mot.TrimEnd(); //Not for passwords -> "" = char
 		return (mot.Length > 1) ? modif : mot;
 	}
+    
+    /// <summary>
+    ///     Clear the InputField <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "inputfield">The InputField to clear.</param>
+    /// <returns>The cleared InputField.</returns>
+    public static InputField Clear(InputField inputfield)
+    {
+        inputfield.Select();
+        inputfield.text = "";
+        return inputfield;
+    }
 }

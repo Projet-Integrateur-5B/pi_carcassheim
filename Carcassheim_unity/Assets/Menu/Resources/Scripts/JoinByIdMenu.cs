@@ -26,6 +26,7 @@ public class JoinByIdMenu : Miscellaneous
         s_listAction = new Semaphore(1, 1);
 
         OnMenuChange += OnStart;
+        OnMenuChange += ClearAll;
     }
 
     public void OnStart(string pageName)
@@ -115,5 +116,10 @@ public class JoinByIdMenu : Miscellaneous
             listAction.Clear();
             s_listAction.Release();
         }
+    }
+    
+    public void ClearAll(string arg)
+    {
+        idCM = Clear(idCM);
     }
 }

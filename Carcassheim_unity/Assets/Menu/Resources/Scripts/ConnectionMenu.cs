@@ -12,6 +12,7 @@ public class ConnectionMenu : Miscellaneous
     private InputField loginCM, passwordCM;
     private GameObject tmpGO;
     private Text tmpText;
+    private Toggle hidePwd;
 
     public List<bool> listAction;
     public Semaphore s_listAction;
@@ -23,12 +24,14 @@ public class ConnectionMenu : Miscellaneous
         loginCM = CMCI.GetChild(0).GetComponent<InputField>();
         passwordCM = CMCI.GetChild(1).GetComponent<InputField>();
         passwordCM.inputType = InputField.InputType.Password; // Hide password by default
+        hidePwd = FindObject(gameObject, "Toggle ShowPwdCM").GetComponent<Toggle>();
 
         listAction = new List<bool>();
         s_listAction = new Semaphore(1, 1);
 
 
         OnMenuChange += OnStart;
+        OnMenuChange += ClearAll;
     }
 
     public void OnStart(string pageName)
@@ -158,5 +161,12 @@ public class ConnectionMenu : Miscellaneous
                 tmpText.text = "Ressaisissez votre login et votre mot de passe !";
             }
         }
+    }
+    
+    public void ClearAll(string arg)
+    {
+        loginCM = Clear(loginCM);
+        passwordCM = Clear(passwordCM);
+        hidePwd.isOn = false;
     }
 }

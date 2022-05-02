@@ -14,7 +14,9 @@ public class backLocal : CarcasheimBack
     private List<int> saved_players_score = new List<int>();
 
     private int index_player = 0; // joueur en jeu
-    private int nb_player = 3; // à remplir via field
+    private int nb_player = 2; // à remplir via field
+
+    public int NbPlayer { get => nb_player; set { nb_player = value + 2; } }
 
     [SerializeField] private TMP_Text error_msg;
 
@@ -23,16 +25,17 @@ public class backLocal : CarcasheimBack
     [SerializeField] private GameObject fen_tile;
     [SerializeField] private GameObject fen_time;
 
-    int win_time_sec = 0;
-    int win_time_min = 10;
+    public int win_time_sec { set; get; } = 0;
+    public int win_time_min { set; get; } = 10;
 
     long time_start_of_game = 0;
 
-    int win_tile_nb = 70;
+    public int win_tile_nb { set; get; } = 70;
     int nb_tile_drawn = 0;
-    int win_point_nb;
+    public int win_point_nb { set; get; } = 60;
 
     private int nb_meeple = 10;
+
 
     private int compteur_de_tour = 0;
     private int last_generated_tile_tour = -1;
@@ -45,7 +48,7 @@ public class backLocal : CarcasheimBack
 
     private ulong tile_final_river = 35;
 
-    private bool river_on = true;
+    public bool river_on { set; get; } = false;
 
     private List<ulong> tiles_for_river;
     List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
@@ -56,16 +59,49 @@ public class backLocal : CarcasheimBack
 
     [SerializeField] private DisplaySystem system_display;
 
+    [SerializeField] GameObject panel_param;
+
+    [SerializeField] List<GameObject> win_params;
+
     void Start()
     {
         dicoTuile = LireXML2.Read(XML_PATH);
         _plateau = new Plateau(dicoTuile);
-        gameStart();
+        //gameStart();
     }
 
     public void begin_pressed()
     {
-        Debug.Log("COucou hibou");
+        // Debug.Log("COucou hibou");
+    }
+
+    public void setWinCondition(int win_cond)
+    {
+        switch (my_wincond)
+        {
+            case WinCondition.WinByTime:
+                win_params[1].SetActive(false);
+                break;
+            case WinCondition.WinByPoint:
+                win_params[2].SetActive(false);
+                break;
+            default:
+                win_params[0].SetActive(false);
+                break;
+        }
+        win_params[win_cond].SetActive(true);
+        switch (win_cond)
+        {
+            case 2:
+                my_wincond = WinCondition.WinByPoint;
+                break;
+            case 1:
+                my_wincond = WinCondition.WinByTime;
+                break;
+            default:
+                my_wincond = WinCondition.WinByTile;
+                break;
+        }
     }
 
     bool validate_start()
@@ -101,6 +137,7 @@ public class backLocal : CarcasheimBack
     {
         if (validate_start())
         {
+            panel_param.SetActive(false);
             _plateau.Poser1ereTuile((ulong)askIdTileInitial());
 
             switch (my_wincond)
@@ -116,8 +153,11 @@ public class backLocal : CarcasheimBack
                 foreach (Tuile tile in dicoTuile.Values)
                 {
                     if (tile.isARiver() && tile.Id != tile_init_river && tile.Id != tile_final_river)
+                    {
                         tiles_for_river.Add(tile.Id);
+                    }
                 }
+                Debug.Log(tiles_for_river.Count);
             }
 
             generatePlayers();
@@ -147,28 +187,27 @@ public class backLocal : CarcasheimBack
         bool tuile_valide = false;
         bool meeple_valide = false;
         ulong player_act = (ulong)players[index_player].id_player;
-        Debug.Log(_plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation));
+        // Debug.Log(_plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation));
         if (play.id_tile != -1 && _plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation))
         {
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
-        Debug.Log(play.id_meeple);
-        Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
+        //Debug.Log("MEEPLE" + play.id_meeple);
+        //Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
             _plateau.PoserPion(player_act, play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos);
             players[index_player] = new PlayerInitParam(players[index_player].id_player, players[index_player].nb_meeple - 1, players[index_player].player_name);
             meeple_valide = true;
         }
-        Debug.Log(tuile_valide);
         if (tuile_valide)
         {
-            Debug.Log("PTI VALID");
+            // Debug.Log("PTI VALID");
             _plateau.ValiderTour();
             gains.Clear();
             zones.Clear();
-            Debug.Log("PTITI SCORE");
+            // Debug.Log("PTITI SCORE");
             score_changed = _plateau.VerifZoneFermeeTuile(play.tile_pos.X, play.tile_pos.Y, gains, zones);
             if (score_changed)
             {
@@ -195,18 +234,15 @@ public class backLocal : CarcasheimBack
         act_turn_play = new TurnPlayParam(tuile_valide ? play.id_tile : -1, tuile_valide ? play.tile_pos : null, meeple_valide ? play.id_meeple : -1, meeple_valide ? play.slot_pos : -1);
         if (end)
         {
-            Debug.Log("IT S THE END OF THE WORLD");
             system_display.setNextState(DisplaySystemState.endOfGame);
         }
         else if (score_changed)
         {
-            Debug.Log("SCORE CHANGED");
             system_display.setNextState(DisplaySystemState.scoreChange);
             newTurn();
         }
         else
         {
-            Debug.Log("NEXT TURN");
             newTurn();
         }
 
@@ -221,6 +257,7 @@ public class backLocal : CarcasheimBack
     {
         if (players[index_player].nb_meeple > 0 && !river_on)
             meeples.Add(new MeepleInitParam(0, players[index_player].nb_meeple));
+        river_on = river_on && tile_final_river != ulong.MaxValue;
     }
 
     private void generateTile()
@@ -253,8 +290,9 @@ public class backLocal : CarcasheimBack
     int drawRiver()
     {
         Debug.Log("pioche d'une tuile riviere...\ntiles_for_river.Count = " + tiles_for_river.Count);
+        Debug.Log(tiles_for_river.Count);
         ulong result = 0;
-        if (tiles_for_river.Count != 0)
+        if (tiles_for_river.Count > 0)
         {
             int index = UnityEngine.Random.Range(0, tiles_for_river.Count);
             result = tiles_for_river[index];
@@ -266,9 +304,9 @@ public class backLocal : CarcasheimBack
             tile_final_river = ulong.MaxValue;
 
         }
+        Debug.Log(tiles_for_river.Count);
         possibilities_tile_act_turn.AddRange(_plateau.PositionsPlacementPossible(result));
         Debug.Log("tirer");
-        river_on = tiles_for_river.Count > 0 && tile_final_river != ulong.MaxValue;
         Debug.Log("tuile d'id : " + result + " piochee");
         return (int)result;
     }
