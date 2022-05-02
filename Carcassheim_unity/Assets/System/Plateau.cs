@@ -133,15 +133,16 @@ namespace Assets.system
         public void PoserTuileFantome(ulong idTuile, int x, int y, int rot)
         {
             var t = tuileDeModelId(idTuile);
-            if (!t.Riviere)
-                t.TuileFantome = true;
+            t.TuileFantome = true;
             _tuiles.Remove(FindTuileFantome);
             PoserTuile(t, x, y, rot);
         }
 
         public void ValiderTour()
         {
-            FindTuileFantome.TuileFantome = false;
+            Tuile tuile = FindTuileFantome;
+            if (tuile != null)
+                FindTuileFantome.TuileFantome = false;
         }
 
         private Tuile FindTuileFantome
@@ -264,8 +265,9 @@ namespace Assets.system
                 TypeTerrain[] faceTuile1 = tuile.TerrainSurFace((rotation + i) % 4);
                 TypeTerrain[] faceTuile2 = t.TerrainSurFace((t.Rotation + i + 2) % 4);
 
-                if (!CorrespondanceTerrains(faceTuile1, faceTuile2) &&
-                    (!riviere || RiviereDansFace(faceTuile2)))
+                if (!CorrespondanceTerrains(faceTuile1, faceTuile2))
+                    return false;
+                if (riviere && !RiviereDansFace(faceTuile2))
                     return false;
                 else
                 {
