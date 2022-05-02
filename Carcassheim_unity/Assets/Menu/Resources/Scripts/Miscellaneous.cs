@@ -206,4 +206,11 @@ public abstract class Miscellaneous : MonoBehaviour
         string modif = mot.TrimEnd();
         return (mot.Length > 1) ? modif : mot;
     }
+    
+    public static InputField Clear(InputField inputfield)
+    {
+        inputfield.Select();
+        inputfield.text = "";
+        return inputfield;
+    }
 }

@@ -12,6 +12,7 @@ public class ConnectionMenu : Miscellaneous
     private InputField loginCM, passwordCM;
     private GameObject tmpGO;
     private Text tmpText;
+    private Toggle hidePwd;
 
     public List<bool> listAction;
     public Semaphore s_listAction;
@@ -23,12 +24,14 @@ public class ConnectionMenu : Miscellaneous
         loginCM = CMCI.GetChild(0).GetComponent<InputField>();
         passwordCM = CMCI.GetChild(1).GetComponent<InputField>();
         passwordCM.inputType = InputField.InputType.Password; // Hide password by default
+        hidePwd = FindObject(gameObject, "Toggle ShowPwdCM").GetComponent<Toggle>();
 
         listAction = new List<bool>();
         s_listAction = new Semaphore(1, 1);
 
 
         OnMenuChange += OnStart;
+        OnMenuChange += ClearAll;
     }
 
     public void OnStart(string pageName)
@@ -60,7 +63,6 @@ public class ConnectionMenu : Miscellaneous
     {
         HidePopUpOptions();
         ResetWarningTextCM();
-        ClearAll();
         ChangeMenu("ConnectionMenu", "HomeMenu");
     }
 
@@ -89,7 +91,6 @@ public class ConnectionMenu : Miscellaneous
         tmpText.color = Color.white;
         tmpText.text = "Connectez vous";
         HidePopUpOptions();
-        ClearAll();
         ChangeMenu("ConnectionMenu", "AccountMenu");
     }
 
@@ -162,16 +163,10 @@ public class ConnectionMenu : Miscellaneous
         }
     }
     
-    public void ClearAll()
+    public void ClearAll(string arg)
     {
         loginCM = Clear(loginCM);
         passwordCM = Clear(passwordCM);
-    }
-	
-    public static InputField Clear(InputField inputfield)
-    {
-        inputfield.Select();
-        inputfield.text = "";
-        return inputfield;
+        hidePwd.isOn = false;
     }
 }
