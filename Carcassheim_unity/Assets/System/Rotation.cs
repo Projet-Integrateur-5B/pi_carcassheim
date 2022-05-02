@@ -1,3 +1,6 @@
+/// <summary>
+///     différente direction possible d'une tuile
+/// </summary>
 public static class Rotation
 {
     public const int NORD = 0,

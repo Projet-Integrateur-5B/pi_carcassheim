@@ -2,25 +2,57 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 
-// L'accueil dans lequel les joueurs se rejoignent et paramètrent la partie
+/// <summary>
+///     accueil dans lequel les joueurs se rejoignent et paramètrent la partie
+/// </summary>
 public class  Accueil_partie
 {
 
-    // Attributs
-
+    /// <summary>
+    ///     Id de la partie
+    /// </summary>
     private int _id_partie;
 
-    private List<int> _lst_joueurs; // Contient les ID's de chaque joueur
-    private int _id_moderateur; // Identifiant du joueur modérateur
+    /// <summary>
+    ///     Id de chaque joueur présent 
+    /// </summary>
+    private List<int> _lst_joueurs;
 
+    /// <summary>
+    ///     Identifiant du joueur modérateur
+    /// </summary>
+    private int _id_moderateur;
+
+    /// <summary>
+    ///     Status de la partie
+    /// </summary>
     private string _statut_partie;
+
+    /// <summary>
+    ///     Indique si la partie est privé
+    /// </summary>
     private int _privee; 
+
+    /// <summary>
+    ///     Timer séléctionner
+    /// </summary>
     private int _timer;
+
+    /// <summary>
+    ///     Timer max par joueur séléctionner
+    /// </summary>
     private int _timer_max_joueur;
+
+    /// <summary>
+    ///     Nombre de meeples par joueur
+    /// </summary>
     private int _meeples; // Nombre de meeples par joueur
 
-    // Constructeurs 
 
+    /// <summary>
+    /// constructeur de l'accueil
+    /// </summary>
+    /// <param name="id_joueur_createur">id du créteur</param>
     public Accueil_partie(int id_joueur_createur)
     {
 
