@@ -460,7 +460,7 @@ namespace Assets.system
 
                 if (positions != null)
                 {
-                    if (positions.Length >= 0)
+                    if (positions.Length > 0)
                     {
                         SendPosition(id_tuile, positions[0].X, positions[0].Y, positions[0].ROT, Tools.IdMessage.TuileVerification);
                         tileParam.tile_flags = true;
