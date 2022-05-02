@@ -560,7 +560,7 @@ namespace system
                         if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                         {
                             Console.WriteLine("Com_EndTurn : game stopped !");
-                            
+                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
                             ulong idPlayerWinner = thread_serv_ite.GetWinner();
                             string[] dataToSend = new string[] { idPlayerWinner.ToString() };
                             SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
