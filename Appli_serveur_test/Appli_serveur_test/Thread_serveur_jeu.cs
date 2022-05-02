@@ -1060,11 +1060,6 @@ namespace system
 
             var db = new Database();
             db.RemplirRivieres(rivieresRaw);
-            
-            foreach (var i in rivieresRaw)
-            { 
-                Console.WriteLine("RIVIERES RAW : " + i);
-            }
 
             rivieres.Add(rivieresRaw.First());
             rivieresRaw.RemoveAt(0);
@@ -1074,17 +1069,11 @@ namespace system
             while(rivieresRaw.Count > 0)
             {
                 var index = random.Next(0, rivieresRaw.Count);
-                Console.WriteLine("index = " + index + " & Count = " + rivieresRaw.Count);
                 rivieres.Add(rivieresRaw[index]);
                 rivieresRaw.RemoveAt(index);
             }
             
             rivieres.Add(tail);
-
-            foreach (var i in rivieres)
-            { 
-                Console.WriteLine("RIVIERES : " + i);
-            }
 
             //Retourner la liste 
             return rivieres;
