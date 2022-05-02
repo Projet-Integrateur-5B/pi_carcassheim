@@ -149,6 +149,8 @@ namespace Assets.System
         {
             if (Communication.Instance.IdClient != idModerateur)
                 return;
+
+            Debug.Log("I SENT ROOM CHANGE");
             Packet packet = new Packet();
             packet.IdPlayer = Communication.Instance.IdClient;
             packet.IdMessage = Tools.IdMessage.RoomSettingsSet;

@@ -109,7 +109,7 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomTimerTurnChange()
     {
-        Debug.Log(time_tour_slider.value);
+        Debug.Log("timer tour" + time_tour_slider.value);
         RoomInfo.Instance.timerJoueur = (int)time_tour_slider.value;
     }
 
