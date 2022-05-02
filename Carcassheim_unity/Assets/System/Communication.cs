@@ -146,8 +146,8 @@ namespace Assets.System
         ///     Représente un <see cref="bool" /> qui indique si le <see cref="Socket" /> 
         ///     qu'utilise <see cref="Communication" /> est connecté avec le Serveur.
         /// </summary>
-        /// <value>Par Défaut = false</value>
-        /// <returns><see cref="bool" /></returns>
+        /// <value>Par Défaut = false </value>
+        /// <returns> <see cref="bool"/> </returns>
         public bool IsConnected 
         {
             get
@@ -274,7 +274,7 @@ namespace Assets.System
         public void StopListening(ClientAsync.OnPacketReceivedHandler pointeurFonction)
         {
             ClientAsync.OnPacketReceived -= pointeurFonction;
-            ClientAsync.StopListening(LeSocket);
+            ClientAsync.StopListening();
         }
 
         /// <summary>

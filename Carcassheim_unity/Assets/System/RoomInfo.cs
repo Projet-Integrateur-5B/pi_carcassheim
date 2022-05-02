@@ -15,7 +15,6 @@ namespace Assets.System
         {
             get
             {
-
                 if (_instance == null)
                 {
                     _instance = GameObject.FindObjectOfType<RoomInfo>();
@@ -28,10 +27,8 @@ namespace Assets.System
                 }
 
                 return _instance;
-
             }
         }
-
         /* Les Informations de la Room */
 
         private int _idPartie;

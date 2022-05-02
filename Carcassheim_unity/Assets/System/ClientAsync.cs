@@ -59,23 +59,73 @@ public class StateObject
     public string[] Data { get; set; } = Array.Empty<string>();
 }
 
+/// <summary>
+///     Cette class permet de stocker l'adresse ip et le port.
+/// </summary>
 [Serializable]
 public class Parameters
 {
+    /// <summary>
+    ///     Le port du Serveur.
+    /// </summary>
+    /// <returns> <see cref="int"/> </returns>
     public int ServerPort { get; set; }
+
+    /// <summary>
+    ///     L'adresse du Serveur.
+    /// </summary>
+    /// <returns> <see cref="string"/> </returns>
     public string ServerIP { get; set; } = "";
 }
 
+/// <summary>
+///     Cette class permet de comminiquer de manière asynchrone.
+/// </summary>
+/// <remarks>
+///     Elle doit être utilisé avec <see cref="Communication"/>.
+/// </remarks>
 public class ClientAsync
 {
+    /// <summary>
+    ///     Attribut pour mettre en attente lors d'une connexion.
+    /// </summary>
+    /// <value>Par Défaut = <see cref="ManualResetEvent" />(false)</value>
+    /// <returns> <see cref="ManualResetEvent" /> </returns>
     public static ManualResetEvent connectDone = new ManualResetEvent(false);
+
+    /// <summary>
+    ///     Attribut pour mettre en attente lors de la lecture loop.
+    /// </summary>
+    /// <value>Par Défaut = <see cref="ManualResetEvent" />(false)</value>
+    /// <returns> <see cref="ManualResetEvent" /> </returns>
     private static ManualResetEvent receiveDone = new ManualResetEvent(false);
 
+    /// <summary>
+    ///     Attribut permet d'avoir la forme des pointeurs de fonction 
+    ///     qu'il faut utiliser pour la communication.
+    /// </summary>
     public delegate void OnPacketReceivedHandler(object sender, Packet packet);
+
+    /// <summary>
+    ///     Attribut permet d'avoir les pointeurs de fonction des class qui souhaite communiquer.
+    /// </summary>
+    /// <returns> <see cref="event" /> </returns>
     public static event OnPacketReceivedHandler OnPacketReceived;
 
+    /// <summary>
+    ///     Attribut qui permet de gérer <see cref="ReceiveLoop(Socket)"/> le début et la fin.
+    /// </summary>
+    /// <value>Par Défaut = false</value>
+    /// <returns> <see cref="bool" /> </returns>
     private static bool mustLoop = false;
 
+    /// <summary>
+    ///     Permet d'initialiser une connection TCP asynchrone avec le Serveur.
+    /// </summary>
+    /// <remarks>
+    ///     Le socket créé est placé dans <see cref="Communication.lesSockets"/>.
+    /// </remarks>
+    /// <param name="parameters"> L'objet avec l'adresse ip et le port du Serveur. </param>
     public static void Connection(Parameters parameters)
     {
         connectDone.Reset();
@@ -95,6 +145,10 @@ public class ClientAsync
             new AsyncCallback(ConnectCallback), clientSocket);
     }
 
+    /// <summary>
+    ///     Méthode utilisé par <see cref="Connection"/>.
+    /// </summary>
+    /// <param name="ar"> L'objet asynchrone. </param>
     private static void ConnectCallback(IAsyncResult ar)
     {
         try
@@ -116,12 +170,20 @@ public class ClientAsync
         }
     }
 
+    /// <summary>
+    ///     Permet lancer une déconnexion asynchrone avec le Serveur.
+    /// </summary>
+    /// <param name="clientSocket"> Le <see cref="Socket" /> a utiliser. </param>
     public static void Disconnection(Socket clientSocket)
     {
         clientSocket.BeginDisconnect(true,
             new AsyncCallback(DisconnectCallback), clientSocket);
     }
 
+    /// <summary>
+    ///     Méthode utilisé par <see cref="Disconnection"/>.
+    /// </summary>
+    /// <param name="ar"> L'objet asynchrone. </param>
     public static void DisconnectCallback(IAsyncResult ar)
     {
         try
@@ -139,12 +201,14 @@ public class ClientAsync
         }
     }
 
+    /// <summary>
+    ///     Permet d'initialiser une écoute asynchrone.
+    /// </summary>
+    /// <param name="clientSocket"> Le <see cref="Socket" /> a utiliser. </param>
     public static void Receive(Socket clientSocket)
     {
         try
         {
-            Debug.Log("------------------------- Lancement Ecoute -------------------------");
-
             // Create the state object.
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
@@ -162,6 +226,10 @@ public class ClientAsync
         }
     }
 
+    /// <summary>
+    ///     Méthode utilisé par <see cref="Receive"/>.
+    /// </summary>
+    /// <param name="ar"> L'objet asynchrone. </param>
     private static void ReceiveCallback(IAsyncResult ar)
     {
         try
@@ -173,15 +241,11 @@ public class ClientAsync
 
             // Read data from the remote device.
             int bytesRead = client.EndReceive(ar);
-
-
-            // Nothing to read here.
             if (bytesRead <= 0)
             {
                 mustLoop = false;
                 return;
             }
-                
 
             // Get the last received bytes.
             var packetAsBytes = new byte[bytesRead];
@@ -190,10 +254,9 @@ public class ClientAsync
 
             // Deserialize the byte array
             state.Packets = packetAsBytes.ByteArrayToPacket(ref error_value);
-            if (error_value != Tools.Errors.None) // Checking for errors.
+            if (error_value != Tools.Errors.None)
             {
-                // Setting the error value.
-                // TODO : ByteArrayToPacket => handle error
+                Debug.LogError("[ERREUR] : Received PacketToByteArray not None : " + error_value);
                 return;
             }
 
@@ -221,20 +284,23 @@ public class ClientAsync
         }
     }
 
+    /// <summary>
+    ///     Permet d'initialiser une écoute en boucle asynchrone.
+    /// </summary>
+    /// <param name="clientSocket"> Le <see cref="Socket" /> a utiliser. </param>
     public static void ReceiveLoop(Socket clientSocket)
     {
         try
         {
-            mustLoop = true;
-
             // Create the state object.
             StateObject state = new StateObject();
             state.workSocket = clientSocket;
 
+            mustLoop = true;
             Communication.Instance.IsListening = true;
+
             while (mustLoop)
             {
-                Debug.Log("------------------------- Lancement Ecoute Infini -------------------------");
                 receiveDone.Reset();
                 // Begin receiving the data from the remote device.
                 clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
@@ -242,6 +308,7 @@ public class ClientAsync
                 receiveDone.WaitOne();
             }
 
+            Communication.Instance.IsListening = false;
         }
         catch (Exception e)
         {
@@ -250,12 +317,21 @@ public class ClientAsync
         }
     }
 
+    /// <summary>
+    ///     Méthode utilisé par <see cref="ReceiveLoop"/>.
+    /// </summary>
+    /// <param name="ar"> L'objet asynchrone. </param>
     private static void ReceiveLoopCallback(IAsyncResult ar)
     {
         receiveDone.Set();
         ReceiveCallback(ar);
     }
 
+    /// <summary>
+    ///     Permet d'envoyer un <see cref="Packet" /> en asynchrone.
+    /// </summary>
+    /// <param name="clientSocket"> Le <see cref="Socket" /> a utiliser. </param>
+    /// <param name="original"> Le <see cref="Packet" /> a envoyer. </param>
     public static void Send(Socket clientSocket, Packet original)
     {
         byte[]? bytes = null;
@@ -280,6 +356,10 @@ public class ClientAsync
             SendCallback, clientSocket);
     }
 
+    /// <summary>
+    ///     Méthode utilisé par <see cref="Send"/>.
+    /// </summary>
+    /// <param name="ar"> L'objet asynchrone. </param>
     private static void SendCallback(IAsyncResult ar)
     {
         try
@@ -296,8 +376,14 @@ public class ClientAsync
         }
     }
 
-    public static void StopListening(Socket client)
+    /// <summary>
+    ///     Permet d'arrêter l'écoute en boucle.
+    /// </summary>
+    /// <remarks>
+    ///     Cela ne stoppe pas l'écoute en cours.
+    /// </remarks>
+    public static void StopListening()
     {
-        //Todo
+        mustLoop = false;
     }
 }
