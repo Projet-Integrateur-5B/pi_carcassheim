@@ -318,7 +318,7 @@ public class Database
     
     public void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
-        string commande = "SELECT idm,proba FROM Modele;";
+        string commande = "SELECT idm,proba FROM Modele WHERE extnom = \"\";";
         string[] parametres = Array.Empty<string>();
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
@@ -337,6 +337,29 @@ public class Database
             }
         }
         
+    }
+
+    public void RemplirRivieres(Dictionary<ulong, ulong> dico)
+    {
+        string commande = "SELECT idm,proba FROM Modele WHERE extnom = rivière;";
+        string[] parametres = Array.Empty<string>();
+        Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
+
+        int taille = res.Result.Length;
+        int i;
+        
+        for(i = 0; i < taille; i+=3)
+        {
+            if(Convert.ToUInt64(res.Result[i+2]) != 1) continue;
+            try
+            {
+                dico.Add(Convert.ToUInt64(res.Result[i]), Convert.ToUInt64(res.Result[i + 1]));
+            }
+            catch (Exception ex)
+            {
+                Console.Write("Erreur : Convertion string to int : " + ex);
+            }
+        }
     }
     
     public string[] GetStatistics(ulong idu)

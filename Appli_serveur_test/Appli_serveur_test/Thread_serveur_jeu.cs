@@ -55,7 +55,8 @@ namespace system
 
         private Plateau _plateau;
         private uint _offsetActualPlayer; // The offset of the actual player in the _dico_joueur 
-        private List<ulong> _tuilesGame; // Totalité des tuiles de la game       
+        private List<ulong> _tuilesGame; // Totalité des tuiles de la game
+        private List<ulong> _rivieresGame; // Totalité des tuiles de la game       
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
         private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
@@ -638,6 +639,8 @@ namespace system
             // Génération des tuiles de la game
             _s_tuilesGame.WaitOne();
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
+            if(_extensionsGame is 1 or 3)
+                _rivieresGame = Random_sort_rivieres();
             _s_tuilesGame.Release();
 
             // Génération des attributs d'anti cheat
@@ -1021,6 +1024,38 @@ namespace system
             }
 
             return id;
+        }
+
+        public static List<ulong> Random_sort_rivieres()
+        {
+            List<ulong> list = null;
+            list = new List<ulong>();
+            System.Random MyRand = new System.Random();
+            int x = 0;
+            ulong idTuile = 0, sumDesProbas = 0;
+            
+            Dictionary<ulong, ulong> map = new Dictionary<ulong, ulong>();
+
+            var db = new Database();
+            db.RemplirRivieres(map);
+            
+            //Parcourir le dictionnaire resultat pour calculer la somme des probabilités des tuiles:
+            foreach (var item in map)
+            {
+                sumDesProbas += item.Value;
+
+            }
+            int tmp = (int)(sumDesProbas - sumDesProbas % 1.0);
+            //Tirage aléatoire des tuiles
+            for (int i = 1; i < map.Count-1; i++)
+            {
+                x = MyRand.Next(tmp);
+                idTuile = tuile_a_tirer(idTuile, x, map);
+                list.Add(idTuile);
+
+            }
+            //Retourner la liste 
+            return list;
         }
 
         /// <summary>
