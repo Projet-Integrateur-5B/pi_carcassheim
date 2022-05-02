@@ -132,6 +132,17 @@ namespace Assets.system
                     _lastRiverTurn = temp;
                 Debug.Log("Derniere tournant de la riviere : " + _lastRiverTurn);
             }
+
+            int c = 0;
+            foreach (var item in _tuiles)
+            {
+                if (item.TuileFantome)
+                {
+                    Debug.Log("tuile d'id " + item.Id + " est toujours fantome");
+                    c++;
+                }
+            }
+            Debug.Log("il y a en tout : " + c + "tuiles fantomes");
         }
 
         public void CheckDirectionRiviere(Tuile tuile, int x, int y, int rot, out int turn)
