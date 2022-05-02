@@ -436,6 +436,10 @@ namespace Assets.system
                     }
                 }
             }
+            else if(packet.IdMessage == Tools.IdMessage.EndGame)
+            {
+                system_display.setNextState(DisplaySystemState.endOfGame);
+            }
         }
 
         private bool OnTuileReceived(Packet packet)
