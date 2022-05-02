@@ -38,6 +38,7 @@ public class AccountMenu : Miscellaneous
 		tmpText = tmpGO.GetComponent<Text>();
 		*/
 		OnMenuChange += OnStart;
+		OnMenuChange += ClearAll;
 	}
 
 	public void OnStart(string pageName)
@@ -69,7 +70,6 @@ public class AccountMenu : Miscellaneous
 	{
 		ResetWarningTextAM();
 		HidePopUpOptions();
-		ClearAll();
 		ChangeMenu("AccountMenu", "ConnectionMenu");
 	}
 
@@ -77,7 +77,6 @@ public class AccountMenu : Miscellaneous
 	{
 		ResetWarningTextAM();
 		HidePopUpOptions();
-		ClearAll();
 		ChangeMenu("AccountMenu", "HomeMenu");
 		Connected();
 	}
@@ -185,18 +184,11 @@ public class AccountMenu : Miscellaneous
 		}
 	}
 
-	public void ClearAll()
+	public void ClearAll(string arg)
 	{
 		pseudoCA = Clear(pseudoCA);
 		emailCA = Clear(emailCA);
 		passwordCA = Clear(passwordCA);
 		confirmPwdCA = Clear(confirmPwdCA);
-	}
-	
-	public static InputField Clear(InputField inputfield)
-	{
-		inputfield.Select();
-		inputfield.text = "";
-		return inputfield;
 	}
 }

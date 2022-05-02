@@ -77,7 +77,7 @@ public class RoomSelectionMenu : Miscellaneous
 
     public void OnStart(string pageName)
     {
-        Debug.Log(pageName);
+        // Debug.Log(pageName);
         switch (pageName)
         {
             case "RoomSelectionMenu":
@@ -104,8 +104,8 @@ public class RoomSelectionMenu : Miscellaneous
         HidePopUpOptions();
         ChangeMenu("RoomSelectionMenu", "HomeMenu");
     }
-    
-    
+
+
     /// <summary>
     ///     Go to Join By Id menu 
     /// </summary>
