@@ -106,7 +106,6 @@ public class DisplaySystem : MonoBehaviour
         if (!DIRTY_ACTIONS || queue_actions.Count == 0)
             return;
         DisplaySystemAction action = queue_actions.Peek();
-        Debug.Log("ACTION 1 of " + queue_actions.Count + " PEEKED FOUND IN GOOD STATE ? " + (action.required_state == act_system_state));
         if (action.required_state == act_system_state)
         {
             execAction(queue_actions.Dequeue());
@@ -117,7 +116,6 @@ public class DisplaySystem : MonoBehaviour
 
     public void execDirtyAction(DisplaySystemAction action)
     {
-        Debug.Log("EXEC DIRTY ACTION");
         queue_actions.Enqueue(action);
     }
 
@@ -137,12 +135,10 @@ public class DisplaySystem : MonoBehaviour
             {
                 case DisplaySystemActionTypes.tileSetCoord:
                     DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
-                    Debug.Log("TILE PLACEMENT ACTION TILE ID OF " + act_tile.Id + " VS " + action_tsc.tile_id + " SETTING AT " + action_tsc.new_pos);
                     if (act_tile != null && act_tile.Id == action_tsc.tile_id)
                     {
                         if (!board.setTileAt(action_tsc.new_pos, act_tile))
-                            Debug.Log("BOARD DIDN'T POSED THE TILE");
-                        table.tilePositionChanged(act_tile);
+                            table.tilePositionChanged(act_tile);
                     }
                     break;
                 case DisplaySystemActionTypes.tileSelection:
@@ -202,16 +198,16 @@ public class DisplaySystem : MonoBehaviour
     {
         state_transition.Enqueue(next_state);
         DisplaySystemState old_state = act_system_state;
-        act_system_state = DisplaySystemState.StateTransition;
         if (state_transition.Count == 1)
         {
+            act_system_state = DisplaySystemState.StateTransition;
             prev_system_state = old_state;
         }
     }
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
     {
-        //Debug.Log("Leaving " + old_state + " to " + new_state);
+        // Debug.Log("Leaving " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.meeplePosing:
@@ -318,7 +314,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        //Debug.Log("State enterring from " + old_state + " to " + new_state);
+        // Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
@@ -552,9 +548,10 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.turnStart:
                 break;
             case DisplaySystemState.StateTransition:
-                act_system_state = state_transition.Dequeue();
+                act_system_state = state_transition.Peek();
                 stateLeave(prev_system_state, act_system_state);
                 stateEnter(act_system_state, prev_system_state);
+                state_transition.Dequeue();
                 if (state_transition.Count > 0)
                 {
                     prev_system_state = act_system_state;
