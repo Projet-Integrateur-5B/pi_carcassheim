@@ -29,21 +29,49 @@ namespace Assets.system
     };
     public class Plateau
     {
-        private const int GAUCHE = 1, DROITE = -1;
+        /// <summary>
+        /// le dernier virage de la riviere
+        /// </summary>
         private int _lastRiverTurn = 0;
+
+        /// <summary>
+        /// le decalage des coordonnees en fonction d'une direction
+        /// </summary>
         public static readonly int[,] PositionAdjacentes;
+
+        /// <summary>
+        /// les tuiles en fonction de leur id
+        /// </summary>
         private Dictionary<ulong, Tuile> _dicoTuile;
 
+        /// <summary>
+        /// les tuiles en fonction de leur id
+        /// </summary>
         public Dictionary<ulong, Tuile> DicoTuile => _dicoTuile;
+
+        /// <summary>
+        /// les tuiles posees sur le plateau
+        /// </summary>
         private List<Tuile> _tuiles;
+
+        /// <summary>
+        /// les tuiles posees sur le plateau
+        /// </summary>
         public List<Tuile> Tuiles
         {
             get { return _tuiles; }
             set { _tuiles = value; }
         }
 
+        /// <summary>
+        /// les tuiles posees sur le plateau
+        /// </summary>
         public List<(int, int, ulong)> ChampsOuDesPionsOntEtePoses { get; private set; }
 
+        /// <summary>
+        /// instancie un plateau
+        /// </summary>
+        /// <param name="dicoTuiles">les tuiles que ce plateau pourra utiliser</param>
         public Plateau(Dictionary<ulong, Tuile> dicoTuiles)
         {
             _tuiles = new List<Tuile>();
@@ -52,6 +80,9 @@ namespace Assets.system
             ChampsOuDesPionsOntEtePoses = new List<(int, int, ulong)>();
         }
 
+        /// <summary>
+        /// initialise un plateau
+        /// </summary>
         public Plateau()
         {
             _tuiles = new List<Tuile>();
@@ -59,6 +90,9 @@ namespace Assets.system
             _dicoTuile = new Dictionary<ulong, Tuile>();
         }
 
+        /// <summary>
+        /// initialise les champs static
+        /// </summary>
         static Plateau()
         {
             PositionAdjacentes = new int[,]
@@ -69,6 +103,13 @@ namespace Assets.system
                 { -1, 0 }
             };
         }
+
+        /// <summary>
+        /// recupere une tuile en fonction de ses coordonnees
+        /// </summary>
+        /// <param name="x">l'abscisse</param>
+        /// <param name="y">l'ordonnee</param>
+        /// <returns>la tuile aux coordonnees (x, y)</returns>
         public Tuile GetTuile(int x, int y)
         {
             foreach (var item in _tuiles)
@@ -79,24 +120,31 @@ namespace Assets.system
             return null;
         }
 
+        /// <summary>
+        /// les tuiles posees
+        /// </summary>
         public Tuile[] GetTuiles => _tuiles.ToArray();/*
     {
         return _tuiles.ToArray();
     }*/
 
-        public void GenererRiviere()
-        {
-            List<Tuile> riviere = new List<Tuile>();
+        //public void GenererRiviere()
+        //{
+        //    List<Tuile> riviere = new List<Tuile>();
 
-            foreach (var item in _dicoTuile.Values)
-            {
-                if (item.Riviere)
-                    riviere.Add(item);
-            }
+        //    foreach (var item in _dicoTuile.Values)
+        //    {
+        //        if (item.Riviere)
+        //            riviere.Add(item);
+        //    }
 
-            Riviere.Init(this, riviere.ToArray());
-        }
+        //    Riviere.Init(this, riviere.ToArray());
+        //}
 
+        /// <summary>
+        /// pose la toute premiere tuile
+        /// </summary>
+        /// <param name="idTuile">l'id de la tuile a poser</param>
         public void Poser1ereTuile(ulong idTuile)
         {
             var t = tuileDeModelId(idTuile);
@@ -104,20 +152,28 @@ namespace Assets.system
             _tuiles = new List<Tuile> { t };
         }
 
-        private void PoserTuile(Tuile tuile, Position pos)
-        {
-            PoserTuile(tuile, pos.X, pos.Y, pos.ROT);
-        }
+        //private void PoserTuile(Tuile tuile, Position pos)
+        //{
+        //    PoserTuile(tuile, pos.X, pos.Y, pos.ROT);
+        //}
 
-        private void PoserTuile(ulong idTuile, Position pos)
-        {
-            PoserTuile(tuileDeModelId(idTuile), pos.X, pos.Y, pos.ROT);
-        }
+        //private void PoserTuile(ulong idTuile, Position pos)
+        //{
+        //    PoserTuile(tuileDeModelId(idTuile), pos.X, pos.Y, pos.ROT);
+        //}
 
-        private void PoserTuile(ulong idTuile, int x, int y, int rot)
-        {
-            PoserTuile(tuileDeModelId(idTuile), x, y, rot);
-        }
+        //private void PoserTuile(ulong idTuile, int x, int y, int rot)
+        //{
+        //    PoserTuile(tuileDeModelId(idTuile), x, y, rot);
+        //}
+
+        /// <summary>
+        /// Pose une tuile
+        /// </summary>
+        /// <param name="tuile">la tuile a poser</param>
+        /// <param name="x">l'abscisse ou la poser</param>
+        /// <param name="y">l'ordonnees ou la poser</param>
+        /// <param name="rot">la rotation a lui appliquer (dans le sens direct)</param>
         private void PoserTuile(Tuile tuile, int x, int y, int rot)
         {
             tuile.X = x;
@@ -146,6 +202,14 @@ namespace Assets.system
             Debug.Log("il y a en tout : " + c + "tuiles fantomes");
         }
 
+        /// <summary>
+        /// quel virage prend une tuile riviere lorsqu'elle est dans une certaine position
+        /// </summary>
+        /// <param name="tuile">la tuile</param>
+        /// <param name="x">l'abscisse la tuile est</param>
+        /// <param name="y">l'ordonnee ou la tuile est</param>
+        /// <param name="rot">la rotation qui lui est appliquee</param>
+        /// <param name="turn">le virage qu'elle prend</param>
         public void CheckDirectionRiviere(Tuile tuile, int x, int y, int rot, out int turn)
         {
             turn = 0;
@@ -239,11 +303,23 @@ namespace Assets.system
             //Debug.Log("Direction intiale :" + dirInit + "      prochaine direction " + dirNext);
         //}
 
+        /// <summary>
+        /// Pose une tuile ephemere, supprime les autres tuiles ephemeres
+        /// </summary>
+        /// <param name="idTuile">l'id de la tuile en question</param>
+        /// <param name="pos">la position dans laquelle la tuile est posee</param>
         public void PoserTuileFantome(ulong idTuile, Position pos)
         {
             PoserTuileFantome(idTuile, pos.X, pos.Y, pos.ROT);
         }
 
+        /// <summary>
+        /// Pose une tuile ephemere, supprime les autres tuiles ephemeres
+        /// </summary>
+        /// <param name="idTuile">l'id de la tuile en question</param>
+        /// <param name="x">l'abscisse ou la placer</param>
+        /// <param name="y">l'ordonnee ou la placer</param>
+        /// <param name="rot">la rotation a appliquer a la tuile</param>
         public void PoserTuileFantome(ulong idTuile, int x, int y, int rot)
         {
             var t = tuileDeModelId(idTuile);
@@ -252,6 +328,9 @@ namespace Assets.system
             PoserTuile(t, x, y, rot);
         }
 
+        /// <summary>
+        /// Les tuiles fantome deviennent des vrais tuiles
+        /// </summary>
         public void ValiderTour()
         {
             Tuile tuile = FindTuileFantome;
@@ -261,6 +340,9 @@ namespace Assets.system
                 Debug.LogWarning("pas de tuile fantome trouvee");
         }
 
+        /// <summary>
+        /// La tuile fantome du plateau si il y en a une
+        /// </summary>
         private Tuile FindTuileFantome
         {
             get
@@ -293,16 +375,31 @@ namespace Assets.system
         //        _tuiles.RemoveAt(toRemove);
         //}
 
+        /// <summary>
+        /// instancie une tuile a partir d'un modele
+        /// </summary>
+        /// <param name="id_tuile">l'id du modele</param>
+        /// <returns>la tuile instanciee</returns>
         public Tuile tuileDeModelId(ulong id_tuile)
         {
             return Tuile.Copy(_dicoTuile[id_tuile]);
         }
 
+        /// <summary>
+        /// parcoure tous les emplacements libres du plateau, verfie si chacun est libre, dans chaque rotation
+        /// </summary>
+        /// <param name="idTuile">l'id de la tuile</param>
+        /// <returns>un tableau de toutes les positions ou une tuile est posable</returns>
         public Position[] PositionsPlacementPossible(ulong idTuile)
         {
             return PositionsPlacementPossible(tuileDeModelId(idTuile));
         }
 
+        /// <summary>
+        /// parcoure tous les emplacements libres du plateau, verfie si chacun est libre, dans chaque rotation
+        /// </summary>
+        /// <param name="tuile">la tuile</param>
+        /// <returns>un tableau de toutes les positions ou une tuile est posable</returns>
         public Position[] PositionsPlacementPossible(Tuile tuile)
         {
             if (tuile.Riviere)
@@ -351,11 +448,27 @@ namespace Assets.system
             return resultat.ToArray();
         }
 
+        /// <summary>
+        /// verifie que les faces d'une tuile s'assemblent avec les faces des tuiles adjacentes a un emplacement
+        /// </summary>
+        /// <param name="idTuile">l'id de cette tuile</param>
+        /// <param name="x">l'abscisse de l'emplacement</param>
+        /// <param name="y">l'ordonnee de l'emplacement</param>
+        /// <param name="rotation">la rotation appliquee a la tuile</param>
+        /// <returns>true si la tuile est placable a ces coordonnees avec cette rotation, false sinon</returns>
         public bool PlacementLegal(ulong idTuile, int x, int y, int rotation)
         {
             return PlacementLegal(tuileDeModelId(idTuile), x, y, rotation);
         }
 
+        /// <summary>
+        /// verifie que les faces d'une tuile s'assemblent avec les faces des tuiles adjacentes a un emplacement
+        /// </summary>
+        /// <param name="tuile">la tuile</param>
+        /// <param name="x">l'abscisse de l'emplacement</param>
+        /// <param name="y">l'ordonnee de l'emplacement</param>
+        /// <param name="rotation">la rotation appliquee a la tuile</param>
+        /// <returns>true si la tuile est placable a ces coordonnees avec cette rotation, false sinon</returns>
         public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
         {
             bool riviere = tuile.Riviere;
@@ -410,6 +523,11 @@ namespace Assets.system
             return auMoinsUne;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="face">les 3 elements terrains d'une face</param>
+        /// <returns>true si une riviere touche cette face, false sinon</returns>
         private bool RiviereDansFace(TypeTerrain[] face)
         {
             for (int i = 0; i < face.Length; i++)
@@ -420,6 +538,12 @@ namespace Assets.system
             return false;
         }
 
+        /// <summary>
+        /// verifie que 2 faces peuvent s'assembler
+        /// </summary>
+        /// <param name="t1">la face de la premiere tuile</param>
+        /// <param name="t2">la face de la deuxieme tuile</param>
+        /// <returns>true si les faces correspondent, false sinon</returns>
         private bool CorrespondanceTerrains(TypeTerrain[] t1, TypeTerrain[] t2)
         {
             for (int i = 0; i < 3; i++)
@@ -430,6 +554,12 @@ namespace Assets.system
             return true;
         }
 
+        /// <summary>
+        /// verfie si 2 terrains peuvent etre places cote-a-cote
+        /// </summary>
+        /// <param name="t1">un terrain</param>
+        /// <param name="t2">l'autre terrain</param>
+        /// <returns>true si les terrains sont compatible, false sinon</returns>
         private bool TerrainCompatible(TypeTerrain t1, TypeTerrain t2)
         {
             if (t1 == t2)
@@ -441,6 +571,12 @@ namespace Assets.system
             return false;
         }
 
+        /// <summary>
+        /// renvoie les tuiles adjacentes a des coordonnees
+        /// </summary>
+        /// <param name="x">l'abscisse de la position</param>
+        /// <param name="y">l'ordonnee de la position</param>
+        /// <returns>un tableau contenant 4 elements : les 4 tuiles adjacentes a l'emplacement, potentiellement nulles</returns>
         private Tuile[] TuilesAdjacentes(int x, int y)
         {
             Tuile[] resultat = new Tuile[4];
@@ -454,11 +590,19 @@ namespace Assets.system
             return resultat;
         }
 
-        private Tuile[] TuilesAdjacentes(Tuile t)
-        {
-            return TuilesAdjacentes(t.X, t.Y);
-        }
+        //private Tuile[] TuilesAdjacentes(Tuile t)
+        //{
+        //    return TuilesAdjacentes(t.X, t.Y);
+        //}
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile a partir de laquelle on part</param>
+        /// <param name="y">l'ordonnee de la tuile a partir de laquelle on part</param>
+        /// <param name="gain"></param>
+        /// <param name="zones"></param>
+        /// <returns>true si la zone est fermee, false sinon</returns>
         public bool VerifZoneFermeeTuile(int x, int y, List<PlayerScoreParam> gain, List<Zone> zones)
         {
             Tuile tl = GetTuile(x, y);
@@ -525,6 +669,15 @@ namespace Assets.system
             return ferme;
         }
 
+        /// <summary>
+        /// permet d'acceder aux tuiles qui sont directement liees a un certain slot
+        /// </summary>
+        /// <param name="tuile">la tuile a partir de laquelle on cherche celle qui lui sont adjacentes</param>
+        /// <param name="idSlot">le slot en question</param>
+        /// <param name="emplacementVide"> si il le slot mene a une un emplacement vide, c'est-a-dire a une zone ouverte</param>
+        /// <param name="positionsInternesProchainesTuiles"> les positions internes a partir desquelles on a accede aux tuiles retournees</param>
+        /// <returns>un tableau des tuiles adjacentes</returns>
+        /// <exception cref="Exception">si l'id du slot est invalide</exception>
         private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, ulong idSlot,
             out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
         {
@@ -582,23 +735,49 @@ namespace Assets.system
             return resultat.ToArray();
         }
 
+        /// <summary>
+        /// pose un pion sur une tuile sur un slot
+        /// </summary>
+        /// <param name="idJoueur">le joueur posant ce pion</param>
+        /// <param name="x">l'abscisse de la tuile ou le pion est pose</param>
+        /// <param name="y">l'ordonnee de la tuile ou le pion est pose</param>
+        /// <param name="idSlot">l'id du slot sur lequel le pion est pose</param>
         public void PoserPion(ulong idJoueur, int x, int y, ulong idSlot)
         {
             PoserPion(idJoueur, GetTuile(x, y), idSlot);
         }
 
+        /// <summary>
+        /// pose un pion sur une tuile sur un slot
+        /// </summary>
+        /// <param name="idJoueur">le joueur posant ce pion</param>
+        /// <param name="tuile">la tuile sur laquelle le pion est pose</param>
+        /// <param name="idSlot">l'id du slot sur lequel le pion est pose</param>
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
         {
             tuile.Slots[idSlot].IdJoueur = idJoueur;
             ChampsOuDesPionsOntEtePoses.Add((tuile.X, tuile.Y, idSlot));
         }
 
-        public int[] EmplacementPionPossible(int x, int y, ulong idJoueur, ulong id_meeple)
+        /// <summary>
+        /// verifie sur quels slots d'une tuile un pion est posable
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile en question</param>
+        /// <param name="y">l'ordonnee de la tuile en question</param>
+        /// <param name="id_meeple">l'id du type de meeple</param>
+        /// <returns>un tableau contenant les id des slots ou un pion est posable</returns>
+        public int[] EmplacementPionPossible(int x, int y/*, ulong idJoueur*/, ulong id_meeple)
         {
-            return EmplacementPionPossible(x, y, idJoueur);
+            return EmplacementPionPossible(x, y/*, idJoueur*/);
         }
 
-        public int[] EmplacementPionPossible(int x, int y, ulong idJoueur)
+        /// <summary>
+        /// verifie sur quels slots d'une tuile un pion est posable
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile en question</param>
+        /// <param name="y">l'ordonnee de la tuile en question</param>
+        /// <returns>un tableau contenant les id des slots ou un pion est posable</returns>
+        public int[] EmplacementPionPossible(int x, int y/*, ulong idJoueur*/)
         {
             //Debug.Log("Debut fonction EmplacementPionPossible avec X = " + x + " Y = " + y);
             Tuile tuile = GetTuile(x, y);
@@ -608,7 +787,7 @@ namespace Assets.system
             for (int i = 0; i < tuile.NombreSlot; i++)
             {
                 //Debug.Log("LOOKING SLOT " + i);
-                if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, idJoueur, parcourus))
+                if (!ZoneAppartientAutreJoueur(x, y, (ulong)i, /*idJoueur,*/ parcourus))
                     resultat.Add(i);
                 parcourus.Clear();
             }
@@ -616,7 +795,15 @@ namespace Assets.system
             return resultat.ToArray();
         }
 
-        private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, ulong idJoueur, List<(Tuile, ulong)> parcourus)
+        /// <summary>
+        /// verifie si une zone est deja occupee
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile ou commence la zone</param>
+        /// <param name="y">l'ordonnee de la tuile ou commence la zone</param>
+        /// <param name="idSlot">l'id du slot ou commence la zone</param>
+        /// <param name="parcourus">liste des tuples (tuile, slot) deja parcourus/traites</param>
+        /// <returns>true si la zone est deja occupee</returns>
+        private bool ZoneAppartientAutreJoueur(int x, int y, ulong idSlot, /*ulong idJoueur,*/ List<(Tuile, ulong)> parcourus)
         {
             //Debug.Log("debut methode ZoneAppartientAutreJoueur avec x=" + x + " y=" + y + " idslot=" + idSlot + " idJoueur=" + idJoueur
             //+ " liste des tuiles parcourues de longeur: " + parcourus.Count);
@@ -656,7 +843,7 @@ namespace Assets.system
                     return true;
                 }
                 //Debug.Log("FROM " + x + ", " + y + ", " + idSlot + " to " + t.X + ", " + t.Y + ", " + nextSlot);
-                resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, idJoueur, parcourus);
+                resultat = resultat || ZoneAppartientAutreJoueur(t.X, t.Y, nextSlot, /*idJoueur,*/ parcourus);
                 if (resultat)
                     return resultat;
             }
@@ -664,6 +851,15 @@ namespace Assets.system
             return resultat;
         }
 
+        /// <summary>
+        /// verifie qu'un joueur a le droit de poser un meeple sur un certain slot
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile sur laquelle le joueur veut poser un meeple</param>
+        /// <param name="y">l'ordonnee de la tuile sur laquelle le joueur veut poser un meeple</param>
+        /// <param name="idSlot">l'id du slot sur lequel le joueur veut poser un meeple</param>
+        /// <param name="idJoueur">l'id du joueur</param>
+        /// <param name="idMeeple">l'id du type de meeple</param>
+        /// <returns>true si le pion est posable, false sinon</returns>
         public bool PionPosable(int x, int y, ulong idSlot, ulong idJoueur, ulong idMeeple)
         {
             if (idSlot > 12)
@@ -675,7 +871,7 @@ namespace Assets.system
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;
 
-            int[] tab = EmplacementPionPossible(x, y, idJoueur);
+            int[] tab = EmplacementPionPossible(x, y/*, idJoueur*/);
             for (int i = 0; i < tab.Length; i++)
             {
                 if ((ulong)tab[i] == idSlot)
@@ -684,6 +880,13 @@ namespace Assets.system
             return false;
         }
 
+        /// <summary>
+        /// Enleve les pions d'une zone du plateau et les rend aux joueurs a qui ils appartiennent
+        /// </summary>
+        /// <param name="x">l'abscisse ou la tuile a partir de laquelle commence la zone se trouve</param>
+        /// <param name="y">l'ordonnee ou la tuile a partir de laquelle commence la zone se trouve</param>
+        /// <param name="idSlot">le slot de la tuile ou la zone commence</param>
+        /// <returns>en clefs l'id des joueurs a qui rendre les pions. En valeur, combien de slot leur rendre</returns>
         public Dictionary<ulong, int> RemoveAllPawnInZone(int x, int y, ulong idSlot)
         {
             List<(Tuile, ulong)> parcourues = new List<(Tuile, ulong)>();
@@ -694,6 +897,15 @@ namespace Assets.system
             RemoveAllPawnInZoneAux(tuile, idSlot, parcourues, ref result);
             return result;
         }
+
+        /// <summary>
+        /// Enleve les pions d'une zone du plateau et les rend aux joueurs a qui ils appartiennent
+        /// </summary>
+        /// <param name="tuile">la tuile sur laquelle la zone commence</param>
+        /// <param name="idSlot">le slot de la tuile ou la zone commence</param>
+        /// <param name="parcourues">la list des tuples (tuiles, slot) etant deja traites</param>
+        /// <param name="result">en clefs l'id des joueurs a qui rendre les pions. En valeur, combien de slot leur rendre</param>
+        /// <returns>en clefs l'id des joueurs a qui rendre les pions. En valeur, combien de slot leur rendre</returns>
         private Dictionary<ulong, int> RemoveAllPawnInZoneAux(Tuile tuile, ulong idSlot,
             List<(Tuile, ulong)> parcourues, ref Dictionary<ulong, int> result)
         {

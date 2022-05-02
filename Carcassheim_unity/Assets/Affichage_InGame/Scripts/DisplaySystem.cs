@@ -73,7 +73,7 @@ public class DisplaySystem : MonoBehaviour
     private bool DIRTY_ACTIONS = true;
     private Queue<DisplaySystemAction> queue_actions = new Queue<DisplaySystemAction>();
 
-
+    public DisplaySystemState State { get => act_system_state; private set { act_system_state = value; } }
 
     // Start is called before the first frame update
     void Awake()
@@ -207,7 +207,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
     {
-        // Debug.Log("Leaving " + old_state + " to " + new_state);
+        Debug.Log("Leaving " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.meeplePosing:
@@ -241,6 +241,12 @@ public class DisplaySystem : MonoBehaviour
 
             case DisplaySystemState.idleState:
                 TurnPlayParam play_param;
+                if (act_system_state == DisplaySystemState.idleState)
+                {
+                    Debug.LogError("Don(t do this ");
+                    break;
+                }
+
                 system_back.getTile(out play_param);
                 int index;
                 // tuile posé
@@ -314,7 +320,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        // Debug.Log("State enterring from " + old_state + " to " + new_state);
+        Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
