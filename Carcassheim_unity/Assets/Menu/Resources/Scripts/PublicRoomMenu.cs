@@ -101,7 +101,12 @@ public class PublicRoomMenu : Miscellaneous
         packet.Data = Array.Empty<string>();
 
         preparer.color = readyState;
-        preparer.text = "PRET A JOUER !";
+        if (OptionsMenu.langue == 0)
+            preparer.text = "PRET A JOUER !"; 
+        else if (OptionsMenu.langue == 1)
+            preparer.text = "READY TO PLAY!";
+        else if (OptionsMenu.langue == 2)
+            preparer.text = "SPIELBEREIT!";
 
         Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);

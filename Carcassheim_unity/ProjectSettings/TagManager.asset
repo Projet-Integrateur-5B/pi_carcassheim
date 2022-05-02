@@ -9,6 +9,8 @@ TagManager:
   - SlotCollider
   - TileBodyCollider
   - TileIndicCollider
+  - no_trad
+  - modif
   layers:
   - Default
   - TransparentFX

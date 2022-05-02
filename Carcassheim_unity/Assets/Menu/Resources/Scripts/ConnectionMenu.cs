@@ -56,7 +56,14 @@ public class ConnectionMenu : Miscellaneous
         tmpGO = GameObject.Find("Instructions");
         tmpText = tmpGO.GetComponent<Text>();
         tmpText.color = Color.white;
-        tmpText.text = "Connectez vous";
+
+        //on gere selon la langue
+        if(OptionsMenu.langue == 0)
+            tmpText.text = "Connectez vous";
+        else if (OptionsMenu.langue == 1)
+            tmpText.text = "Log in";
+        else if (OptionsMenu.langue == 2)
+            tmpText.text = "Loggen Sie sich ein";
     }
 
     public void HideConnection()
@@ -89,7 +96,14 @@ public class ConnectionMenu : Miscellaneous
         GameObject tmpGO = GameObject.Find("Instructions");
         Text tmpText = tmpGO.GetComponent<Text>();
         tmpText.color = Color.white;
-        tmpText.text = "Connectez vous";
+
+        //on gere selon la langue
+        if (OptionsMenu.langue == 0)
+            tmpText.text = "Connectez vous";
+        else if (OptionsMenu.langue == 1)
+            tmpText.text = "Log in";
+        else if (OptionsMenu.langue == 2)
+            tmpText.text = "Loggen Sie sich ein";
         HidePopUpOptions();
         ChangeMenu("ConnectionMenu", "AccountMenu");
     }
@@ -158,7 +172,15 @@ public class ConnectionMenu : Miscellaneous
             else
             {
                 tmpGO.GetComponent<Text>().color = Color.yellow;
-                tmpText.text = "Ressaisissez votre login et votre mot de passe !";
+
+                //on gere selon la langue
+                if (OptionsMenu.langue == 0)
+                    tmpText.text = "Ressaisissez votre login et votre mot de passe !";
+                else if (OptionsMenu.langue == 1)
+                    tmpText.text = "Re-enter your login and password!";
+                else if (OptionsMenu.langue == 2)
+                    tmpText.text = "Geben Sie Ihren Login und Ihr Passwort erneut ein!";
+                
             }
         }
     }
