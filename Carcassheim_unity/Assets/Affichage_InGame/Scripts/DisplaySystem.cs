@@ -241,6 +241,12 @@ public class DisplaySystem : MonoBehaviour
 
             case DisplaySystemState.idleState:
                 TurnPlayParam play_param;
+                if (act_system_state == DisplaySystemState.idleState)
+                {
+                    Debug.LogError("Don(t do this ");
+                    break;
+                }
+
                 system_back.getTile(out play_param);
                 int index;
                 // tuile posé

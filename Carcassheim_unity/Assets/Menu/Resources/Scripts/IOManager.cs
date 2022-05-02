@@ -227,8 +227,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     public void textColor(Color c, int s, GameObject go)
     {
         _btnText = go.GetComponentInChildren<Text>();
+        if (_btnText.color != c)
+            _btnText.fontSize += s;
         _btnText.color = c;
-        _btnText.fontSize += s;
     }
 
     public void colorImage(GameObject go, byte r, byte g, byte b, byte f, bool changeColor)
