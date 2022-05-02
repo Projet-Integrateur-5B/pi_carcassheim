@@ -184,7 +184,7 @@ public class PublicRoomMenu : Miscellaneous
 				case "playerReady":
 					/* Update l'affichage */
 					break;
-			}
+			
 
                 Action listening = () =>
                 {
@@ -208,6 +208,7 @@ public class PublicRoomMenu : Miscellaneous
                 /* Stop la reception dans cette class */
                 Communication.Instance.StopListening(OnPacketReceived);
                 break;
+			}
         }
     }
 
