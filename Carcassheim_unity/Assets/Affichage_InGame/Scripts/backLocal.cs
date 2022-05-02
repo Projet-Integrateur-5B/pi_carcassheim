@@ -48,7 +48,7 @@ public class backLocal : CarcasheimBack
 
     private ulong tile_final_river = 35;
 
-    public bool river_on { set; get; } = false;
+    public bool river_on { set; get; } = true;
 
     private List<ulong> tiles_for_river;
     List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
@@ -203,7 +203,7 @@ public class backLocal : CarcasheimBack
         }
         if (tuile_valide)
         {
-            // Debug.Log("PTI VALID");
+            Debug.Log("PTI VALID");
             _plateau.ValiderTour();
             gains.Clear();
             zones.Clear();

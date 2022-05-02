@@ -49,6 +49,7 @@ namespace Assets.system
             _tuiles = new List<Tuile>();
             CompteurPoints.Init(this);
             _dicoTuile = dicoTuiles;
+            ChampsOuDesPionsOntEtePoses = new List<(int, int, ulong)>();
         }
 
         public Plateau()
@@ -132,6 +133,17 @@ namespace Assets.system
                     _lastRiverTurn = temp;
                 Debug.Log("Derniere tournant de la riviere : " + _lastRiverTurn);
             }
+
+            int c = 0;
+            foreach (var item in _tuiles)
+            {
+                if (item.TuileFantome)
+                {
+                    Debug.Log("tuile d'id " + item.Id + " est toujours fantome");
+                    c++;
+                }
+            }
+            Debug.Log("il y a en tout : " + c + "tuiles fantomes");
         }
 
         public void CheckDirectionRiviere(Tuile tuile, int x, int y, int rot, out int turn)
@@ -245,6 +257,8 @@ namespace Assets.system
             Tuile tuile = FindTuileFantome;
             if (tuile != null)
                 FindTuileFantome.TuileFantome = false;
+            else
+                Debug.LogWarning("pas de tuile fantome trouvee");
         }
 
         private Tuile FindTuileFantome
@@ -347,6 +361,10 @@ namespace Assets.system
             bool riviere = tuile.Riviere;
 
             Tuile tl = GetTuile(x, y);
+            if (tl != null)
+            {
+                Debug.Log("tuile non nulle en (" + x + " : " + y + ") de fantomite " + tl.TuileFantome);
+            }
             if (tl != null && !tl.TuileFantome)
             {
                 return false;
