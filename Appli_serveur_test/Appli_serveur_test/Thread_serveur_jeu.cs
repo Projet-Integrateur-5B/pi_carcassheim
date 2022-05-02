@@ -349,6 +349,15 @@ namespace system
                         _score_max = int.Parse(settings[7]);
                         _extensionsGame = int.Parse(settings[8]);
 
+                        if (IsRiverExtensionOn())
+                        {
+                            _idTuileInit = 24;
+                        }
+                        else
+                        {
+                            _idTuileInit = 22;
+                        }
+
                     }
                     catch (Exception ex)
                     {
@@ -1111,6 +1120,17 @@ namespace system
 
         }
 
-    }
+        public bool IsRiverExtensionOn()
+        {
+            bool riverOn = (_extensionsGame & (int)Tools.Extensions.Riviere) > 0;
+            return riverOn;
+        }
 
+        public bool IsAbbayeExtensionOn()
+        {
+            bool abbayeOn = (_extensionsGame & (int)Tools.Extensions.Abbaye) > 0;
+            return abbayeOn;
+        }
+
+    }
 }
