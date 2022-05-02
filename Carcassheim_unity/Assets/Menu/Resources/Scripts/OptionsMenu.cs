@@ -113,9 +113,9 @@ public class OptionsMenu : Miscellaneous
 	}
 
 	/// <summary>
-	/// Toggles the language <see cref = "OptionsMenu"/> class.
+	/// Toggles <see cref = "OptionsMenu"/> class.
 	/// </summary>
-	/// <param name="curT">The current language 
+	/// <param name="curT">The current toggle.</param>
 	public void ToggleValueChangedOM(Toggle curT)
 	{
 		if (curT.isOn)
@@ -209,13 +209,12 @@ public class OptionsMenu : Miscellaneous
 	}
 
 	//---------------------------- Music/Sound Begin ----------------------------//
-
 	/// <summary>
-	/// Displays the music/sound volume <see cref="Slider"/>.
+	/// Volume of the music/sound <see cref = "OptionsMenu"/> class.
 	/// </summary>
 	/// <param name="ads">The ads.</param>
 	/// <param name="txt">The text.</param>
-	/// <param name="sb">The sb.</param>
+	/// <param name="sb">The slider bar.</param>
 	public void Volume(AudioSource ads, Text txt, Slider sb)
 	{
 		ads.volume = sb.value;
