@@ -1043,21 +1043,12 @@ namespace system
             var db = new Database();
             db.RemplirRivieres(map);
             
-            //Parcourir le dictionnaire resultat pour calculer la somme des probabilités des tuiles:
             foreach (var item in map)
             {
-                sumDesProbas += item.Value;
+                list.Add(item.Key);
 
             }
-            int tmp = (int)(sumDesProbas - sumDesProbas % 1.0);
-            //Tirage aléatoire des tuiles
-            for (int i = 1; i < map.Count-1; i++)
-            {
-                x = MyRand.Next(tmp);
-                idTuile = tuile_a_tirer(idTuile, x, map);
-                list.Add(idTuile);
 
-            }
             //Retourner la liste 
             return list;
         }
