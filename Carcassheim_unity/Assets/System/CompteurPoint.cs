@@ -23,11 +23,17 @@ namespace Assets.system
                 instance._plateau = plateau;
         }
 
-        public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur)
+        public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur, bool compterChamps = false)
         {
             Tuile tuile = instance._plateau.GetTuile(x, y);
             if (tuile.NombreSlot <= idSlot)
                 throw new ArgumentException("idSlot trop grand");
+
+            if (tuile.Slots[idSlot].Terrain == TypeTerrain.Pre && !compterChamps)
+            {
+                idJoueur = new ulong[0];
+                return 0;
+            }
 
             //idJoueur = tuile.Slots[idSlot].IdJoueur;
 
