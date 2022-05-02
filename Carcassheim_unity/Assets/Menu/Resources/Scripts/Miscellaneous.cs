@@ -5,21 +5,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 
-/* Convention de nommage : 
- * 
- * Méthodes : Méthode(int a...)
- * Attributs : public int Variable, private int _variable, static s_variable
- * Variables locales : int variable;
- * Classes : Classe1
- * 
- */
 public abstract class Miscellaneous : MonoBehaviour
 {
-    [SerializeField] public GameObject absolute_parent;
+    [SerializeField]
+    public GameObject absolute_parent;
     static protected GameObject absolute_parent_ref;
-
     public static event Action<string> OnMenuChange;
-
     private static bool s_state = false;
     private static bool s_menuHasChanged = false;
     private static GameObject previousMenu = null;
@@ -27,6 +18,16 @@ public abstract class Miscellaneous : MonoBehaviour
     private Color colState;
     public GameObject Pop_up_Options;
     public static bool s_isOpenPanel = false;
+
+    public static bool s_menuChanged = false;
+
+    /// <summary>
+    ///    MonoBehaviour Awake is called when the script instance is being loaded.
+    ///    Awake is called only once during the lifetime of the script instance.
+    ///    Awake is always called before any Start functions.
+    ///    Awake is called in the editor before OnEnable.
+    ///    If it is overridden, it is called before the subclass' Awake.
+    /// </summary>
     void Awake()
     {
         if (absolute_parent == null)
@@ -35,6 +36,16 @@ public abstract class Miscellaneous : MonoBehaviour
         nextMenu = Miscellaneous.FindObject(absolute_parent, "HomeMenu"); // Menu courant au lancement du jeu
     }
 
+    /// <summary>
+    ///     Create a room line <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "roomline_model">The roomline model.</param>
+    /// <param name = "id">The identifier.</param>
+    /// <param name = "host">The host.</param>
+    /// <param name = "nb_player">The number of players.</param>
+    /// <param name = "nb_player_max">The max number of players.</param>
+    /// <param name = "endgame">The endgame.</param>
+    /// <returns>The room line.</returns>
     static protected RoomLine CreateRoomLine(RoomLine roomline_model, string id, string host, string nb_player, string nb_player_max, string endgame)
     {
         RoomLine rm = Instantiate<RoomLine>(roomline_model, roomline_model.parent_area);
@@ -49,6 +60,12 @@ public abstract class Miscellaneous : MonoBehaviour
         return rm;
     }
 
+    /// <summary>
+    ///     Find a GameObject <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "parent">The parent of the object to find.</param>
+    /// <param name = "name">The name of the object to find.</param>
+    /// <returns>The GameObject.</returns>
     public static GameObject FindObject(GameObject parent, string name)
     {
         Transform[] trs = parent.GetComponentsInChildren<Transform>(true);
@@ -59,27 +76,22 @@ public abstract class Miscellaneous : MonoBehaviour
                 return t.gameObject;
             }
         }
+
         return null;
     }
 
-    // PATCH : 
-    /*public void GetScripts()
-	{
-		var scripts = Resources.LoadAll<MonoScript>("Scripts");
-		int len = scripts.Length;
-		foreach (var script in scripts)
-		{
-			// GetClass method returns the type of the script
-			Debug.Log("Script : " + script.GetClass());
-		}
-	}*/
-
+    /// <summary>
+    ///     Hide pop up options <see cref = "Miscellaneous"/> class.
+    /// </summary>
     public void HidePopUpOptions()
     {
         SetPanelOpen(false);
         Pop_up_Options.SetActive(GetPanelOpen());
     }
 
+    /// <summary>
+    ///     Show pop up options <see cref = "Miscellaneous"/> class.
+    /// </summary>
     public void ShowPopUpOptions()
     {
         if (GetPanelOpen())
@@ -97,26 +109,39 @@ public abstract class Miscellaneous : MonoBehaviour
         Pop_up_Options.SetActive(GetPanelOpen());
     }
 
-    public void SetPanelOpen(bool b)
-    {
-        s_isOpenPanel = b;
-    }
+    /// <summary>
+    ///     Set the opening or closing of the panel <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "b">if set to <c>true</c> [b] is open panel else is close panel.</param>
+    public void SetPanelOpen(bool b) => s_isOpenPanel = b;
 
+    /// <summary>
+    ///     Gets the panel open <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <returns>The opened panel boolean.</returns>
     public bool GetPanelOpen()
     {
         return s_isOpenPanel;
     }
 
+    /// <summary>
+    ///     Gets the state <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <returns>The state boolean.</returns>
     public bool GetState()
     {
         return s_state;
     }
 
-    public void SetState(bool b)
-    {
-        s_state = b;
-    }
+    /// <summary>
+    ///     Set the state to true or false <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "b">if set to <c>true</c> [b] the state is true else it is false.</param>
+    public void SetState(bool b) => s_state = b;
 
+    /// <summary>
+    ///     Change the display when conected <see cref = "Miscellaneous"/> class.
+    /// </summary>
     public void Connected()
     {
         ColorUtility.TryParseHtmlString("#90EE90", out colState);
@@ -133,15 +158,18 @@ public abstract class Miscellaneous : MonoBehaviour
         Transform buttons = Miscellaneous.FindObject(absolute_parent, "Buttons").transform;
         for (int i = 1; i < buttons.childCount - 1; i++)
             buttons.GetChild(i).transform.position += new Vector3(0, 150 - i * 10, 0);
-
         // Probleme de hover quand connecté sur home menu par défaut suite à l'intégration (sémaphore ??)
         // PATCH provisoire (A CHANGER):
         GameObject TridentGo = GameObject.Find("Other").transform.Find("Trident").gameObject;
         if (TridentGo.activeSelf == true)
             TridentGo.SetActive(false);
-        //tridentHover(buttons.GetChild(1).GetComponent<Component>(),  GameObject.Find("Other").transform.Find("Trident").gameObject);
     }
 
+    /// <summary>
+    ///     Hover with trident <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "c">The component.</param>
+    /// <param name = "GoT">The game object (current button).</param>
     public void tridentHover(Component c, GameObject GoT)
     {
         if (!(c.transform.parent.name == "ForgottenPwdUser" || c.transform.parent.name == "CGU"))
@@ -157,26 +185,43 @@ public abstract class Miscellaneous : MonoBehaviour
         }
     }
 
-    public void SetMenuChanged(bool b)
-    {
-        s_menuHasChanged = b;
-    }
-
+    /// <summary>
+    ///     Set the menu to the boolean value <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "b">if set to <c>true</c> [b] the menu changed else it is not changed.</param>
+    public void SetMenuChanged(bool b) => s_menuChanged = b;
+    /// <summary>
+    ///     Gets the boolean if menu has changed <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <returns>The boolean value of menu has changed.</returns>
     public bool HasMenuChanged()
     {
         return s_menuHasChanged;
     }
 
+    /// <summary>
+    ///     Gets the previous menu GameObject <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <returns>The previous menu GameObject.</returns>
     public GameObject GetPreviousMenu()
     {
         return previousMenu;
     }
 
+    /// <summary>
+    ///     Gets the current menu GameObject <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <returns>The current menu GameObject.</returns>
     public GameObject GetCurrentMenu()
     {
         return nextMenu;
     }
 
+    /// <summary>
+    ///     Get the first active child and return it (as GameObject) <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "FAGO">The parent GameObject.</param>
+    /// <returns>The first active child.</returns>
     public GameObject FirstActiveChild(GameObject FAGO)
     {
         foreach (Transform child in FAGO.transform)
@@ -185,28 +230,38 @@ public abstract class Miscellaneous : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    ///     Change the Menu <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "close">The previous menu.</param>
+    /// <param name = "goTo">The next menu.</param>
     public void ChangeMenu(string close, string goTo)
     {
         Debug.Log("CHANGED");
         s_menuHasChanged = true;
-
-
         previousMenu = Miscellaneous.FindObject(absolute_parent, close).gameObject;
         nextMenu = Miscellaneous.FindObject(absolute_parent, goTo).gameObject;
-
         OnMenuChange?.Invoke(goTo);
-
         previousMenu.SetActive(false);
         nextMenu.SetActive(true);
     }
 
-    //Not for passwords -> "" = char
+    /// <summary>
+    ///     Remove the last space of a string <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "mot">The string to remove the last space.</param>
+    /// <returns>The string without the last space.</returns>
     public string RemoveLastSpace(string mot) // Inputfield
     {
-        string modif = mot.TrimEnd();
+        string modif = mot.TrimEnd(); //Not for passwords -> "" = char
         return (mot.Length > 1) ? modif : mot;
     }
-    
+
+    /// <summary>
+    ///     Clear the InputField <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "inputfield">The InputField to clear.</param>
+    /// <returns>The cleared InputField.</returns>
     public static InputField Clear(InputField inputfield)
     {
         inputfield.Select();

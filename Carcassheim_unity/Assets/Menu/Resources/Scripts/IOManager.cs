@@ -29,20 +29,18 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     private bool cooldown = false;
     private InputField IF = null;
     private static bool boolPC = true;
+    [SerializeField]
+    GameObject loading_screen;
 
-    [SerializeField] GameObject loading_screen;
-
+    /// <summary>
+    /// Start is called before the first frame update <see cref = "IOManager"/> class.
+    /// </summary>
     void Start()
     {
         absolute_parent_ref = absolute_parent;
 #if !(UNITY_IOS || UNITY_ANDROID)
         boolPC = true;
 #endif
-        // SCRIPT : (nécessaire pour SendMessage) => chercher un moyen de l'enlever.
-        // ---------------------------------- PATCH : ------------------------------------
-        /* 		Debug.Log("Liste des scripts : ");
-		GetScripts(); */
-        // à enlever : 
         _option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
         _option.absolute_parent = absolute_parent;
         _acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
@@ -65,9 +63,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         _croom.absolute_parent = absolute_parent;
         _rcreated = gameObject.AddComponent(typeof(RoomIsCreated)) as RoomIsCreated;
         _rcreated.absolute_parent = absolute_parent;
-
         absolute_parent_ref = null;
-        // ---------------------------------- FIN PATCH : --------------------------------
         //Cursor Texture :
         _cursorTexture = Resources.Load("Miscellaneous/Cursors/BlueCursor") as Texture2D; // Texture Type = Cursor
         Cursor.SetCursor(_cursorTexture, _cursorHotspot, _cursorMode);
@@ -75,7 +71,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         eventSystem = EventSystem.current;
         if (GameObject.Find("InputFieldEndEdit") != null)
             nextGo = FirstActiveChild(GameObject.Find("InputFieldEndEdit"));
-        else nextGo = FirstActiveChild(GameObject.Find("Buttons"));
+        else
+            nextGo = FirstActiveChild(GameObject.Find("Buttons"));
         eventSystem.SetSelectedGameObject(nextGo);
         ColorUtility.TryParseHtmlString("#1e90ff", out colHover);
         ColorUtility.TryParseHtmlString("#FFA500", out FCcolor);
@@ -94,6 +91,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                             MethodCall(btn.name, null, null);
                         });
             }
+
             if (menu.Find("Toggle Group"))
                 foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
                     if (tog.GetComponent<Toggle>())
@@ -111,6 +109,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         }
     }
 
+    /// <summary>
+    /// Update is called once per frame <see cref = "IOManager"/> class.
+    /// </summary>
     public void Update()
     {
         if (Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow)) // résout probleme souris/clavier avec GetKey 
@@ -131,7 +132,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                     nextGo = eventSystem.currentSelectedGameObject;
                 if (nextGo.transform.GetSiblingIndex() > 0)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() - 1).gameObject;
-                else nextGo = nextGo.transform.parent.GetChild(GameObject.Find("InputFieldEndEdit").transform.childCount - 1).gameObject;
+                else
+                    nextGo = nextGo.transform.parent.GetChild(GameObject.Find("InputFieldEndEdit").transform.childCount - 1).gameObject;
                 eventSystem.SetSelectedGameObject(nextGo);
             }
             else if (Input.GetKeyDown(KeyCode.Tab))
@@ -140,50 +142,35 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                     nextGo = eventSystem.currentSelectedGameObject;
                 if (nextGo.transform.GetSiblingIndex() < GameObject.Find("InputFieldEndEdit").transform.childCount - 1)
                     nextGo = nextGo.transform.parent.GetChild(nextGo.transform.GetSiblingIndex() + 1).gameObject;
-                else nextGo = nextGo.transform.parent.GetChild(0).gameObject;
+                else
+                    nextGo = nextGo.transform.parent.GetChild(0).gameObject;
                 eventSystem.SetSelectedGameObject(nextGo);
             }
         }
-
-        // Dans version finale utiliser ESCAPE à la place de space (escape quitte preview unity)
-        /* 		if ((Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2) || Input.GetKey(KeyCode.Space)) && Cursor.lockState == CursorLockMode.Locked && cooldown == false)
-                { */
-        /* lockMouse(false); */
-        /* 			nextGo = eventSystem.currentSelectedGameObject;
-                    resetHoverPreviousGo(); */
-        // EVITE SPAM CLIC
-        /* 			Invoke("ResetCooldown", 5.0f);
-                    cooldown = true; */
-        /* } */
-
-        /* --------------------- PATCH INPUTFIELD --------------------- */
-        // il faut mieux gérer l'inputfield pour la saisie (entree et escape)
-        /* 		if (IF!=null) 
-                    if(IF.isFocused)
-                        {
-                            previousGo = nextGo;
-                            nextGo = eventSystem.currentSelectedGameObject;
-                            changeHover();
-                            lockMouse(true);
-                            if(Input.GetKey(KeyCode.Return)) // touche enter
-                                lockMouse(false); 
-                        } */
-        /* ------------------ FIN PATCH INPUTFIELD -------------------- */
     }
 
+    /// <summary>
+    /// Lock the mouse cursor <see cref = "IOManager"/> class.
+    /// </summary>
+    /// <param name = "b">True pour bloquer, False pour débloquer</param>
     private void lockMouse(bool b)
     {
         Cursor.lockState = b ? CursorLockMode.Locked : CursorLockMode.None;
         Cursor.visible = !b;
     }
 
+    /// <summary>
+    /// Reset the mouse clic cooldown <see cref = "IOManager"/> class.
+    /// </summary>
     private void ResetCooldown()
     { // EVITE SPAM CLIC
         cooldown = false;
     }
 
-
-
+    /// <summary>
+    /// Detect the hover of the mouse cursor <see cref = "IOManager"/> class.
+    /// </summary>
+    /// <param name = "eventData"type="PointerEventData">Données de l'évènement</param>
     public void OnPointerEnter(PointerEventData eventData)
     {
         //IF = eventData.pointerCurrentRaycast.gameObject.GetComponent<InputField>(); // PATCH INPUTFIELD 
@@ -194,16 +181,36 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         //}
     }
 
+    /*     
+    /// <summary>
+    /// Detect the key name <see cref = "IOManager"/> class.
+    /// </summary>
+    void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
+    {
+        if(Input.anyKeyDown &&  Event.current.isKey)
+                switch(Event.current.keyCode.ToString()){
+                case "UpArrow" : case "DownArrow" : case "LeftArrow" : case "RightArrow" :
+                break;
+                }
+    }  
+    */
 
-    /* 	void OnGUI() // TROP LENT (a gardé pour détecter une touche quelconque)
-{
-	if(Input.anyKeyDown &&  Event.current.isKey)
-			switch(Event.current.keyCode.ToString()){
-			case "UpArrow" : case "DownArrow" : case "LeftArrow" : case "RightArrow" :
-			break;
-			}
-} */
-
+    /// <summary>
+    /// Change the text color <see cref = "IOManager"/> class.
+    /// </summary>
+    /// <param name = "c">Couleur</param>
+    /// <param name = "s">Taille de la police</param>
+    /// <param name = "go">GameObject</param>
+    public void textColor(Color c, int s, GameObject go)
+    {
+        _btnText = go.GetComponentInChildren<Text>();
+        if (_btnText.color != c)
+            _btnText.fontSize += s;
+        _btnText.color = c;
+    }
+    /// <summary>
+    /// Change the button color when the mouse cursor is on it <see cref = "IOManager"/> class.
+    /// </summary>
     public void selectionChange()
     {
         // Aparté : (Les inpufield : le "Text" doit avoir du raycast pour fonctionner donc à ne pas désactiver)
@@ -211,7 +218,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         bool btn = nextGo.GetComponent<Button>() && nextGo.GetComponent<Button>().interactable;
         bool slider = nextGo.transform.GetChild(0).name == "Handle";
         bool inputfd = nextGo.transform.parent.name == "InputField" || nextGo.transform.parent.name == "InputFieldEndEdit";
-        // RAYCAST NECESSAIRE INPUTFIELD (sur 1 des 3 composante, actuellement sur texte) => petit bug de hover
         // Si nextGo != currentSelected ET (selection de : slider ou bouton ou toggle)
         if (nextGo != eventSystem.currentSelectedGameObject && (slider || btn || inputfd || nextGo.GetComponent<Toggle>()))
         {
@@ -224,13 +230,15 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         changeHover();
     }
 
-    public void textColor(Color c, int s, GameObject go)
-    {
-        _btnText = go.GetComponentInChildren<Text>();
-        _btnText.color = c;
-        _btnText.fontSize += s;
-    }
-
+    /// <summary>
+    /// Change the image color or transparency <see cref = "IOManager"/> class.
+    /// </summary>  
+    /// <param name = "go">GameObject</param>
+    /// <param name = "r">Rouge</param>
+    /// <param name = "g">Vert</param>
+    /// <param name = "b">Bleu</param>
+    /// <param name = "f">Alpha</param>
+    /// <param name = "changeColor">True pour changer la couleur, False pour ne pas la changer</param>
     public void colorImage(GameObject go, byte r, byte g, byte b, byte f, bool changeColor)
     {
         Image image = go.transform.GetChild(0).gameObject.GetComponent<Image>();
@@ -240,6 +248,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
             image.color = new Color32(r, g, b, f); // transparence et couleur
     }
 
+    /// <summary>
+    /// Reset the hover of the previous GameObject <see cref = "IOManager"/> class.
+    /// </summary>
     public void resetHoverPreviousGo()
     {
         if (previousGo != null && boolPC == true)
@@ -271,16 +282,17 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         }
     }
 
+    /// <summary>
+    /// Change the hover of the next GameObject <see cref = "IOManager"/> class.
+    /// </summary>
     public void changeHover()
     {
-
         if ((boolSelectionChange && boolPC) == true)
         {
             if (TridentGo.activeSelf == true) // TRIDENT
                 TridentGo.SetActive(false);
             resetHoverPreviousGo();
             Component nextTarget = nextGo.transform.GetChild(0).GetComponent<Component>();
-
             switch (nextTarget.name)
             {
                 case "RawImage": // GIF : A changer (mettre autre chose que zoom)
@@ -305,6 +317,9 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         }
     }
 
+    /// <summary>
+    /// Change  the selected button (to the new menu) <see cref = "IOManager"/> class.
+    /// </summary>
     public void NewMenuSelectButton()
     {
         if (HasMenuChanged() == true)
@@ -318,7 +333,8 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                 {
                     if (GameObject.Find("InputFieldEndEdit") != null)
                         nextGo = FirstActiveChild(GameObject.Find("InputFieldEndEdit"));
-                    else nextGo = FirstActiveChild(GameObject.Find("Buttons"));
+                    else
+                        nextGo = FirstActiveChild(GameObject.Find("Buttons"));
                     if (child.name.Contains(previousMenu) && child.gameObject.activeSelf)
                     {
                         nextGo = child.gameObject;
@@ -326,22 +342,32 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
                     }
                 }
             }
+
             SetMenuChanged(false);
             selectionChange();
         }
     }
 
-
+    /// <summary>
+    /// Call the function <see cref = "IOManager"/> class.
+    /// </summary>
+    /// <param name = "methode">Nom de la méthode</param>
+    /// <param name = "tog">Toggle</param>
+    /// <param name = "inp">InputField</param>
     public void MethodCall(string methode, Toggle tog, InputField inp)
     {
         GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
         if (inp == null)
             gameObject.SendMessage(methode, tog);
-        else gameObject.SendMessage(methode, inp);
+        else
+            gameObject.SendMessage(methode, inp);
         if (tog == null || inp == null)
             NewMenuSelectButton();
     }
 
+    /// <summary>
+    /// Deactivate the trident and activate the loading creen <see cref = "IOManager"/> class.
+    /// </summary>
     void OnDisable()
     {
         TridentGo.SetActive(false);

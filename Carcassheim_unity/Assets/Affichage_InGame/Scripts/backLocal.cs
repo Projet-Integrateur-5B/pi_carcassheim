@@ -25,14 +25,14 @@ public class backLocal : CarcasheimBack
     [SerializeField] private GameObject fen_tile;
     [SerializeField] private GameObject fen_time;
 
-    int win_time_sec = 0;
-    int win_time_min = 10;
+    public int win_time_sec { set; get; } = 0;
+    public int win_time_min { set; get; } = 10;
 
     long time_start_of_game = 0;
 
     public int win_tile_nb { set; get; } = 70;
     int nb_tile_drawn = 0;
-    int win_point_nb;
+    public int win_point_nb { set; get; } = 60;
 
     private int nb_meeple = 10;
 
@@ -48,7 +48,7 @@ public class backLocal : CarcasheimBack
 
     private ulong tile_final_river = 35;
 
-    public bool river_on { set; get; } = false;
+    public bool river_on { set; get; } = true;
 
     private List<ulong> tiles_for_river;
     List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
@@ -72,7 +72,7 @@ public class backLocal : CarcasheimBack
 
     public void begin_pressed()
     {
-        Debug.Log("COucou hibou");
+        // Debug.Log("COucou hibou");
     }
 
     public void setWinCondition(int win_cond)
@@ -203,7 +203,7 @@ public class backLocal : CarcasheimBack
         }
         if (tuile_valide)
         {
-            // Debug.Log("PTI VALID");
+            Debug.Log("PTI VALID");
             _plateau.ValiderTour();
             gains.Clear();
             zones.Clear();
