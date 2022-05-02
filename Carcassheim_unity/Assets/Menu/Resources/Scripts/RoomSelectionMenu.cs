@@ -36,6 +36,13 @@ public class RoomSelectionMenu : Miscellaneous
     private void TableauRoom()
     {
         RoomLine model = FindObject(gameObject, "ROOMLINE").GetComponent<RoomLine>();
+        if (List_of_Rooms != null)
+        {
+            foreach (RoomLine room in List_of_Rooms)
+            {
+                room.killRoomLine();
+            }
+        }
         List_of_Rooms.Clear();
 
 
@@ -60,6 +67,7 @@ public class RoomSelectionMenu : Miscellaneous
 
     public void OnStart(string pageName)
     {
+        Debug.Log(pageName);
         switch (pageName)
         {
             case "RoomSelectionMenu":
@@ -69,6 +77,7 @@ public class RoomSelectionMenu : Miscellaneous
                 break;
 
             default:
+                RoomChangeAction.Clear();
                 /* Ce n'est pas la bonne page */
                 /* Stop la reception dans cette class */
                 Communication.Instance.StopListening(OnPacketReceived);

@@ -68,6 +68,7 @@ public class PublicRoomMenu : Miscellaneous
 
     public void HideRoom()
     {
+        Debug.Log("HIDDING ROOM");
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.PlayerLeave;
         packet.IdPlayer = Communication.Instance.IdClient;
@@ -77,7 +78,8 @@ public class PublicRoomMenu : Miscellaneous
         Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);
 
-        HidePopUpOptions();
+        // HidePopUpOptions();
+        Debug.Log("HALLO ?????");
         ChangeMenu("PublicRoomMenu", "RoomSelectionMenu");
     }
 
