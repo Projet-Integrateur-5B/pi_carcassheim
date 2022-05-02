@@ -23,6 +23,30 @@ namespace Assets.system
                 instance._plateau = plateau;
         }
 
+        public static Dictionary<ulong, int> CompterPointDesChampsEnFinDePartie()
+        {
+            ulong[] idJoueurTemp;
+            var result = new Dictionary<ulong, int>();
+
+            foreach (var item in instance._plateau.ChampsOuDesPionsOntEtePoses)
+            {
+                int x, y; ulong idSlot;
+                (x, y, idSlot) = item;
+                int points = CompterZoneFerme(x, y, (int)idSlot, out idJoueurTemp, true);
+                foreach (var joueur in idJoueurTemp)
+                {
+                    if (result.ContainsKey(joueur))
+                    {
+                        result[joueur] += points;
+                    }
+                    else
+                        result.Add(joueur, points);
+                }
+            }
+
+            return result;
+        }
+
         public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur, bool compterChamps = false)
         {
             Tuile tuile = instance._plateau.GetTuile(x, y);
@@ -72,7 +96,7 @@ namespace Assets.system
         }
 
         private void PointsZone(Tuile tuile, int idSlot,
-            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
+            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur, bool compterChamps = false)
         {
             bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
@@ -92,6 +116,10 @@ namespace Assets.system
                 parcourue.Add((item, nextSlot));
 
                 ulong idJ = item.Slots[nextSlot].IdJoueur;
+                if (compterChamps)
+                {
+                    item.Slots[nextSlot].IdJoueur = ulong.MaxValue;
+                }
 
                 if (idJ != ulong.MaxValue)
                 {

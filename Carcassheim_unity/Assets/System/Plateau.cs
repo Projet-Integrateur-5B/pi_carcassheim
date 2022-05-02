@@ -40,6 +40,8 @@ namespace Assets.system
             set { _tuiles = value; }
         }
 
+        public List<(int, int, ulong)> ChampsOuDesPionsOntEtePoses { get; private set; }
+
         public Plateau(Dictionary<ulong, Tuile> dicoTuiles)
         {
             _tuiles = new List<Tuile>();
@@ -438,6 +440,7 @@ namespace Assets.system
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
         {
             tuile.Slots[idSlot].IdJoueur = idJoueur;
+            ChampsOuDesPionsOntEtePoses.Add((tuile.X, tuile.Y, idSlot));
         }
 
         public int[] EmplacementPionPossible(int x, int y, ulong idJoueur, ulong id_meeple)
