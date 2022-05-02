@@ -131,8 +131,7 @@ namespace Assets.system
         public void PoserTuileFantome(ulong idTuile, int x, int y, int rot)
         {
             var t = tuileDeModelId(idTuile);
-            if (!t.Riviere)
-                t.TuileFantome = true;
+            t.TuileFantome = true;
             _tuiles.Remove(FindTuileFantome);
             PoserTuile(t, x, y, rot);
         }
