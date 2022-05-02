@@ -186,6 +186,8 @@ namespace Assets.system
 
         public Position[] PositionsPlacementPossible(Tuile tuile)
         {
+            if (tuile.Riviere)
+                Debug.Log("Ou cette tuile riviere est placable ? \n" + tuile.ToString());
             var listTuiles = new List<Tuile>();
 
             foreach (var item in _tuiles)
