@@ -50,6 +50,7 @@ public class HomeMenu : Miscellaneous
     public void QuitGame() // A LA FIN : quand tout fonctionnera : RemoveAllListeners(); (bouton -> "free")
     {
         Communication.Instance.LancementDeconnexion();
+        ChangeMenu("HomeMenu", "ConnectionMenu");
         Application.Quit();
     }
 

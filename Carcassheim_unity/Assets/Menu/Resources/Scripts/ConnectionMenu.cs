@@ -60,6 +60,7 @@ public class ConnectionMenu : Miscellaneous
     {
         HidePopUpOptions();
         ResetWarningTextCM();
+        ClearAll();
         ChangeMenu("ConnectionMenu", "HomeMenu");
     }
 
@@ -88,6 +89,7 @@ public class ConnectionMenu : Miscellaneous
         tmpText.color = Color.white;
         tmpText.text = "Connectez vous";
         HidePopUpOptions();
+        ClearAll();
         ChangeMenu("ConnectionMenu", "AccountMenu");
     }
 
@@ -158,5 +160,18 @@ public class ConnectionMenu : Miscellaneous
                 tmpText.text = "Ressaisissez votre login et votre mot de passe !";
             }
         }
+    }
+    
+    public void ClearAll()
+    {
+        loginCM = Clear(loginCM);
+        passwordCM = Clear(passwordCM);
+    }
+	
+    public static InputField Clear(InputField inputfield)
+    {
+        inputfield.Select();
+        inputfield.text = "";
+        return inputfield;
     }
 }

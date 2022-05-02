@@ -53,6 +53,7 @@ public class JoinByIdMenu : Miscellaneous
     public void HideJoinById()
     {
         HidePopUpOptions();
+        ClearAll();
         ChangeMenu("JoinByIdMenu", "RoomSelectionMenu");
     }
 
@@ -108,6 +109,7 @@ public class JoinByIdMenu : Miscellaneous
 
             if (res)
             {
+                ClearAll();
                 ChangeMenu("JoinByIdMenu", "PublicRoomMenu");
             }
 
@@ -115,5 +117,17 @@ public class JoinByIdMenu : Miscellaneous
             listAction.Clear();
             s_listAction.Release();
         }
+    }
+    
+    public void ClearAll()
+    {
+        idCM = Clear(idCM);
+    }
+	
+    public static InputField Clear(InputField inputfield)
+    {
+        inputfield.Select();
+        inputfield.text = "";
+        return inputfield;
     }
 }
