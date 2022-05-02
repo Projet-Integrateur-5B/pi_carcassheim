@@ -1069,6 +1069,7 @@ namespace system
             for(var i=0; i<rivieresRaw.Count;i++)
             {
                 var index = random.Next(0, rivieresRaw.Count);
+                Console.WriteLine("index = " + index);
                 rivieres.Add(rivieresRaw[index]);
                 rivieresRaw.RemoveAt(index);
             }
@@ -1076,8 +1077,8 @@ namespace system
             rivieres.Add(tail);
 
             foreach (var i in rivieres)
-            {
-                Console.WriteLine("RIVIERES : i");
+            { 
+                Console.WriteLine("RIVIERES : " + i);
             }
 
             //Retourner la liste 
