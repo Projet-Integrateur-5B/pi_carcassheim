@@ -9,10 +9,24 @@ using UnityEngine;
 
 namespace Assets.system
 {
+    /// <summary>
+    /// class static dont les fonctions permettent de l'initialisation des tuiles a partir d'un fichier xml
+    /// </summary>
     internal class LireXML2
     {
+        /// <summary>
+        /// donne l'id d'une position interne en fonction d'un point cardinal
+        /// </summary>
         static Dictionary<string, int> Positions;
+
+        /// <summary>
+        /// permet de recuperer un type de terrain a partir de son id
+        /// </summary>
         public static Dictionary<int, TypeTerrain> IdVersTerrain;
+
+        /// <summary>
+        /// donne un terrain en fonction de son nom
+        /// </summary>
         static Dictionary<string, TypeTerrain> DictionaireTemp;
         static LireXML2()
         {
@@ -43,6 +57,12 @@ namespace Assets.system
                 { "riviere", TypeTerrain.Riviere }
             };
         }
+
+        /// <summary>
+        /// initialise les type de terrains et les tuiles a partir d'un fichier xml
+        /// </summary>
+        /// <param name="file">nom du fichier xml se trouvant dans le dossier StreamingAssets</param>
+        /// <returns>un dictionnaire dont les clefs sont les ids des tuiles et les valeurs sont les tuiles</returns>
         public static Dictionary<ulong, Tuile> Read(string file)
         {
             var result = new Dictionary<ulong, Tuile>();
@@ -112,6 +132,10 @@ namespace Assets.system
             return result;
         }
 
+        /// <summary>
+        /// initialise les terrains
+        /// </summary>
+        /// <param name="xmlReader">fichier xml</param>
         private static void ReadTerrain(XmlReader xmlReader)
         {
             //// Debug.Log("TERAAIN");
@@ -161,6 +185,12 @@ namespace Assets.system
             }
         }
 
+        /// <summary>
+        /// lit une section slot de l'xml
+        /// </summary>
+        /// <param name="xmlReader">fichier</param>
+        /// <param name="slot">slot lu</param>
+        /// <returns>un tableau d'adjacence vers les autres solts</returns>
         private static List<int> ReadSlot(XmlReader xmlReader, out Slot slot)
         {
             // // Debug.Log("SLOT");
