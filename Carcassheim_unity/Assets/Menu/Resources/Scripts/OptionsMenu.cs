@@ -1,6 +1,9 @@
 using Assets.System;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Linq;
+using System;
 
 /// <summary>
 ///    Options Menu.
@@ -22,6 +25,15 @@ public class OptionsMenu : Miscellaneous
 	private Button _btnSonP, _btnMusiqueP;
 	private Transform panelMenu, PCB; // Options Container Buttons
 	private Sprite _spriteMusicON, _spriteMusicOFF, _spriteSoundON, _spriteSoundOFF, _spriteMusicUnselectedON, _spriteMusicUnselectedOFF, _spriteSoundUnselectedON, _spriteSoundUnselectedOFF;
+	private Text[] all_textes;
+	private List<Text> l_all_textes;
+	private List<string> fr_textes, en_textes, de_textes;
+	public static int langue = 0;
+
+	private GameObject ready, connect, status;
+
+	//0 FR, 1 EN, 2 DE
+
 	/// <summary>
 	/// Start is called before the first frame update <see cref = "OptionsMenu"/> class.
 	/// </summary>
@@ -34,6 +46,8 @@ public class OptionsMenu : Miscellaneous
 		_btnMusicUnselectedP = _btnMusiqueP.transform.GetChild(0).gameObject;
 		_btnSonP = PCB.Find("SwitchSound").GetComponent<Button>();
 		_btnSonUnselectedP = _btnSonP.transform.GetChild(0).gameObject;
+
+
 		optionsMenu = GameObject.Find("SubMenus").transform.Find("OptionsMenu").transform;
 		OCB = optionsMenu.Find("Buttons").transform;
 		OCS = optionsMenu.Find("Sliders").transform;
@@ -66,25 +80,142 @@ public class OptionsMenu : Miscellaneous
 		lastSoundValue = _soundSlider.value;
 		_musicSlider.onValueChanged.AddListener(MusicSliderCallBack);
 		lastMusicValue = _musicSlider.value;
+
+		//tableaux contenant tous les textes du menu
+		all_textes = Resources.FindObjectsOfTypeAll<Text>();
+		//on enleve de ce tableau les Text avec le tag no_trad (mots qu'on a pas besoin de traduire) et modif (les textes modifi�es par le script) et les textes vides
+		all_textes = Array.FindAll(all_textes, i => i.tag != "no_trad" && i.tag != "modif" && !string.IsNullOrEmpty(i.text)).ToArray();
+
+		//on convertit le tableau en liste (pour faciliter les op�rations)
+		l_all_textes = all_textes.ToList<Text>();
+
+		/*foreach (Text a in l_all_textes)
+			Debug.Log(a.text);*/
+
+		//liste contenant tous les textes en fran�ais
+		fr_textes = new List<string>();
+		foreach (Text a in l_all_textes)
+			fr_textes.Add(a.text);
+
+		//liste contenant tous les textes en anglais (tres sensible � l'ordre des gameobject)
+		en_textes = new List<string> {"STATUS", "Room ID -> X", "OPTIONS", "Extensions", "Year ...", "Join by ID", "CREDITS", "CONNECT", "River", "Enter your password ...", "Time per round", "Enter your Username ...", "PUBLIC ROOM", "CREATE", "JOIN ROOM", "ID to enter", "QUIT", "Abbey", "The room is created !", "Enter your password ...", "Email / Username", "Accept ", "Enter your Email/Pseudo ...", "Confirm your password ...", "CREATE AN ACCOUNT", "month ...", "STATUS", "Day ...", "Endgame", "Enter an ID ...", "PLAY SOLO", "ID", "Max players", "Password", "Enter your Email ...", "CREATE AN ACCOUNT", "Public", "HELP", "STATS", "Option A", "PLAY MULTI", "Show password", "JOIN ROOM MENU", "Show password", "Private", "Create your account", "Confirm password", "Room settings", "JOIN BY ID", "Ending condition", "Options", "Public", "GCU", "Email", "Create your room", "Forgot your username/password?", "Username", "Room ", "Number of players ", "Password", "Private", "LOG IN", "Date of birth", "Hosts", "READY", "Players", "Tile", "ID", "Players", "Hosts", "Endgame", "Max players" };
+		//liste contenant tous les textes en allemand (tres sensible � l'ordre des gameobject)
+		de_textes = new List<string> {"STATUS", "Raum-ID -> X", "OPTIONEN", "Erweiterungen", "Jahr ...", "Beitritt nach ID", "CREDITS", "VERBINDEN", "Fluss", "Geben Sie Ihr Passwort ein ...", "Zeit pro Runde", "Geben Sie Ihren Benutzernamen ein ...", "�FFENTLICHER RAUM", "ANLEGEN", "RAUM ANMELDEN", "ID zum Betreten", "BEENDEN", "Abtei", "Der Raum wird erstellt!", "Geben Sie Ihr Passwort ein ...", "E-Mail / Benutzername", "Akzeptieren ", "Geben Sie Ihre Email/Pseudo ein ...", "Best�tigen Sie Ihr Passwort ...", "EIN KONTO ERSTELLEN", "Monat ...", "STATUS", "Tag ...", "Endgame", "Eine ID eingeben ...", "SOLO SPIELEN", "KENNUNG", "Max Spieler", "Kennwort", "Geben Sie Ihre E-Mail ein ...", "EIN KONTO ERSTELLEN", "�ffentlich", "HILFE", "STATISTIKEN", "Option A", "MULTI SPIELEN", "Passwort anzeigen", "ZIMMERMEN� BETRETEN", "Passwort anzeigen", "Privat", "Erstellen Sie Ihr Konto", "Best�tigen Sie Ihr Passwort", "Raum-Einstellungen", "JOIN BY ID", "Bedingung zum Beenden", "Optionen", "�ffentlich", "GCU", "E-Mail", "Erstellen Sie Ihren Raum", "Haben Sie Ihren Benutzernamen/Passwort vergessen?", "Benutzername", "Raum ", "Anzahl der Spieler ", "Kennwort", "Privat", "ANMELDEN", "Geburtsdatum", "Gastgeber", "READY", "Spieler", "Kachel", "ID", "Spieler", "Gastgeber", "Endspiel", "Maximale Spieler" };
+
+		//les 3 textes qui se modifient
+
+		//NON PRET
+		ready = GameObject.Find("SubMenus").transform.Find("PublicRoomMenu").transform.Find("Text").transform.Find("preparation").gameObject;
+		//Deconnecte
+		connect = GameObject.Find("SubMenus").transform.Find("HomeMenu").transform.Find("Text").transform.Find("Etat de connexion").gameObject;
+		//Connectez-vous
+		status = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform.Find("Text").transform.Find("Instructions").gameObject;
 	}
 
 	/// <summary>
-	/// Toggle options <see cref = "OptionsMenu"/> class.
+	/// Toggles the language <see cref = "OptionsMenu"/> class.
 	/// </summary>
-	/// <param name = "curT">Current toggle.</param>
+	/// <param name="curT">The current language 
 	public void ToggleValueChangedOM(Toggle curT)
 	{
 		if (curT.isOn)
 			Debug.Log(curT.name);
+
+		if (curT.name == "Toggle French")
+		{
+			//francais
+			langue = 0;
+
+			//on met a jour les textes en fran�ais
+			for (int i = 0; i < l_all_textes.Count; i++)
+				l_all_textes[i].text = fr_textes[i];
+
+			//on actualise les textes
+			all_textes = l_all_textes.ToArray();
+			
+			//on gere les textes particuliers qui sont modifies par le script
+			if(ready.GetComponent<Text>().text == "NOT READY" || ready.GetComponent<Text>().text == "NICHT BEREIT")
+				ready.GetComponent<Text>().text = "NON PRET";
+			else if(ready.GetComponent<Text>().text == "READY TO PLAY!" || ready.GetComponent<Text>().text == "SPIELBEREIT!")
+				ready.GetComponent<Text>().text = "PRET A JOUER !";
+
+			if (connect.GetComponent<Text>().text == "Disconnected" || connect.GetComponent<Text>().text == "Offline")
+				connect.GetComponent<Text>().text = "Deconnecte";
+			else if (connect.GetComponent<Text>().text == "Connected" || connect.GetComponent<Text>().text == "Verbunden")
+				connect.GetComponent<Text>().text = "Connecte";
+
+			if (status.GetComponent<Text>().text == "Log in" || status.GetComponent<Text>().text == "Loggen Sie sich ein")
+				status.GetComponent<Text>().text = "Connectez-vous";
+			else if (status.GetComponent<Text>().text == "Re-enter your login and password!" || status.GetComponent<Text>().text == "Geben Sie Ihren Login und Ihr Passwort erneut ein!")
+				status.GetComponent<Text>().text = "Ressaisissez votre login et votre mot de passe !";
+
+		}
+		else if (curT.name == "Toggle English")
+		{
+			//anglais
+			langue = 1;
+
+			//on met a jour les textes en anglais
+			for (int i = 0; i < l_all_textes.Count; i++)
+				l_all_textes[i].text = en_textes[i];
+
+			//on actualise les textes
+			all_textes = l_all_textes.ToArray();
+
+			//on gere les textes particuliers qui sont modifies par le script
+			if (ready.GetComponent<Text>().text == "NON PRET" || ready.GetComponent<Text>().text == "NICHT BEREIT")
+				ready.GetComponent<Text>().text = "NOT READY";
+			else if (ready.GetComponent<Text>().text == "PRET A JOUER !" || ready.GetComponent<Text>().text == "SPIELBEREIT!")
+				ready.GetComponent<Text>().text = "READY TO PLAY!";
+
+			if (connect.GetComponent<Text>().text == "Deconnecte" || connect.GetComponent<Text>().text == "Offline")
+				connect.GetComponent<Text>().text = "Disconnected";
+			else if (connect.GetComponent<Text>().text == "Connecte" || connect.GetComponent<Text>().text == "Verbunden")
+				connect.GetComponent<Text>().text = "Connected";
+
+			if (status.GetComponent<Text>().text == "Connectez-vous" || status.GetComponent<Text>().text == "Loggen Sie sich ein")
+				status.GetComponent<Text>().text = "Log in";
+			else if (status.GetComponent<Text>().text == "Ressaisissez votre login et votre mot de passe !" || status.GetComponent<Text>().text == "Geben Sie Ihren Login und Ihr Passwort erneut ein!")
+				status.GetComponent<Text>().text = "Re-enter your login and password!";
+		}
+		else if (curT.name == "Toggle German")
+		{
+			//allemand
+			langue = 2;
+
+			//on met a jour les textes en allemand
+			for (int i = 0; i < l_all_textes.Count; i++)
+				l_all_textes[i].text = de_textes[i];
+
+			//on actualise les textes
+			all_textes = l_all_textes.ToArray();
+
+			//on gere les textes particuliers qui sont modifies par le script
+			if (ready.GetComponent<Text>().text == "NON PRET" || ready.GetComponent<Text>().text == "NOT READY")
+				ready.GetComponent<Text>().text = "NICHT BEREIT";
+			else if (ready.GetComponent<Text>().text == "PRET A JOUER !" || ready.GetComponent<Text>().text == "READY TO PLAY!")
+				ready.GetComponent<Text>().text = "SPIELBEREIT!";
+
+			if (connect.GetComponent<Text>().text == "Deconnecte" || connect.GetComponent<Text>().text == "Disconnected")
+				connect.GetComponent<Text>().text = "Offline";
+			else if (connect.GetComponent<Text>().text == "Connecte" || connect.GetComponent<Text>().text == "Connected")
+				connect.GetComponent<Text>().text = "Verbunden";
+
+			if (status.GetComponent<Text>().text == "Connectez-vous" || status.GetComponent<Text>().text == "Log in")
+				status.GetComponent<Text>().text = "Loggen Sie sich ein";
+			else if (status.GetComponent<Text>().text == "Ressaisissez votre login et votre mot de passe !" || status.GetComponent<Text>().text == "Re-enter your login and password!")
+				status.GetComponent<Text>().text = "Geben Sie Ihren Login und Ihr Passwort erneut ein!";
+		}
 	}
 
 	//---------------------------- Music/Sound Begin ----------------------------//
+
 	/// <summary>
-	/// Display volume <see cref = "OptionsMenu"/> class.
+	/// Displays the music/sound volume <see cref="Slider"/>.
 	/// </summary>
-	/// <param name = "ads">Audio source.</param>
-	/// <param name = "txt">Text to display.</param>
-	/// <param name = "sb">Slider bar.</param>
+	/// <param name="ads">The ads.</param>
+	/// <param name="txt">The text.</param>
+	/// <param name="sb">The sb.</param>
 	public void Volume(AudioSource ads, Text txt, Slider sb)
 	{
 		ads.volume = sb.value;
