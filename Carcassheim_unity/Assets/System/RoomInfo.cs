@@ -136,11 +136,11 @@ namespace Assets.System
                 int flags_extension = int.Parse(values[10]);
                 _riverOn = (flags_extension & (int)Tools.Extensions.Riviere) > 0;
                 _abbayeOn = (flags_extension & (int)Tools.Extensions.Abbaye) > 0;
-                Debug.Log("river " + _riverOn + " abba " + _abbayeOn);
+                //Debug.Log("river " + _riverOn + " abba " + _abbayeOn);
 
                 s_RoomInfo.Release();
 
-                repre_parameter?.addParameters(isPrivate, mode, timerJoueur, timerPartie, scoreMax, nbTuile, abbayeOn, riverOn);
+                repre_parameter?.addParameters(isPrivate, mode, timerJoueur, timerPartie, scoreMax, nbTuile, riverOn, abbayeOn);
             }
             catch (Exception ex)
             {
