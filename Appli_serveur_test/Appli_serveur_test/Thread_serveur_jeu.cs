@@ -1075,6 +1075,11 @@ namespace system
             
             rivieres.Add(tail);
 
+            foreach (var i in rivieres)
+            {
+                Console.WriteLine("RIVIERES : i");
+            }
+
             //Retourner la liste 
             return rivieres;
         }
