@@ -77,6 +77,7 @@ public class PublicRoomMenu : Miscellaneous
 
         Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);
+        Communication.Instance.IsInRoom = 0;
 
         // HidePopUpOptions();
         Debug.Log("HALLO ?????");

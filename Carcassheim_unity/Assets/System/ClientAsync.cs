@@ -290,6 +290,7 @@ public class ClientAsync
 
             while (mustLoop)
             {
+                Debug.Log("----------------------------------- loop ---------------------------------------------------");
                 receiveDone.Reset();
                 // Begin receiving the data from the remote device.
                 clientSocket.BeginReceive(state.buffer, 0, StateObject.BufferSize, 0,
@@ -373,6 +374,7 @@ public class ClientAsync
     /// </remarks>
     public static void StopListening()
     {
-        mustLoop = false;
+        if(Communication.Instance.IsInRoom == 0)
+            mustLoop = false;
     }
 }
