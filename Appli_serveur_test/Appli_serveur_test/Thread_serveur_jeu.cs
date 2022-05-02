@@ -925,9 +925,11 @@ namespace system
 
             _plateau.ValiderTour();
 
+            List<Zone> lstZone = new List<Zone>();
+
             // Vérification des fermetures de chemins et mise à jour des points
             List<PlayerScoreParam> lstPlayerScoreGain = new List<PlayerScoreParam>();
-            if(_plateau.VerifZoneFermeeTuile(_posTuileTourActu.X, _posTuileTourActu.Y, lstPlayerScoreGain, null))
+            if(_plateau.VerifZoneFermeeTuile(_posTuileTourActu.X, _posTuileTourActu.Y, lstPlayerScoreGain, lstZone))
             {
                 // Mise à jour des points 
                 _s_dico_joueur.WaitOne();
