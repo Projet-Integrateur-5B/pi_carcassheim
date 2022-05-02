@@ -29,6 +29,8 @@ namespace Assets.system
     };
     public class Plateau
     {
+        private const int GAUCHE = 1, DROITE = -1;
+        private int _lastRiverTurn = 0;
         public static readonly int[,] PositionAdjacentes;
         private Dictionary<ulong, Tuile> _dicoTuile;
 
@@ -239,6 +241,8 @@ namespace Assets.system
 
         public bool PlacementLegal(Tuile tuile, int x, int y, int rotation)
         {
+            bool riviere = tuile.Riviere;
+
             Tuile tl = GetTuile(x, y);
             if (tl != null && !tl.TuileFantome)
             {
@@ -260,7 +264,8 @@ namespace Assets.system
                 TypeTerrain[] faceTuile1 = tuile.TerrainSurFace((rotation + i) % 4);
                 TypeTerrain[] faceTuile2 = t.TerrainSurFace((t.Rotation + i + 2) % 4);
 
-                if (!CorrespondanceTerrains(faceTuile1, faceTuile2))
+                if (!CorrespondanceTerrains(faceTuile1, faceTuile2) &&
+                    (!riviere || RiviereDansFace(faceTuile2)))
                     return false;
                 else
                 {
@@ -268,8 +273,17 @@ namespace Assets.system
                 }
                 //Debug.Log("hello " + i + x + y + rotation);
             }
-
             return auMoinsUne;
+        }
+
+        private bool RiviereDansFace(TypeTerrain[] face)
+        {
+            for (int i = 0; i < face.Length; i++)
+            {
+                if (face[i] == TypeTerrain.Riviere)
+                    return true;
+            }
+            return false;
         }
 
         private bool CorrespondanceTerrains(TypeTerrain[] t1, TypeTerrain[] t2)
