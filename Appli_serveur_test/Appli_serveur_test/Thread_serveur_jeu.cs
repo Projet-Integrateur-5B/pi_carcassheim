@@ -1071,7 +1071,7 @@ namespace system
             var tail = rivieresRaw.Last();
             rivieresRaw.RemoveAt(rivieresRaw.Count-1);
 
-            for(var i=0; i<rivieresRaw.Count;i++)
+            while(rivieresRaw.Count > 0)
             {
                 var index = random.Next(0, rivieresRaw.Count);
                 Console.WriteLine("index = " + index);
