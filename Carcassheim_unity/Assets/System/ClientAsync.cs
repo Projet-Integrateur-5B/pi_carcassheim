@@ -176,24 +176,13 @@ public class ClientAsync
     /// <param name="clientSocket"> Le <see cref="Socket" /> a utiliser. </param>
     public static void Disconnection(Socket clientSocket)
     {
-        clientSocket.BeginDisconnect(true,
-            new AsyncCallback(DisconnectCallback), clientSocket);
-    }
-
-    /// <summary>
-    ///     Méthode utilisé par <see cref="Disconnection"/>.
-    /// </summary>
-    /// <param name="ar"> L'objet asynchrone. </param>
-    public static void DisconnectCallback(IAsyncResult ar)
-    {
         try
         {
+            Debug.Log("Client disconnected from {0} " + clientSocket.RemoteEndPoint);
+            
             // Complete the disconnect request.
-            Socket client = (Socket)ar.AsyncState;
-            client.EndDisconnect(ar);
-
-            Debug.Log("Client is disconnected to {0} " + client.RemoteEndPoint);
-
+            clientSocket.Shutdown(SocketShutdown.Both);  
+            clientSocket.Close();
         }
         catch (Exception e)
         {

@@ -234,6 +234,8 @@ namespace Assets.System
         /// </remarks>
         public void LancementDeconnexion()
         {
+            if (!IsConnected) return;
+            
             ClientAsync.Disconnection(lesSockets[IsInRoom]);
             ClientAsync.connectDone.WaitOne();
 
