@@ -3,14 +3,38 @@ using System.Threading;
 
 namespace Assert.system
 {
+    /// <summary>
+    ///     Information du joueur
+    /// </summary>
     public class Player
     {
-        /* Attributs */
+        /// <summary>
+        ///     Id du joueur
+        /// </summary>
         public ulong id { get; }
+
+        /// <summary>
+        ///     Nom du joueur
+        /// </summary>
         public string name { get; set; }
+
+        /// <summary>
+        ///     Nombre de meeple du joueur
+        /// </summary>
         public uint nbMeeples { get; set; }
+
+        /// <summary>
+        ///     score du joueur
+        /// </summary>
         public uint score { get; set; }
 
+        /// <summary>
+        ///     récupération des nouvelles informations du joueur
+        /// </summary>
+        /// <param name="player_id">Id du joueur</param>
+        /// <param name="player_name">Nom du joueur</param>
+        /// <param name="player_nbMeeples">Nombre de meeples du joueur</param>
+        /// <param name="player_score">Score du joueur</param>
         public Player(ulong player_id,string player_name,uint player_nbMeeples,uint player_score)
         {
             id = player_id;
