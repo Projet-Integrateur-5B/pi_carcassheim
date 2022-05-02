@@ -252,6 +252,7 @@ public class backLocal : CarcasheimBack
 
     int drawRiver()
     {
+        Debug.Log("pioche d'une tuile riviere...\ntiles_for_river.Count = " + tiles_for_river.Count);
         ulong result = 0;
         if (tiles_for_river.Count != 0)
         {
@@ -268,6 +269,7 @@ public class backLocal : CarcasheimBack
         possibilities_tile_act_turn.AddRange(_plateau.PositionsPlacementPossible(result));
         Debug.Log("tirer");
         river_on = tiles_for_river.Count > 0 && tile_final_river != ulong.MaxValue;
+        Debug.Log("tuile d'id : " + result + " piochee");
         return (int)result;
     }
 
