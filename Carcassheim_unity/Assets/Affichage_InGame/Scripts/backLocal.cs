@@ -63,9 +63,9 @@ public class backLocal : CarcasheimBack
         gameStart();
     }
 
-    public void pressed()
+    public void begin_pressed()
     {
-
+        Debug.Log("COucou hibou");
     }
 
     bool validate_start()
@@ -147,22 +147,28 @@ public class backLocal : CarcasheimBack
         bool tuile_valide = false;
         bool meeple_valide = false;
         ulong player_act = (ulong)players[index_player].id_player;
+        Debug.Log(_plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation));
         if (play.id_tile != -1 && _plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation))
         {
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
+        Debug.Log(play.id_meeple);
+        Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
             _plateau.PoserPion(player_act, play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos);
             players[index_player] = new PlayerInitParam(players[index_player].id_player, players[index_player].nb_meeple - 1, players[index_player].player_name);
             meeple_valide = true;
         }
+        Debug.Log(tuile_valide);
         if (tuile_valide)
         {
+            Debug.Log("PTI VALID");
             _plateau.ValiderTour();
             gains.Clear();
             zones.Clear();
+            Debug.Log("PTITI SCORE");
             score_changed = _plateau.VerifZoneFermeeTuile(play.tile_pos.X, play.tile_pos.Y, gains, zones);
             if (score_changed)
             {
@@ -189,15 +195,18 @@ public class backLocal : CarcasheimBack
         act_turn_play = new TurnPlayParam(tuile_valide ? play.id_tile : -1, tuile_valide ? play.tile_pos : null, meeple_valide ? play.id_meeple : -1, meeple_valide ? play.slot_pos : -1);
         if (end)
         {
+            Debug.Log("IT S THE END OF THE WORLD");
             system_display.setNextState(DisplaySystemState.endOfGame);
         }
         else if (score_changed)
         {
+            Debug.Log("SCORE CHANGED");
             system_display.setNextState(DisplaySystemState.scoreChange);
             newTurn();
         }
         else
         {
+            Debug.Log("NEXT TURN");
             newTurn();
         }
 
@@ -256,6 +265,7 @@ public class backLocal : CarcasheimBack
             tile_final_river = ulong.MaxValue;
 
         }
+        possibilities_tile_act_turn.AddRange(_plateau.PositionsPlacementPossible(result));
         Debug.Log("tirer");
         river_on = tiles_for_river.Count > 0 && tile_final_river != ulong.MaxValue;
         return (int)result;
