@@ -602,6 +602,54 @@ namespace system
         }
 
         /// <summary>
+        /// Forces the end of a turn. 
+        /// Doesn't care if the play is valid (tile and pawn pos), because it has already been checked if it is stored.
+        /// If no play stored, -1 -1 broadcasted and no placement is played.
+        /// </summary>
+        /// <param name="idPlayer"></param>
+        /// <param name="idRoom"></param>
+        /// <param name="data"></param>
+        public void ForceEndTurn(ulong idPlayer, int idRoom, string[] data)
+        {
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (idRoom != thread_serv_ite.Get_ID()) continue;
+                Console.WriteLine("Force_EndTurn : room found !");
+                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
+                {
+                    // Fin du tour actuel
+                    Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
+                    // Mise à jour du status de la game
+                    Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+
+                    if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
+                    {
+                        Console.WriteLine("Force_EndTurn : game stopped !");
+
+                        ulong idPlayerWinner = thread_serv_ite.GetWinner();
+                        string[] dataToSend = new string[] { idPlayerWinner.ToString() };
+                        SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
+                        DeleteGame(idRoom);
+                    }
+                    else // Si la partie n'est pas terminée
+                    {
+                        Console.WriteLine("Force_EndTurn : game still running !");
+
+                        // Mélange des tuiles pour le prochain tirage
+                        thread_serv_ite.ShuffleTilesGame();
+                        thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
+
+                        Console.WriteLine("Force_EndTurn : before broadcast !");
+
+                        // Envoi de l'information du endturn
+                        SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
+                    }
+
+                }
+            }             
+        }
+
+        /// <summary>
         ///     Checks if the data is equivalent to the last play stored. If not, check the validity of it.
         /// </summary>
         /// <param name="dataReceived"></param>

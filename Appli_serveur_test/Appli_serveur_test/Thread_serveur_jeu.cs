@@ -60,7 +60,7 @@ namespace system
         private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
         private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
         private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
-        private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, posTuile X, posTuile Y, idSlot}
+        private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, posTuile X, posTuile Y, idMeeple, idSlot}
         private int _extensionsGame; // Indications sur les extensions utilisees dans cette partie
 
         // Attributs anticheat
@@ -718,7 +718,11 @@ namespace system
             var idPlayer = Get_ActualPlayerId();
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
             _timer_player.Stop();
-            //EndTurn(idPlayer);
+
+            string[] dataPlayToSend = ParseStoredPlayToData();
+            GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+            // Force the end of the turn
+            gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
         }
 
         /// <summary>
@@ -908,23 +912,31 @@ namespace system
         public Socket? EndTurn(ulong idPlayer)
         {
             _timer_player.Stop();
+
+            bool aJoue = false;
             
             // Prise en compte du placement de la tuile et du pion (mise à jour structure de données)
             _s_plateau.WaitOne();
             
             try
             {
-                _plateau.PoserTuileFantome(_idTuileChoisie, _posTuileTourActu);
-
-                if (_posPionTourActu.Length != 0) // Si un pion a été posé durant le tour
+                // Si une tuile a été posée durant le tour (pour prendre en compte le cas de forçage de fin de tour)
+                if (Get_posTuileTourActu().IsExisting())
                 {
-                    _plateau.PoserPion(idPlayer, _posTuileTourActu.X, _posTuileTourActu.Y, UInt64.Parse(_posPionTourActu[2]));
+                    _plateau.PoserTuileFantome(_idTuileChoisie, _posTuileTourActu);
 
-                    // Retrait d'un pion au joueur
-                    _s_dico_joueur.WaitOne();
-                    _dico_joueur[idPlayer]._nbMeeples = _dico_joueur[idPlayer]._nbMeeples - 1;
-                    _s_dico_joueur.Release();
-                }
+                    if (_posPionTourActu.Length != 0) // Si un pion a été posé durant le tour
+                    {
+                        _plateau.PoserPion(idPlayer, _posTuileTourActu.X, _posTuileTourActu.Y, UInt64.Parse(_posPionTourActu[2]));
+
+                        // Retrait d'un pion au joueur
+                        _s_dico_joueur.WaitOne();
+                        _dico_joueur[idPlayer]._nbMeeples = _dico_joueur[idPlayer]._nbMeeples - 1;
+                        _s_dico_joueur.Release();
+                    }
+
+                    aJoue = true;
+                }           
       
             }
             catch (Exception ex)
@@ -935,13 +947,14 @@ namespace system
 
             // Validation de la position
 
-            _plateau.ValiderTour();
+            if(aJoue)
+                _plateau.ValiderTour();
 
             List<Zone> lstZone = new List<Zone>();
 
             // Vérification des fermetures de chemins et mise à jour des points
             List<PlayerScoreParam> lstPlayerScoreGain = new List<PlayerScoreParam>();
-            if(_plateau.VerifZoneFermeeTuile(_posTuileTourActu.X, _posTuileTourActu.Y, lstPlayerScoreGain, lstZone))
+            if(aJoue && _plateau.VerifZoneFermeeTuile(_posTuileTourActu.X, _posTuileTourActu.Y, lstPlayerScoreGain, lstZone))
             {
                 // Mise à jour des points 
                 _s_dico_joueur.WaitOne();
@@ -955,7 +968,9 @@ namespace system
 
             }
 
-            RetirerTuileGame(_idTuileChoisie);
+
+            if(aJoue)
+                RetirerTuileGame(_idTuileChoisie);
 
 
             // Remise à inexistant la tuilePosActu et pionPosActu
@@ -1137,6 +1152,49 @@ namespace system
         {
             bool abbayeOn = (_extensionsGame & (int)Tools.Extensions.Abbaye) > 0;
             return abbayeOn;
+        }
+
+        public string[] ParseStoredPlayToData()
+        {
+            string[] dataToReturn = new string[6];
+
+            dataToReturn[0] = Get_idTuileChoisie().ToString(); // idTuile
+
+            _s_posTuileTourActu.WaitOne();
+
+            if (Get_posTuileTourActu().IsExisting()) // Tile play stored
+            {
+                dataToReturn[1] = Get_posTuileTourActu().X.ToString(); // Pos X
+                dataToReturn[2] = Get_posTuileTourActu().Y.ToString(); // Pos Y
+                dataToReturn[3] = Get_posTuileTourActu().ROT.ToString(); // Pos ROT
+            }
+            else // No tile play stored
+            {
+                dataToReturn[1] = (-1).ToString(); // Pos X
+                dataToReturn[2] = (-1).ToString(); // Pos Y
+                dataToReturn[3] = (-1).ToString(); // Pos ROT
+            }
+
+            _s_posTuileTourActu.Release();
+
+
+            _s_posPionTourActu.WaitOne();
+
+            if (Get_posPionTourActu().Length != 0) // Pawn play stored
+            {
+                dataToReturn[4] = Get_posPionTourActu()[4]; // idMeeple
+                dataToReturn[5] = Get_posPionTourActu()[5]; // slotPos
+            }
+            else // No pawn play stored
+            {
+                dataToReturn[4] = (-1).ToString(); // idMeeple
+                dataToReturn[5] = (-1).ToString(); // slotPos
+            }
+
+            _s_posPionTourActu.Release();
+
+            return dataToReturn;
+
         }
         
     }

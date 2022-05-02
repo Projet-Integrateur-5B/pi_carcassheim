@@ -619,6 +619,22 @@ namespace system
             }
             return errors; // return valeur correcte
         }
+
+        public void CallForceEndTurn(ulong idPlayer, int idRoom, string[] data)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
+                {
+                    Console.WriteLine("CallForceEndTurn : idRoom was found !");
+                    thread_com_iterateur.ForceEndTurn(idPlayer, idRoom, data);
+                    break;
+                }
+
+            }
+        }
         
         public void CallChooseIdTile(ulong idPlayer, int idRoom, ulong idTuile, Position pos, Socket? playerSocket)
         {
