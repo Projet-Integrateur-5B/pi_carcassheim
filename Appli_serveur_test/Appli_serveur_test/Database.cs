@@ -318,7 +318,7 @@ public class Database
     
     public void RemplirTuiles(Dictionary<ulong, ulong> dico)
     {
-        string commande = "SELECT idm,proba FROM Modele WHERE extnom = '';";
+        string commande = "SELECT idm,proba FROM Modele WHERE extnom = 'none';";
         string[] parametres = Array.Empty<string>();
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
@@ -341,7 +341,7 @@ public class Database
 
     public void RemplirRivieres(Dictionary<ulong, ulong> dico)
     {
-        string commande = "SELECT idm,proba FROM Modele WHERE extnom = rivière;";
+        string commande = "SELECT idm,proba FROM Modele WHERE extnom = 'rivière';";
         string[] parametres = Array.Empty<string>();
         Task<object[]> res = ExecuteCommandeWithResult(commande, parametres);
 
