@@ -96,7 +96,7 @@ namespace Assets.system
         }
 
         private void PointsZone(Tuile tuile, int idSlot,
-            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur)
+            List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur, bool compterChamps = false)
         {
             bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
@@ -116,6 +116,10 @@ namespace Assets.system
                 parcourue.Add((item, nextSlot));
 
                 ulong idJ = item.Slots[nextSlot].IdJoueur;
+                if (compterChamps)
+                {
+                    item.Slots[nextSlot].IdJoueur = ulong.MaxValue;
+                }
 
                 if (idJ != ulong.MaxValue)
                 {
