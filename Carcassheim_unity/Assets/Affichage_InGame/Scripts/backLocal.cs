@@ -69,6 +69,8 @@ public class backLocal : CarcasheimBack
     [SerializeField] List<GameObject> win_params;
     List<System.Tuple<int, int, ulong>> meeple_positions = new List<Tuple<int, int, ulong>>();
 
+    bool turn_on = false;
+
     void Start()
     {
         dicoTuile = LireXML2.Read(XML_PATH);
@@ -199,18 +201,21 @@ public class backLocal : CarcasheimBack
         bool meeple_valide = false;
         ulong player_act = (ulong)players[index_player].id_player;
         // Debug.Log(_plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation));
+        Debug.Log("pk " + play.id_tile);
         if (play.id_tile != -1 && _plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation))
         {
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
         //Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
+        Debug.Log("pk " + play.id_meeple);
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
             _plateau.PoserPion(player_act, play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos);
             players[index_player] = new PlayerInitParam(players[index_player].id_player, players[index_player].nb_meeple - 1, players[index_player].player_name);
             meeple_valide = true;
         }
+        Debug.Log("pk");
         if (tuile_valide)
         {
             _plateau.ValiderTour();
@@ -243,7 +248,7 @@ public class backLocal : CarcasheimBack
             }
             Debug.Log("Score changed ? " + score_changed);
         }
-
+        Debug.Log("OK");
         switch (my_wincond)
         {
             case WinCondition.WinByTime:
@@ -285,10 +290,11 @@ public class backLocal : CarcasheimBack
 
         long timeLapse = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - _timeLapse;
 
-        if (timeLapse > _turnMaxMin * 60 + _turnMaxSec)
+        if (turn_on && timeLapse > _turnMaxMin * 60 + _turnMaxSec)
         {
+            turn_on = false;
+
             system_display.setNextState(DisplaySystemState.idleState);
-            Debug.LogWarning("TIMER EXPIRED");
         }
     }
 

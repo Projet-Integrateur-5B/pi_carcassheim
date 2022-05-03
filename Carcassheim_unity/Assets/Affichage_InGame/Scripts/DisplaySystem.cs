@@ -473,8 +473,14 @@ public class DisplaySystem : MonoBehaviour
                 {
                     if (act_meeple != null && act_meeple.ParentTile != null)
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
-                    else
+                    else if (act_tile.Pos != null)
+                    {
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, -1, -1));
+                    }
+                    else
+                    {
+                        system_back.sendTile(new TurnPlayParam(-1, null, -1, -1));
+                    }
                 }
                 break;
             case DisplaySystemState.turnStart:
