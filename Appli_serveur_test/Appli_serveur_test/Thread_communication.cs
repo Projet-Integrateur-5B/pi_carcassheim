@@ -556,6 +556,7 @@ namespace system
                         Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                         // Mise à jour du status de la game
                         Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+                        Console.WriteLine(thread_serv_ite.Get_Status());
 
                         if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                         {
