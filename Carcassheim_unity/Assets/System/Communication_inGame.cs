@@ -308,7 +308,7 @@ namespace Assets.system
 
                 case DisplaySystemActionTypes.meepleSetCoord:
                     DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
-                    SendMeepple(action_msc.tile_id, action_msc.meeple_id, action_msc.slot_pos);
+                    SendMeepple( action_msc.tile_pos.X, action_msc.tile_pos.Y, action_msc.meeple_id, action_msc.slot_pos) ;
                     break;
 
                 case DisplaySystemActionTypes.meepleSelection:
@@ -622,7 +622,7 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        public void SendMeepple(int id_tuile, int id_meeple, int slot_pos)
+        public void SendMeepple( int X, int Y, int id_meeple, int slot_pos)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.PionPlacement;
@@ -631,7 +631,8 @@ namespace Assets.system
 
             packet.Data = new string[]
             {
-                id_tuile.ToString(),
+                X.ToString(),
+                Y.ToString(),
                 id_meeple.ToString(),
                 slot_pos.ToString()
             };
