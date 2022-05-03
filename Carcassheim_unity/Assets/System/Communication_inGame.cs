@@ -536,7 +536,7 @@ namespace Assets.system
 
             for (i = 0; i < taille_data; i += 2)
             {
-                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], RoomInfo.Instance.meeples, 0);
+                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)RoomInfo.Instance.meeples, 0);
                 compteur++;
             }
 
