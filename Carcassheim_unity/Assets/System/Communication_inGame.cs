@@ -156,11 +156,11 @@ namespace Assets.system
             int taille = playerList.Length;
             for (int i = 0; i < meeple_type; i++)
                 for (int j = 0; j < taille; j++)
-                    if (playerList[j].id == nextPlayer)
-                    {
-                        meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
-                        break;
-                    }
+                {
+                    meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
+                    Debug.Log("playerList[" + j + "].nbMeeples : " + playerList[j].nbMeeples);
+                }
+                    
         }
 
         override public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
@@ -619,18 +619,14 @@ namespace Assets.system
 
                 gains.Clear();
                 zones.Clear();
-                // Debug.Log("PTITI SCORE");
-                bool score_changed = lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones);
-                if (score_changed)
+
+                int taille = playerList.Length;
+                for (int j = 0; j < taille; j++)
                 {
-                    for (int i = 0; i < gains.Count; i++)
-                    {
-                        // TODO mettre à jour score dans playerscore
-                    }
+                    playerList[j].score = uint.Parse(packet.Data[j+6]);
                 }
                 system_display.setNextState(next_state);
-                if (score_changed)
-                    system_display.setNextState(DisplaySystemState.scoreChange);
+                system_display.setNextState(DisplaySystemState.scoreChange);
             }
 
         }
