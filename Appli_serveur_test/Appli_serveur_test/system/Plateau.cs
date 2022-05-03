@@ -521,22 +521,32 @@ namespace system
             Tuile tuile = GetTuile(x, y);
 
             // Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
-
-            Console.WriteLine("tuile == null : " + (tuile == null) + " WWWWW (ulong)tuile.NombreSlot < idSlot : " + ((ulong)tuile.NombreSlot < idSlot));
             
-            if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
+            if (tuile == null)
+            {
+                Console.WriteLine("NULL NULL NULL");
                 return false;
+            }
+
+            if ((ulong) tuile.NombreSlot < idSlot)
+            {
+                Console.WriteLine("tuile.NombreSlot=" + (ulong) tuile.NombreSlot + " | idSlot=" + idSlot);
+                return false;
+            }
 
             int[] tab = EmplacementPionPossible(x, y, idJoueur);
+            Console.WriteLine("LENGTH = " + tab.Length);
             for (int i = 0; i < tab.Length; i++)
             {
-                Console.WriteLine("(ulong) tab[i] == idSlot : " + ((ulong) tab[i] == idSlot));
+                Console.WriteLine("i=" + i + " | tab[i] =" + (ulong) tab[i] + " | idSlot=" + idSlot);
                 if ((ulong) tab[i] == idSlot)
                 {
                     Console.WriteLine("TRUE TRUE TRUE");
                     return true;
                 }
             }
+
+            Console.WriteLine("NO NO NO");
             return false;
         }
 
