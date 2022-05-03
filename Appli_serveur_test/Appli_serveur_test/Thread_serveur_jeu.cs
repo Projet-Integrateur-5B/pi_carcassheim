@@ -919,7 +919,7 @@ namespace system
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
-            if (diff < (int) _timer_player_value / 3600) return;
+            if (diff < (int) _timer_game_value / 3600) return;
             
             Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
             _timer_game.Stop();
@@ -934,7 +934,7 @@ namespace system
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
-            if (diff < (int) _timer_game_value / 60) return;
+            if (diff < (int) _timer_player_value / 60) return;
             
             var idPlayer = Get_ActualPlayerId();
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
