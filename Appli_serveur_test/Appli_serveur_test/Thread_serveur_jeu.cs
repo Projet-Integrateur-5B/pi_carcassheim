@@ -861,7 +861,8 @@ namespace system
             // Génération des tuiles de la game
             _s_tuilesGame.WaitOne();
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
-            if (_extensionsGame is 1 or 3)
+            
+            if (IsRiverExtensionOn())
             {
                 Console.WriteLine("extension RIVIERE is ON");
                 _rivieresGame = Random_sort_rivieres();
@@ -918,17 +919,22 @@ namespace system
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
-            if (diff < (int) _timer_game_value / 3600) return;
+            if (diff < (int) _timer_player_value / 3600) return;
             
             Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
             _timer_game.Stop();
-            //EndGame();
+
+            var idPlayer = Get_ActualPlayerId();
+            string[] dataPlayToSend = ParseStoredPlayToData();
+            GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+            // Force the end of the turn
+            gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
-            if (diff < (int) _timer_player_value / 60) return;
+            if (diff < (int) _timer_game_value / 60) return;
             
             var idPlayer = Get_ActualPlayerId();
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
