@@ -104,7 +104,7 @@ namespace Assets.system
             List<ulong> playerGainingPoints = new List<ulong>();
             foreach (var item in pionParJoueur)
             {
-                Debug.Log(item);
+                //Debug.Log(item);
                 if (item.Value > mostPawn)
                 {
                     mostPawn = item.Value;
