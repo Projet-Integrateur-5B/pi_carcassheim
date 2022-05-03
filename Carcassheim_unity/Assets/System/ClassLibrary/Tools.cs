@@ -117,6 +117,10 @@ namespace ClassLibrary
             Huit = 8,
             Dix = 10
         }
+        public enum MeepleType
+        {
+            Default = 0
+        }
 
         /// <summary>
         ///     Indicates the different endgame types
