@@ -637,7 +637,14 @@ namespace system
                     {
                         Console.WriteLine("Force_EndTurn : game stopped !");
 
-                        SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, data);
+                        // Génération du nouveau tableau data+scores
+                        string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                        string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                        data.CopyTo(dataWithScores, 0);
+                        allScores.CopyTo(dataWithScores, data.Length);
+
+                        SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
                         
                         ulong idPlayerWinner = thread_serv_ite.GetWinner();
                         string[] dataToSend = new string[] { idPlayerWinner.ToString() };
@@ -654,8 +661,15 @@ namespace system
 
                         Console.WriteLine("Force_EndTurn : before broadcast !");
 
+                        // Génération du nouveau tableau data+scores
+                        string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                        string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                        data.CopyTo(dataWithScores, 0);
+                        allScores.CopyTo(dataWithScores, data.Length);
+
                         // Envoi de l'information du endturn
-                        SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, data);
+                        SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
                     }
 
                 }
