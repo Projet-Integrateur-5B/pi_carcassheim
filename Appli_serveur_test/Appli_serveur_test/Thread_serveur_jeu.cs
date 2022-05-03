@@ -988,10 +988,13 @@ namespace system
             if (isTilePlacementLegal(idTuile, posX, posY, rotat)){
 
                 Console.WriteLine("TilePlacement : isTilePlacementLegal OK");
-                
+
                 _s_posTuileTourActu.WaitOne();
                 _posTuileTourActu = new Position(posX, posY, rotat);
                 _s_posTuileTourActu.Release();
+
+                // Pose tuile fantôme
+                _plateau.PoserTuileFantome(_idTuileChoisie, new Position(posX, posY, rotat));
 
                 _s_plateau.Release();
                 return Tools.Errors.None;
