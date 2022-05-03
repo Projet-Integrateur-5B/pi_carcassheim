@@ -80,6 +80,8 @@ public class DisplaySystem : MonoBehaviour
 
     [SerializeField] CameraManager camera_manager;
 
+    List<MeepleRepre> meeple_posed = new List<MeepleRepre>();
+
     [SerializeField] GameObject button_actions;
     private Button cancelButt, AcceptButt, LeftArrowButt, RightArrowButt;
 
@@ -423,6 +425,25 @@ public class DisplaySystem : MonoBehaviour
 
     }
 
+    public void meepleGoback(List<System.Tuple<int, int, ulong>> meeple_leaving)
+    {
+        foreach (System.Tuple<int, int, ulong> pos_meeple in meeple_leaving)
+        {
+            Debug.Log(pos_meeple);
+            for (int i = meeple_posed.Count - 1; i >= 0; i--)
+            {
+                MeepleRepre mp = meeple_posed[i];
+                Debug.Log("" + mp.ParentTile.Pos + " " + mp.SlotPos);
+                if (PositionRepre.EqualWithoutRotation(mp.ParentTile.Pos, new PositionRepre(pos_meeple.Item1, pos_meeple.Item2)) && mp.SlotPos == (int)pos_meeple.Item3)
+                {
+                    mp.parent_player.NbMeeple += 1;
+                    Destroy(mp.gameObject);
+                    meeple_posed.RemoveAt(i);
+                }
+            }
+        }
+    }
+
     public void setNextState(DisplaySystemState next_state)
     {
         state_transition.Enqueue(next_state);
@@ -525,7 +546,10 @@ public class DisplaySystem : MonoBehaviour
                         }
 
                         if (act_tile.setMeeplePos(act_meeple, play_param.slot_pos))
+                        {
                             table.meeplePositionChanged(act_meeple);
+                        }
+                        meeple_posed.Add(act_meeple);
                     }
                     else
                     {
@@ -549,6 +573,11 @@ public class DisplaySystem : MonoBehaviour
                         table.meeplePositionChanged(act_meeple);
                     }
                 }
+                Debug.Log("HALLOcvedsf");
+                List<System.Tuple<int, int, ulong>> positions = new List<System.Tuple<int, int, ulong>>();
+                system_back.askMeepleRetired(positions);
+                meepleGoback(positions);
+                Debug.Log("IGYAZFVJU");
                 act_player = null;
                 break;
             case DisplaySystemState.tilePosing:
@@ -865,6 +894,7 @@ public class DisplaySystem : MonoBehaviour
         {
             // TODO should instantiate dependnat on the type
             MeepleRepre mp = Instantiate<MeepleRepre>(meeple_model);
+            mp.parent_player = act_player;
             mp.color.material.color = act_player.color;
             mp.Id = meeples_init[i].id_meeple;
             meeples_hand.Add(mp);

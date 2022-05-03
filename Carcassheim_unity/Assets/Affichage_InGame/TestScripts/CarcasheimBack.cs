@@ -184,4 +184,6 @@ public abstract class CarcasheimBack : MonoBehaviour
     /// <param name="mp">les informations du tour du joueur</param>
     /// <param name="slot_pos">liste d'id des slots ou le meeple est posable</param>
     public abstract void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos);
+
+    public abstract void askMeepleRetired(List<System.Tuple<int, int, ulong>> positions);
 }

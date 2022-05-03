@@ -67,6 +67,7 @@ public class backLocal : CarcasheimBack
     [SerializeField] GameObject panel_param;
 
     [SerializeField] List<GameObject> win_params;
+    List<System.Tuple<int, int, ulong>> meeple_positions = new List<Tuple<int, int, ulong>>();
 
     void Start()
     {
@@ -227,30 +228,17 @@ public class backLocal : CarcasheimBack
                     saved_players_score[(int)gains[i].id_player] += gains[i].points_gagnes;
                 }
 
-                // Les meeples sont rendus aux joueurs
-                for (int idSlotTemp = 0; idSlotTemp < _plateau.DicoTuile[(ulong)play.id_tile].NombreSlot; idSlotTemp++)
+                Dictionary<ulong, int> dico = _plateau.RemoveAllPawnInTile(play.tile_pos.X, play.tile_pos.Y, meeple_positions);
+                Debug.Log("dico de longueur : " + dico.Count);
+                foreach (ulong id_player in dico.Keys)
                 {
-                    if (!_plateau.ZoneFermeeForSlot(play.tile_pos.X, play.tile_pos.Y, (ulong)idSlotTemp))
-                        continue;
-
-                    var dico = _plateau.RemoveAllPawnInZone(play.tile_pos.X, play.tile_pos.Y, (ulong)idSlotTemp);
-                    Debug.Log("dico de longueur : " + dico.Count);
-                    for (int i = 0; i < dico.Count; i++)
-                    {
-                        for (int j = 0; j < players.Count; j++)
-                        {
-                            var joueur = players[j];
-                            int meeplesRendus;
-                            if (dico.TryGetValue((ulong)joueur.id_player, out meeplesRendus))
-                            {
-                                Debug.Log("joueur j = " + j + " a " + joueur.nb_meeple + " meeples");
-                                var temp = new PlayerInitParam(players[j].id_player, players[j].nb_meeple + meeplesRendus, players[j].player_name);
-                                players[j] = temp;
-                                Debug.LogWarning(meeplesRendus + " meeples ont ete rendus au joueur " + joueur.id_player);
-                                Debug.Log("joueur j = " + j + " a " + joueur.nb_meeple + " meeples");
-                            }
-                        }
-                    }
+                    var joueur = players[(int)id_player];
+                    int meeplesRendus = dico[id_player];
+                    Debug.Log("joueur j = " + id_player + " a " + joueur.nb_meeple + " meeples");
+                    var temp = new PlayerInitParam(joueur.id_player, joueur.nb_meeple + meeplesRendus, joueur.player_name);
+                    joueur = temp;
+                    Debug.LogWarning(meeplesRendus + " meeples ont ete rendus au joueur " + joueur.id_player);
+                    Debug.Log("joueur j = " + id_player + " a " + joueur.nb_meeple + " meeples");
                 }
             }
             Debug.Log("Score changed ? " + score_changed);
@@ -368,6 +356,12 @@ public class backLocal : CarcasheimBack
         return (int)result;
     }
 
+    public override void askMeepleRetired(List<Tuple<int, int, ulong>> positions)
+    {
+        system_display.meepleGoback(meeple_positions);
+        meeple_positions.Clear();
+    }
+
     override public int askTilesInit(List<TileInitParam> tiles)
     {
         if (river_on)
@@ -438,7 +432,7 @@ public class backLocal : CarcasheimBack
 
     override public void sendAction(DisplaySystemAction action)
     {
-        
+
     }
 
     override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
