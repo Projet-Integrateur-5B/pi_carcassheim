@@ -366,6 +366,8 @@ public class DisplaySystem : MonoBehaviour
                     DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
                     if (act_tile != null && act_tile.Id == action_tsc.tile_id)
                     {
+                        if (action_tsc.new_pos.X == 0 && action_tsc.new_pos.Y == 0)
+                            action_tsc.new_pos = null;
                         if (board.setTileAt(action_tsc.new_pos, act_tile))
                             table.tilePositionChanged(act_tile);
                     }

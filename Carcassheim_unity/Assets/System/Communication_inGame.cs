@@ -155,11 +155,13 @@ namespace Assets.system
             // Id meeple, nb de meeple d'id Id disponible
             int taille = playerList.Length;
             for (int i = 0; i < meeple_type; i++)
+            {
                 for (int j = 0; j < taille; j++)
                 {
-                    meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
-                    Debug.Log("playerList[" + j + "].nbMeeples : " + playerList[j].nbMeeples);
+                    if (playerList[j].id == nextPlayer)
+                        meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
                 }
+            }
 
         }
 
@@ -301,9 +303,14 @@ namespace Assets.system
             {
                 case DisplaySystemActionTypes.tileSetCoord:
                     DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
-                    SendPosition(action_tsc.tile_id,
-                        action_tsc.new_pos.X, action_tsc.new_pos.Y, action_tsc.new_pos.Rotation
-                        , Tools.IdMessage.TuilePlacement);
+                    if (action_tsc.new_pos != null)
+                        SendPosition(action_tsc.tile_id,
+                            action_tsc.new_pos.X, action_tsc.new_pos.Y, action_tsc.new_pos.Rotation
+                            , Tools.IdMessage.TuilePlacement);
+                    else
+                        SendPosition(action_tsc.tile_id,
+                            0, 0, 0
+                            , Tools.IdMessage.TuilePlacement);
                     break;
 
                 case DisplaySystemActionTypes.tileSelection:
