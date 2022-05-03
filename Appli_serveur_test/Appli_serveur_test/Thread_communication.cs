@@ -580,8 +580,15 @@ namespace system
 
                             Console.WriteLine("Com_EndTurn : before broadcast !");
 
+                            // Génération du nouveau tableau data+scores
+                            string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                            string[] newDataToSend = new string[allScores.Length + data.Length];
+
+                            data.CopyTo(newDataToSend, 0);
+                            allScores.CopyTo(newDataToSend, data.Length);
+
                             // Envoi de l'information du endturn
-                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
+                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, newDataToSend);
                         }
 
                         return Tools.Errors.None;

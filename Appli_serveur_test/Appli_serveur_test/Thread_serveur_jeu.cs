@@ -1429,6 +1429,21 @@ namespace system
             return dataToReturn;
 
         }
+
+        public string[] GetAllPlayersScore()
+        {
+            List<string> allPlayersScore = new List<string>();
+
+            _s_dico_joueur.WaitOne();
+            foreach (var player in _dico_joueur)
+            {
+                allPlayersScore.Add(player.Value._score.ToString());
+
+            }
+            _s_dico_joueur.Release();
+
+            return allPlayersScore.ToArray();
+        }
         
     }
 }
