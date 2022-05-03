@@ -224,7 +224,7 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.idleState:
                 if ((DEBUG || act_player.is_my_player) && (old_state == DisplaySystemState.tilePosing || old_state == DisplaySystemState.meeplePosing))
                 {
-                    if (act_meeple != null)
+                    if (act_meeple != null && act_meeple.ParentTile != null)
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
                     else
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, -1, -1));

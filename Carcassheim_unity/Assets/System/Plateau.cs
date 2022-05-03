@@ -250,57 +250,57 @@ namespace Assets.system
                 turn = 1;
         }
 
-            //turn = 0;
-            //int rot = tuile.Rotation;
-            //int dirInit = -1, dirNext = -1;
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    int x1 = x + PositionAdjacentes[i, 0];
-            //    int y1 = y + PositionAdjacentes[i, 1];
+        //turn = 0;
+        //int rot = tuile.Rotation;
+        //int dirInit = -1, dirNext = -1;
+        //for (int i = 0; i < 4; i++)
+        //{
+        //    int x1 = x + PositionAdjacentes[i, 0];
+        //    int y1 = y + PositionAdjacentes[i, 1];
 
-            //    if (GetTuile(x1, y1) != null)
-            //    {
-            //        dirInit = i + tuile.Rotation;
-            //        Debug.Log("tuile trouve en (" + x1 + " : " + y1 + ") direction :" + i);
-            //        Debug.LogWarning("x = " + x + " y = " + y);
-            //        break;
-            //    }
-            //}
-            //int j = 0;
-            //foreach (var item in tuile.Slots)
-            //{
-            //    if (item.Terrain == TypeTerrain.Riviere)
-            //    {
-            //        if (tuile.LienSlotPosition.Length == 1)
-            //            return;
+        //    if (GetTuile(x1, y1) != null)
+        //    {
+        //        dirInit = i + tuile.Rotation;
+        //        Debug.Log("tuile trouve en (" + x1 + " : " + y1 + ") direction :" + i);
+        //        Debug.LogWarning("x = " + x + " y = " + y);
+        //        break;
+        //    }
+        //}
+        //int j = 0;
+        //foreach (var item in tuile.Slots)
+        //{
+        //    if (item.Terrain == TypeTerrain.Riviere)
+        //    {
+        //        if (tuile.LienSlotPosition.Length == 1)
+        //            return;
 
-            //        int direction = tuile.LienSlotPosition[j][0];
-            //        direction = direction / 3;
-            //        direction += rot;
-            //        direction = direction % 4;
+        //        int direction = tuile.LienSlotPosition[j][0];
+        //        direction = direction / 3;
+        //        direction += rot;
+        //        direction = direction % 4;
 
-            //        if (direction == dirInit)
-            //        {
-            //            direction = tuile.LienSlotPosition[j][1];
-            //            direction = direction / 3;
-            //            direction += rot;
-            //            direction = direction % 4;
-            //        }
-            //        dirNext = direction;
-            //    }
-            //    j++;
-            //}
+        //        if (direction == dirInit)
+        //        {
+        //            direction = tuile.LienSlotPosition[j][1];
+        //            direction = direction / 3;
+        //            direction += rot;
+        //            direction = direction % 4;
+        //        }
+        //        dirNext = direction;
+        //    }
+        //    j++;
+        //}
 
-            //switch ((4 + dirInit - dirNext) % 4)
-            //{
-            //    case GAUCHE:
-            //        turn = GAUCHE;
-            //        break;
-            //    case DROITE:
-            //        turn = DROITE;
-            //        break;
-            //}
-            //Debug.Log("Direction intiale :" + dirInit + "      prochaine direction " + dirNext);
+        //switch ((4 + dirInit - dirNext) % 4)
+        //{
+        //    case GAUCHE:
+        //        turn = GAUCHE;
+        //        break;
+        //    case DROITE:
+        //        turn = DROITE;
+        //        break;
+        //}
+        //Debug.Log("Direction intiale :" + dirInit + "      prochaine direction " + dirNext);
         //}
 
         /// <summary>
@@ -517,7 +517,7 @@ namespace Assets.system
                         Debug.Log("PAS DE probleme avec le U de la riviere\ncurrentTurn : " + currentTurn + "\n_lastTurn" + _lastRiverTurn);
                     }
                 }//Debug.Log("Correspondance : " + ((t.Rotation + i + 2) % 4));
-                
+
                 //Debug.Log("hello " + i + x + y + rotation);
             }
             return auMoinsUne;
@@ -775,8 +775,10 @@ namespace Assets.system
         /// <param name="idSlot">l'id du slot sur lequel le pion est pose</param>
         public void PoserPion(ulong idJoueur, Tuile tuile, ulong idSlot)
         {
+            Debug.Log(idSlot);
             tuile.Slots[idSlot].IdJoueur = idJoueur;
-            ChampsOuDesPionsOntEtePoses.Add((tuile.X, tuile.Y, idSlot));
+            if (tuile.Slots[idSlot].Terrain == TypeTerrain.Pre)
+                ChampsOuDesPionsOntEtePoses.Add((tuile.X, tuile.Y, idSlot));
         }
 
         /// <summary>
