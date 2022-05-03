@@ -695,8 +695,6 @@ namespace system
 
                     Console.WriteLine("Force_EndTurn : game stopped !");
 
-                    SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
-                        
                     ulong idPlayerWinner = thread_serv_ite.GetWinner();
                     string[] dataToSend = new string[] { idPlayerWinner.ToString() };
                     SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);

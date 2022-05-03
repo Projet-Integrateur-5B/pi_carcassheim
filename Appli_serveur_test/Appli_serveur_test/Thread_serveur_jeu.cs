@@ -943,6 +943,7 @@ namespace system
             string[] dataPlayToSend = ParseStoredPlayToData();
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the game
+            gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
             gestionnaire.CallForceEndGame(idPlayer, _id_partie, dataPlayToSend);
         }
         
