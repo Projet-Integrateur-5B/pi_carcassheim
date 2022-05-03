@@ -903,24 +903,25 @@ namespace system
             // Initialise les meeples de tt le monde
             InitializePlayerMeeples();
 
+            
+            _timer_game = new System.Timers.Timer();
+            _timer_game.Interval = 1000;
+            _timer_game.Elapsed += OnTimedEventGame;
+            _DateTime_game = DateTime.Now;
+            _timer_game.AutoReset = true;
+            _timer_game.Enabled = true;
+
             if (_mode == Tools.Mode.TimeAttack)
             {
-                _timer_game = new System.Timers.Timer();
-                _timer_game.Interval = 1000;
-                _timer_game.Elapsed += OnTimedEventGame;
-                _DateTime_game = DateTime.Now;
-                _timer_game.AutoReset = true;
-                _timer_game.Enabled = true;
+                _timer_player = new System.Timers.Timer();
+                _timer_player.Interval = 1000;
+                _timer_player.Elapsed += OnTimedEventPlayer;
+                _DateTime_player = DateTime.Now;
+                _timer_player.AutoReset = true;
+                _timer_player.Enabled = true;
             }
-            
-            _timer_player = new System.Timers.Timer();
-            _timer_player.Interval = 1000;
-            _timer_player.Elapsed += OnTimedEventPlayer;
-            _DateTime_player = DateTime.Now;
-            _timer_player.AutoReset = true;
-            _timer_player.Enabled = true;
 
-            // TODO :
+// TODO :
             // synchronisation de la methode
             // genere les tuiles
             // envoie 3 tuiles au player 1
@@ -932,7 +933,8 @@ namespace system
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
-            if (diff < (int) _timer_game_value / 3600) return;
+            Console.WriteLine(diff);
+            if (diff < (int) 30 / 3600) return;
             
             Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
             _timer_game.Stop();
@@ -947,7 +949,6 @@ namespace system
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
-            Console.WriteLine(diff);
             if (diff < (int) _timer_player_value / 60) return;
             
             var idPlayer = Get_ActualPlayerId();
