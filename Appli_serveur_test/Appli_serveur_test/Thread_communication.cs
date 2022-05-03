@@ -629,6 +629,7 @@ namespace system
                 Console.WriteLine("Force_EndTurn : room found !" + "test=" + thread_serv_ite.Get_ActualPlayerId());
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
+                    Console.WriteLine("hearpgiqegpioqdjgodqrigjhde$tigujqedpgjuqed$gjuqe$gbujru");
                     // Fin du tour actuel
                     Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                     // Mise à jour du status de la game
