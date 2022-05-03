@@ -465,7 +465,6 @@ namespace system
                         string[] dataStartGame = new string[] { idTuileInit.ToString() };
                         // Préviens tous les joueurs (broadcast start)
                         thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.StartGame, dataStartGame);
-                        Thread.Sleep(200);
                         // Stockage des 3 tuiles qui seront envoyées lors de la demande de tuileDraw
                         thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
                         return Tools.Errors.None; // return valeur correcte
