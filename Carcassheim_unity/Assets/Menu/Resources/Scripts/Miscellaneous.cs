@@ -24,6 +24,8 @@ public abstract class Miscellaneous : MonoBehaviour
 
     public static bool s_menuChanged = false;
 
+    private static int _pause = 0;
+
     /// <summary>
     ///    MonoBehaviour Awake is called when the script instance is being loaded.
     ///    Awake is called only once during the lifetime of the script instance.
@@ -97,19 +99,26 @@ public abstract class Miscellaneous : MonoBehaviour
     /// </summary>
     public void ShowPopUpOptions()
     {
-        if (GetPanelOpen())
-        {
-            Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().Stop();
-            Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = false;
-        }
-        else
-        {
-            Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().Play();
-            Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = true;
-        }
-
-        SetPanelOpen(!GetPanelOpen());
-        Pop_up_Options.SetActive(GetPanelOpen());
+        if(_pause++ == 0) {
+            if (!GetPanelOpen())
+            {
+                Debug.Log("Opening panel");
+                
+                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().Play();
+                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = true;
+                SetPanelOpen(!GetPanelOpen());
+                Pop_up_Options.SetActive(GetPanelOpen());
+            }
+        } else if(_pause == 1)
+            if (GetPanelOpen())
+            {
+                Debug.Log("Closing panel : " + _pause);
+                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().Stop();
+                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = false;
+                SetPanelOpen(!GetPanelOpen());
+                Pop_up_Options.SetActive(GetPanelOpen());
+                _pause = 0;
+            }   
     }
 
     /// <summary>
