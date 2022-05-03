@@ -468,8 +468,7 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.TimerPlayer)
             {
-                system_display.setNextState(DisplaySystemState.timeOutIdleState);
-                OnEndTurnReceive(null);
+                OnEndTurnReceive(packet, DisplaySystemState.timeOutIdleState);
             }
             else if (packet.IdMessage == Tools.IdMessage.PionPlacement)
             {
@@ -571,7 +570,7 @@ namespace Assets.system
                 }
         }
 
-        private void OnEndTurnReceive(Packet packet)
+        private void OnEndTurnReceive(Packet packet, DisplaySystemState next_state = DisplaySystemState.idleState)
         {
             Action playercurrent = () =>
             {
@@ -629,7 +628,7 @@ namespace Assets.system
                         // TODO mettre à jour score dans playerscore
                     }
                 }
-                system_display.setNextState(DisplaySystemState.idleState);
+                system_display.setNextState(next_state);
                 if (score_changed)
                     system_display.setNextState(DisplaySystemState.scoreChange);
             }
