@@ -935,15 +935,15 @@ namespace system
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
             Console.WriteLine(diff);
             if (diff < (int) _timer_player_value / 60) return;
-            
-            Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
-            _timer_game.Stop();
 
             var idPlayer = Get_ActualPlayerId();
+            Console.WriteLine("Game was raised at {0}. EndGame() is called + {1}", e.SignalTime, idPlayer);
+            _timer_game.Stop();
+            
             string[] dataPlayToSend = ParseStoredPlayToData();
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-            // Force the end of the turn
-            gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
+            // Force the end of the game
+            gestionnaire.CallForceEndGame(idPlayer, _id_partie, dataPlayToSend);
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
