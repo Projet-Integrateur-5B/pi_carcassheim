@@ -170,9 +170,11 @@ public class TuileRepre : MonoBehaviour
     {
         if (id_slot == -1)
         {
+            TuileRepre old_parent = meeple.ParentTile;
             meeple.ParentTile = null;
             meeple.SlotPos = -1;
-            return true;
+            return old_parent == null;
+
         }
         SlotIndic slot_indic;
         if (slots_mapping.TryGetValue(id_slot, out slot_indic))
@@ -184,11 +186,12 @@ public class TuileRepre : MonoBehaviour
     }
     public bool setMeeplePos(MeepleRepre meeple, SlotIndic slot_indic)
     {
+        TuileRepre old_parent = meeple.ParentTile;
         meeple.ParentTile = this;
         meeple.SlotPos = slot_indic.Id;
         meeple.transform.parent = slot_indic.transform;
         meeple.transform.localPosition = new Vector3(0, 0, 0);
         slot_indic.meeple_at = meeple;
-        return true;
+        return old_parent == null;
     }
 }

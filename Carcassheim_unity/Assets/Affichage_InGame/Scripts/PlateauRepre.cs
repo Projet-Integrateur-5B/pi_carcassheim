@@ -61,7 +61,6 @@ public class PlateauRepre : MonoBehaviour
         bool res = false;
         if (pos == null)
         {
-            Debug.Log("A SET TO NULL");
             tile_found = tile.Pos != null && tiles_on_board.TryGetValue(tile.Pos, out act_tile);
             if (tile_found && act_tile == tile)
             {
@@ -73,11 +72,9 @@ public class PlateauRepre : MonoBehaviour
         else
         {
             tile_found = tiles_on_board.TryGetValue(pos, out act_tile);
-            Debug.Log("ON BOARD ?" + tile_found);
             if (!tile_found)
             {
                 tile_found = tile.Pos != null && tiles_on_board.TryGetValue(tile.Pos, out act_tile);
-                Debug.Log("I WAS LOST BUT WAS I FOUND ? " + tile_found);
                 res = true;
                 if (tile_found)
                 {
@@ -88,14 +85,12 @@ public class PlateauRepre : MonoBehaviour
                     else
                     {
                         res = false;
-                        Debug.Log("WE ARE NOT ALONE");
                     }
                 }
                 if (res)
                 {
                     tiles_on_board.Add(pos, tile);
                     tile.Pos = pos;
-                    Debug.Log("TUILE POSE A " + pos);
                     tile.transform.position = rep_O.position + (rep_u.position - rep_O.position) * pos.X - (rep_v.position - rep_O.position) * pos.Y;
                 }
             }
@@ -103,13 +98,8 @@ public class PlateauRepre : MonoBehaviour
             {
                 if (tile.Pos.X == pos.X && tile.Pos.Y == pos.Y && tile.Pos.Rotation != pos.Rotation)
                 {
-                    Debug.Log("TUILE POSE MODIFIE " + pos);
                     tile.Pos = pos;
                     return true;
-                }
-                else
-                {
-                    Debug.Log("CHEH");
                 }
             }
         }

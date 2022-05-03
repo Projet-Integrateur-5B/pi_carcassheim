@@ -195,11 +195,11 @@ namespace Assets.system
             {
                 if (item.TuileFantome)
                 {
-                    Debug.Log("tuile d'id " + item.Id + " est toujours fantome");
+                    // Debug.Log("tuile d'id " + item.Id + " est toujours fantome");
                     c++;
                 }
             }
-            Debug.Log("il y a en tout : " + c + "tuiles fantomes");
+            // Debug.Log("il y a en tout : " + c + "tuiles fantomes");
         }
 
         /// <summary>
@@ -474,10 +474,10 @@ namespace Assets.system
             bool riviere = tuile.Riviere;
 
             Tuile tl = GetTuile(x, y);
-            if (tl != null)
-            {
-                Debug.Log("tuile non nulle en (" + x + " : " + y + ") de fantomite " + tl.TuileFantome);
-            }
+            // if (tl != null)
+            // {
+            //     Debug.Log("tuile non nulle en (" + x + " : " + y + ") de fantomite " + tl.TuileFantome);
+            // }
             if (tl != null && !tl.TuileFantome)
             {
                 return false;
@@ -509,12 +509,12 @@ namespace Assets.system
                     CheckDirectionRiviere(tuile, x, y, rotation, out currentTurn);
                     if (currentTurn == _lastRiverTurn && currentTurn != 0)
                     {
-                        Debug.Log("CURRENT TURN  = " + currentTurn);
+                        // Debug.Log("CURRENT TURN  = " + currentTurn);
                         return false;
                     }
                     else
                     {
-                        Debug.Log("PAS DE probleme avec le U de la riviere\ncurrentTurn : " + currentTurn + "\n_lastTurn" + _lastRiverTurn);
+                        // Debug.Log("PAS DE probleme avec le U de la riviere\ncurrentTurn : " + currentTurn + "\n_lastTurn" + _lastRiverTurn);
                     }
                 }//Debug.Log("Correspondance : " + ((t.Rotation + i + 2) % 4));
 
@@ -611,7 +611,7 @@ namespace Assets.system
             {
                 if (ZoneFermeeForSlot(x, y, i))
                 {
-                    Debug.Log("Une Zone a ete fermee");
+                    // Debug.Log("Une Zone a ete fermee");
                     ulong[] gagnants;
                     int point = CompteurPoints.CompterZoneFerme(x, y, (int)i, out gagnants);
                     foreach (ulong id_joueur in gagnants)
