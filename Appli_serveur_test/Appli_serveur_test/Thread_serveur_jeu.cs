@@ -1147,6 +1147,10 @@ namespace system
 
                     if (_posPionTourActu.Length != 0) // Si un pion a été posé durant le tour
                     {
+                        foreach (var i in _posPionTourActu)
+                        {
+                            Console.WriteLine("i" + i);
+                        }
                         _plateau.PoserPion(idPlayer, _posTuileTourActu.X, _posTuileTourActu.Y, UInt64.Parse(_posPionTourActu[2]));
 
                         // Retrait d'un pion au joueur
