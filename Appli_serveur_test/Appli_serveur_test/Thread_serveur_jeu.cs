@@ -907,7 +907,7 @@ namespace system
             _timer_game = new System.Timers.Timer();
             _timer_game.Interval = 1000;
             _timer_game.Elapsed += OnTimedEventGame;
-            _DateTime_game = DateTime.Now;
+            _DateTime_player = DateTime.Now;
             _timer_game.AutoReset = true;
             _timer_game.Enabled = true;
 
