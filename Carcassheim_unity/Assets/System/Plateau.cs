@@ -596,12 +596,12 @@ namespace Assets.system
         //}
 
         /// <summary>
-        /// 
+        /// verifie si une zone est fermee
         /// </summary>
         /// <param name="x">l'abscisse de la tuile a partir de laquelle on part</param>
         /// <param name="y">l'ordonnee de la tuile a partir de laquelle on part</param>
-        /// <param name="gain"></param>
-        /// <param name="zones"></param>
+        /// <param name="gain">les points que chaque joueur gagne du a la fermeture de cette zone</param>
+        /// <param name="zones">les couples (tuiles; idSlot) formant la zone</param>
         /// <returns>true si la zone est fermee, false sinon</returns>
         public bool VerifZoneFermeeTuile(int x, int y, List<PlayerScoreParam> gain, List<Zone> zones)
         {
@@ -630,11 +630,24 @@ namespace Assets.system
             return point_change;
         }
 
+        /// <summary>
+        /// verifie si une zone est ferme
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile de depart</param>
+        /// <param name="y">l'ordonnee de la tuile de depart</param>
+        /// <param name="idSlot">l'id du slot qui definie la zone</param>
+        /// <returns>true si la zone est fermee, false sinon</returns>
         public bool ZoneFermeeForSlot(int x, int y, ulong idSlot)
         {
             return ZoneFermeeForSlot(GetTuile(x, y), idSlot);
         }
 
+        /// <summary>
+        /// verifie si une zone est ferme
+        /// </summary>
+        /// <param name="tuile">la tuile qui definie la zone</param>
+        /// <param name="idSlot">l'id du slot qui definie la zone</param>
+        /// <returns>true si la zone est fermee, false sinon</returns>
         public bool ZoneFermeeForSlot(Tuile tuile, ulong idSlot)
         {
             if (!_tuiles.Contains(tuile)) // ERROR
@@ -645,6 +658,13 @@ namespace Assets.system
             return ZoneFermeeAux(tuile, idSlot, tuilesFormantZone);
         }
 
+        /// <summary>
+        /// verifie recursivement si une zone est fermee
+        /// </summary>
+        /// <param name="tuile">la tuile courrante</param>
+        /// <param name="idSlot">le slot de la tuile courrante appartenant a la zone</param>
+        /// <param name="tuilesFormantZone">la liste des tuiles deja parcourue</param>
+        /// <returns>true si la zone est fermee, false sinon</returns>
         private bool ZoneFermeeAux(Tuile tuile, ulong idSlot, List<Tuile> tuilesFormantZone)
         {
             bool ferme = true, emplacementVide;
