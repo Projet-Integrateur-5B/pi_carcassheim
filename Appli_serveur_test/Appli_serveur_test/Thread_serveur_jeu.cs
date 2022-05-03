@@ -1037,6 +1037,7 @@ namespace system
 
         public bool isPionPlacementLegal(Position posTuile, int idSlot, ulong idPlayer, ulong idMeeple)
         {
+            Console.WriteLine("X=" + posTuile.X + " | Y=" + posTuile.Y);
             return _plateau.PionPosable(posTuile.X, posTuile.Y, (ulong)idSlot, idPlayer, idMeeple);
         }
 
