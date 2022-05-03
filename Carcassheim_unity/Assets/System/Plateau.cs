@@ -602,7 +602,7 @@ namespace Assets.system
         /// <param name="y">l'ordonnee de la tuile a partir de laquelle on part</param>
         /// <param name="gain">les points que chaque joueur gagne du a la fermeture de cette zone</param>
         /// <param name="zones">les couples (tuiles; idSlot) formant la zone</param>
-        /// <returns>true si la zone est fermee, false sinon</returns>
+        /// <returns>true si au moins un joueur a gagne des points, false sinon</returns>
         public bool VerifZoneFermeeTuile(int x, int y, List<PlayerScoreParam> gain, List<Zone> zones)
         {
             Tuile tl = GetTuile(x, y);
