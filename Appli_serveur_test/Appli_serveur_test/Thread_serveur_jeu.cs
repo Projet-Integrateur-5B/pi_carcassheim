@@ -947,6 +947,7 @@ namespace system
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
+            Console.WriteLine(diff);
             if (diff < (int) _timer_player_value / 60) return;
             
             var idPlayer = Get_ActualPlayerId();
