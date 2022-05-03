@@ -2069,7 +2069,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fafe2cfe61f6974895a912c3755e8f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AllowSwitchOff: 1
+  m_AllowSwitchOff: 0
 --- !u!1 &132994287
 GameObject:
   m_ObjectHideFlags: 0
@@ -2873,8 +2873,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 100, y: -686}
-  m_SizeDelta: {x: 63.9999, y: 71.8088}
+  m_AnchoredPosition: {x: 100, y: -760.9522}
+  m_SizeDelta: {x: 63.9999, y: -78.09558}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &180678688
 MonoBehaviour:
@@ -3302,7 +3302,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -31, y: -200}
+  m_AnchoredPosition: {x: -31, y: -350}
   m_SizeDelta: {x: 80, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &221218504
@@ -6923,8 +6923,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -29.000977, y: -686}
-  m_SizeDelta: {x: 69.95017, y: 71.8088}
+  m_AnchoredPosition: {x: -29.000977, y: -760.9522}
+  m_SizeDelta: {x: 69.95017, y: -78.09558}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &494016207
 MonoBehaviour:
@@ -12194,7 +12194,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: JOUER SOLO
+  m_Text: JEU LOCAL
 --- !u!222 &821056653
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -13373,8 +13373,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -160, y: -686}
-  m_SizeDelta: {x: 64.0001, y: 71.8088}
+  m_AnchoredPosition: {x: -160, y: -760.95215}
+  m_SizeDelta: {x: 64.0001, y: -78.0957}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &987082332
 MonoBehaviour:
@@ -16206,7 +16206,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: JOUER MULTI
+  m_Text: MULTIJOUEUR
 --- !u!222 &1225720912
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17120,7 +17120,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -161, y: -200}
+  m_AnchoredPosition: {x: -161, y: -350}
   m_SizeDelta: {x: 80, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1277566169
@@ -19944,7 +19944,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 400, y: 150}
+  m_AnchoredPosition: {x: 400, y: 0}
   m_SizeDelta: {x: 69.9502, y: 132.4328}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1435983119
@@ -20029,7 +20029,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 530, y: 150}
+  m_AnchoredPosition: {x: 530, y: 0}
   m_SizeDelta: {x: 65.9982, y: 132.4328}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1439056016
@@ -20386,7 +20386,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 270, y: 150}
+  m_AnchoredPosition: {x: 270, y: 0}
   m_SizeDelta: {x: 65.9982, y: 132.4328}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1466733384
@@ -24727,7 +24727,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 99, y: -200}
+  m_AnchoredPosition: {x: 99, y: -350}
   m_SizeDelta: {x: 80, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1831109399
@@ -25441,7 +25441,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 1262, y: 0}
-  m_SizeDelta: {x: 159.85, y: 151.72}
+  m_SizeDelta: {x: 170, y: 151.72}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1939247252
 Animator:
