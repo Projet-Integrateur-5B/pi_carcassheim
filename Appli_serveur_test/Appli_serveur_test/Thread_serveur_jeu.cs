@@ -940,9 +940,6 @@ namespace system
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the game
             gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
-            idPlayer = Get_ActualPlayerId();
-            Console.WriteLine(idPlayer);
-            gestionnaire.CallForceEndGame(Get_ActualPlayerId(), _id_partie, dataPlayToSend);
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
@@ -1093,7 +1090,9 @@ namespace system
                     }
                     break;
                 case Tools.Mode.TimeAttack:
-
+                    var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
+                    if (diff >= (int)_timer_game_value / 3600)
+                        statutGame = Tools.GameStatus.Stopped;
                     //TODO
 
                     break;
