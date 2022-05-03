@@ -415,6 +415,6 @@ public class backLocal : CarcasheimBack
     {
         _plateau.PoserTuileFantome((ulong)mp.id_tile, mp.pos_tile.X, mp.pos_tile.Y, mp.pos_tile.Rotation);
         // Debug.Log("ROTATION   " + mp.pos_tile);
-        slot_pos.AddRange(_plateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, (ulong)players[index_player].id_player, (ulong)mp.id_meeple));
+        slot_pos.AddRange(_plateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, (ulong)players[index_player].id_player/*, (ulong)mp.id_meeple*/));
     }
 }
