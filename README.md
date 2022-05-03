@@ -9,8 +9,8 @@
 
 # /!\\ Rendu
 
-Le rendu du **03/05** se trouve sur les branches de release, nommées release-client et release-serveur.
-Vous y trouverez la dernière implémentation à jour de la partie client et serveur du jeu Carcassheim.
+Le rendu du **03/05** se trouve sur les branches de release, nommées release-client et release-serveur.\
+Vous y trouverez la dernière implémentation à jour de la partie client et serveur du jeu Carcassheim !
 
 # Introduction 
 
