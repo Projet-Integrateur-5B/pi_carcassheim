@@ -410,7 +410,7 @@ namespace system
             return errors; // return valeur correcte
         }
 
-        public Tools.Errors VerifyPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom, Position posTuile, string idMeeple, string slotPos)
+        public Tools.Errors VerifyPionPlacement(ulong idPlayer, Socket? playerSocket, int idRoom, string[] data)
         {
             // Si la demande ne trouve pas de partie ou qu'elle ne provient pas d'un joueur à qui c'est le tour : permission error
             Tools.Errors errors = Tools.Errors.Permission;
@@ -433,13 +433,16 @@ namespace system
                         }
 
                         // Vérification du placement
-                        errors = thread_serv_ite.PionPlacement(idPlayer, posTuile, UInt32.Parse(idMeeple), Int32.Parse(slotPos));
+                        var posTuile = new Position(int.Parse(data[1]), int.Parse(data[2]), int.Parse(data[3]));
+                        var idMeeple = ulong.Parse(data[4]);
+                        var slotPos = int.Parse(data[5]);
                         
+                        errors = thread_serv_ite.PionPlacement(idPlayer, posTuile, idMeeple, slotPos);
+
                         if(errors == Tools.Errors.None) // Si placement légal
                         {
                             // Envoi de l'information à tous pour l'affichage 
-                            string[] dataToSend = new string[] { posTuile.X.ToString(), posTuile.Y.ToString(), idMeeple, slotPos };
-                            SendBroadcast(idRoom, Tools.IdMessage.PionPlacement, idPlayer, dataToSend);
+                            SendBroadcast(idRoom, Tools.IdMessage.PionPlacement, idPlayer, data);
                         }
                         
                         break;
