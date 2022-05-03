@@ -1417,6 +1417,7 @@ namespace system
             }
             else // No tile play stored
             {
+                dataToReturn[0] = (-1).ToString(); // Set the id to -1 because there is no play
                 dataToReturn[1] = (-1).ToString(); // Pos X
                 dataToReturn[2] = (-1).ToString(); // Pos Y
                 dataToReturn[3] = (-1).ToString(); // Pos ROT
