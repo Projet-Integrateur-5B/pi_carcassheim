@@ -96,8 +96,8 @@ namespace Assets.system
             Dictionary<ulong, int> pionParJoueur = new Dictionary<ulong, int>();
             instance.PointsZone(tuile, idSlot, parcourue, ref result, pionParJoueur);
 
-            Debug.Log("Pions Par Joueur : " + pionParJoueur.ToString());
-            Debug.Log("POINTS : " + result);
+            // Debug.Log("Pions Par Joueur : " + pionParJoueur.ToString());
+            // Debug.Log("POINTS : " + result);
 
             ulong playerWithMostPawn = ulong.MaxValue;
             int mostPawn = -1;
@@ -111,13 +111,13 @@ namespace Assets.system
                     playerWithMostPawn = item.Key;
                 }
             }
-            Debug.Log("PION " + mostPawn);
+            // Debug.Log("PION " + mostPawn);
             foreach (var item in pionParJoueur)
             {
                 if (item.Value == mostPawn)
                 {
                     playerGainingPoints.Add(item.Key);
-                    Debug.Log("JOUEUR " + item.Key);
+                    // Debug.Log("JOUEUR " + item.Key);
                 }
             }
             idJoueur = playerGainingPoints.ToArray();

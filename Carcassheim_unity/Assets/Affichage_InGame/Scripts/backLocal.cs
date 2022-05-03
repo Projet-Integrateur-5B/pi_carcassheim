@@ -193,7 +193,6 @@ public class backLocal : CarcasheimBack
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
-        Debug.Log("MEEPLE" + play.id_meeple);
         //Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
@@ -203,7 +202,6 @@ public class backLocal : CarcasheimBack
         }
         if (tuile_valide)
         {
-            Debug.Log("PTI VALID");
             _plateau.ValiderTour();
             gains.Clear();
             zones.Clear();
@@ -212,6 +210,11 @@ public class backLocal : CarcasheimBack
             if (score_changed)
             {
                 //_plateau.RemoveAllPawnInZone()
+                for (int i = 0; i < gains.Count; i++)
+                {
+                    Debug.Log("GAGNE " + gains[i].id_player + " " + gains[i].points_gagnes);
+                    saved_players_score[(int)gains[i].id_player] += gains[i].points_gagnes;
+                }
             }
             Debug.Log("Score changed ? " + score_changed);
         }
@@ -219,27 +222,28 @@ public class backLocal : CarcasheimBack
         switch (my_wincond)
         {
             case WinCondition.WinByTime:
-
+                Debug.Log("TEMPS");
                 break;
             case WinCondition.WinByPoint:
+                Debug.Log("RESTART");
                 for (int i = 0; i < players.Count; i++)
                 {
-                    end = end || (saved_players_score[index_player] >= win_point_nb);
+                    end = end || (saved_players_score[i] >= win_point_nb);
+                    Debug.Log("" + saved_players_score[i] + " > " + win_point_nb + " ? " + end);
                 }
                 break;
             case WinCondition.WinByTile:
+                Debug.Log("HALLO");
                 end = _plateau.GetTuiles.Length >= win_tile_nb;
                 break;
         }
         act_turn_play = new TurnPlayParam(tuile_valide ? play.id_tile : -1, tuile_valide ? play.tile_pos : null, meeple_valide ? play.id_meeple : -1, meeple_valide ? play.slot_pos : -1);
+
+        if (score_changed)
+            system_display.setNextState(DisplaySystemState.scoreChange);
         if (end)
         {
             system_display.setNextState(DisplaySystemState.endOfGame);
-        }
-        else if (score_changed)
-        {
-            system_display.setNextState(DisplaySystemState.scoreChange);
-            newTurn();
         }
         else
         {
@@ -351,11 +355,6 @@ public class backLocal : CarcasheimBack
 
     override public void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones)
     {
-        for (int i = 0; i < gains.Count; i++)
-        {
-            Debug.Log(gains[i].id_player);
-            saved_players_score[(int)gains[i].id_player] += gains[i].points_gagnes;
-        }
         for (int i = 0; i < players.Count; i++)
         {
             ulong id_p = (ulong)players[i].id_player;
