@@ -420,13 +420,17 @@ namespace system
         }
 
         // <summary>
-        ///     Getter : Get the player number.
+        ///     Getter : Get number of players.
         /// </summary>
         public uint NbJoueurs
         {
             get { return this._nombre_joueur; }
         }
 
+
+        // <summary>
+        ///     Getter : Get max number of players.
+        /// </summary>
         public uint NbJoueursMax
         {
             get { return this._nombre_joueur_max; }
