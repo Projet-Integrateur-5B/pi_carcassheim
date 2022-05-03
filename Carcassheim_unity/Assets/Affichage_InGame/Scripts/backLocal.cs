@@ -28,8 +28,13 @@ public class backLocal : CarcasheimBack
     public int win_time_sec { set; get; } = 0;
     public int win_time_min { set; get; } = 10;
 
+    private long _timeLapse = 0;
+    private int _turnMaxMin = 99999;
+    private int _turnMaxSec;
+
     long time_start_of_game = 0;
 
+    bool _hasGameStarted = false;
     public int win_tile_nb { set; get; } = 70;
     int nb_tile_drawn = 0;
     public int win_point_nb { set; get; } = 60;
@@ -137,6 +142,10 @@ public class backLocal : CarcasheimBack
     {
         if (validate_start())
         {
+            _hasGameStarted = true;
+            _timeLapse = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            askTimerTour(out _turnMaxMin, out _turnMaxSec);
+
             panel_param.SetActive(false);
             _plateau.Poser1ereTuile((ulong)askIdTileInitial());
 
@@ -174,6 +183,7 @@ public class backLocal : CarcasheimBack
         system_display.setNextState(DisplaySystemState.turnStart);
         index_player = (index_player + 1) % players.Count;
         compteur_de_tour += 1;
+        _timeLapse = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
     }
 
 
@@ -203,6 +213,7 @@ public class backLocal : CarcasheimBack
         if (tuile_valide)
         {
             _plateau.ValiderTour();
+
             gains.Clear();
             zones.Clear();
             // Debug.Log("PTITI SCORE");
@@ -277,6 +288,20 @@ public class backLocal : CarcasheimBack
             newTurn();
         }
 
+    }
+
+    public void Update()
+    {
+        if (!_hasGameStarted)
+            return;
+
+        long timeLapse = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - _timeLapse;
+
+        if (timeLapse > _turnMaxMin * 60 + _turnMaxSec)
+        {
+            system_display.setNextState(DisplaySystemState.idleState);
+            Debug.LogWarning("TIMER EXPIRED");
+        }
     }
 
     override public void getTile(out TurnPlayParam play)
@@ -407,12 +432,13 @@ public class backLocal : CarcasheimBack
 
     override public void askTimerTour(out int min, out int sec)
     {
-        min = 1;
-        sec = 0;
+        min = 0;
+        sec = 10;
     }
 
     override public void sendAction(DisplaySystemAction action)
     {
+        
     }
 
     override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
