@@ -657,11 +657,12 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
+        List<ulong> currentPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
 
-        if (idActualPlayer != 0)
+        if (currentPlayer[0] != 0)
         {
-            packet.IdPlayer = idActualPlayer;
+            packet.IdPlayer = currentPlayer[0];
+            packet.Data = new[] { currentPlayer[1].ToString() };
             error = Tools.Errors.None;
         }
 

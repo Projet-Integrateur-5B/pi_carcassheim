@@ -404,9 +404,11 @@ namespace system
             return listPlayerAndName.ToArray();
         }
 
-        public ulong CallPlayerCurrent(int idRoom)
+        public List<ulong> CallPlayerCurrent(int idRoom)
         {
-            ulong idActualPlayer = 0;
+            var currentPlayer = new List<ulong>();
+            currentPlayer.Add(0);
+            currentPlayer.Add(0);
 
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
@@ -414,11 +416,14 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    return thread_serv_ite.Get_ActualPlayerId();
+                    currentPlayer[0] = thread_serv_ite.Get_ActualPlayerId();
+                    if(currentPlayer[0] != 0)
+                        currentPlayer[1] = thread_serv_ite.Get_PlayerMeeples(currentPlayer[0]);
+                    return currentPlayer;
                 }
             }
-
-            return idActualPlayer;
+            
+            return currentPlayer;
         }
 
         public Tools.PlayerStatus LogoutPlayer(ulong idPlayer)

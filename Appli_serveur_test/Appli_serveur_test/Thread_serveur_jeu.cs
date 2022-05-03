@@ -258,6 +258,14 @@ namespace system
             return idPlayer_array[_offsetActualPlayer];
         }
 
+        public ulong Get_PlayerMeeples(ulong idPlayer)
+        {
+            _s_dico_joueur.WaitOne();
+            var playerMeeples = _dico_joueur[idPlayer]._nbMeeples;
+            _s_dico_joueur.Release();
+            return playerMeeples;
+        }
+
         /// <summary>
         ///     Getter : Get the game status.
         /// </summary>
@@ -818,7 +826,7 @@ namespace system
             _s_dico_joueur.WaitOne();
             foreach(var player in _dico_joueur)
             {
-                player.Value._nbMeeples = ((int)_meeples);
+                player.Value._nbMeeples = ((ulong)_meeples);
             }
             _s_dico_joueur.Release();
         }
