@@ -514,8 +514,7 @@ namespace system
                                 break;
                         }
 
-                        // DEBUG
-                        //_nb_tuiles = int.Parse(settings[3]);
+                        _nb_tuiles = int.Parse(settings[3]);
 
                         switch (int.Parse(settings[4]))
                         {
@@ -867,8 +866,6 @@ namespace system
             _offsetActualPlayer = 0;
             _s_offsetActualPlayer.Release();
 
-            // DEBUG pour parties + courtes et tests
-            _nb_tuiles = 10;
 
             // Réduction du nombre de tuile de 1, pour la tuile de départ
             if (IsRiverExtensionOn() == false)
