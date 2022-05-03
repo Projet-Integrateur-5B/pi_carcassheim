@@ -1099,6 +1099,8 @@ namespace system
                     indexOfTile = i;
                 }
             }
+            Console.WriteLine("* RetirerTuileGame _tuilesGame.Count = " + _tuilesGame.Count);
+            Console.WriteLine("* RetirerTuileGame tuile d'index : " + indexOfTile + " de _tuilesGame");
             _tuilesGame.RemoveAt(indexOfTile);
             _s_tuilesGame.Release();
         }
