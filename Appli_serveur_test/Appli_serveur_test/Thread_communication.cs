@@ -669,38 +669,6 @@ namespace system
             }             
         }
         
-        // <summary>
-        /// Forces the end of the game. 
-        /// </summary>
-        /// <param name="idRoom"></param>
-        /// <param name="data"></param>
-        public void ForceEndGame(ulong idPlayer, int idRoom, string[] data)
-        {
-            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
-            {
-                if (idRoom != thread_serv_ite.Get_ID()) continue;
-                Console.WriteLine("Force_EndGame : room found !");
-                if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
-                {
-                    // Fin du tour actuel
-                    Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
-
-                    // Génération du nouveau tableau data+scores
-                    string[] allScores = thread_serv_ite.GetAllPlayersScore();
-                    string[] dataWithScores = new string[allScores.Length + data.Length];
-
-                    data.CopyTo(dataWithScores, 0);
-                    allScores.CopyTo(dataWithScores, data.Length);
-
-                    Console.WriteLine("Force_EndGame : game stopped !");
-
-                    ulong idPlayerWinner = thread_serv_ite.GetWinner();
-                    string[] dataToSend = new string[] { idPlayerWinner.ToString() };
-                    SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
-                    DeleteGame(idRoom);
-                }
-            }             
-        }
 
         /// <summary>
         ///     Checks if the data is equivalent to the last play stored. If not, check the validity of it.

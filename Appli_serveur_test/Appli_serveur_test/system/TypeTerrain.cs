@@ -1,3 +1,6 @@
+/// <summary>
+///     diffrent terrain possible
+/// </summary>
 public enum TypeTerrain
 {
     Ville,

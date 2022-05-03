@@ -514,8 +514,7 @@ namespace system
                                 break;
                         }
 
-                        // DEBUG
-                        //_nb_tuiles = int.Parse(settings[3]);
+                        _nb_tuiles = int.Parse(settings[3]);
 
                         switch (int.Parse(settings[4]))
                         {
@@ -611,7 +610,12 @@ namespace system
             return nextPlayer;
         }
 
-        // Constructeur
+        /// <summary>
+        ///     Constructor : initialisation of parameters.
+        /// </summary>
+        ///<param name="id_partie">id of the game .</param>
+        ///<param name="id_joueur_createur">id of the admin player.</param>
+        ///<param name="playerSocket">socket.</param>
         public Thread_serveur_jeu(int id_partie, ulong id_joueur_createur, Socket? playerSocket)
         {
             _id_partie = id_partie;
@@ -664,10 +668,12 @@ namespace system
 
         }
 
-        // ===================
-        // Méthodes settings
-        // ===================
-
+        
+        /// <summary>
+        ///     Method : adding a player to the game.
+        /// </summary>
+        ///<param name="id_joueur">id of the player entering the game (to add).</param>
+        ///<param name="playerSocket">socket.</param>
         public Tools.PlayerStatus AddJoueur(ulong id_joueur, Socket? playerSocket)
         {
             _s_dico_joueur.WaitOne();
@@ -697,6 +703,12 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
+
+        /// <summary>
+        ///     Method : Removing player from the game.
+        /// </summary>
+        ///<param name="id_joueur">id of the player to remove from game .</param>
+        ///<param name="playerSocket">socket.</param>
         public Tools.PlayerStatus RemoveJoueur(ulong id_joueur)
         {
 
@@ -729,6 +741,12 @@ namespace system
             return Tools.PlayerStatus.NotFound;
         }
 
+
+
+        /// <summary>
+        ///     Methode : incrementing the cheat value of the player, and testing if it's his second time then RemoveJoueur .
+        /// </summary>
+        ///<param name="id_joueur">id of the concerned player .</param>
         public Tools.PlayerStatus SetPlayerTriche(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
@@ -754,6 +772,11 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
+
+        /// <summary>
+        ///     Methode : Changing the player status, if not ready then ready else not ready.
+        /// </summary>
+        ///<param name="id_joueur">id of the concerned player .</param>
         public Tools.PlayerStatus SetPlayerStatus(ulong id_joueur)
         {
             _s_dico_joueur.WaitOne();
@@ -772,6 +795,12 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
+
+        /// <summary>
+        ///     Methode : incrementong a player score.
+        /// </summary>
+        ///<param name="id_joueur">id of the concerned player .</param>
+        ///<param name="score">score to add to the concerned player score.</param>
         public Tools.PlayerStatus SetPlayerPoint(ulong id_joueur, uint score)
         {
             _s_dico_joueur.WaitOne();
@@ -790,6 +819,10 @@ namespace system
             return Tools.PlayerStatus.Success;
         }
 
+
+        /// <summary>
+        ///     Methode : Setting barrier.
+        /// </summary>
         public void SetACBarrier()
         {
             _s_nombre_joueur.WaitOne();
@@ -802,10 +835,18 @@ namespace system
             _s_AC_barrierUp.Release();
             _s_nombre_joueur.Release();
         }
+
+        /// <summary>
+        ///     Methode : wait barrier.
+        /// </summary>
         public void WaitACBarrier()
         {
             _AC_barrierAllVerifDone.SignalAndWait(2000);
         }
+
+        /// <summary>
+        ///     Methode : Disposing the barrier then getting it down again.
+        /// </summary>
         public void DisposeACBarrier()
         {
             _s_AC_barrierUp.WaitOne();
@@ -813,7 +854,13 @@ namespace system
             _AC_barrierUp = false;
             _s_AC_barrierUp.Release();
         }
+        
 
+        
+        /// <summary>
+        ///     Methode : is everyone ready?.
+        /// </summary>
+        /// <returns> Returns True or False </returns>
         public bool EveryoneIsReady()
         {
             bool result = true;
@@ -833,6 +880,9 @@ namespace system
             return result;
         }
 
+        /// <summary>
+        ///     Methode : Initialization of player's meeples from the value of the parametre _meeples.
+        /// </summary>
         public void InitializePlayerMeeples()
         {
             _s_dico_joueur.WaitOne();
@@ -847,6 +897,10 @@ namespace system
         // Méthodes moteur de jeu
         // =======================
 
+        /// <summary>
+        ///     Methode : Starting game.
+        /// </summary>
+        /// <returns> Returns the id of the initial tile  </returns>
         public ulong StartGame()
         {
             _statut_partie = Tools.GameStatus.Running;
@@ -867,8 +921,6 @@ namespace system
             _offsetActualPlayer = 0;
             _s_offsetActualPlayer.Release();
 
-            // DEBUG pour parties + courtes et tests
-            _nb_tuiles = 10;
 
             // Réduction du nombre de tuile de 1, pour la tuile de départ
             if (IsRiverExtensionOn() == false)
@@ -930,6 +982,10 @@ namespace system
             return _idTuileInit;
         }
         
+
+        /// <summary>
+        ///     Methode : Event when game timer expires (EndGame()) .
+        /// </summary>
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
@@ -943,11 +999,12 @@ namespace system
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the game
             gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
-            idPlayer = Get_ActualPlayerId();
-            Console.WriteLine(idPlayer);
-            gestionnaire.CallForceEndGame(Get_ActualPlayerId(), _id_partie, dataPlayToSend);
         }
         
+
+        /// <summary>
+        ///     Methode : Event when player's round timer expires, forcing the end of the round .
+        /// </summary>
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
@@ -964,7 +1021,7 @@ namespace system
         }
 
         /// <summary>
-        /// Get three tiles' id from the game's list of tile
+        ///     Method : Get three tiles' id from the game's list of tile
         /// </summary>
         /// <returns> A array of 3 tiles' id </returns>
         public string[] GetThreeLastTiles()
@@ -982,7 +1039,7 @@ namespace system
         }
 
         /// <summary>
-        /// Shuffles the list of game's tiles
+        ///     Method : Shuffles the list of game's tiles
         /// </summary>
         public void ShuffleTilesGame()
         {
@@ -1001,7 +1058,14 @@ namespace system
 
         }
         
-
+        /// <summary>
+        ///     Methode : Tile placement, this method test if the tile placement asked by the player is legal, if yes, the tile is placed, if not illegal + cheat avertissement
+        /// </summary>
+        ///<param name="idPlayer">id of the concerned player .</param>
+        ///<param name="idTuile">id of the concerned tile .</param>
+        ///<param name="posX"> postion x .</param>
+        ///<param name="posY">position y .</param>
+        ///<param name="rotat">rotation .</param>
         public Tools.Errors TilePlacement(ulong idPlayer, ulong idTuile, int posX, int posY, int rotat)
         {
             Console.WriteLine("DEBUG_TuilePlacement : Entrée dans Serveur_jeu");
@@ -1031,6 +1095,14 @@ namespace system
             }
         }
 
+
+        /// <summary>
+        ///     Methode : Pion placement, this method test if the pion placement asked by the player is legal, if yes, the pion is placed, if not illegal + cheat avertissement
+        /// </summary>
+        ///<param name="idPlayer">id of the concerned player .</param>
+        ///<param name="idTuile">id of the concerned tile .</param>
+        ///<param name="idMeeple"> id of the concerned meeple x .</param>
+        ///<param name="slotPos">the position on the slot .</param>
         public Tools.Errors PionPlacement(ulong idPlayer, Position posTuile, ulong idMeeple, int slotPos)
         {
             _s_plateau.WaitOne();
@@ -1055,18 +1127,38 @@ namespace system
             }
         }
         
-
+        /// <summary>
+        ///     Methode : this method test if a tile placement is legal.
+        /// </summary>
+        ///<param name="idTuile">id of the concerned tile .</param>
+        ///<param name="idMeeple"> id of the concerned meeple x .</param>
+        ///<param name="posX"> postion x .</param>
+        ///<param name="posY">position y .</param>
+        ///<param name="rotat">rotation .</param>
+        /// <returns> Returns True or False </returns>
         public bool isTilePlacementLegal(ulong idTuile, int posX, int posY, int rotat)
         {
             return _plateau.PlacementLegal(idTuile, posX, posY, rotat);
         }
+        
 
+        /// <summary>
+        ///     Methode : this method test if a pion placement is legal.
+        /// </summary>
+        ///<param name="posTuile">The position of the concerned tile .</param>
+        ///<param name="idSlot">id if the concerned slot .</param>
+        ///<param name="idPlayer">id of the concerned player .</param>
+        ///<param name="idMeeple"> id of the concerned meeple x .</param>
+        /// <returns> Returns True or False </returns>
         public bool isPionPlacementLegal(Position posTuile, int idSlot, ulong idPlayer, ulong idMeeple)
         {
             Console.WriteLine("X=" + posTuile.X + " | Y=" + posTuile.Y);
             return _plateau.PionPosable(posTuile.X, posTuile.Y, (ulong)idSlot, idPlayer, idMeeple);
         }
-
+        
+        /// <summary>
+        ///     Methode : Remove a tile when trying to be placed on a not possible position.
+        /// </summary>
         public void RetirerTuileTourActu()
         {
             _s_posTuileTourActu.WaitOne();
@@ -1074,13 +1166,21 @@ namespace system
             _s_posTuileTourActu.Release();
         }
 
+
+        /// <summary>
+        ///     Methode : Remove a pion.
+        /// </summary>
         public void RetirerPionTourActu()
         {
             _s_posPionTourActu.WaitOne();
             _posPionTourActu = Array.Empty<string>();
             _s_posPionTourActu.Release();
         }
+        
 
+        /// <summary>
+        ///     Methode : Updating the game status.
+        /// </summary>
         public Tools.GameStatus UpdateGameStatus()
         {
             Tools.GameStatus statutGame = _statut_partie;
@@ -1095,7 +1195,9 @@ namespace system
                     }
                     break;
                 case Tools.Mode.TimeAttack:
-
+                    var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
+                    if (diff >= (int)_timer_game_value / 3600)
+                        statutGame = Tools.GameStatus.Stopped;
                     //TODO
 
                     break;
@@ -1111,6 +1213,10 @@ namespace system
             return statutGame;
         }
 
+
+        /// <summary>
+        ///     Methode : Remove all game tiles.
+        /// </summary>
         public void RetirerTuileGame(ulong idTuile)
         {
             _s_tuilesGame.WaitOne();
@@ -1128,6 +1234,10 @@ namespace system
             _s_tuilesGame.Release();
         }
 
+
+        /// <summary>
+        ///     Methode : Cancelling a turn.
+        /// </summary>
         public Socket? CancelTurn()
         {
             // Remise à inexistant la tuilePosActu et pionPosActu
@@ -1151,7 +1261,7 @@ namespace system
         }
 
         /// <summary>
-        /// End the turn
+        ///     Methode : End the turn
         /// </summary>
         /// <returns> The socket of the next player to play </returns>
         public Socket? EndTurn(ulong idPlayer)
@@ -1245,6 +1355,10 @@ namespace system
             return nextPlayerSocket;
         }
 
+
+        /// <summary>
+        ///     Methode : Ending a game.
+        /// </summary>
         public void EndGame()
         {
             _statut_partie = Tools.GameStatus.Stopped;
@@ -1266,7 +1380,7 @@ namespace system
         // =================================
 
         /// <summary>
-        /// Get 3 tiles id in string format from a tile list
+        ///     Method : Get 3 tiles id in string format from a tile list
         /// </summary>
         /// <param name="tuiles"> Tiles list </param>
         /// <returns> List of 3 tiles id in string format </returns>
@@ -1288,6 +1402,13 @@ namespace system
             
             return list;
         }
+
+        /// <summary>
+        ///     Methode : Removing the chosen tile's id from the game tiles list.
+        /// </summary>
+        ///<param name="tuiles">game tiles list .</param>
+        ///<param name="idTuile">id of the concerned tile .</param>
+        /// <returns> New list after removing the tile </returns>
         public static List<ulong> suppTuileChoisie(List<ulong> tuiles, ulong idTuile)
         {
             int i = 0;
@@ -1298,6 +1419,14 @@ namespace system
         }
 
 
+
+        /// <summary>
+        ///     Methode : select a tile to pick up while randomly generating the game tiles list .
+        /// </summary>
+        ///<param name="id">tile's id .</param>
+        ///<param name="x">random number (it must be between 0 and the sum of all tiles probabilities) .</param>
+        ///<param name="dico">tiles dictionary (id,probability) .</param>
+        /// <returns> Selected tile to pick up </returns>
         public static ulong tuile_a_tirer(ulong id, int x, Dictionary<ulong, ulong> dico)
         {
             ulong sum = 0;
@@ -1320,6 +1449,12 @@ namespace system
             return id;
         }
 
+
+
+        /// <summary>
+        ///     Methode : Randomly generat a river to begin (river extention).
+        /// </summary>
+        /// <returns> list of generated river's tiles </returns>
         public static List<ulong> Random_sort_rivieres()
         {
             var random = new Random();
@@ -1348,10 +1483,10 @@ namespace system
         }
 
         /// <summary>
-        /// Get a randomized list of tiles 
+        ///     Method : 'Randomly' generate the game tiles list.  
         /// </summary>
         /// <param name="nbTuiles"> Number of tiles to have in the list </param>
-        /// <returns> List of tiles </returns>
+        /// <returns> List of game tiles </returns>
         public static List<ulong> Random_sort_tuiles(int nbTuiles)
         {
             List<ulong> list = null;
@@ -1392,6 +1527,11 @@ namespace system
 
         }
 
+
+        /// <summary>
+        ///     Methode : Testing if the river extention is activated.
+        /// </summary>
+        /// <returns> True or False </returns>
         public bool IsRiverExtensionOn()
         {
             bool riverOn = (_extensionsGame & (int)Tools.Extensions.Riviere) > 0;
