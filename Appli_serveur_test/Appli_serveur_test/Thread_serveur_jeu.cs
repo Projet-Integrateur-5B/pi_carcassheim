@@ -858,6 +858,12 @@ namespace system
             // DEBUG pour parties + courtes et tests
             _nb_tuiles = 10;
 
+            // Réduction du nombre de tuile de 1, pour la tuile de départ
+            if (IsRiverExtensionOn() == false)
+            {
+                _nb_tuiles--;
+            }
+
             // Génération des tuiles de la game
             _s_tuilesGame.WaitOne();
             _tuilesGame = Random_sort_tuiles(_nb_tuiles);
@@ -881,11 +887,6 @@ namespace system
             _s_plateau.WaitOne();
             _plateau.Poser1ereTuile(_idTuileInit);
             _s_plateau.Release();
-            // Retrait de cette tuile de la liste de tuiles (si extension rivière désactivée)
-            if (IsRiverExtensionOn() == false)
-            {
-                RetirerTuileGame(_idTuileInit);
-            }
 
             // Initialise les meeples de tt le monde
             InitializePlayerMeeples();
