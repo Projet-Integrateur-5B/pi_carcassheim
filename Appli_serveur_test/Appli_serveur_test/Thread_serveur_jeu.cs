@@ -1151,7 +1151,7 @@ namespace system
                         {
                             Console.WriteLine("i" + i);
                         }
-                        _plateau.PoserPion(idPlayer, _posTuileTourActu.X, _posTuileTourActu.Y, UInt64.Parse(_posPionTourActu[2]));
+                        _plateau.PoserPion(idPlayer, _posTuileTourActu.X, _posTuileTourActu.Y, UInt64.Parse(_posPionTourActu[4]));
 
                         // Retrait d'un pion au joueur
                         _s_dico_joueur.WaitOne();
