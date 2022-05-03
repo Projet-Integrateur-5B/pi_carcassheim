@@ -8,16 +8,25 @@ namespace Assets.system
 {
     internal class Riviere
     {
+        /// <summary>
+        /// le plateau sur lequel il faut generer une riviere
+        /// </summary>
         private Plateau _plateau;
+
+        /// <summary>
+        /// instancie un generateur de riviere
+        /// </summary>
+        /// <param name="plateau">le plateau</param>
         private Riviere(Plateau plateau)
         {
             _plateau = plateau;
         }
 
         /// <summary>
-        /// 
+        /// cree la riviere sur le plateau
         /// </summary>
         /// <param name="tuilesRiviere">le 1er elem du tableau doit etre le debut de la riviere, le dernier doit en etre la fin</param>
+        /// <exception cref="Exception">si le tableau des tuiles rivieres n'est pas conforme</exception>
         public static void Init(Plateau plateau, Tuile[] tuilesRiviere)
         {
             var obj = new Riviere(plateau);
@@ -42,6 +51,10 @@ namespace Assets.system
             obj.InitialiserRiviere(tuilesRiviere);
         }
 
+        /// <summary>
+        /// cree la riviere
+        /// </summary>
+        /// <param name="tuilesRiviere">les tuiles qui forment la riviere</param>
         private void InitialiserRiviere(Tuile[] tuilesRiviere)
         {
             _plateau.Poser1ereTuile(tuilesRiviere[0].Id);
@@ -79,6 +92,11 @@ namespace Assets.system
             }
         }
 
+        /// <summary>
+        /// retourne le slot riviere d'une tuile
+        /// </summary>
+        /// <param name="tuile">la tuile en question</param>
+        /// <returns>l'id du slot representant la riviere</returns>
         private static int SlotRiviere(Tuile tuile)
         {
             for (int i = 0; i < tuile.Slots.Length; i++)
@@ -90,6 +108,12 @@ namespace Assets.system
             return -1;
         }
 
+        /// <summary>
+        /// calcul la direction vers laquelle une riviere pointe
+        /// </summary>
+        /// <param name="tuile">la tuile</param>
+        /// <returns>la direction</returns>
+        /// <exception cref="Exception">si la tuile n'est pas bien formatee</exception>
         private static int DirectionRiviereExtreme(Tuile tuile)
         {
             int slot = SlotRiviere(tuile);
@@ -104,6 +128,11 @@ namespace Assets.system
             return tuile.Rotation + posInterne / 3;
         }
 
+        /// <summary>
+        /// calcul si une tuile a une seule face riviere
+        /// </summary>
+        /// <param name="tuile">la tuile</param>
+        /// <returns>true si la tuile n'a qu'une seule face riviere, false sinon</returns>
         private static bool RiviereExtreme(Tuile tuile)
         {
             int slot = SlotRiviere(tuile);

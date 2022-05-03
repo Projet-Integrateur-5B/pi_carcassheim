@@ -176,11 +176,9 @@ public class DisplaySystem : MonoBehaviour
                     DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
                     if (board.getTileAt(action_msc.tile_pos) == act_tile && act_meeple != null && act_meeple.Id == action_msc.meeple_id)
                     {
-                        bool meeple_pos_null = act_meeple.ParentTile == null;
                         if (act_tile.setMeeplePos(act_meeple, action_msc.slot_pos))
                         {
-                            if (meeple_pos_null != (act_meeple.ParentTile == null))
-                                table.meeplePositionChanged(act_meeple);
+                            table.meeplePositionChanged(act_meeple);
                         }
                     }
                     break;
@@ -210,7 +208,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateLeave(DisplaySystemState old_state, DisplaySystemState new_state)
     {
-        Debug.Log("Leaving " + old_state + " to " + new_state);
+        // Debug.Log("Leaving " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.meeplePosing:
@@ -288,8 +286,9 @@ public class DisplaySystem : MonoBehaviour
                             }
                             setSelectedMeeple(index);
                         }
-                        act_tile.setMeeplePos(act_meeple, play_param.slot_pos);
-                        table.meeplePositionChanged(act_meeple);
+
+                        if (act_tile.setMeeplePos(act_meeple, play_param.slot_pos))
+                            table.meeplePositionChanged(act_meeple);
                     }
                     else
                     {
@@ -324,7 +323,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        Debug.Log("State enterring from " + old_state + " to " + new_state);
+        // Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
@@ -387,38 +386,12 @@ public class DisplaySystem : MonoBehaviour
                 List<PlayerScoreParam> scores_final = new List<PlayerScoreParam>();
                 List<Zone> zones_final = new List<Zone>();
                 system_back.askFinalScore(scores_final, zones_final);
-
-                if (my_player != null)
+                foreach (PlayerScoreParam score in scores_final)
                 {
-                    foreach (PlayerScoreParam score in scores_final)
-                    {
-                        players_mapping[(int)score.id_player].Score = score.points_gagnes;
-                    }
-
-                    int n_sup = 0;
-                    foreach (PlayerRepre player in players_mapping.Values)
-                    {
-                        if (player.Id != my_player.Id && my_player.Score < player.Score)
-                        {
-                            n_sup += 1;
-                        }
-
-                    }
-                    score_board.setEndOfGame(my_player, 1 + n_sup);
-                }
-                else
-                {
-                    PlayerRepre max_player = null;
-
-                    foreach (PlayerRepre pl in players_mapping.Values)
-                    {
-                        if (max_player == null || max_player.Score < pl.Score)
-                            max_player = pl;
-                    }
-
-                    score_board.setEndOfGame(max_player, 1);
+                    players_mapping[(int)score.id_player].Score = score.points_gagnes;
                 }
 
+                score_board.setEndOfGame(new List<PlayerRepre>(players_mapping.Values));
                 break;
         }
         act_system_state = new_state;
@@ -490,11 +463,9 @@ public class DisplaySystem : MonoBehaviour
                                 Debug.LogWarning("Wrong parent " + hit.transform.parent.parent.name + " instead of " + act_tile.pivotPoint.name);
                             else
                             {
-                                bool meeple_position_is_null = act_meeple.ParentTile == null;
                                 if (act_tile.setMeeplePos(act_meeple, slot))
                                 {
-                                    if (meeple_position_is_null != (act_meeple.ParentTile == null))
-                                        table.meeplePositionChanged(act_meeple);
+                                    table.meeplePositionChanged(act_meeple);
                                 }
                                 system_back.sendAction(new DisplaySystemActionMeepleSetCoord(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
                             }

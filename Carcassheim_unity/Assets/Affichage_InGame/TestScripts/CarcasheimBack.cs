@@ -82,35 +82,106 @@ public struct TurnPlayParam
 
 public abstract class CarcasheimBack : MonoBehaviour
 {
+    /// <summary>
+    /// donne une tuile a un joueur, qu'il place sur le plateau et pose un meeple dessus
+    /// </summary>
+    /// <param name="play">la tuile a jouer, dans quelle position, le type de meeple l'id du slot sur lequel mettre le meeple</param>
     public abstract void sendTile(TurnPlayParam play);
 
+    /// <summary>
+    /// recupere la derniere tuile jouee
+    /// </summary>
+    /// <param name="play">l'id de la tuile, sa position, l'id du slot sur lequel le meeple a ete place, le type du meeple</param>
     public abstract void getTile(out TurnPlayParam play);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="meeples"></param>
     public abstract void askMeeplesInit(List<MeepleInitParam> meeples);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tiles"></param>
+    /// <returns></returns>
     public abstract int askTilesInit(List<TileInitParam> tiles);
 
+    /// <summary>
+    /// remplie une liste avec comme informations l'id des joueurs, leur nom et de combien de meeples ils disposent pour cette partie
+    /// </summary>
+    /// <param name="players">la liste</param>
     public abstract void askPlayersInit(List<PlayerInitParam> players);
 
+    /// <summary>
+    /// calcul les positions ou une tuile est posable sur le plateau
+    /// </summary>
+    /// <param name="tile_id">l'id de la tuile</param>
+    /// <param name="positions">liste des positions ou la tuile est posable</param>
     public abstract void getTilePossibilities(int tile_id, List<PositionRepre> positions);
 
+    /// <summary>
+    /// remplie et trie une liste avec les ids des joueurs en fonction de l'ordre dans lequel il joue
+    /// </summary>
+    /// <param name="player_ids">la liste contenant les ids ordonnes des joueurs</param>
     public abstract void askPlayerOrder(List<int> player_ids);
 
+    /// <summary>
+    /// retourne le joueur qui doit etre le prochain a jouer
+    /// </summary>
+    /// <returns>l'id du prochain joueur</returns>
     public abstract int getNextPlayer();
 
+    /// <summary>
+    /// getter du joueur utilisant ce client
+    /// </summary>
+    /// <returns>l'id du joueur</returns>
     public abstract int getMyPlayer();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="players_scores"></param>
+    /// <param name="zones"></param>
     public abstract void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="playerScores"></param>
+    /// <param name="zones"></param>
     public abstract void askFinalScore(List<PlayerScoreParam> playerScores, List<Zone> zones);
 
+    /// <summary>
+    /// le temps maximal qu'un joueur peut prendre pour un tour, en minute + seconde
+    /// </summary>
+    /// <param name="min">les minutes</param>
+    /// <param name="sec">les secondes</param>
     public abstract void askTimerTour(out int min, out int sec);
 
+    /// <summary>
+    /// renvoie soit la tuile demarrant le jeu
+    /// </summary>
+    /// <returns>l'id de la tuile</returns>
     public abstract int askIdTileInitial();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="action"></param>
     public abstract void sendAction(DisplaySystemAction action);
 
+    /// <summary>
+    /// renvoie les conditions qui arrete une partie
+    /// </summary>
+    /// <param name="win_cond">le type de la condition de victoire</param>
+    /// <param name="parameters">les parametres de la victoire</param>
     public abstract void askWinCondition(ref WinCondition win_cond, List<int> parameters);
 
-
+    /// <summary>
+    /// calcul les slots ou un joueur peut poser un meeple
+    /// </summary>
+    /// <param name="mp">les informations du tour du joueur</param>
+    /// <param name="slot_pos">liste d'id des slots ou le meeple est posable</param>
     public abstract void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos);
 }
