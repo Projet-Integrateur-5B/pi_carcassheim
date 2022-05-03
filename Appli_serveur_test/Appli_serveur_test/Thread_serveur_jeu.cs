@@ -903,23 +903,23 @@ namespace system
             // Initialise les meeples de tt le monde
             InitializePlayerMeeples();
 
-            
-            _timer_game = new System.Timers.Timer();
-            _timer_game.Interval = 1000;
-            _timer_game.Elapsed += OnTimedEventGame;
-            _DateTime_player = DateTime.Now;
-            _timer_game.AutoReset = true;
-            _timer_game.Enabled = true;
-
             if (_mode == Tools.Mode.TimeAttack)
             {
-                _timer_player = new System.Timers.Timer();
-                _timer_player.Interval = 1000;
-                _timer_player.Elapsed += OnTimedEventPlayer;
+                _timer_game = new System.Timers.Timer();
+                _timer_game.Interval = 1000;
+                _timer_game.Elapsed += OnTimedEventGame;
                 _DateTime_player = DateTime.Now;
-                _timer_player.AutoReset = true;
-                _timer_player.Enabled = true;
+                _timer_game.AutoReset = true;
+                _timer_game.Enabled = true;
             }
+
+
+            _timer_player = new System.Timers.Timer();
+            _timer_player.Interval = 1000;
+            _timer_player.Elapsed += OnTimedEventPlayer;
+            _DateTime_player = DateTime.Now;
+            _timer_player.AutoReset = true;
+            _timer_player.Enabled = true;
 
 // TODO :
             // synchronisation de la methode
@@ -932,9 +932,8 @@ namespace system
         
         private void OnTimedEventGame(Object source, System.Timers.ElapsedEventArgs e)
         {
-            var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
-            Console.WriteLine(diff);
-            if (diff < (int) _timer_player_value / 60) return;
+            var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
+            if (diff < (int) _timer_game_value / 3600) return;
 
             var idPlayer = Get_ActualPlayerId();
             Console.WriteLine("Game was raised at {0}. EndGame() is called + {1}", e.SignalTime, idPlayer);
@@ -952,7 +951,6 @@ namespace system
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_player).Minutes;
-            Console.WriteLine(diff);
             if (diff < (int) _timer_player_value / 60) return;
             
             var idPlayer = Get_ActualPlayerId();
@@ -1159,7 +1157,7 @@ namespace system
         /// <returns> The socket of the next player to play </returns>
         public Socket? EndTurn(ulong idPlayer)
         {
-            //_timer_player.Stop();
+            _timer_player.Stop();
 
             bool aJoue = false;
             

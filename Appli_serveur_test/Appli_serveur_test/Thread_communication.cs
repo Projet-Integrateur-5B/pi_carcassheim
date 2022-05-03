@@ -626,26 +626,20 @@ namespace system
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
-                Console.WriteLine("Force_EndTurn : room found !" + "test=" + thread_serv_ite.Get_ActualPlayerId());
+                Console.WriteLine("Force_EndTurn : room found !");
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
-                    Console.WriteLine("hearpgiqegpioqdjgodqrigjhde$tigujqedpgjuqed$gjuqe$gbujru");
                     // Fin du tour actuel
-                    Console.WriteLine(1);
                     Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
                     // Mise à jour du status de la game
-                    Console.WriteLine(2);
                     Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
-                    Console.WriteLine(3);
 
                     // Génération du nouveau tableau data+scores
                     string[] allScores = thread_serv_ite.GetAllPlayersScore();
-                    Console.WriteLine(4);
                     string[] dataWithScores = new string[allScores.Length + data.Length];
 
                     data.CopyTo(dataWithScores, 0);
                     allScores.CopyTo(dataWithScores, data.Length);
-                    Console.WriteLine(5);
 
                     if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                     {
@@ -671,7 +665,6 @@ namespace system
                         // Envoi de l'information du endturn
                         SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
                     }
-
                 }
             }             
         }
@@ -686,7 +679,7 @@ namespace system
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
-                Console.WriteLine("Force_EndGame : room found !" + "test=" + thread_serv_ite.Get_ActualPlayerId());
+                Console.WriteLine("Force_EndGame : room found !");
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Fin du tour actuel
@@ -699,7 +692,7 @@ namespace system
                     data.CopyTo(dataWithScores, 0);
                     allScores.CopyTo(dataWithScores, data.Length);
 
-                    Console.WriteLine("Force_EndTurn : game stopped !");
+                    Console.WriteLine("Force_EndGame : game stopped !");
 
                     ulong idPlayerWinner = thread_serv_ite.GetWinner();
                     string[] dataToSend = new string[] { idPlayerWinner.ToString() };
