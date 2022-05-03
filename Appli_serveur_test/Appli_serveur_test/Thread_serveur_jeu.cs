@@ -270,7 +270,7 @@ namespace system
         /// <param name="settings"> The new set of settings (in the same order than Get_settings, without the 2 firsts) </param>
         public void Set_Settings(ulong idPlayer, string[] settings)
         {
-            if (idPlayer == Get_Moderateur())
+            if (idPlayer == Get_Moderateur() && _statut_partie == Tools.GameStatus.Room)
             {
                 lock (_lock_settings)
                 {
