@@ -125,7 +125,7 @@ namespace system
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
                         // On envoie le display à tous sauf au joueur dont c'est l'action (si tuileDrawn on envoit à tous)
-                        if (joueur.Key != idPlayer || idMessage == Tools.IdMessage.TuileDraw) 
+                        if (joueur.Key != idPlayer || idMessage is Tools.IdMessage.TuileDraw or Tools.IdMessage.PionPlacement) 
                         {
                             Console.WriteLine("SendBroadcast : to " + joueur.Value._id_player + "!");
                             Server.Server.SendToSpecificClient(joueur.Value._socket_of_player, packet);

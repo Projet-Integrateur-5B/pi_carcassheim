@@ -894,6 +894,7 @@ public partial class Server
         // Vérification du coup
         Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, packetReceived.Data);
         packet.Error = errors;
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     /// <summary>
     ///     Cancels a meeple.
