@@ -147,6 +147,9 @@ namespace Assets.system
             int c = 0;
             foreach (var item in adj)
             {
+                if (item == null)
+                    continue;
+
                 int pos = positionsInternesProchainesTuiles[c++];
                 ulong nextSlot = item.IdSlotFromPositionInterne(pos);
 
