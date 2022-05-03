@@ -54,9 +54,11 @@ namespace Assets.system
         private int nb_tile_for_turn = 0;
 
         private bool player_received = false;
+        private bool playerlist_received = false;
         private bool gameStatus = true;
 
         private Semaphore s_WaitInit;
+        private Semaphore s_WaitPlayerList;
 
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
@@ -308,7 +310,7 @@ namespace Assets.system
 
                 case DisplaySystemActionTypes.meepleSetCoord:
                     DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
-                    SendMeepple(action_msc.tile_id, action_msc.meeple_id, action_msc.slot_pos);
+                    SendMeepple(action_msc.tile_id, action_msc.tile_pos.X, action_msc.tile_pos.Y,action_msc.tile_pos.Rotation, action_msc.meeple_id, action_msc.slot_pos) ;
                     break;
 
                 case DisplaySystemActionTypes.meepleSelection:
@@ -328,6 +330,7 @@ namespace Assets.system
         {
             s_WaitInit = new Semaphore(1, 1);
             s_WaitInit.WaitOne();
+            s_WaitPlayerList = new Semaphore(0, 1);
 
             dico_tuile = LireXML2.Read("config_back.xml");
             lePlateau = new Plateau(dico_tuile);
@@ -538,11 +541,22 @@ namespace Assets.system
 
             s_InGame.WaitOne();
             players_received = true;
+            playerlist_received = true;
             s_InGame.Release();
+            s_WaitPlayerList.Release();
         }
 
         public void OnPlayerCurrentReceive(Packet packet)
         {
+            bool isOK = false; 
+            s_InGame.WaitOne();
+            if(playerlist_received)
+                isOK = true;
+            s_InGame.Release();
+
+            if(!isOK)
+                s_WaitPlayerList.WaitOne();
+
             nextPlayer = packet.IdPlayer;
             player_received = true;
 
@@ -622,7 +636,7 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        public void SendMeepple(int id_tuile, int id_meeple, int slot_pos)
+        public void SendMeepple(int id_tuile, int X, int Y,int ROT, int id_meeple, int slot_pos)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.PionPlacement;
@@ -632,6 +646,9 @@ namespace Assets.system
             packet.Data = new string[]
             {
                 id_tuile.ToString(),
+                X.ToString(),
+                Y.ToString(),
+                ROT.ToString(),
                 id_meeple.ToString(),
                 slot_pos.ToString()
             };
@@ -657,6 +674,8 @@ namespace Assets.system
             s_InGame.WaitOne();
             if (players_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received && player_received)
             {
+                s_InGame.Release();
+
                 testGameBegin = false;
                 players_received = false;
                 player_received = false;
