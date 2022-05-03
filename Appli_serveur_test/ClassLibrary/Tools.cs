@@ -67,6 +67,7 @@ public static class Tools
         EndGame = 31,
         EndTurn = 32,
         TimerPlayer = 33,
+        TimerGame = 34,
         
         TuileDraw = 40,
         TuilePlacement = 41,

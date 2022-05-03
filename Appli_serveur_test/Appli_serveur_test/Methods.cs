@@ -657,9 +657,11 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
+        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom, ref error);
 
-        if(idActualPlayer != 0)
+        if (error == Tools.Errors.Permission)
+            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
+        else if (idActualPlayer != 0)
         {
             packet.IdPlayer = idActualPlayer;
             error = Tools.Errors.None;
@@ -743,6 +745,10 @@ public partial class Server
         if (tilesToSend.Length == 0)
         {
             packet.Error = Tools.Errors.Unknown;
+        }
+        else if (tilesToSend[0] == "Permission")
+        {
+            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
         }
         
         

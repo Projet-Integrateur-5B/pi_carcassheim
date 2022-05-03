@@ -469,7 +469,7 @@ namespace system
         /// <param name="settings"> The new set of settings (in the same order than Get_settings, without the 2 firsts) </param>
         public void Set_Settings(ulong idPlayer, string[] settings)
         {
-            if (idPlayer == Get_Moderateur())
+            if (idPlayer == Get_Moderateur() && _statut_partie == Tools.GameStatus.Room)
             {
                 lock (_lock_settings)
                 {
@@ -881,12 +881,15 @@ namespace system
             // Initialise les meeples de tt le monde
             InitializePlayerMeeples();
 
-            _timer_game = new System.Timers.Timer();
-            _timer_game.Interval = 1000;
-            _timer_game.Elapsed += OnTimedEventGame;
-            _DateTime_game = DateTime.Now;
-            _timer_game.AutoReset = true;
-            _timer_game.Enabled = true;
+            if (_mode == Tools.Mode.TimeAttack)
+            {
+                _timer_game = new System.Timers.Timer();
+                _timer_game.Interval = 1000;
+                _timer_game.Elapsed += OnTimedEventGame;
+                _DateTime_game = DateTime.Now;
+                _timer_game.AutoReset = true;
+                _timer_game.Enabled = true;
+            }
             
             _timer_player = new System.Timers.Timer();
             _timer_player.Interval = 1000;

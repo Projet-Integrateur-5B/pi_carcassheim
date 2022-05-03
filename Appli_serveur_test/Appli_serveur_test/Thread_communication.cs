@@ -626,6 +626,8 @@ namespace system
                     {
                         Console.WriteLine("Force_EndTurn : game stopped !");
 
+                        SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, data);
+                        
                         ulong idPlayerWinner = thread_serv_ite.GetWinner();
                         string[] dataToSend = new string[] { idPlayerWinner.ToString() };
                         SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
@@ -642,7 +644,7 @@ namespace system
                         Console.WriteLine("Force_EndTurn : before broadcast !");
 
                         // Envoi de l'information du endturn
-                        SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
+                        SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, data);
                     }
 
                 }
