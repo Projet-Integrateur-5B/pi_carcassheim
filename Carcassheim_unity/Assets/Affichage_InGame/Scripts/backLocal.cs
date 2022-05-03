@@ -48,7 +48,7 @@ public class backLocal : CarcasheimBack
 
     private ulong tile_final_river = 35;
 
-    public bool river_on { set; get; } = true;
+    public bool river_on { set; get; } = false;
 
     private List<ulong> tiles_for_river;
     List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
@@ -193,7 +193,7 @@ public class backLocal : CarcasheimBack
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
-        //Debug.Log("MEEPLE" + play.id_meeple);
+        Debug.Log("MEEPLE" + play.id_meeple);
         //Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
@@ -291,6 +291,7 @@ public class backLocal : CarcasheimBack
     {
         Debug.Log("pioche d'une tuile riviere...\ntiles_for_river.Count = " + tiles_for_river.Count);
         Debug.Log(tiles_for_river.Count);
+        possibilities_tile_act_turn.Clear();
         ulong result = 0;
         if (tiles_for_river.Count > 0)
         {

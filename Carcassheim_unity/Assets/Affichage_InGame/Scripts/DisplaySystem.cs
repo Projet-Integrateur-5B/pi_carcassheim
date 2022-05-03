@@ -13,7 +13,8 @@ public enum DisplaySystemState
     idleState,
     endOfGame,
     scoreChange,
-    gameStart
+    gameStart,
+    timeOutIdleState
 };
 
 public class DisplaySystem : MonoBehaviour
@@ -137,8 +138,10 @@ public class DisplaySystem : MonoBehaviour
                     DisplaySystemActionTileSetCoord action_tsc = (DisplaySystemActionTileSetCoord)action;
                     if (act_tile != null && act_tile.Id == action_tsc.tile_id)
                     {
-                        if (!board.setTileAt(action_tsc.new_pos, act_tile))
+                        if (board.setTileAt(action_tsc.new_pos, act_tile))
                             table.tilePositionChanged(act_tile);
+                        else
+                            Debug.Log("Vas y connard");
                     }
                     break;
                 case DisplaySystemActionTypes.tileSelection:
@@ -221,7 +224,7 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.idleState:
                 if ((DEBUG || act_player.is_my_player) && (old_state == DisplaySystemState.tilePosing || old_state == DisplaySystemState.meeplePosing))
                 {
-                    if (act_meeple != null)
+                    if (act_meeple != null && act_meeple.ParentTile != null)
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
                     else
                         system_back.sendTile(new TurnPlayParam(act_tile.Id, act_tile.Pos, -1, -1));
@@ -239,6 +242,7 @@ public class DisplaySystem : MonoBehaviour
                 act_tile.hidePossibilities();
                 break;
 
+            case DisplaySystemState.timeOutIdleState:
             case DisplaySystemState.idleState:
                 TurnPlayParam play_param;
                 if (act_system_state == DisplaySystemState.idleState)

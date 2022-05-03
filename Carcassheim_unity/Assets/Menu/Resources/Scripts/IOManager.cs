@@ -26,7 +26,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     static private GameObject previousGo, nextGo, TridentGo;
     private Texture2D _cursorTexture;
     private CursorMode _cursorMode = CursorMode.Auto;
-    private Vector2 _cursorHotspot = Vector2.zero;
+    private Vector2 _cursorHotspot = new Vector2(10, 5);
     private EventSystem eventSystem;
     private bool boolSelectionChange = true;
     private bool cooldown = false;

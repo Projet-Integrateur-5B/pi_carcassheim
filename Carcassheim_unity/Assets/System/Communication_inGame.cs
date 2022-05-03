@@ -31,6 +31,7 @@ namespace Assets.system
         private int _timer; // En secondes
         bool timer_tour_received = false;
         private int _meeples; // Nombre de meeples par joueur
+        private int meeple_type = 1;
 
         private Dictionary<ulong, Tuile> dico_tuile;
         private Plateau lePlateau;
@@ -53,6 +54,7 @@ namespace Assets.system
         private int nb_tile_for_turn = 0;
 
         private bool player_received = false;
+        private bool gameStatus = true;
 
         private Semaphore s_WaitInit;
 
@@ -108,7 +110,6 @@ namespace Assets.system
             //TODO PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
             Debug.Log("GET TILE " + play_of_this_turn.id_tile + " MA POS " + play_of_this_turn.tile_pos);
             param = play_of_this_turn;
-            play_of_this_turn = new TurnPlayParam(-1, null, -1, -1);
         }
 
         //=======================================================
@@ -118,7 +119,7 @@ namespace Assets.system
         {
             lePlateau.PoserTuileFantome((ulong)mp.id_tile, mp.pos_tile.X, mp.pos_tile.Y, mp.pos_tile.Rotation);
             // Debug.Log("ROTATION   " + mp.pos_tile);
-            slot_pos.AddRange(lePlateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, nextPlayer, (ulong)mp.id_meeple));
+            slot_pos.AddRange(lePlateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, (ulong)mp.id_meeple));
         }
         override public int getNextPlayer()
         {
@@ -148,6 +149,14 @@ namespace Assets.system
         {
             //TODO PARTAGER LA LISTE DES ID DES MEEPLES POSABLES ET LE NOMBRE DISP�NIBLE => Display
             // Id meeple, nb de meeple d'id Id disponible
+            int taille = playerList.Length;
+            for (int i = 0; i < meeple_type; i++)
+                for(int j = 0; j < taille; j++)
+                    if(playerList[j].id == nextPlayer)
+                    {
+                        meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
+                        break;
+                    }
         }
 
         override public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
@@ -398,15 +407,25 @@ namespace Assets.system
 
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
+                if((packet.Error == Tools.Errors.Unknown) && !gameStatus)
+                {
+                    Debug.LogError("[ERREUR] : TuileDraw : " + packet.Error);
+                    return;
+                }
                 OnTuileReceived(packet);
+            }
+            else if (packet.IdMessage == Tools.IdMessage.PlayerCurrent)
+            {
+                if ((packet.Error == Tools.Errors.Unknown) && !gameStatus)
+                {
+                    Debug.LogError("[ERREUR] : PlayerCurrent : " + packet.Error);
+                    return;
+                }
+                OnPlayerCurrentReceive(packet);
             }
             else if (packet.IdMessage == Tools.IdMessage.PlayerList)
             {
                 OnPlayerListReceive(packet);
-            }
-            else if (packet.IdMessage == Tools.IdMessage.PlayerCurrent)
-            {
-                OnPlayerCurrentReceive(packet);
             }
             else if (packet.IdMessage == Tools.IdMessage.TuilePlacement)
             {
@@ -419,6 +438,7 @@ namespace Assets.system
             }
             else if (packet.IdMessage == Tools.IdMessage.EndTurn)
             {
+                gameStatus = false;
                 OnEndTurnReceive(packet);
             }
             else if (packet.IdMessage == Tools.IdMessage.TuileVerification)
@@ -437,9 +457,24 @@ namespace Assets.system
                     }
                 }
             }
-            else if (packet.IdMessage == Tools.IdMessage.EndGame)
+            else if(packet.IdMessage == Tools.IdMessage.EndGame)
             {
                 system_display.setNextState(DisplaySystemState.endOfGame);
+            }
+            else if(packet.IdMessage == Tools.IdMessage.TimerPlayer)
+            {
+                system_display.setNextState(DisplaySystemState.timeOutIdleState);
+                OnEndTurnReceive(null);
+            }
+            else if(packet.IdMessage == Tools.IdMessage.PionPlacement)
+            {
+                if(packet.Error == Tools.Errors.None)
+                {
+                    DisplaySystemAction dsa = new DisplaySystemActionMeepleSetCoord(int.Parse(packet.Data[0]),
+                    new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])),
+                    int.Parse(packet.Data[4]), int.Parse(packet.Data[5]));
+                    system_display.execDirtyAction(dsa);
+                }
             }
         }
 
@@ -497,7 +532,7 @@ namespace Assets.system
 
             for (i = 0; i < taille_data; i += 2)
             {
-                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)_meeples, 0);
+                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], 0, 0);
                 compteur++;
             }
 
@@ -510,6 +545,14 @@ namespace Assets.system
         {
             nextPlayer = packet.IdPlayer;
             player_received = true;
+
+            int taille = playerList.Length;
+            for (int j = 0; j < taille; j++)
+                if (playerList[j].id == nextPlayer)
+                {
+                    playerList[j].nbMeeples = uint.Parse(packet.Data[0]);
+                    break;
+                }
         }
 
         private void OnEndTurnReceive(Packet packet)

@@ -240,7 +240,6 @@ public abstract class Miscellaneous : MonoBehaviour
     /// <param name = "goTo">The next menu.</param>
     public void ChangeMenu(string close, string goTo)
     {
-        Debug.Log("CHANGED");
         s_menuHasChanged = true;
         previousMenu = Miscellaneous.FindObject(absolute_parent, close).gameObject;
         nextMenu = Miscellaneous.FindObject(absolute_parent, goTo).gameObject;
