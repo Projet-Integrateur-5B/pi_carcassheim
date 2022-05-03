@@ -79,6 +79,9 @@ public static class Tools
         NoAnswerNeeded = 99
     }
 
+    /// <summary>
+    ///     Indicates the player status for a room
+    /// </summary>
     public enum PlayerStatus
     {
         Default = 0,
@@ -91,6 +94,9 @@ public static class Tools
         NotFound = -1
     }
     
+    /// <summary>
+    ///     Indicates the game status
+    /// </summary>
     public enum GameStatus
     {
         Room = 0,
@@ -98,6 +104,9 @@ public static class Tools
         Stopped = 2
     }
 
+    /// <summary>
+    ///     Indicates the lenght of the timer
+    /// </summary>
     public enum Timer
     {
         DixSecondes = 10,
@@ -107,6 +116,9 @@ public static class Tools
         Heure = 3600
     }
 
+    /// <summary>
+    ///     Indicates the number of meeple per player
+    /// </summary>
     public enum Meeple
     {
         Quatre = 4,
@@ -114,6 +126,9 @@ public static class Tools
         Dix = 10
     }
 
+    /// <summary>
+    ///     Indicates the different endgame types
+    /// </summary>
     public enum Mode
     {
         Default = 0,
@@ -121,6 +136,9 @@ public static class Tools
         Score = 2
     }
 
+    /// <summary>
+    ///     Indicates the different extensions
+    /// </summary>
     public enum Extensions
     {
         None = 0,
