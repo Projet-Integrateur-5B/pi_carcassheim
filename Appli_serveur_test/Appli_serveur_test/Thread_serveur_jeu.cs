@@ -309,7 +309,7 @@ namespace system
             {
                 Console.Write(elem + ", ");
             }
-            Console.Write("\n");
+            Console.Write("] \n");
             _s_tuilesEnvoyees.Release();
 
 
@@ -642,7 +642,7 @@ namespace system
 
             // Initialisation attributs anticheat
             _posPionTourActu = Array.Empty<string>();
-            _AC_idFirstValidTile = 0;
+            _AC_idFirstValidTile = ulong.MaxValue;
             _AC_barrierUp = false;
             _AC_drawedTilesValid = false;
 
