@@ -1059,7 +1059,7 @@ MonoBehaviour:
   - {r: 0, g: 0.020439148, b: 1, a: 1}
   - {r: 1, g: 0, b: 0.92679024, a: 1}
   DEBUG: 0
-  camera_manager: {fileID: 0}
+  camera_manager: {fileID: 902419866}
 --- !u!4 &857668915
 Transform:
   m_ObjectHideFlags: 0
