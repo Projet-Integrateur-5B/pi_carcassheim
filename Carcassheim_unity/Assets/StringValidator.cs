@@ -8,6 +8,9 @@ public class StringValidator : MonoBehaviour
 {
 
     TMP_InputField text_field;
+    InputField text_field_bis;
+
+    int field_selected = -1;
     string last_valid;
     int value;
 
@@ -17,6 +20,7 @@ public class StringValidator : MonoBehaviour
     void Start()
     {
         text_field = gameObject.GetComponent<TMP_InputField>();
+        text_field_bis = gameObject.GetComponent<InputField>();
         if (text_field != null)
         {
             last_valid = text_field.text;
@@ -27,6 +31,20 @@ public class StringValidator : MonoBehaviour
             }
             text_field.onValueChanged.AddListener(onModif);
             text_field.onEndEdit.AddListener(onEnd);
+            text_field_bis = null;
+        }
+        else if (text_field_bis != null)
+        {
+            last_valid = text_field_bis.text;
+            if (!int.TryParse(last_valid, out value))
+            {
+                value = 0;
+                text_field_bis.SetTextWithoutNotify("0");
+            }
+            text_field_bis.onValueChanged.AddListener(onModif);
+            text_field_bis.onEndEdit.AddListener(onEnd);
+            text_field = null;
+
         }
         else
         {
@@ -41,7 +59,8 @@ public class StringValidator : MonoBehaviour
         int res;
         if (!int.TryParse(to_validate, out res))
         {
-            text_field.SetTextWithoutNotify(last_valid);
+            text_field?.SetTextWithoutNotify(last_valid);
+            text_field_bis?.SetTextWithoutNotify(last_valid);
         }
         else
         {
@@ -55,7 +74,8 @@ public class StringValidator : MonoBehaviour
         int res;
         if (!int.TryParse(to_validate, out res))
         {
-            text_field.SetTextWithoutNotify(last_valid);
+            text_field?.SetTextWithoutNotify(last_valid);
+            text_field_bis?.SetTextWithoutNotify(last_valid);
         }
         else
         {

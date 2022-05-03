@@ -13,7 +13,8 @@ public enum DisplaySystemState
     idleState,
     endOfGame,
     scoreChange,
-    gameStart
+    gameStart,
+    timeOutIdleState
 };
 
 public class DisplaySystem : MonoBehaviour
@@ -239,6 +240,7 @@ public class DisplaySystem : MonoBehaviour
                 act_tile.hidePossibilities();
                 break;
 
+            case DisplaySystemState.timeOutIdleState:
             case DisplaySystemState.idleState:
                 TurnPlayParam play_param;
                 if (act_system_state == DisplaySystemState.idleState)
