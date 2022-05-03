@@ -674,6 +674,8 @@ namespace Assets.system
             s_InGame.WaitOne();
             if (players_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received && player_received)
             {
+                s_InGame.Release();
+
                 testGameBegin = false;
                 players_received = false;
                 player_received = false;
