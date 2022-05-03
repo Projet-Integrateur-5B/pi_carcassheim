@@ -522,14 +522,20 @@ namespace system
 
             // Debug.Log("LE PION EST IL POSABLE SUR LA TUILE " + tuile.ToString() + " SLOT :" + idSlot + " ?");
 
+            Console.WriteLine("tuile == null : " + (tuile == null) + " WWWWW (ulong)tuile.NombreSlot < idSlot : " + ((ulong)tuile.NombreSlot < idSlot));
+            
             if (tuile == null || (ulong)tuile.NombreSlot < idSlot)
                 return false;
 
             int[] tab = EmplacementPionPossible(x, y, idJoueur);
             for (int i = 0; i < tab.Length; i++)
             {
-                if ((ulong)tab[i] == idSlot)
+                Console.WriteLine("(ulong) tab[i] == idSlot : " + ((ulong) tab[i] == idSlot));
+                if ((ulong) tab[i] == idSlot)
+                {
+                    Console.WriteLine("TRUE TRUE TRUE");
                     return true;
+                }
             }
             return false;
         }

@@ -659,7 +659,7 @@ public partial class Server
         // Get the actual player
         List<ulong> currentPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
 
-        if (currentPlayer[0] != 0)
+        if (currentPlayer[0] != 0 && currentPlayer.Count > 1)
         {
             packet.IdPlayer = currentPlayer[0];
             packet.Data = new[] { currentPlayer[1].ToString() };
@@ -889,7 +889,8 @@ public partial class Server
         // Vérification du coup
         Position pos_XY_Tuile = new Position(Int32.Parse(packetReceived.Data[0]), Int32.Parse(packetReceived.Data[1]), 0);
         Tools.Errors errors = gestionnaire.CallVerifyPionPlacement(packetReceived.IdPlayer, socket, packetReceived.IdRoom, pos_XY_Tuile, packetReceived.Data[2], packetReceived.Data[3]);
-        packet.Error = errors; 
+        packet.Error = errors;
+        packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
     }
     /// <summary>
     ///     Cancels a meeple.
