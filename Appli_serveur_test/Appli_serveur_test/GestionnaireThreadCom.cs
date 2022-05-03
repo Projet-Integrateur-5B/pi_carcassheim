@@ -404,7 +404,7 @@ namespace system
             return listPlayerAndName.ToArray();
         }
 
-        public ulong CallPlayerCurrent(int idRoom, ref Tools.Errors errors)
+        public ulong CallPlayerCurrent(int idRoom)
         {
             ulong idActualPlayer = 0;
 
@@ -414,14 +414,7 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    if (thread_serv_ite.Get_Status() == Tools.GameStatus.Stopped)
-                    {
-                        errors = Tools.Errors.Permission;
-                    }
-                    else
-                    {
-                        idActualPlayer = thread_serv_ite.Get_ActualPlayerId();
-                    }
+                    idActualPlayer = thread_serv_ite.Get_ActualPlayerId();
                     return idActualPlayer;
                 }
             }
@@ -497,11 +490,6 @@ namespace system
                 foreach (Thread_serveur_jeu threadJeu in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != threadJeu.Get_ID()) continue;
-                    if (threadJeu.Get_Status() == Tools.GameStatus.Stopped)
-                    {
-                        Console.WriteLine("AAAAAAAAAAAAAAAAAA");
-                        return new[] {"Permission"};
-                    }
                     return threadJeu.GetThreeLastTiles();
                 }                  
             }

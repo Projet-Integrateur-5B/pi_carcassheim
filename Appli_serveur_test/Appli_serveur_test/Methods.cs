@@ -657,11 +657,9 @@ public partial class Server
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom, ref error);
+        ulong idActualPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
 
-        if (error == Tools.Errors.Permission)
-            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
-        else if (idActualPlayer != 0)
+        if (idActualPlayer != 0)
         {
             packet.IdPlayer = idActualPlayer;
             error = Tools.Errors.None;
@@ -746,12 +744,8 @@ public partial class Server
         {
             packet.Error = Tools.Errors.Unknown;
         }
-        else if (tilesToSend[0] == "Permission")
-        {
-            packet.IdMessage = Tools.IdMessage.NoAnswerNeeded;
-        }
-        
-        
+
+
     }
     /// <summary>
     ///     Checks if the specified position is enabled.
