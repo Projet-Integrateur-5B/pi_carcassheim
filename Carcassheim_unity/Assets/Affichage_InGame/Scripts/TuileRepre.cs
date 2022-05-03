@@ -203,6 +203,8 @@ public class TuileRepre : MonoBehaviour
     }
     public bool setMeeplePos(MeepleRepre meeple, SlotIndic slot_indic)
     {
+        if (meeple == null)
+            return false;
         TuileRepre old_parent = meeple.ParentTile;
         meeple.ParentTile = this;
         meeple.SlotPos = slot_indic.Id;
