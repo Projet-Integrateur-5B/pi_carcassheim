@@ -961,7 +961,6 @@ namespace system
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the turn
             gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
-            _timer_player.Start();
         }
 
         /// <summary>
@@ -1241,6 +1240,7 @@ namespace system
             
             // reset player timer
             _DateTime_player = DateTime.Now;
+            _timer_player.Start();
 
             return nextPlayerSocket;
         }
