@@ -23,6 +23,8 @@ namespace system
         public void AddPoints(uint points)
         {
             _s_player.WaitOne();
+            Console.WriteLine("Gain de points ! Joueur " + _id_player.ToString() + " a gagné " + points.ToString() + " supplémentaires ! ("
+                + _score.ToString() + "->" + (_score+points).ToString());
             _score = _score + points;
             _s_player.Release();
         }
