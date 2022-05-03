@@ -302,6 +302,17 @@ namespace system
                 _AC_drawedTilesValid = true;
             }
 
+            _s_tuilesEnvoyees.WaitOne();
+            // DEBUG affichage _tuilesEnvoyees
+            Console.WriteLine("** DEBUG : MaJ idFirstValid _tuilesEnvoyees : [ ");
+            foreach (var elem in _tuilesEnvoyees)
+            {
+                Console.Write(elem + ", ");
+            }
+            Console.Write("\n");
+            _s_tuilesEnvoyees.Release();
+
+
             _s_AC_idFirstValidTile.WaitOne();
             for(int i = 0; i<3; i++)
             {
@@ -313,6 +324,7 @@ namespace system
                 }
                 if(_AC_idFirstValidTile == UInt64.Parse(_tuilesEnvoyees[i])) // Si l'idFirstValid arrive avant le nouveau idTuile
                 {
+                    Console.WriteLine("*** DEBUG : NO MaJ SetValide_AC -> idFirstValid = " + _tuilesEnvoyees[i] + " has been found first.");
                     break;
                 }
             }
