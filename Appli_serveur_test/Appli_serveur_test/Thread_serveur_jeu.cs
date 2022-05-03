@@ -934,7 +934,7 @@ namespace system
         {
             var diff = DateTime.Now.Subtract(_DateTime_game).Hours;
             Console.WriteLine(diff);
-            if (diff < (int) 30 / 3600) return;
+            if (diff < (int) _timer_player_value / 3600) return;
             
             Console.WriteLine("Game was raised at {0}. EndGame() is called", e.SignalTime);
             _timer_game.Stop();
