@@ -235,14 +235,13 @@ namespace system
                 {
                     if (errors == Tools.Errors.Data) // Aucune tuile n'est pas posable selon ce client
                     {
-                        if(idPlayer != threadJeu.Get_ActualPlayerId()) // Autre joueur
-                        {
-                            threadJeu.SetACBarrier(); // Sets the barrier if inexistant
+                        threadJeu.SetACBarrier(); // Sets the barrier if inexistant
 
-                            // On attend que tous les autres joueurs aient exécuté leur rôle d'arbitre
-                            threadJeu.WaitACBarrier();
-                        }
-                        else // Joueur actuel
+
+                        // On attend que tous les joueurs aient exécuté leur rôle d'arbitre
+                        threadJeu.WaitACBarrier();
+
+                        if (idPlayer == threadJeu.Get_ActualPlayerId()) // Joueur actuel
                         {
                             // Vérification de la validité des tuiles piochées
                             if (threadJeu.Get_AC_drawedTilesValid())
@@ -258,12 +257,12 @@ namespace system
                                 threadJeu.ShuffleTilesGame();
                                 threadJeu.Set_tuilesEnvoyees(threadJeu.GetThreeLastTiles());
                                 SendUnicast(idRoom, Tools.IdMessage.TuileDraw, playerSocket, idPlayer, threadJeu.GetThreeLastTiles());
-
                             }
 
+                            // Destruction de la barrière par le joueur actu
                             threadJeu.DisposeACBarrier();
-                        }
-                        
+                        }                   
+
                     }
                     else if (errors == Tools.Errors.None) // Une tuile est posable selon ce client
                     {
@@ -305,6 +304,7 @@ namespace system
 
                             }
 
+                            // Destruction de la barrière par le joueur actu
                             threadJeu.DisposeACBarrier();
                         }
 
