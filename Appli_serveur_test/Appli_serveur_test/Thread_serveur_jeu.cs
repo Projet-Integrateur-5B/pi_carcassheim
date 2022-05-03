@@ -944,7 +944,9 @@ namespace system
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the game
             gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
-            gestionnaire.CallForceEndGame(idPlayer, _id_partie, dataPlayToSend);
+            idPlayer = Get_ActualPlayerId();
+            Console.WriteLine(idPlayer);
+            gestionnaire.CallForceEndGame(Get_ActualPlayerId(), _id_partie, dataPlayToSend);
         }
         
         private void OnTimedEventPlayer(Object source, System.Timers.ElapsedEventArgs e)

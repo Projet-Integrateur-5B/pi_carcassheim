@@ -626,7 +626,7 @@ namespace system
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
-                Console.WriteLine("Force_EndTurn : room found !");
+                Console.WriteLine("Force_EndTurn : room found !" + "test=" + thread_serv_ite.Get_ActualPlayerId());
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Fin du tour actuel
@@ -680,7 +680,7 @@ namespace system
             foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
             {
                 if (idRoom != thread_serv_ite.Get_ID()) continue;
-                Console.WriteLine("Force_EndGame : room found !");
+                Console.WriteLine("Force_EndGame : room found !" + "test=" + thread_serv_ite.Get_ActualPlayerId());
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Fin du tour actuel
