@@ -958,6 +958,7 @@ namespace system
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the turn
             gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
+            _timer_player.Start();
         }
 
         /// <summary>
