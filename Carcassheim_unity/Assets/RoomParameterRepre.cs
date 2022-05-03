@@ -33,7 +33,6 @@ public class RoomParameterRepre : MonoBehaviour
     [SerializeField] Text id_room;
 
     [SerializeField] Slider time_tour_slider;
-    [SerializeField] ToggleGroup room_access_toggle;
     [SerializeField] Toggle room_extension_rivier;
     [SerializeField] Toggle room_extension_abbaye;
     [SerializeField] Toggle room_access_private;
@@ -56,20 +55,28 @@ public class RoomParameterRepre : MonoBehaviour
     RoomParametersStruct change_planned;
     bool changed = false;
 
+    public bool IsInititialized { set; get; }
 
 
     // Start is called before the first frame update
     void Start()
     {
         RoomInfo room = RoomInfo.Instance;
+        initRoom(false);
+        room.repre_parameter = this;
+        setParameters(room.isPrivate, room.mode, room.timerJoueur, room.timerPartie, room.scoreMax, room.idTileInit, room.riverOn, room.abbayeOn);
+    }
+
+    public void initRoom(bool isinit = true)
+    {
+        RoomInfo room = RoomInfo.Instance;
         id_room.text = Communication.Instance.IdRoom.ToString();
-        bool interactif = Communication.Instance.IdClient != room.idModerateur;
+        bool interactif = Communication.Instance.IdClient == room.idModerateur;
         foreach (Selectable selectable in menu_activate)
         {
             selectable.interactable = interactif;
         }
-        room.repre_parameter = this;
-        setParameters(room.isPrivate, room.mode, room.timerJoueur, room.timerPartie, room.scoreMax, room.idTileInit, room.riverOn, room.abbayeOn);
+        IsInititialized = isinit;
     }
 
     public void OnRoomWinChange(int index)
@@ -90,10 +97,10 @@ public class RoomParameterRepre : MonoBehaviour
         RoomInfo.Instance.mode = winmode;
     }
 
-    public void OnRoomPolicyChange(bool state)
+    public void OnRoomPolicyChange(int i)
     {
-        foreach (Toggle t in room_access_toggle.ActiveToggles())
-            Debug.Log("" + t.name + " : " + t.spriteState);
+        Debug.Log("ROOM PRIVATE ON OFF " + (i != 0));
+        RoomInfo.Instance.isPrivate = i != 0;
     }
 
     public void OnRoomExtensionChangeRiviere(bool state)

@@ -137,6 +137,9 @@ namespace Assets.System
 
                 s_RoomInfo.Release();
 
+                if (repre_parameter != null && !repre_parameter.IsInititialized)
+                    repre_parameter.initRoom();
+
                 repre_parameter?.addParameters(isPrivate, mode, timerJoueur, timerPartie, scoreMax, nbTuile, riverOn, abbayeOn);
             }
             catch (Exception ex)
