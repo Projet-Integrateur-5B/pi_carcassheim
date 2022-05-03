@@ -311,8 +311,11 @@ public class Table : MonoBehaviour
         }
         else
         {
-            tile.transform.parent = null;
-            tile.model.layer = DisplaySystem.BoardLayer;
+            if (tile.transform.parent != null)
+            {
+                tile.transform.parent = null;
+                tile.model.layer = DisplaySystem.BoardLayer;
+            }
         }
     }
 

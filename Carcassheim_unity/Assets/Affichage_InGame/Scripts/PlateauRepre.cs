@@ -254,7 +254,6 @@ public class PlateauRepre : MonoBehaviour
         if (pos != null)
         {
             float new_radius = pos.X * pos.X + pos.Y * pos.Y;
-            Debug.Log(new_radius + " vs " + BoardRadius);
             if (new_radius > BoardRadius)
                 BoardRadius = new_radius;
         }

@@ -18,7 +18,10 @@ public class TuileRepre : MonoBehaviour
 
     Dictionary<int, SlotIndic> slots_mapping;
 
+    int _index = -1;
+    public int Index { set => _index = value; get => _index; }
 
+    public int MaxSlot { set; get; }
 
     // * STAT *************************************************
     private int _id = 0;
@@ -40,6 +43,7 @@ public class TuileRepre : MonoBehaviour
             body_collider.enabled = _pos != null;
             int rotation = _pos != null ? _pos.Rotation : 0;
             transform.localRotation = Quaternion.Euler(0, 0, rotation * 90);
+            setIndexFromPos();
         }
         get => _pos;
     }
@@ -52,6 +56,7 @@ public class TuileRepre : MonoBehaviour
         {
             slots_mapping.Add(slot.Id, slot);
         }
+        MaxSlot = slots_mapping.Count;
     }
 
     public void showPossibilities(PlayerRepre player)
@@ -99,6 +104,18 @@ public class TuileRepre : MonoBehaviour
         }
         return null;
     }
+
+    public void setIndexFromPos()
+    {
+        if (Pos == null)
+            _index = -1;
+        for (int idx = 0; idx < possibilitiesPosition.Count; idx++)
+        {
+            if (possibilitiesPosition[idx] == Pos)
+                _index = idx;
+        }
+    }
+
 
     public bool nextRotation()
     {

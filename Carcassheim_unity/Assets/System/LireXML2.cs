@@ -84,6 +84,7 @@ namespace Assets.system
                 path = www.url;
                 xmlData = new StringReader(www.downloadHandler.text);
             }
+            Debug.Log(path);
 
             using (XmlReader reader = (xmlData == null) ? XmlReader.Create(path) : XmlReader.Create(xmlData))
             {

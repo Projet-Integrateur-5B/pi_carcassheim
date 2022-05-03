@@ -29,4 +29,15 @@ public class PositionRepre
     {
         return "(" + X.ToString() + ", " + Y.ToString() + ") rot : " + Rotation.ToString();
     }
+
+    public static bool EqualWithoutRotation(PositionRepre pos1, PositionRepre pos2)
+    {
+        if (pos1 == null && pos2 == null)
+            return true;
+        else if ((pos1 == null && pos2 != null) || (pos1 != null && pos2 == null))
+            return false;
+        else
+            return (pos1.X == pos2.X && pos1.Y == pos2.Y) ? true : false;
+
+    }
 }
