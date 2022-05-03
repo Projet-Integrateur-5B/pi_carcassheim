@@ -682,22 +682,22 @@ namespace system
             // Initialise les meeples de tt le monde
             InitializePlayerMeeples();
 
-            _timer_game = new System.Timers.Timer();
-            _timer_game.Interval = 1000;
-            _timer_game.Elapsed += OnTimedEventGame;
-            _DateTime_game = DateTime.Now;
-            _timer_game.AutoReset = true;
-            _timer_game.Enabled = true;
-            
-            if(_mode == Tools.Mode.TimeAttack)
+            if (_mode == Tools.Mode.TimeAttack)
             {
-                _timer_player = new System.Timers.Timer();
-                _timer_player.Interval = 1000;
-                _timer_player.Elapsed += OnTimedEventPlayer;
-                _DateTime_player = DateTime.Now;
-                _timer_player.AutoReset = true;
-                _timer_player.Enabled = true;
+                _timer_game = new System.Timers.Timer();
+                _timer_game.Interval = 1000;
+                _timer_game.Elapsed += OnTimedEventGame;
+                _DateTime_game = DateTime.Now;
+                _timer_game.AutoReset = true;
+                _timer_game.Enabled = true;
             }
+            
+            _timer_player = new System.Timers.Timer();
+            _timer_player.Interval = 1000;
+            _timer_player.Elapsed += OnTimedEventPlayer;
+            _DateTime_player = DateTime.Now;
+            _timer_player.AutoReset = true;
+            _timer_player.Enabled = true;
 
             // TODO :
             // synchronisation de la methode

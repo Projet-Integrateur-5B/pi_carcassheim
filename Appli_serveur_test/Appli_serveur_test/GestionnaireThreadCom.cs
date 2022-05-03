@@ -498,7 +498,10 @@ namespace system
                 {
                     if (idRoom != threadJeu.Get_ID()) continue;
                     if (threadJeu.Get_Status() == Tools.GameStatus.Stopped)
+                    {
+                        Console.WriteLine("AAAAAAAAAAAAAAAAAA");
                         return new[] {"Permission"};
+                    }
                     return threadJeu.GetThreeLastTiles();
                 }                  
             }
