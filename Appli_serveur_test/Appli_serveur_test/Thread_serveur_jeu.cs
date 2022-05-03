@@ -1159,7 +1159,7 @@ namespace system
         /// <returns> The socket of the next player to play </returns>
         public Socket? EndTurn(ulong idPlayer)
         {
-            _timer_player.Stop();
+            //_timer_player.Stop();
 
             bool aJoue = false;
             
