@@ -561,10 +561,18 @@ namespace system
                         Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
                         Console.WriteLine(thread_serv_ite.Get_Status());
 
-                        if(statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
+                        // Génération du nouveau tableau data+scores
+                        string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                        string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                        data.CopyTo(dataWithScores, 0);
+                        allScores.CopyTo(dataWithScores, data.Length);
+
+                        if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                         {
                             Console.WriteLine("Com_EndTurn : game stopped !");
-                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, data);
+
+                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, dataWithScores);
                             ulong idPlayerWinner = thread_serv_ite.GetWinner();
                             string[] dataToSend = new string[] { idPlayerWinner.ToString() };
                             SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
@@ -580,15 +588,8 @@ namespace system
 
                             Console.WriteLine("Com_EndTurn : before broadcast !");
 
-                            // Génération du nouveau tableau data+scores
-                            string[] allScores = thread_serv_ite.GetAllPlayersScore();
-                            string[] newDataToSend = new string[allScores.Length + data.Length];
-
-                            data.CopyTo(newDataToSend, 0);
-                            allScores.CopyTo(newDataToSend, data.Length);
-
                             // Envoi de l'information du endturn
-                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, newDataToSend);
+                            SendBroadcast(idRoom, Tools.IdMessage.EndTurn, dataWithScores);
                         }
 
                         return Tools.Errors.None;
@@ -633,16 +634,16 @@ namespace system
                     // Mise à jour du status de la game
                     Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
 
+                    // Génération du nouveau tableau data+scores
+                    string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                    string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                    data.CopyTo(dataWithScores, 0);
+                    allScores.CopyTo(dataWithScores, data.Length);
+
                     if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                     {
                         Console.WriteLine("Force_EndTurn : game stopped !");
-
-                        // Génération du nouveau tableau data+scores
-                        string[] allScores = thread_serv_ite.GetAllPlayersScore();
-                        string[] dataWithScores = new string[allScores.Length + data.Length];
-
-                        data.CopyTo(dataWithScores, 0);
-                        allScores.CopyTo(dataWithScores, data.Length);
 
                         SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
                         
@@ -660,13 +661,6 @@ namespace system
                         thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
 
                         Console.WriteLine("Force_EndTurn : before broadcast !");
-
-                        // Génération du nouveau tableau data+scores
-                        string[] allScores = thread_serv_ite.GetAllPlayersScore();
-                        string[] dataWithScores = new string[allScores.Length + data.Length];
-
-                        data.CopyTo(dataWithScores, 0);
-                        allScores.CopyTo(dataWithScores, data.Length);
 
                         // Envoi de l'information du endturn
                         SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
