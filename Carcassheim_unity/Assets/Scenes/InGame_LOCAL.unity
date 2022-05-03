@@ -1738,7 +1738,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &471136828
 GameObject:
@@ -2783,6 +2783,7 @@ MonoBehaviour:
   - {r: 0.9647059, g: 0.85882354, b: 0.05882353, a: 1}
   - {r: 1, g: 0.5686275, b: 0.22352941, a: 1}
   DEBUG: 0
+  camera_manager: {fileID: 902419866}
 --- !u!4 &857668915
 Transform:
   m_ObjectHideFlags: 0
@@ -3120,10 +3121,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75e453abc62b70befb2b2391798d8951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 0}
-  dragSpeed: 0.25
-  table: {fileID: 0}
-  limitRay: 0
+  board: {fileID: 316843530}
+  limitRay: 0.1
+  moveSpeed: 5.5
+  moveTreshold: 0.001
+  scrollSpeed: 0.7
+  Z_max: 0.46
+  Z_min: -1.6
 --- !u!1 &919545019
 GameObject:
   m_ObjectHideFlags: 0
@@ -3927,7 +3931,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1214569395
 GameObject:
@@ -8814,7 +8818,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 300291018925765475, guid: 4e6695e30881b256c9c9ca293b552fea, type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 300291018925765475, guid: 4e6695e30881b256c9c9ca293b552fea, type: 3}
       propertyPath: m_LocalPosition.x

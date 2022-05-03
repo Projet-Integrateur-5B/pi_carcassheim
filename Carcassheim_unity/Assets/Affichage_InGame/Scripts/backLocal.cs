@@ -112,14 +112,14 @@ public class backLocal : CarcasheimBack
             case WinCondition.WinByPoint:
                 valid = win_point_nb > 0;
                 break;
-            case WinCondition.WinByTile:
+            case WinCondition.WinByTime:
                 valid = win_time_min > 0 && win_time_sec >= 0;
                 break;
-            case WinCondition.WinByTime:
-                valid = win_point_nb > 0;
+            case WinCondition.WinByTile:
+                valid = win_tile_nb > 10;
                 break;
         }
-        valid = valid && nb_player >= 0;
+        valid = valid && nb_player >= 2;
 
         return valid;
     }
@@ -223,6 +223,7 @@ public class backLocal : CarcasheimBack
         {
             case WinCondition.WinByTime:
                 Debug.Log("TEMPS");
+                end = (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - time_start_of_game) > win_time_min * 60 + win_time_sec;
                 break;
             case WinCondition.WinByPoint:
                 Debug.Log("RESTART");
