@@ -54,6 +54,7 @@ namespace Assets.system
         private int nb_tile_for_turn = 0;
 
         private bool player_received = false;
+        private bool playerlist_received = false;
         private bool gameStatus = true;
 
         private Semaphore s_WaitInit;
@@ -152,8 +153,8 @@ namespace Assets.system
             // Id meeple, nb de meeple d'id Id disponible
             int taille = playerList.Length;
             for (int i = 0; i < meeple_type; i++)
-                for(int j = 0; j < taille; j++)
-                    if(playerList[j].id == nextPlayer)
+                for (int j = 0; j < taille; j++)
+                    if (playerList[j].id == nextPlayer)
                     {
                         meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
                         break;
@@ -309,7 +310,7 @@ namespace Assets.system
 
                 case DisplaySystemActionTypes.meepleSetCoord:
                     DisplaySystemActionMeepleSetCoord action_msc = (DisplaySystemActionMeepleSetCoord)action;
-                    SendMeepple(action_msc.tile_id, action_msc.tile_pos.X, action_msc.tile_pos.Y,action_msc.tile_pos.Rotation, action_msc.meeple_id, action_msc.slot_pos) ;
+                    SendMeepple(action_msc.tile_id, action_msc.tile_pos.X, action_msc.tile_pos.Y, action_msc.tile_pos.Rotation, action_msc.meeple_id, action_msc.slot_pos);
                     break;
 
                 case DisplaySystemActionTypes.meepleSelection:
@@ -409,7 +410,7 @@ namespace Assets.system
 
             if (packet.IdMessage == Tools.IdMessage.TuileDraw)
             {
-                if((packet.Error == Tools.Errors.Unknown) && !gameStatus)
+                if ((packet.Error == Tools.Errors.Unknown) && !gameStatus)
                 {
                     Debug.LogError("[ERREUR] : TuileDraw : " + packet.Error);
                     return;
@@ -459,18 +460,18 @@ namespace Assets.system
                     }
                 }
             }
-            else if(packet.IdMessage == Tools.IdMessage.EndGame)
+            else if (packet.IdMessage == Tools.IdMessage.EndGame)
             {
                 system_display.setNextState(DisplaySystemState.endOfGame);
             }
-            else if(packet.IdMessage == Tools.IdMessage.TimerPlayer)
+            else if (packet.IdMessage == Tools.IdMessage.TimerPlayer)
             {
                 system_display.setNextState(DisplaySystemState.timeOutIdleState);
                 OnEndTurnReceive(null);
             }
-            else if(packet.IdMessage == Tools.IdMessage.PionPlacement)
+            else if (packet.IdMessage == Tools.IdMessage.PionPlacement)
             {
-                if(packet.Error == Tools.Errors.None)
+                if (packet.Error == Tools.Errors.None)
                 {
                     DisplaySystemAction dsa = new DisplaySystemActionMeepleSetCoord(int.Parse(packet.Data[0]),
                     new PositionRepre(int.Parse(packet.Data[1]), int.Parse(packet.Data[2]), int.Parse(packet.Data[3])),
@@ -540,19 +541,20 @@ namespace Assets.system
 
             s_InGame.WaitOne();
             players_received = true;
+            playerlist_received = true;
             s_InGame.Release();
             s_WaitPlayerList.Release();
         }
 
         public void OnPlayerCurrentReceive(Packet packet)
         {
-            bool isNotOK = true; 
+            bool isOK = false;
             s_InGame.WaitOne();
-            if(players_received)
-                isNotOK = false;
+            if (playerlist_received)
+                isOK = true;
             s_InGame.Release();
 
-            if(isNotOK)
+            if (!isOK)
                 s_WaitPlayerList.WaitOne();
 
             nextPlayer = packet.IdPlayer;
@@ -610,6 +612,8 @@ namespace Assets.system
                 play_of_this_turn = new TurnPlayParam(id_tile, new PositionRepre(x_tile, y_tile, r_tile), id_meeple, pos_meeple);
                 if (id_tile != -1)
                     lePlateau.PoserTuileFantome((ulong)id_tile, new Position(x_tile, y_tile, r_tile));
+                if (id_meeple != -1)
+                    lePlateau.PoserPion(nextPlayer, x_tile, y_tile, (ulong)pos_meeple);
                 lePlateau.ValiderTour();
                 system_display.setNextState(DisplaySystemState.idleState);
             }
@@ -634,7 +638,7 @@ namespace Assets.system
             Communication.Instance.SendAsync(packet);
         }
 
-        public void SendMeepple(int id_tuile, int X, int Y,int ROT, int id_meeple, int slot_pos)
+        public void SendMeepple(int id_tuile, int X, int Y, int ROT, int id_meeple, int slot_pos)
         {
             Packet packet = new Packet();
             packet.IdMessage = Tools.IdMessage.PionPlacement;
@@ -672,6 +676,8 @@ namespace Assets.system
             s_InGame.WaitOne();
             if (players_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received && player_received)
             {
+                s_InGame.Release();
+
                 testGameBegin = false;
                 players_received = false;
                 player_received = false;

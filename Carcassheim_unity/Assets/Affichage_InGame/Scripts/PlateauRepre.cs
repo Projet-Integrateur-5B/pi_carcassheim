@@ -21,7 +21,7 @@ public class PlateauRepre : MonoBehaviour
     }
     [SerializeField] TileIndicator tile_indic_model; // ton prefab
     public event Action OnBoardExpanded;
-    public float BoardRadius { get => _board_radius; private set { OnBoardExpanded?.Invoke(); _board_radius = value; } }
+    public float BoardRadius { get => _board_radius; private set { _board_radius = value; OnBoardExpanded?.Invoke(); } }
     private float _board_radius;
 
     public bool TilePossibilitiesShown { get => _tilePossibilitiesShown; set { _tilePossibilitiesShown = value; } }
@@ -254,6 +254,7 @@ public class PlateauRepre : MonoBehaviour
         if (pos != null)
         {
             float new_radius = pos.X * pos.X + pos.Y * pos.Y;
+            Debug.Log(new_radius + " vs " + BoardRadius);
             if (new_radius > BoardRadius)
                 BoardRadius = new_radius;
         }

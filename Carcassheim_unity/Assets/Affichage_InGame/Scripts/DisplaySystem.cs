@@ -76,6 +76,9 @@ public class DisplaySystem : MonoBehaviour
 
     public DisplaySystemState State { get => act_system_state; private set { act_system_state = value; } }
 
+
+    [SerializeField] CameraManager camera_manager;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -409,7 +412,8 @@ public class DisplaySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool mouse_consumed = (act_system_state != DisplaySystemState.tilePosing && act_system_state != DisplaySystemState.meeplePosing);
+        bool mouse_consumed = (act_system_state != DisplaySystemState.noState && camera_manager.cameraUpdate())
+         || (act_system_state != DisplaySystemState.tilePosing && act_system_state != DisplaySystemState.meeplePosing);
         if (!mouse_consumed && Input.GetMouseButtonUp(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
