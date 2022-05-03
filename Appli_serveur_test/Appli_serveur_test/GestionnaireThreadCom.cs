@@ -414,14 +414,7 @@ namespace system
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    Console.WriteLine(thread_serv_ite.Get_Status());
-                    if (thread_serv_ite.Get_Status() == Tools.GameStatus.Stopped)
-                        Console.WriteLine("WUWUWUWUUWUWUWUWUWUWU");
-                    else
-                    {
-                        idActualPlayer = thread_serv_ite.Get_ActualPlayerId();
-                    }
-                    return idActualPlayer;
+                    return thread_serv_ite.Get_ActualPlayerId();
                 }
             }
 
@@ -496,9 +489,6 @@ namespace system
                 foreach (Thread_serveur_jeu threadJeu in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != threadJeu.Get_ID()) continue;
-                    Console.WriteLine(threadJeu.Get_Status());
-                    if (threadJeu.Get_Status() == Tools.GameStatus.Stopped)
-                        Console.WriteLine("WUWUWUWUUWUWUWUWUWUWU");
                     return threadJeu.GetThreeLastTiles();
                 }                  
             }
