@@ -54,6 +54,7 @@ namespace Assets.system
         private int nb_tile_for_turn = 0;
 
         private bool player_received = false;
+        private bool playerlist_received = false;
         private bool gameStatus = true;
 
         private Semaphore s_WaitInit;
@@ -540,19 +541,20 @@ namespace Assets.system
 
             s_InGame.WaitOne();
             players_received = true;
+            playerlist_received = true;
             s_InGame.Release();
             s_WaitPlayerList.Release();
         }
 
         public void OnPlayerCurrentReceive(Packet packet)
         {
-            bool isNotOK = true; 
+            bool isOK = false; 
             s_InGame.WaitOne();
-            if(players_received)
-                isNotOK = false;
+            if(playerlist_received)
+                isOK = true;
             s_InGame.Release();
 
-            if(isNotOK)
+            if(!isOK)
                 s_WaitPlayerList.WaitOne();
 
             nextPlayer = packet.IdPlayer;
