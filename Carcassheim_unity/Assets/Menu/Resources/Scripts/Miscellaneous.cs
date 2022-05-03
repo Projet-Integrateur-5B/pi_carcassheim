@@ -24,7 +24,7 @@ public abstract class Miscellaneous : MonoBehaviour
 
     public static bool s_menuChanged = false;
 
-    private static int _pause = 0;
+    private static bool clicked = false;
 
     /// <summary>
     ///    MonoBehaviour Awake is called when the script instance is being loaded.
@@ -92,33 +92,6 @@ public abstract class Miscellaneous : MonoBehaviour
     {
         SetPanelOpen(false);
         Pop_up_Options.SetActive(GetPanelOpen());
-    }
-
-    /// <summary>
-    ///     Show pop up options <see cref = "Miscellaneous"/> class.
-    /// </summary>
-    public void ShowPopUpOptions()
-    {
-        if(_pause++ == 0) {
-            if (!GetPanelOpen())
-            {
-                Debug.Log("Opening panel");
-                
-                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().Play();
-                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = true;
-                SetPanelOpen(!GetPanelOpen());
-                Pop_up_Options.SetActive(GetPanelOpen());
-            }
-        } else if(_pause == 1)
-            if (GetPanelOpen())
-            {
-                Debug.Log("Closing panel : " + _pause);
-                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().Stop();
-                Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>().isLooping = false;
-                SetPanelOpen(!GetPanelOpen());
-                Pop_up_Options.SetActive(GetPanelOpen());
-                _pause = 0;
-            }   
     }
 
     /// <summary>
