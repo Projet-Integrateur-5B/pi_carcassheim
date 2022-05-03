@@ -937,16 +937,23 @@ namespace Assets.system
             Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
 
             ulong idCurrentJoueur = tuile.Slots[idSlot].IdJoueur;
-            if (result.ContainsKey(idCurrentJoueur))
-                result[idCurrentJoueur] += 1;
-            else
-                result.Add(idCurrentJoueur, 1);
+
+            if (idCurrentJoueur != ulong.MaxValue)
+            {
+                if (result.ContainsKey(idCurrentJoueur))
+                    result[idCurrentJoueur] += 1;
+                else
+                    result.Add(idCurrentJoueur, 1);
+            }
+
             tuile.Slots[idSlot].IdJoueur = ulong.MaxValue;
             for (int i = 0; i < adj.Length; i++)
             {
                 Tuile currentTuile = adj[i];
+                if (currentTuile == null)
+                    continue;
                 ulong nextSlot = currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]);
-                if (currentTuile == null || parcourues.Contains((currentTuile, nextSlot)))
+                if (parcourues.Contains((currentTuile, nextSlot)))
                     continue;
                 RemoveAllPawnInZoneAux(currentTuile,
                     nextSlot, parcourues, ref result);

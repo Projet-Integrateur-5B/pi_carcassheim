@@ -171,6 +171,20 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     }
 
     /// <summary>
+    ///     Show pop up options <see cref = "IOManager"/> class.
+    /// </summary>
+    public void ShowPopUpOptions()
+    {
+        var wp = Miscellaneous.FindObject(absolute_parent, "WheelPlayer").GetComponent<UnityEngine.Video.VideoPlayer>();
+        bool b = !GetPanelOpen();
+        if (b) wp.Play();
+        else wp.Stop();
+        wp.isLooping = b;
+        SetPanelOpen(b);
+        Pop_up_Options.SetActive(GetPanelOpen());
+    }
+
+    /// <summary>
     /// Detect the hover of the mouse cursor <see cref = "IOManager"/> class.
     /// </summary>
     /// <param name = "eventData"type="PointerEventData">Données de l'évènement</param>

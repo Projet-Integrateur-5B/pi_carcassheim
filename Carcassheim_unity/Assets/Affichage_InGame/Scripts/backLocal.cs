@@ -215,6 +215,32 @@ public class backLocal : CarcasheimBack
                     Debug.Log("GAGNE " + gains[i].id_player + " " + gains[i].points_gagnes);
                     saved_players_score[(int)gains[i].id_player] += gains[i].points_gagnes;
                 }
+
+                // Les meeples sont rendus aux joueurs
+                for (int idSlotTemp = 0; idSlotTemp < _plateau.DicoTuile[(ulong)play.id_tile].NombreSlot; idSlotTemp++)
+                {
+                    if (!_plateau.ZoneFermeeForSlot(play.tile_pos.X, play.tile_pos.Y, (ulong)idSlotTemp))
+                        continue;
+
+                    var dico = _plateau.RemoveAllPawnInZone(play.tile_pos.X, play.tile_pos.Y, (ulong)idSlotTemp);
+                    Debug.Log("dico de longueur : " + dico.Count);
+                    for (int i = 0; i < dico.Count; i++)
+                    {
+                        for (int j = 0; j < players.Count; j++)
+                        {
+                            var joueur = players[j];
+                            int meeplesRendus;
+                            if (dico.TryGetValue((ulong)joueur.id_player, out meeplesRendus))
+                            {
+                                Debug.Log("joueur j = " + j + " a " + joueur.nb_meeple + " meeples");
+                                var temp = new PlayerInitParam(players[j].id_player, players[j].nb_meeple + meeplesRendus, players[j].player_name);
+                                players[j] = temp;
+                                Debug.LogWarning(meeplesRendus + " meeples ont ete rendus au joueur " + joueur.id_player);
+                                Debug.Log("joueur j = " + j + " a " + joueur.nb_meeple + " meeples");
+                            }
+                        }
+                    }
+                }
             }
             Debug.Log("Score changed ? " + score_changed);
         }
