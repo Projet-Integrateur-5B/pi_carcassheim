@@ -10,97 +10,245 @@ using Server;
 
 namespace system
 {
+/// <summary>
+///     Object used when a user create a game, on a new thread that will be the server of this game
+/// </summary>
 
     public partial class Thread_serveur_jeu
     {
 
-        // Attributs
-
-        // Champs qui paramètrent la partie
-
+        /// <summary>
+        ///     The concerned game id.
+        /// </summary>
         private readonly int _id_partie;
 
-        /* Attributs en lien avec le Dictionary Player */
-        private Dictionary<ulong, Player> _dico_joueur; // Contient les ID's de chaque joueur
-        private Semaphore _s_dico_joueur;
-        private uint _nombre_joueur;
-        private uint _nombre_joueur_max;
-        private ulong _id_moderateur; // Identifiant du joueur modérateur
+        /// <summary>
+        ///     The players dictionary, Keys are ids and Values are players.
+        /// </summary>
+        private Dictionary<ulong, Player> _dico_joueur;
 
+        /// <summary>
+        ///     semaphore added on the players dictionary.
+        /// </summary>
+        private Semaphore _s_dico_joueur;
+
+        /// <summary>
+        ///     actual players number.
+        /// </summary>
+        private uint _nombre_joueur;
+
+        /// <summary>
+        ///     maximum players number.
+        /// </summary>
+        private uint _nombre_joueur_max;
+
+        /// <summary>
+        ///     Admin's id.
+        /// </summary>
+        private ulong _id_moderateur;
+
+        /// <summary>
+        ///     Game status.
+        /// </summary>
         private Tools.GameStatus _statut_partie;
 
-        private Tools.Mode _mode; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
+        /// <summary>
+        ///     Game mode, 0 when classic, 1 when Time-Attack and 2 when score.
+        /// </summary>
+        private Tools.Mode _mode; 
 
+        /// <summary>
+        ///     Tiles number.
+        /// </summary>
         private int _nb_tuiles;
+
+        /// <summary>
+        ///     Score to get, in case of score mode.
+        /// </summary>
         private int _score_max;
 
+        /// <summary>
+        ///     private game, if True, the game is private, else the game is public.
+        /// </summary>
         private bool _privee;
+
+        /// <summary>
+        ///     Number of meeples per player.
+        /// </summary>
         private Tools.Meeple _meeples; // Nombre de meeples par joueur
         
-        // Timer
+        /// <summary>
+        ///     The game timer in case that the game mode is set to Time-attack.
+        /// </summary>
         private DateTime _DateTime_game;
         private System.Timers.Timer _timer_game;
-        private Tools.Timer _timer_game_value; // En secondes
+        private Tools.Timer _timer_game_value;
+
+        /// <summary>
+        ///     The round timer, for each round the player has to finish before timer expiration.
+        /// </summary>
         private DateTime _DateTime_player;
         private System.Timers.Timer _timer_player;
         private Tools.Timer _timer_player_value; // En secondes
 
-        private ulong _idTuileInit; // Id de la tuile initiale : soit le chemin soit la rivière suivant si le dlc est choisi
+        /// <summary>
+        ///     Initial tile's id, either the path or the river, depends on the dlc
+        /// </summary>
+        private ulong _idTuileInit; 
 
-        // Locks
-
+        
+        /// <summary>
+        ///     settings lock.
+        /// </summary>
         private readonly object _lock_settings;
 
-        // Attribut pour le bon fonctionnement du moteur de jeu
-
+       
+        /// <summary>
+        ///     Plateau (game board)
+        /// </summary>
         private Plateau _plateau;
-        private uint _offsetActualPlayer; // The offset of the actual player in the _dico_joueur 
-        private List<ulong> _tuilesGame; // Totalité des tuiles de la game
-        private List<ulong> _rivieresGame; // Totalité des tuiles de la game       
-        private string[] _tuilesEnvoyees; // Stock les 3 tuiles envoyées au client à chaque tour
-        private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
-        private Position _posTuileTourActu; // Position temporaire de la tuile de ce tour
-        private string[] _posPionTourActu; // Position temporaire du pion de ce tour (à cast) {idPlayer, posTuile X, posTuile Y, idMeeple, idSlot}
-        private int _extensionsGame; // Indications sur les extensions utilisees dans cette partie
 
-        // Attributs anticheat
+        /// <summary>
+        ///     The actual player's offset.
+        /// </summary>
+        private uint _offsetActualPlayer; // The offset of the actual player in the _dico_joueur 
+
+        /// <summary>
+        ///     The game tiles list.
+        /// </summary>
+        private List<ulong> _tuilesGame; // Totalité des tuiles de la game
+
+        /// <summary>
+        ///     In case that the river extention is on, when river generated at the begginig, it's tiles is stored in this list.
+        /// </summary>
+        private List<ulong> _rivieresGame; // Totalité des tuiles de la game 
+
+        /// <summary>
+        ///     List containes the three tiles sent by server to client, at the bigging of each round.
+        /// </summary>      
+        private string[] _tuilesEnvoyees; 
+
+        /// <summary>
+        ///     Chosen tile's id.
+        /// </summary>      
+        private ulong _idTuileChoisie; // L'id de la tuile choisie par le client parmis les 3 envoyées
+        
+        /// <summary>
+        ///     Temporary position of the tile of actual round.
+        /// </summary>      
+        private Position _posTuileTourActu;
+
+        /// <summary>
+        ///     Temporary position of the pion of actual round, to cast : {idPlayer, posTuile X, posTuile Y, idMeeple, idSlot}.
+        /// </summary>      
+        private string[] _posPionTourActu;
+
+        /// <summary>
+        ///    Extention chosen for this game.
+        /// </summary>  
+        private int _extensionsGame; 
+
+
+        /// <summary>
+        ///     Anti-chreat : The first valid tile's id, when three tiles sent to client, the id of the first valid one.
+        /// </summary>  
         private ulong _AC_idFirstValidTile;
+
+        /// <summary>
+        ///     Anti-chreat : Semaphore on the first valid tile's id attribut, to protect access.
+        /// </summary>  
         private Semaphore _s_AC_idFirstValidTile;
+
+        /// <summary>
+        ///     Anti-chreat : .
+        /// </summary>  
         private bool _AC_drawedTilesValid;
+
+        /// <summary>
+        ///     Anti-chreat : Barrier used in waiting all users to verify the validity of one or many tiles.
+        /// </summary>  
         private Barrier _AC_barrierAllVerifDone;
-        private bool _AC_barrierUp; // Indique si la barrière existe
+
+        /// <summary>
+        ///     Anti-chreat : True if the barrier's up, false if not.
+        /// </summary>  
+        private bool _AC_barrierUp; 
+        
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _AC_barrierUp to protect acess.
+        /// </summary>  
         private Semaphore _s_AC_barrierUp;
 
-        // Semaphores moteur
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_nombre_joueur to protect acess.
+        /// </summary>
         private Semaphore _s_nombre_joueur;
+
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_plateau to protect acess.
+        /// </summary>
         private Semaphore _s_plateau;
+
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_offsetActualPlayer to protect acess.
+        /// </summary>
         private Semaphore _s_offsetActualPlayer;
+
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_tuilesGame to protect acess.
+        /// </summary>
         private Semaphore _s_tuilesGame;
+
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_tuilesEnvoyees to protect acess.
+        /// </summary>
         private Semaphore _s_tuilesEnvoyees;
-        private Semaphore _s_posTuileTourActu; // Position temporaire de la tuile de ce tour
-        private Semaphore _s_posPionTourActu; // Position temporaire du pion de ce tour
 
-        // Getters et setters
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_posTuileTourActu to protect acess.
+        /// </summary>
+        private Semaphore _s_posTuileTourActu;
 
+        /// <summary>
+        ///     Anti-chreat : Semaphore on _s_posPionTourActu to protect acess.
+        /// </summary>
+        private Semaphore _s_posPionTourActu; 
+
+        /// <summary>
+        ///     Getter : Get the player dictionary.
+        /// </summary>
         public Dictionary<ulong, Player> Get_Dico_Joueurs()
         {
             return this._dico_joueur;
         }
+
+        /// <summary>
+        ///     Getter : Get the game id.
+        /// </summary>
         public int Get_ID()
         {
             return this._id_partie;
         }
 
+        /// <summary>
+        ///     Getter : Get the game mode.
+        /// </summary>
         public Tools.Mode Get_Mode()
         {
             return this._mode;
         }
 
+        /// <summary>
+        ///     Getter : Get the admin player id.
+        /// </summary>
         public ulong Get_Moderateur()
         {
             return this._id_moderateur;
         }
         
+        /// <summary>
+        ///     Getter : Get the actual player id.
+        /// </summary>
         public ulong Get_ActualPlayerId()
         {
             _s_dico_joueur.WaitOne();
@@ -110,22 +258,32 @@ namespace system
             return idPlayer_array[_offsetActualPlayer];
         }
 
+        /// <summary>
+        ///     Getter : Get the game status.
+        /// </summary>
         public Tools.GameStatus Get_Status()
         {
             return this._statut_partie;
         }
 
+        /// <summary>
+        ///     Getter : Get the value of _privee to define if the game is privat or public.
+        /// </summary>
         public bool Is_Private()
         {
             return this._privee;
         }
+
+        /// <summary>
+        ///     Getter : Get _AC_drawedTilesValid.
+        /// </summary>
         public bool Get_AC_drawedTilesValid()
         {
             return _AC_drawedTilesValid;
         }
 
         /// <summary>
-        ///     Pass the attribute indicating if a tile is valid to true and stores the id of the first valid tile if prior to the actual one
+        ///     Setter : Pass the attribute indicating if a tile is valid to true and stores the id of the first valid tile if prior to the actual one
         /// </summary>
         /// <param name="idTuile"></param>
         public void SetValid_AC_drawedTilesValid(ulong idTuile)
@@ -154,21 +312,33 @@ namespace system
             
         }
 
+        /// <summary>
+        ///     Getter : Get the first valid tile's id (_AC_idFirstValidTile).
+        /// </summary>
         public ulong Get_AC_idFirstValidTile()
         {
             return _AC_idFirstValidTile;
         }
 
+        /// <summary>
+        ///     Getter : Get value of (_AC_barrierUp).
+        /// </summary>
         public bool Get_AC_barrierUp()
         {
             return _AC_barrierUp;
         }
 
+        /// <summary>
+        ///     Getter : Get actual position of the round's tile (_posTuileTourActu).
+        /// </summary>
         public Position Get_posTuileTourActu()
         {
             return _posTuileTourActu;
         }
 
+        /// <summary>
+        ///     Getter : Get actual position of the round's pion.
+        /// </summary>
         public string[] Get_posPionTourActu()
         {
             string[] returnString;
@@ -185,11 +355,21 @@ namespace system
             return returnString;
         }
 
+        /// <summary>
+        ///     Setter : Set the chosen tile's id (_idTuileChoisie).
+        /// </summary>
+        ///<param name="idTuile">the id of the chosen tile.</param>
         public void Set_idTuileChoisie(ulong idTuile)
         {
             this._idTuileChoisie = idTuile;
         }
 
+
+        
+        /// <summary>
+        ///     Setter : Set the three picked tiles list  (_tuilesEnvoyees).
+        /// </summary>
+        ///<param name="tuilesEnvoyees">the list of the three picked tiles .</param>
         public void Set_tuilesEnvoyees(string[] tuilesEnvoyees)
         {
             _s_tuilesEnvoyees.WaitOne();
@@ -198,11 +378,19 @@ namespace system
             _s_tuilesEnvoyees.Release();
         }
 
+
+        /// <summary>
+        ///     Getter : Get id of the chosen tile (_idTuileChoisie).
+        /// </summary>
         public ulong Get_idTuileChoisie()
         {
             return _idTuileChoisie;
         }
 
+
+        // <summary>
+        ///     Getter : Get winner id, max of player.Value._score from the _s_dico_joueur
+        /// </summary>
         public ulong GetWinner()
         {
             uint scoreMax = 0;
@@ -222,11 +410,18 @@ namespace system
             return winner;
         }
 
+
+        // <summary>
+        ///     Getter : Get id of initial tile (_idTuileInit).
+        /// </summary>
         public ulong Get_idTuileInit()
         {
             return this._idTuileInit;
         }
 
+        // <summary>
+        ///     Getter : Get the player number.
+        /// </summary>
         public uint NbJoueurs
         {
             get { return this._nombre_joueur; }
