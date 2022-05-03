@@ -514,7 +514,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -5233,19 +5233,7 @@ MonoBehaviour:
   m_Group: {fileID: 1432515254}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1942108292}
-        m_TargetAssemblyTypeName: RoomParameterRepre, Assembly-CSharp
-        m_MethodName: OnRoomPolicyChange
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 1
 --- !u!1 &375581464
 GameObject:
@@ -16373,19 +16361,7 @@ MonoBehaviour:
   m_Group: {fileID: 1432515254}
   onValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1942108292}
-        m_TargetAssemblyTypeName: RoomParameterRepre, Assembly-CSharp
-        m_MethodName: OnRoomPolicyChange
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_IsOn: 0
 --- !u!1 &1241745153
 GameObject:
@@ -16761,6 +16737,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1258378711}
   - component: {fileID: 1258378712}
+  - component: {fileID: 1258378713}
   m_Layer: 0
   m_Name: room_access
   m_TagString: Untagged
@@ -16817,6 +16794,36 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1258378713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1258378710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 046d8c2aaf57bb24c981d9d22412f8ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toggles:
+  - {fileID: 373438968}
+  - {fileID: 1240071164}
+  onChanged:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1942108292}
+        m_TargetAssemblyTypeName: RoomParameterRepre, Assembly-CSharp
+        m_MethodName: OnRoomPolicyChange
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1262458841
 GameObject:
   m_ObjectHideFlags: 0
@@ -22056,7 +22063,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1599984246
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22702,7 +22709,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 136.30463, y: -50}
+  m_AnchoredPosition: {x: 268.745, y: -50}
   m_SizeDelta: {x: 188.75, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1629824467
@@ -25701,7 +25708,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id_room: {fileID: 952150805}
   time_tour_slider: {fileID: 791392870}
-  room_access_toggle: {fileID: 1432515254}
   room_extension_rivier: {fileID: 632571086}
   room_extension_abbaye: {fileID: 1964843638}
   room_access_private: {fileID: 1240071164}
@@ -25714,6 +25720,7 @@ MonoBehaviour:
   - {fileID: 1280460033}
   - {fileID: 1240071164}
   - {fileID: 373438968}
+  to_initialize: 0
 --- !u!1 &1947796370
 GameObject:
   m_ObjectHideFlags: 0

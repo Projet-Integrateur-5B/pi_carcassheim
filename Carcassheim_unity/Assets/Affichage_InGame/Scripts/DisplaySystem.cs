@@ -184,22 +184,23 @@ public class DisplaySystem : MonoBehaviour
         bool verif_meeple = false;
         if (right)
         {
-
-            if (act_meeple.SlotPos <= 0)
+            act_meeple.SlotPos -= 1;
+            if (act_meeple.SlotPos < 0)
                 verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
-            else if (act_meeple.SlotPos >= act_tile.MaxSlot - 1)
+            else if (act_meeple.SlotPos >= act_tile.MaxSlot)
                 verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
             else
-                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos - 1);
+                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
         }
         else
         {
-            if (act_meeple.SlotPos <= 0)
+            act_meeple.SlotPos += 1;
+            if (act_meeple.SlotPos < 0)
                 verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
-            else if (act_meeple.SlotPos >= act_tile.MaxSlot - 1)
+            else if (act_meeple.SlotPos >= act_tile.MaxSlot)
                 verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
             else
-                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos - 1);
+                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
         }
 
         if (verif_meeple)
@@ -367,8 +368,6 @@ public class DisplaySystem : MonoBehaviour
                     {
                         if (board.setTileAt(action_tsc.new_pos, act_tile))
                             table.tilePositionChanged(act_tile);
-                        else
-                            Debug.Log("Vas y connard");
                     }
                     break;
                 case DisplaySystemActionTypes.tileSelection:
