@@ -160,7 +160,7 @@ namespace Assets.system
                     meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
                     Debug.Log("playerList[" + j + "].nbMeeples : " + playerList[j].nbMeeples);
                 }
-                    
+
         }
 
         override public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
@@ -536,7 +536,7 @@ namespace Assets.system
 
             for (i = 0; i < taille_data; i += 2)
             {
-                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], 0, 0);
+                playerList[compteur] = new Player(ulong.Parse(packet.Data[i]), packet.Data[i + 1], (uint)RoomInfo.Instance.meeples, 0);
                 compteur++;
             }
 
@@ -623,7 +623,7 @@ namespace Assets.system
                 int taille = playerList.Length;
                 for (int j = 0; j < taille; j++)
                 {
-                    playerList[j].score = uint.Parse(packet.Data[j+6]);
+                    playerList[j].score = uint.Parse(packet.Data[j + 6]);
                 }
                 system_display.setNextState(next_state);
                 system_display.setNextState(DisplaySystemState.scoreChange);
