@@ -8,13 +8,29 @@ namespace Assets.system
 {
     internal class CompteurPoints
     {
+        /// <summary>
+        /// le plateau
+        /// </summary>
         Plateau _plateau;
+
+        /// <summary>
+        /// le singleton
+        /// </summary>
         static CompteurPoints instance;
+
+        /// <summary>
+        /// instancie le singleton
+        /// </summary>
+        /// <param name="plateau">quel plateau le singleton va traiter</param>
         private CompteurPoints(Plateau plateau)
         {
             _plateau = plateau;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="plateau"></param>
         public static void Init(Plateau plateau)
         {
             if (instance == null)
@@ -23,6 +39,10 @@ namespace Assets.system
                 instance._plateau = plateau;
         }
 
+        /// <summary>
+        /// compte les points de tout les champs du plateau
+        /// </summary>
+        /// <returns>quels joueurs gagnent combien de points</returns>
         public static Dictionary<ulong, int> CompterPointDesChampsEnFinDePartie()
         {
             ulong[] idJoueurTemp;
@@ -47,6 +67,16 @@ namespace Assets.system
             return result;
         }
 
+        /// <summary>
+        /// evalue les points qui vaut une zone
+        /// </summary>
+        /// <param name="x">l'abscisse de la tuile definissant la zone</param>
+        /// <param name="y">l'ordonnee de la tuile definissant la zone</param>
+        /// <param name="idSlot">le slot definissant la zone</param>
+        /// <param name="idJoueur">les joueurs gagnants les points</param>
+        /// <param name="compterChamps">laisser a false si il s'agit du comptage des points en milieu de partie du a la fermeture d'une zone</param>
+        /// <returns>les points de la zone</returns>
+        /// <exception cref="ArgumentException">si idSlot est trop grand</exception>
         public static int CompterZoneFerme(int x, int y, int idSlot, out ulong[] idJoueur, bool compterChamps = false)
         {
             Tuile tuile = instance._plateau.GetTuile(x, y);
@@ -95,12 +125,21 @@ namespace Assets.system
             return result;
         }
 
+        /// <summary>
+        /// fonction recursive qui evalue les points qui vaut une zone
+        /// </summary>
+        /// <param name="tuile">la tuile courrante</param>
+        /// <param name="idSlot">le slot courrant</param>
+        /// <param name="parcourue">la liste des couples (tuiles; slots) deja parcourus</param>
+        /// <param name="result">les points que vaut la zone</param>
+        /// <param name="pionParJoueur"></param>
+        /// <param name="compterChamps">laisser a false si il s'agit du comptage des points en milieu de partie du a la fermeture d'une zone</param>
         private void PointsZone(Tuile tuile, int idSlot,
             List<(Tuile, ulong)> parcourue, ref int result, Dictionary<ulong, int> pionParJoueur, bool compterChamps = false)
         {
-            bool vide, resultat = true;
+            //bool vide, resultat = true;
             int[] positionsInternesProchainesTuiles;
-            Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
+            Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out positionsInternesProchainesTuiles);
 
             if (adj.Length == 0)
                 return;
@@ -134,6 +173,12 @@ namespace Assets.system
             }
         }
 
+        /// <summary>
+        /// calcul combien de point vaut un slot
+        /// </summary>
+        /// <param name="tuile">la tuile</param>
+        /// <param name="idSlot">le slot representant le terrain</param>
+        /// <returns>les points que vaut ce slot</returns>
         private static int PointTerrain(Tuile tuile, ulong idSlot)
         {
             int result = 1;
@@ -165,6 +210,11 @@ namespace Assets.system
             return result;
         }
 
+        /// <summary>
+        /// calcul combien de point vaut 1 slot champs
+        /// </summary>
+        /// <param name="tuile">tuile de l'abbaye</param>
+        /// <returns>le nombre de tuile adjascente au celle-ci</returns>
         private static int PointAbbaye(Tuile tuile)
         {
             int result = 0;
@@ -179,6 +229,13 @@ namespace Assets.system
 
             return result;
         }
+
+        /// <summary>
+        /// calcul combien de point vaut 1 slot champs
+        /// </summary>
+        /// <param name="tuile">la tuile surlaquelle est le champs</param>
+        /// <param name="idSlot">le slot representant le champs</param>
+        /// <returns>1 si le champs est adjascent a une ville, 0 sinon</returns>
         private static int PointChamps(Tuile tuile, ulong idSlot)
         {
             Slot[] slots = tuile.Slots;
@@ -191,10 +248,16 @@ namespace Assets.system
             return 0;
         }
 
-        private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, int idSlot,
-            out bool emplacementVide, out int[] positionsInternesProchainesTuiles)
+        /// <summary>
+        /// permet d'acceder aux tuiles qui sont directement liees a un certain slot
+        /// </summary>
+        /// <param name="tuile">la tuile a partir de laquelle on cherche celle qui lui sont adjacentes</param>
+        /// <param name="idSlot">le slot en question</param>
+        /// <param name="positionsInternesProchainesTuiles"> les positions internes a partir desquelles on a accede aux tuiles retournees</param>
+        /// <returns>un tableau des tuiles adjacentes</returns>
+        private Tuile[] TuilesAdjacentesAuSlot(Tuile tuile, int idSlot, out int[] positionsInternesProchainesTuiles)
         {
-            emplacementVide = false;
+            //emplacementVide = false;
 
             int[] positionsInternes = tuile.LienSlotPosition[idSlot];
             List<int> positionsInternesProchainesTuilesTemp = new List<int>();
@@ -211,7 +274,9 @@ namespace Assets.system
                                       y + Plateau.PositionAdjacentes[direction, 1]);
 
                 if (elem == null)
-                    emplacementVide = true;
+                {
+                    //emplacementVide = true;
+                }
 
                 else if (!resultat.Contains(elem))
                 {
