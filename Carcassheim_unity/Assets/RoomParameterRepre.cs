@@ -57,7 +57,7 @@ public class RoomParameterRepre : MonoBehaviour
 
     public bool IsInititialized { set; get; }
 
-
+    public bool to_initialize = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -173,6 +173,8 @@ public class RoomParameterRepre : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (to_initialize)
+            initRoom();
         if (changed)
             setParameters(change_planned);
     }
