@@ -59,6 +59,8 @@ namespace Assets.system
 
         private Semaphore s_WaitInit;
         private Semaphore s_WaitPlayerList;
+        List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
+        List<Zone> zones = new List<Zone>();
 
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
@@ -615,7 +617,21 @@ namespace Assets.system
                 if (id_meeple != -1)
                     lePlateau.PoserPion(nextPlayer, x_tile, y_tile, (ulong)pos_meeple);
                 lePlateau.ValiderTour();
+
+                gains.Clear();
+                zones.Clear();
+                // Debug.Log("PTITI SCORE");
+                bool score_changed = lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones);
+                if (score_changed)
+                {
+                    for (int i = 0; i < gains.Count; i++)
+                    {
+                        // TODO mettre à jour score dans playerscore
+                    }
+                }
                 system_display.setNextState(DisplaySystemState.idleState);
+                if (score_changed)
+                    system_display.setNextState(DisplaySystemState.scoreChange);
             }
 
         }

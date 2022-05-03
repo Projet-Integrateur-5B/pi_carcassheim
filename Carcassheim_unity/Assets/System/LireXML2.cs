@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace Assets.system
 {
@@ -67,8 +68,24 @@ namespace Assets.system
         {
             var result = new Dictionary<ulong, Tuile>();
             IdVersTerrain = new Dictionary<int, TypeTerrain>();
+            string path;
+#if UNITY_ANDROID
+            path = Path.Combine("jar:file://" + Application.dataPath + "!/assets", "config_back.xml");
+#else
+            path = Path.Combine(Application.streamingAssetsPath, "config_back.xml");
+#endif
 
-            using (XmlReader reader = XmlReader.Create(Application.streamingAssetsPath + "/" + file))
+            StringReader xmlData = null;
+
+            if (path.Contains("://"))
+            {
+                UnityWebRequest www = UnityWebRequest.Get(path);
+                www.SendWebRequest();
+                path = www.url;
+                xmlData = new StringReader(www.downloadHandler.text);
+            }
+
+            using (XmlReader reader = (xmlData == null) ? XmlReader.Create(path) : XmlReader.Create(xmlData))
             {
                 ReadTerrain(reader);
                 bool readingId = false;
