@@ -194,7 +194,7 @@ namespace Assets.system
 
             bool abbaye = false;
 
-            foreach(Slot slot in tuile.Slots)
+            foreach (Slot slot in tuile.Slots)
             {
                 if (slot.Terrain == TypeTerrain.Abbaye)
                 {
@@ -1008,8 +1008,6 @@ namespace Assets.system
             {
                 results.Add(new Tuple<int, int, ulong>(tuile.X, tuile.Y, idSlot));
             }
-
-            tuile.Slots[idSlot].IdJoueur = ulong.MaxValue;
             for (int i = 0; i < adj.Length; i++)
             {
                 Tuile currentTuile = adj[i];
