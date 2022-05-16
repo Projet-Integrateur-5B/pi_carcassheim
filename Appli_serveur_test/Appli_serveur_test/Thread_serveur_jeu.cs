@@ -1225,6 +1225,13 @@ namespace system
                     break;
             }
 
+            _s_nombre_joueur.WaitOne();
+            if(_nombre_joueur <= 0)
+            {
+                statutGame = Tools.GameStatus.Stopped;
+            }
+            _s_nombre_joueur.Release();
+
             _statut_partie = statutGame;
 
             return statutGame;

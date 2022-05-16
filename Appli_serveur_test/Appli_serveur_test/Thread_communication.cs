@@ -808,11 +808,11 @@ namespace system
         {
             foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
             {
-                if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
-                // Retrait du joueur de la game
-                thread_serv_ite.RemoveJoueur(idPlayer);
+                if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;             
                 // Informe tous le monde du kick
                 SendBroadcast(idRoom, Tools.IdMessage.PlayerKick, idPlayer);
+                // Retrait du joueur de la game
+                thread_serv_ite.RemoveJoueur(idPlayer);
                 // Mise à jour du status de la game
                 Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
 
