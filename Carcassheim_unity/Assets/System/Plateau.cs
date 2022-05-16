@@ -68,6 +68,8 @@ namespace Assets.system
         /// </summary>
         public List<(int, int, ulong)> ChampsOuDesPionsOntEtePoses { get; private set; }
 
+        public List<(int, int)> AbbayeIncomplete { get; private set; }
+
         /// <summary>
         /// instancie un plateau
         /// </summary>
@@ -188,6 +190,22 @@ namespace Assets.system
                 if (temp != 0)
                     _lastRiverTurn = temp;
                 Debug.Log("Derniere tournant de la riviere : " + _lastRiverTurn);
+            }
+
+            bool abbaye = false;
+
+            foreach(Slot slot in tuile.Slots)
+            {
+                if (slot.Terrain == TypeTerrain.Abbaye)
+                {
+                    abbaye = true;
+                    break;
+                }
+            }
+
+            if (abbaye && CompteurPoints.PointAbbaye(tuile) == 0)
+            {
+                AbbayeIncomplete.Add((x, y));
             }
 
             int c = 0;
@@ -1012,7 +1030,8 @@ namespace Assets.system
             var tuile = GetTuile(x, y);
             for (int slot = 0; slot < tuile.NombreSlot; slot++)
             {
-                if (tuile.Slots[slot].Terrain == TypeTerrain.Pre || !ZoneFermeeForSlot(x, y, (ulong)slot))
+                if (tuile.Slots[slot].Terrain == TypeTerrain.Pre || !ZoneFermeeForSlot(x, y, (ulong)slot) ||
+                    (CompteurPoints.PointAbbaye(tuile) == 0 && tuile.Slots[slot].Terrain == TypeTerrain.Abbaye))
                 {
                     continue;
                 }
