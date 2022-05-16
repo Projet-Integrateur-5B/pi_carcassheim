@@ -12,14 +12,12 @@ namespace Assets.system
 {
     public class Communication_inGame : CarcasheimBack
     {
-
-        // Param�tres de la partie 
         private ulong _id_partie;
 
         private ulong _mon_id;
 
         private int id_tile_init = 20;
-        bool id_tile_init_received = true/*false*/;
+        bool id_tile_init_received = true;
 
         private int _mode = 0; // 0 -> Classique | 1 -> Time-attack | 2 -> Score
         private int _nb_tuiles = -1;
@@ -113,8 +111,7 @@ namespace Assets.system
 
         override public void getTile(out TurnPlayParam param)
         {
-            //TODO PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
-            Debug.Log("GET TILE " + play_of_this_turn.id_tile + " MA POS " + play_of_this_turn.tile_pos);
+            // PARTAGER LE COUP valid� PAR LE JOUEUR ELU => Display
             param = play_of_this_turn;
         }
 
@@ -124,18 +121,17 @@ namespace Assets.system
         override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
         {
             lePlateau.PoserTuileFantome((ulong)mp.id_tile, mp.pos_tile.X, mp.pos_tile.Y, mp.pos_tile.Rotation);
-            // Debug.Log("ROTATION   " + mp.pos_tile);
             slot_pos.AddRange(lePlateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, (ulong)mp.id_meeple));
         }
         override public int getNextPlayer()
         {
-            //TODO PARTAGER L'ID DU JOUEUR ELU => Display
+            //PARTAGER L'ID DU JOUEUR ELU => Display
             return (int)nextPlayer;
         }
 
         override public int askTilesInit(List<TileInitParam> tiles)
         {
-            //TODO PARTAGER LA LISTE DES TUILES TIRES => Display
+            // PARTAGER LA LISTE DES TUILES TIRES => Display
             // Id tuile,
             // FLAG => true : garder la tuile; false: jeter la tuile
             // RETURN nombre de tuile dans la main au final
@@ -148,12 +144,11 @@ namespace Assets.system
             nb_tile_for_turn = 0;
 
             return 1;
-            // (| f) (| f) (| f) (| f) >>(| t)
         }
 
         override public void askMeeplesInit(List<MeepleInitParam> meeples)
         {
-            //TODO PARTAGER LA LISTE DES ID DES MEEPLES POSABLES ET LE NOMBRE DISP�NIBLE => Display
+            // PARTAGER LA LISTE DES ID DES MEEPLES POSABLES ET LE NOMBRE DISP�NIBLE => Display
             // Id meeple, nb de meeple d'id Id disponible
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
@@ -165,8 +160,8 @@ namespace Assets.system
 
         override public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
         {
-            //TODO PARTAGER LA LISTE DES POSITIONS OU LA TUILE D'ID tile_id PEUT ETRE POSE => Display
-            // tile_id est un argument !!!
+            // PARTAGER LA LISTE DES POSITIONS OU LA TUILE D'ID tile_id PEUT ETRE POSE => Display
+            // tile_id est un argument 
             // ajouter avec new Position,(X, Y, Rotation) avec rotation = (0: Nord, 1: Est, 2: Sud, 3: Ouest)
             // mettre une position par rotation
             s_allposition.WaitOne();
@@ -192,7 +187,7 @@ namespace Assets.system
         // SCORE
         override public void askScores(List<PlayerScoreParam> players_scores, List<Zone> zones)
         {
-            //TODO PARTAGER LES NOUVEAUX SCORES POUR CHAQUE JOUEUR => Display
+            // PARTAGER LES NOUVEAUX SCORES POUR CHAQUE JOUEUR => Display
             // Id du joueur dont le score change, Nouveau score, Zone provoquant le changement de score
             // Zone: array/list de (id tuile, position de la tuile sur le plateau, id du slot)
             int taille = playerList.Length;
@@ -222,27 +217,24 @@ namespace Assets.system
         }
         override public int askIdTileInitial()
         {
-            // Debug.Log("TUILE INIT DEMANDE");
-            // TODO PARTAGER ID DE LA TUILE INITIAL EN POSITION (0, 0) => Display
+            // PARTAGER ID DE LA TUILE INITIAL EN POSITION (0, 0) => Display
             return id_tile_init;
         }
 
         override public void askTimerTour(out int min, out int sec)
         {
-            // Debug.Log("TIMER DEMANDE");
-            // TODO PARTAGER LE TEMPS DISPONIBLE PAR TOUR => Display
+            // PARTAGER LE TEMPS DISPONIBLE PAR TOUR => Display
             min = _timer / 60;
             sec = _timer % 60;
         }
 
         override public void askWinCondition(ref WinCondition win_cond, List<int> parameters)
         {
-            // Debug.Log("WIN COND DEMANDED");
-            // TODO PARTAGER CONDITION DE VICTOIRE => Display
+            // PARTAGER CONDITION DE VICTOIRE => Display
             // 0 TUILE => nb de tuile
             // 1 TEMPS => nb de min, puis nb de sec
-            // 2 SCORE => score � atteindre
-            // Debug.Log("MODE :! " + _mode);
+            // 2 SCORE => score à atteindre
+
             switch (_mode)
             {
                 case 1:
@@ -263,18 +255,13 @@ namespace Assets.system
 
         override public int getMyPlayer()
         {
-            // Debug.Log("MON JOUEUR DEMANDE");
-            // TODO PARTAGER ID DU JOUEUR SUR CE CLIENT => Display
+            // PARTAGER ID DU JOUEUR SUR CE CLIENT => Display
             return (int)_mon_id;
         }
 
-
-        //=======================================================
-        // PLEASE NEVER CALL ME
-
         override public void askPlayerOrder(List<int> player_ids)
         {
-            // TODO PARTAGER LES IDS DES JOUEURS DANS L'ORDRE DU TOUR => Display
+            // PARTAGER LES IDS DES JOUEURS DANS L'ORDRE DU TOUR => Display
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
@@ -287,7 +274,7 @@ namespace Assets.system
 
         override public void askFinalScore(List<PlayerScoreParam> playerScores, List<Zone> zones)
         {
-            //TODO Pareil que askScore
+            // Pareil que askScore
             int taille = playerList.Length;
             for (int j = 0; j < taille; j++)
             {
@@ -301,8 +288,7 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
-            Debug.Log("ACTION ENVOYE");
-            //TODO ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
+            // ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
             switch (action.action_type)
             {
                 case DisplaySystemActionTypes.tileSetCoord:
@@ -399,12 +385,6 @@ namespace Assets.system
             OnEndTurnReceive(null);
 
             s_WaitInit.Release();
-            Debug.Log("On est dans la game");
-        }
-
-        // Update is called once per frame
-        public void Update()
-        {
         }
 
         public void Disconnection(Socket socket)
@@ -648,7 +628,7 @@ namespace Assets.system
         }
 
         public void SendPosition(int id_tuile, int X, int Y, int ROT, Tools.IdMessage idMessage)
-        {//ToDo Retirer Meeple et slot et le changer
+        {
             Packet packet = new Packet();
             packet.IdMessage = idMessage;
             packet.IdRoom = (int)_id_partie;
@@ -687,10 +667,8 @@ namespace Assets.system
 
         public void checkTurnStart()
         {
-            Debug.Log("TURN START ? " + player_received + " " + turn_received);
             if (turn_received && player_received)
             {
-                Debug.Log("Nouveau tour");
                 player_received = false;
                 turn_received = false;
                 system_display.setNextState(DisplaySystemState.turnStart);
@@ -699,7 +677,6 @@ namespace Assets.system
 
         public void checkGameBegin()
         {
-            Debug.Log("CALLED checkGameBegin " + players_received + " " + win_cond_received + " " + id_tile_init_received + " " + timer_tour_received + " " + turn_received);
             s_InGame.WaitOne();
             if (players_received && win_cond_received && id_tile_init_received && timer_tour_received && testGameBegin && turn_received && player_received)
             {
