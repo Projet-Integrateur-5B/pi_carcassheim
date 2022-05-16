@@ -841,7 +841,11 @@ namespace system
         /// </summary>
         public void WaitACBarrier()
         {
-            _AC_barrierAllVerifDone.SignalAndWait(2000);
+            if (_AC_barrierUp)
+            {
+                _AC_barrierAllVerifDone.SignalAndWait(5000);
+            }
+            
         }
 
         /// <summary>
