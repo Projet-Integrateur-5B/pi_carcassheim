@@ -610,7 +610,7 @@ namespace system
             {
                 if (ZoneFermeeForSlot(x, y, i))
                 {
-                    // Debug.Log("Une Zone a ete fermee");
+                    //Debug.LogWarning("Une Zone a ete fermee");
                     ulong[] gagnants;
                     int point = CompteurPoints.CompterZoneFerme(x, y, (int)i, out gagnants);
                     foreach (ulong id_joueur in gagnants)
@@ -671,7 +671,10 @@ namespace system
             Tuile[] tuilesAdjSlot = TuilesAdjacentesAuSlot(tuile, idSlot, out emplacementVide, out positionsInternes);
 
             if (emplacementVide)
+            {
+                //Debug.Log("emplacement vide sur tuile d'id : " + tuile.Id);
                 return false;
+            }
 
             int c = 0;
             foreach (var item in tuilesAdjSlot)
@@ -680,9 +683,10 @@ namespace system
                 {
                     tuilesFormantZone.Add(item);
 
-                    ulong idSlotProchaineTuile = item.IdSlotFromPositionInterne(positionsInternes[c++]);
+                    ulong idSlotProchaineTuile = item.IdSlotFromPositionInterne(positionsInternes[c]);
                     ferme = ferme && ZoneFermeeAux(item, idSlotProchaineTuile, tuilesFormantZone);
                 }
+                c++;
             }
 
             return ferme;
@@ -728,7 +732,16 @@ namespace system
                                       y + PositionAdjacentes[direction, 1]);
 
                 if (elem == null)
+                {
+                    if (tuile.Id == 12)
+                    {
+                        //Debug.LogWarning("elem null en direction : " + direction);
+                        //Debug.Log("T12 de coordonnees : " + tuile.X + "; " + tuile.Y);
+                        //Debug.Log("La tuile a pour rotation : " + tuile.Rotation + ". la position pointant vers une tuile nulle est " + position);
+                        //Debug.Log("le slot est le numero " + idSlot + ". Il a pour terrain : " + tuile.Slots[idSlot].Terrain);
+                    }
                     emplacementVide = true;
+                }
 
                 else if (!resultat.Contains(elem))
                 {
@@ -956,6 +969,56 @@ namespace system
                     continue;
                 RemoveAllPawnInZoneAux(currentTuile,
                     nextSlot, parcourues, ref result);
+            }
+            return result;
+        }
+
+
+
+        private void RemoveAllPawnInTuileAux(Tuile tuile, ulong idSlot,
+            List<(Tuile, ulong)> parcourues, List<Tuple<int, int, ulong>> results)
+        {
+            bool vide;
+            int[] positionsInternesProchainesTuiles;
+            parcourues.Add((tuile, idSlot));
+            Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
+
+            ulong idCurrentJoueur = tuile.Slots[idSlot].IdJoueur;
+
+            if (idCurrentJoueur != ulong.MaxValue)
+            {
+                results.Add(new Tuple<int, int, ulong>(tuile.X, tuile.Y, idSlot));
+            }
+
+            tuile.Slots[idSlot].IdJoueur = ulong.MaxValue;
+            for (int i = 0; i < adj.Length; i++)
+            {
+                Tuile currentTuile = adj[i];
+                if (currentTuile == null)
+                    continue;
+                ulong nextSlot = currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]);
+                if (parcourues.Contains((currentTuile, nextSlot)))
+                    continue;
+                RemoveAllPawnInTuileAux(currentTuile,
+                    nextSlot, parcourues, results);
+            }
+        }
+
+        public Dictionary<ulong, int> RemoveAllPawnInTile(int x, int y, List<Tuple<int, int, ulong>> positions)
+        {
+            Dictionary<ulong, int> result = new Dictionary<ulong, int>();
+            List<(Tuile, ulong)> parcourues = new List<(Tuile, ulong)>();
+            var tuile = GetTuile(x, y);
+            for (int slot = 0; slot < tuile.NombreSlot; slot++)
+            {
+                if (tuile.Slots[slot].Terrain == TypeTerrain.Pre || !ZoneFermeeForSlot(x, y, (ulong)slot))
+                {
+                    continue;
+                }
+                parcourues.Clear();
+                RemoveAllPawnInTuileAux(tuile, (ulong)slot, parcourues, positions);
+                parcourues.Clear();
+                RemoveAllPawnInZoneAux(tuile, (ulong)slot, parcourues, ref result);
             }
             return result;
         }

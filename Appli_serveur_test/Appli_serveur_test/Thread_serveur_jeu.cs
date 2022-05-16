@@ -1325,6 +1325,21 @@ namespace system
 
                 _s_dico_joueur.Release();
 
+                List<Tuple<int, int, ulong>> positions = new List<Tuple<int, int, ulong>>();
+
+                Dictionary<ulong, int> dico = _plateau.RemoveAllPawnInTile(_posTuileTourActu.X, _posTuileTourActu.Y, positions);
+                //Debug.Log("dico de longueur : " + dico.Count);
+                foreach (ulong id_player in dico.Keys)
+                {
+                    _s_dico_joueur.WaitOne();
+                    Player joueur = _dico_joueur[id_player];
+                    _s_dico_joueur.Release();
+                 
+                    int meeplesRendus = dico[id_player];
+
+                    joueur.AddMeeple((uint)meeplesRendus);
+                }
+
             }
 
 

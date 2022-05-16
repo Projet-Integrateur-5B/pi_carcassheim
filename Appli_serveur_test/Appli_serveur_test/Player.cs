@@ -57,6 +57,18 @@ namespace system
         }
 
         /// <summary>
+        /// Ajoute des meeples à leur total de pion possédés
+        /// </summary>
+        /// <param name="meepleNum"> Number of meeples to add </param>
+        public void AddMeeple(uint meepleNum)
+        {
+            _s_player.WaitOne();
+            _nbMeeples = _nbMeeples + meepleNum;
+            _s_player.Release();
+            Console.WriteLine(_id_player + " a reçu " + _nbMeeples + " meeples. (Possédés à présent:" + _nbMeeples + ")");
+        }
+
+        /// <summary>
         /// Création d'un nouveau joueur
         /// </summary>
         /// <param name="id_player"></param>
