@@ -757,16 +757,18 @@ namespace system
                     if (playerStatus == Tools.PlayerStatus.Kicked) // Deuxième triche -> kick
                     {
                         packet.IdMessage = Tools.IdMessage.PlayerKick;
+                        PlayerKick(idRoom, idPlayer, Array.Empty<string>());
                     }
                     else // Première triche -> avertissement
                     {
                         packet.IdMessage = Tools.IdMessage.PlayerCheat;
+                        Server.Server.SendToSpecificClient(playerSocket, packet);
                     }
                     break;
                 }
             }
 
-            Server.Server.SendToSpecificClient(playerSocket, packet);
+            
         }
 
         public Tools.PlayerStatus PlayerLeave(ulong idPlayer, int idRoom)
@@ -800,6 +802,41 @@ namespace system
             }
 
             return Tools.PlayerStatus.NotFound;
+        }
+
+        public void PlayerKick(int idRoom, ulong idPlayer, string[] data)
+        {
+            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
+            {
+                if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
+                // Retrait du joueur de la game
+                thread_serv_ite.RemoveJoueur(idPlayer);
+                // Informe tous le monde du kick
+                SendBroadcast(idRoom, Tools.IdMessage.PlayerKick, idPlayer);
+                // Mise à jour du status de la game
+                Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+
+                // Génération du nouveau tableau data+scores
+                string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                data.CopyTo(dataWithScores, 0);
+                allScores.CopyTo(dataWithScores, data.Length);
+
+                if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
+                {
+                    Console.WriteLine("Com_EndTurn : game stopped !");
+
+                    SendBroadcast(idRoom, Tools.IdMessage.EndTurn, dataWithScores);
+                    ulong idPlayerWinner = thread_serv_ite.GetWinner();
+                    string[] dataToSend = new string[] { idPlayerWinner.ToString() };
+                    SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
+                    DeleteGame(idRoom);
+                }
+
+                break;
+
+            }
         }
 
         // ===============================

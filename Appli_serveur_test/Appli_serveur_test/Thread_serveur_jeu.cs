@@ -1031,8 +1031,7 @@ namespace system
             // Kick après la fin du tour (pour éviter les erreurs)
             if (_dico_joueur[idPlayer]._timer > 3)
             {
-
-                RemoveJoueur(idPlayer);
+                
                 gestionnaire.CallPlayerKick(_id_partie, idPlayer, dataPlayToSend);
 
             }
