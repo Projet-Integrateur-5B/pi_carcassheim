@@ -123,6 +123,11 @@ namespace Assets.system
 
         override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
         {
+            if (mp.pos_tile == null)
+            {
+                Debug.LogError("Asking meeple for null position");
+                return;
+            }
             lePlateau.PoserTuileFantome((ulong)mp.id_tile, mp.pos_tile.X, mp.pos_tile.Y, mp.pos_tile.Rotation);
             // Debug.Log("ROTATION   " + mp.pos_tile);
             slot_pos.AddRange(lePlateau.EmplacementPionPossible(mp.pos_tile.X, mp.pos_tile.Y, (ulong)mp.id_meeple));
@@ -301,7 +306,7 @@ namespace Assets.system
         // ACTION IN GAME
         override public void sendAction(DisplaySystemAction action)
         {
-            Debug.Log("ACTION ENVOYE");
+            Debug.Log("ACTION ENVOYE " + action.action_type);
             //TODO ENVOYER AU!!SERVEUR L'ACTION: PARTAGE DIRECT => Serveur
             switch (action.action_type)
             {
@@ -630,6 +635,7 @@ namespace Assets.system
 
                 if (lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones))
                 {
+                    Debug.Log("slowday");
                     lePlateau.RemoveAllPawnInTile(x_tile, y_tile, meeple_positions);
                 }
 

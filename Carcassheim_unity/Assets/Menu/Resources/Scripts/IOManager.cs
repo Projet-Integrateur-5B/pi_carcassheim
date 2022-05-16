@@ -40,32 +40,11 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     /// </summary>
     void Start()
     {
+        Debug.Log("CALLED");
         absolute_parent_ref = absolute_parent;
 #if !(UNITY_IOS || UNITY_ANDROID)
         boolPC = true;
 #endif
-        _option = gameObject.AddComponent(typeof(OptionsMenu)) as OptionsMenu;
-        _option.absolute_parent = absolute_parent;
-        _acc = gameObject.AddComponent(typeof(AccountMenu)) as AccountMenu;
-        _acc.absolute_parent = absolute_parent;
-        _home = gameObject.AddComponent(typeof(HomeMenu)) as HomeMenu;
-        _home.absolute_parent = absolute_parent;
-        _co = gameObject.AddComponent(typeof(ConnectionMenu)) as ConnectionMenu;
-        _co.absolute_parent = absolute_parent;
-        _cred = gameObject.AddComponent(typeof(CreditsMenu)) as CreditsMenu;
-        _cred.absolute_parent = absolute_parent;
-        _stat = gameObject.AddComponent(typeof(StatistiquesMenu)) as StatistiquesMenu;
-        _stat.absolute_parent = absolute_parent;
-        _sroom = gameObject.AddComponent(typeof(RoomSelectionMenu)) as RoomSelectionMenu;
-        _sroom.absolute_parent = absolute_parent;
-        _jid = gameObject.AddComponent(typeof(JoinByIdMenu)) as JoinByIdMenu;
-        _jid.absolute_parent = absolute_parent;
-        _proom = gameObject.AddComponent(typeof(PublicRoomMenu)) as PublicRoomMenu;
-        _proom.absolute_parent = absolute_parent;
-        _croom = gameObject.AddComponent(typeof(CreateRoomMenu)) as CreateRoomMenu;
-        _croom.absolute_parent = absolute_parent;
-        _rcreated = gameObject.AddComponent(typeof(RoomIsCreated)) as RoomIsCreated;
-        _rcreated.absolute_parent = absolute_parent;
         absolute_parent_ref = null;
         //Cursor Texture :
         _cursorTexture = Resources.Load("Miscellaneous/Cursors/BlueCursor") as Texture2D; // Texture Type = Cursor
@@ -82,34 +61,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
         TridentGo = GameObject.Find("Other").transform.Find("Trident").gameObject;
         changeHover();
         // Cherche chaque menu -> liste chaque boutons par menu -> assignation de la fonction respectivement
-        foreach (Transform menu in GameObject.Find("SubMenus").transform)
-        {
-            Transform buttons = menu.Find("Buttons");
-            if (buttons != null)
-            {
-                foreach (Transform btn in buttons)
-                    if (btn.GetComponent<Button>())
-                        btn.GetComponent<Button>().onClick.AddListener(delegate
-                        {
-                            MethodCall(btn.name, null, null);
-                        });
-            }
-
-            if (menu.Find("Toggle Group"))
-                foreach (Transform tog in menu.Find("Toggle Group").transform.GetChild(0).transform)
-                    if (tog.GetComponent<Toggle>())
-                        tog.GetComponent<Toggle>().onValueChanged.AddListener(delegate
-                        {
-                            MethodCall(menu.Find("Toggle Group").transform.GetChild(0).name, tog.GetComponent<Toggle>(), null);
-                        });
-            if (menu.Find("InputField"))
-                foreach (Transform inp in menu.Find("InputField").transform.GetChild(0).transform)
-                    if (inp.GetComponent<InputField>())
-                        inp.GetComponent<InputField>().onEndEdit.AddListener(delegate
-                        {
-                            MethodCall(menu.Find("InputField").transform.GetChild(0).name, null, inp.GetComponent<InputField>());
-                        });
-        }
     }
 
     /// <summary>
@@ -373,6 +324,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     /// <param name = "inp">InputField</param>
     public void MethodCall(string methode, Toggle tog, InputField inp)
     {
+        Debug.Log(methode);
         GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
         if (inp == null)
             gameObject.SendMessage(methode, tog);
@@ -387,7 +339,7 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     /// </summary>
     void OnDisable()
     {
-        TridentGo.SetActive(false);
-        loading_screen.SetActive(true);
+        TridentGo?.SetActive(false);
+        loading_screen?.SetActive(true);
     }
 }

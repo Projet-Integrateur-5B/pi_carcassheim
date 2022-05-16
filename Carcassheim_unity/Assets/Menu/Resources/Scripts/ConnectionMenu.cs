@@ -21,9 +21,9 @@ public class ConnectionMenu : Miscellaneous
     public Semaphore s_listAction;
 
 
-	/// <summary>
-	/// Start is called before the first frame update <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Start is called before the first frame update <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     void Start()
     {
         coMenu = GameObject.Find("SubMenus").transform.Find("ConnectionMenu").transform;
@@ -36,15 +36,24 @@ public class ConnectionMenu : Miscellaneous
         listAction = new List<bool>();
         s_listAction = new Semaphore(1, 1);
 
-
+    }
+    void OnEnable()
+    {
+        Debug.Log("HALLO");
         OnMenuChange += OnStart;
-        OnMenuChange += ClearAll;
     }
 
-	/// <summary>
-	/// OnStart is called when the menu is changed to this one <see cref = "ConnectionMenu"/> class.
-	/// </summary>
-	/// <param name = "pageName">Page name.</param>
+    void OnDisable()
+    {
+        Debug.Log("OSKOUR");
+        OnMenuChange -= OnStart;
+    }
+
+
+    /// <summary>
+    /// OnStart is called when the menu is changed to this one <see cref = "ConnectionMenu"/> class.
+    /// </summary>
+    /// <param name = "pageName">Page name.</param>
     public void OnStart(string pageName)
     {
         switch (pageName)
@@ -62,9 +71,9 @@ public class ConnectionMenu : Miscellaneous
         }
     }
 
-	/// <summary>
-	/// Reset Warning Text <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Reset Warning Text <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     public void ResetWarningTextCM()
     {
         tmpGO = GameObject.Find("Instructions");
@@ -72,7 +81,7 @@ public class ConnectionMenu : Miscellaneous
         tmpText.color = Color.white;
 
         //on gere selon la langue
-        if(OptionsMenu.langue == 0)
+        if (OptionsMenu.langue == 0)
             tmpText.text = "Connectez vous";
         else if (OptionsMenu.langue == 1)
             tmpText.text = "Log in";
@@ -80,29 +89,31 @@ public class ConnectionMenu : Miscellaneous
             tmpText.text = "Loggen Sie sich ein";
     }
 
-	/// <summary>
-	/// Hide connection menu <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Hide connection menu <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     public void HideConnection()
     {
+
+
         HidePopUpOptions();
         ResetWarningTextCM();
         ChangeMenu("ConnectionMenu", "HomeMenu");
     }
 
 
-	/// <summary>
-	/// Forgot password <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Forgot password <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     public void ForgottenPwdUser()
     {
 
     }
 
-	/// <summary>
-	/// Toggle show password <see cref = "ConnectionMenu"/> class.
-	/// </summary>
-	/// <param name = "curT">Current toggle.</param>
+    /// <summary>
+    /// Toggle show password <see cref = "ConnectionMenu"/> class.
+    /// </summary>
+    /// <param name = "curT">Current toggle.</param>
     public void ToggleValueChangedCM(Toggle curT)
     {
         if (curT.name == "Toggle ShowPwdCM")
@@ -116,9 +127,9 @@ public class ConnectionMenu : Miscellaneous
         }
     }
 
-	/// <summary>
-	/// Change account menu <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Change account menu <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     public void ShowAccount()
     {
         GameObject tmpGO = GameObject.Find("Instructions");
@@ -136,17 +147,17 @@ public class ConnectionMenu : Miscellaneous
         ChangeMenu("ConnectionMenu", "AccountMenu");
     }
 
-	/// <summary>
-	/// InputField EndEdit <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// InputField EndEdit <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     public void InputFieldEndEdit(InputField inp)
     {
         // Debug.Log("Input submitted" + " : " + inp.text);
     }
 
-	/// <summary>
-	/// Conect to server <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Conect to server <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     public void Connect()
     {
 
@@ -161,11 +172,11 @@ public class ConnectionMenu : Miscellaneous
         Communication.Instance.SendAsync(packet);
     }
 
-	/// <summary>
-	/// OnPacketReceived is called when a packet is received <see cref = "ConnectionMenu"/> class.
-	/// </summary>
-	/// <param name = "sender">Sender.</param>
-	/// <param name = "packet">Packet.</param>
+    /// <summary>
+    /// OnPacketReceived is called when a packet is received <see cref = "ConnectionMenu"/> class.
+    /// </summary>
+    /// <param name = "sender">Sender.</param>
+    /// <param name = "packet">Packet.</param>
     public void OnPacketReceived(object sender, Packet packet)
     {
 
@@ -180,13 +191,14 @@ public class ConnectionMenu : Miscellaneous
 
             s_listAction.WaitOne();
             listAction.Add(res);
+            Debug.Log("action" + res);
             s_listAction.Release();
         }
     }
 
-	/// <summary>
-	/// Update is called once per frame <see cref = "ConnectionMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Update is called once per frame <see cref = "ConnectionMenu"/> class.
+    /// </summary>
     private void Update()
     {
         s_listAction.WaitOne();
@@ -222,19 +234,19 @@ public class ConnectionMenu : Miscellaneous
                     tmpText.text = "Re-enter your login and password!";
                 else if (OptionsMenu.langue == 2)
                     tmpText.text = "Geben Sie Ihren Login und Ihr Passwort erneut ein!";
-                
+
             }
         }
     }
-    
-	/// <summary>
-	/// Clear all InputField <see cref = "ConnectionMenu"/> class.
-	/// </summary>
-	/// <param name = "args">Arguments.</param>
-	public void ClearAll(string arg)
-	{
-		loginCM = Clear(loginCM);
-		passwordCM = Clear(passwordCM);
-		hidePwd.isOn = false;
-	}
+
+    /// <summary>
+    /// Clear all InputField <see cref = "ConnectionMenu"/> class.
+    /// </summary>
+    /// <param name = "args">Arguments.</param>
+    public void ClearAll(string arg)
+    {
+        loginCM = Clear(loginCM);
+        passwordCM = Clear(passwordCM);
+        hidePwd.isOn = false;
+    }
 }

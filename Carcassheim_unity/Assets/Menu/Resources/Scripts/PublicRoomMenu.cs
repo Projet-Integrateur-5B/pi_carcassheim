@@ -14,59 +14,79 @@ using UnityEngine.UI;
 /// </summary>
 public class PublicRoomMenu : Miscellaneous
 {
-	private Color readyState;
-	public List<string> listAction;
-	public Semaphore s_listAction;
-	private Transform container;
-	private Text id_room; //id de la room (pour l'instant : 'X')
-	/// <summary>
-	/// Start is called before the first frame update <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
-	void Start()
-	{
-		listAction = new List<string>();
-		s_listAction = new Semaphore(1, 1);
-		RoomInfo.Instance.idPartie = Communication.Instance.IdRoom;
-		OnMenuChange += OnStart;
-		container = GameObject.Find("SubMenus").transform.Find("PublicRoomMenu").transform.Find("Text").transform;
-		id_room = container.Find("NumberOfRoom").GetComponent<Text>();
-	}
+    private Color readyState;
+    public List<string> listAction;
+    public Semaphore s_listAction;
+    private Transform container;
+    private Text id_room; //id de la room (pour l'instant : 'X')
 
-	/// <summary>
-	/// OnStart is called when the menu is changed to this one <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
-	public void OnStart(string pageName)
-	{
-		switch (pageName)
-		{
-			case "PublicRoomMenu":
-				/* Commuication Async */
-				Communication.Instance.IsInRoom = 1;
-				Communication.Instance.LancementConnexion();
-				Action listening = () =>
-				{
-					Communication.Instance.StartLoopListening(OnPacketReceived);
-				};
-				Task.Run(listening);
-				/* Communication pour que le serveur set le port */
-				Packet packet = new Packet();
-				packet.IdMessage = Tools.IdMessage.PlayerJoin;
-				packet.IdPlayer = Communication.Instance.IdClient;
-				packet.IdRoom = Communication.Instance.IdRoom;
-				packet.Data = Array.Empty<string>();
-				Communication.Instance.SendAsync(packet);
-				break;
-			default:
-				/* Ce n'est pas la bonne page */
-				/* Stop la reception dans cette class */
-				Communication.Instance.StopListening(OnPacketReceived);
-				break;
-		}
-	}
+    [SerializeField] RoomParameterRepre repre_parameter;
 
-	/// <summary>
-	/// Hide public room menu <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
+    bool is_ready = false;
+
+    /// <summary>
+    /// Start is called before the first frame update <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
+    void Start()
+    {
+        listAction = new List<string>();
+        s_listAction = new Semaphore(1, 1);
+        RoomInfo.Instance.idPartie = Communication.Instance.IdRoom;
+        container = GameObject.Find("SubMenus").transform.Find("PublicRoomMenu").transform.Find("Text").transform;
+        id_room = container.Find("NumberOfRoom").GetComponent<Text>();
+    }
+
+    void OnEnable()
+    {
+        Debug.Log("HALLO");
+        OnMenuChange += OnStart;
+    }
+
+    void OnDisable()
+    {
+        Debug.Log("OSKOUR");
+        RoomInfo.Instance.repre_parameter.IsInititialized = false;
+        OnMenuChange -= OnStart;
+    }
+
+    /// <summary>
+    /// OnStart is called when the menu is changed to this one <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
+    public void OnStart(string pageName)
+    {
+        switch (pageName)
+        {
+            case "PublicRoomMenu":
+                is_ready = false;
+                /* Commuication Async */
+                Communication.Instance.IsInRoom = 1;
+                Communication.Instance.LancementConnexion();
+                Action listening = () =>
+                {
+                    Communication.Instance.StartLoopListening(OnPacketReceived);
+                };
+                Task.Run(listening);
+                /* Communication pour que le serveur set le port */
+                Packet packet = new Packet();
+                packet.IdMessage = Tools.IdMessage.PlayerJoin;
+                packet.IdPlayer = Communication.Instance.IdClient;
+                packet.IdRoom = Communication.Instance.IdRoom;
+                packet.Data = Array.Empty<string>();
+                Communication.Instance.SendAsync(packet);
+                break;
+            default:
+                /* Ce n'est pas la bonne page */
+                /* Stop la reception dans cette class */
+                Communication.Instance.StopListening(OnPacketReceived);
+                Debug.Log("adzzijubg");
+                repre_parameter.IsInititialized = false;
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Hide public room menu <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
     public void HideRoom()
     {
         Debug.Log("HIDDING ROOM");
@@ -85,22 +105,20 @@ public class PublicRoomMenu : Miscellaneous
         ChangeMenu("PublicRoomMenu", "RoomSelectionMenu");
     }
 
-	/// <summary>
-	/// Change to Room Parameters menu <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Change to Room Parameters menu <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
     public void ShowRoomParameters()
     {
         HidePopUpOptions();
         ChangeMenu("PublicRoomMenu", "RoomParametersMenu");
     }
 
-	/// <summary>
-	/// Ready to play <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Ready to play <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
     public void Ready()
     {
-        ColorUtility.TryParseHtmlString("#90EE90", out readyState);
-        Text preparer = Miscellaneous.FindObject(absolute_parent, "preparation").GetComponent<Text>();
 
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.PlayerReady;
@@ -108,23 +126,49 @@ public class PublicRoomMenu : Miscellaneous
         packet.IdRoom = Communication.Instance.IdRoom;
         packet.Data = Array.Empty<string>();
 
-        preparer.color = readyState;
-        if (OptionsMenu.langue == 0)
-            preparer.text = "PRET A JOUER !"; 
-        else if (OptionsMenu.langue == 1)
-            preparer.text = "READY TO PLAY!";
-        else if (OptionsMenu.langue == 2)
-            preparer.text = "SPIELBEREIT!";
+        is_ready = !is_ready;
+        if (is_ready)
+            onReady();
+        else
+            onUnready();
 
         Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);
     }
+    public void onReady()
+    {
+        ColorUtility.TryParseHtmlString("#90EE90", out readyState);
+        Text preparer = Miscellaneous.FindObject(absolute_parent, "preparation").GetComponent<Text>();
 
-	/// <summary>
-	/// Pacjet received <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
-	/// <param name="sender">Sender.</param>
-	/// <param name="packet">Packet.</param>
+        preparer.color = readyState;
+        if (OptionsMenu.langue == 0)
+            preparer.text = "PRET A JOUER !";
+        else if (OptionsMenu.langue == 1)
+            preparer.text = "READY TO PLAY!";
+        else if (OptionsMenu.langue == 2)
+            preparer.text = "SPIELBEREIT!";
+    }
+
+    public void onUnready()
+    {
+        ColorUtility.TryParseHtmlString("#FFA500", out readyState);
+        Text preparer = Miscellaneous.FindObject(absolute_parent, "preparation").GetComponent<Text>();
+
+        preparer.color = readyState;
+        if (OptionsMenu.langue == 0)
+            preparer.text = "NON PRET";
+        else if (OptionsMenu.langue == 1)
+            preparer.text = "NOT READY";
+        else if (OptionsMenu.langue == 2)
+            preparer.text = "NICHT BEREIT";
+
+    }
+
+    /// <summary>
+    /// Pacjet received <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
+    /// <param name="sender">Sender.</param>
+    /// <param name="packet">Packet.</param>
     public void OnPacketReceived(object sender, Packet packet)
     {
         if (packet.IdMessage == Tools.IdMessage.StartGame)
@@ -158,9 +202,9 @@ public class PublicRoomMenu : Miscellaneous
         }
     }
 
-	/// <summary>
-	/// Loads the Scene in the background as the current Scene runs <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Loads the Scene in the background as the current Scene runs <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
     IEnumerator LoadYourAsyncScene()
     {
         // The Application loads the Scene in the background as the current Scene runs.
@@ -177,9 +221,9 @@ public class PublicRoomMenu : Miscellaneous
         }
     }
 
-	/// <summary>
-	/// Update every frame <see cref = "PublicRoomMenu"/> class.
-	/// </summary>
+    /// <summary>
+    /// Update every frame <see cref = "PublicRoomMenu"/> class.
+    /// </summary>
     void Update()
     {
         s_listAction.WaitOne();

@@ -114,6 +114,13 @@ namespace Assets.System
                 nbJoueur--;
         }
 
+        public void setDefault(bool room_is_public, int room_player_max)
+        {
+            _isPrivate = !room_is_public;
+            _nbJoueurMax = room_player_max;
+            SendModification();
+        }
+
         public void SetValues(string[] values)
         {
             try

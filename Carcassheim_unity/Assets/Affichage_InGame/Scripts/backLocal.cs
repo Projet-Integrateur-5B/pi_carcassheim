@@ -241,6 +241,7 @@ public class backLocal : CarcasheimBack
                     int meeplesRendus = dico[id_player];
                     Debug.Log("joueur j = " + id_player + " a " + joueur.nb_meeple + " meeples");
                     var temp = new PlayerInitParam(joueur.id_player, joueur.nb_meeple + meeplesRendus, joueur.player_name);
+                    players[(int)id_player] = temp;
                     joueur = temp;
                     Debug.LogWarning(meeplesRendus + " meeples ont ete rendus au joueur " + joueur.id_player);
                     Debug.Log("joueur j = " + id_player + " a " + joueur.nb_meeple + " meeples");
