@@ -125,7 +125,8 @@ namespace system
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
                         // On envoie le display à tous sauf au joueur dont c'est l'action (si tuileDrawn on envoit à tous)
-                        if (joueur.Key != idPlayer || idMessage is Tools.IdMessage.RoomSettingsGet or Tools.IdMessage.TuileDraw or Tools.IdMessage.PionPlacement) 
+                        if (joueur.Key != idPlayer || idMessage is Tools.IdMessage.RoomSettingsGet or Tools.IdMessage.TuileDraw 
+                            or Tools.IdMessage.PionPlacement or Tools.IdMessage.PlayerKick) 
                         {
                             Console.WriteLine("SendBroadcast : to " + joueur.Value._id_player + "!");
                             Server.Server.SendToSpecificClient(joueur.Value._socket_of_player, packet);
@@ -811,6 +812,10 @@ namespace system
                 if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;               
                 // Informe tous le monde du kick
                 SendBroadcast(idRoom, Tools.IdMessage.PlayerKick, idPlayer);
+
+                //Debug kick
+                Console.WriteLine("/!\\ DEBUG - Playerkicked : " + idPlayer);
+
                 // Retrait du joueur de la game
                 thread_serv_ite.RemoveJoueur(idPlayer);
                 // Cancel tour actuel
@@ -828,7 +833,7 @@ namespace system
 
                 if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
                 {
-                    Console.WriteLine("Com_EndTurn : game stopped !");
+                    Console.WriteLine("Playerkicked : game stopped !");
 
                     SendBroadcast(idRoom, Tools.IdMessage.EndTurn, dataWithScores);
                     ulong idPlayerWinner = thread_serv_ite.GetWinner();
@@ -838,13 +843,13 @@ namespace system
                 }
                 else // Si la partie n'est pas terminée
                 {
-                    Console.WriteLine("Force_EndTurn : game still running !");
+                    Console.WriteLine("Playerkicked : game still running !");
 
                     // Mélange des tuiles pour le prochain tirage
                     thread_serv_ite.ShuffleTilesGame();
                     thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
 
-                    Console.WriteLine("Force_EndTurn : before broadcast !");
+                    Console.WriteLine("Playerkicked : before broadcast !");
 
                     // Envoi de l'information du endturn
                     SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
