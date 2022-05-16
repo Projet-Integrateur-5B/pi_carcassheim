@@ -1327,15 +1327,19 @@ namespace system
 
                 List<Tuple<int, int, ulong>> positions = new List<Tuple<int, int, ulong>>();
 
+                Console.WriteLine("DBG - Avant d'entrer dans removeAllPawnInTile");
+
                 Dictionary<ulong, int> dico = _plateau.RemoveAllPawnInTile(_posTuileTourActu.X, _posTuileTourActu.Y, positions);
                 //Debug.Log("dico de longueur : " + dico.Count);
                 foreach (ulong id_player in dico.Keys)
                 {
+                    Console.WriteLine("DBG - Parcours des joueurs de dico.Keys");
                     _s_dico_joueur.WaitOne();
                     Player joueur = _dico_joueur[id_player];
                     _s_dico_joueur.Release();
                  
                     int meeplesRendus = dico[id_player];
+                    Console.WriteLine("DBG - Meeples à rendre : " + meeplesRendus);
 
                     joueur.AddMeeple((uint)meeplesRendus);
                 }

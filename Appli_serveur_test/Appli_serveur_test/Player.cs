@@ -65,7 +65,7 @@ namespace system
             _s_player.WaitOne();
             _nbMeeples = _nbMeeples + meepleNum;
             _s_player.Release();
-            Console.WriteLine(_id_player + " a reçu " + _nbMeeples + " meeples. (Possédés à présent:" + _nbMeeples + ")");
+            Console.WriteLine("DBG - ADD_MEEPLE - " + _id_player + " a reçu " + _nbMeeples + " meeples. (Possédés à présent:" + _nbMeeples + ")");
         }
 
         /// <summary>
