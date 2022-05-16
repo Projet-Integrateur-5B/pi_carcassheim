@@ -12,6 +12,7 @@ public class AccountMenu : Miscellaneous
 {
     private Transform accMenu, AMCI; // Account Menu Container InputField
     private InputField pseudoCA, emailCA, passwordCA, confirmPwdCA;
+    [SerializeField] StringValidator dayCA, monthCA, yearCA;
     private static bool boolCGU = false;
     public List<bool> listAction;
     public Semaphore s_listAction;
@@ -20,6 +21,8 @@ public class AccountMenu : Miscellaneous
 
     static int created = 0;
     int id_Object = 0;
+
+    [SerializeField] TMPro.TMP_Text errorText;
 
     /// <summary>
     /// Start is called before the first frame update <see cref = "AccountMenu"/> class.
@@ -50,6 +53,8 @@ public class AccountMenu : Miscellaneous
 		tmpGO = GameObject.Find("Create Account");
 		tmpText = tmpGO.GetComponent<Text>();
 		*/
+        errorText.outlineWidth = 0.3f;
+        errorText.outlineColor = new Color32(255, 128, 0, 255);
     }
 
     void OnEnable()
@@ -64,6 +69,8 @@ public class AccountMenu : Miscellaneous
         OnMenuChange -= OnStart;
     }
 
+
+
     /// <summary>
     /// OnStart is called when the menu is changed to this one <see cref = "AccountMenu"/> class.
     /// </summary>
@@ -75,10 +82,12 @@ public class AccountMenu : Miscellaneous
             case "AccountMenu":
                 /* Commuication Async */
                 Communication.Instance.StartListening(OnPacketReceived);
+                ClearAll(null);
                 break;
             default:
                 /* Ce n'est pas la bonne page */
                 /* Stop la reception dans cette class */
+                errorText.gameObject.SetActive(false);
                 Communication.Instance.StopListening(OnPacketReceived);
                 break;
         }
@@ -145,7 +154,115 @@ public class AccountMenu : Miscellaneous
     {
         string tmpPwd = RemoveLastSpace(passwordCA.text);
         string tmpPwd2 = RemoveLastSpace(confirmPwdCA.text);
-        return string.Equals(tmpPwd2, tmpPwd) && boolCGU;
+        bool valid_pass = string.Equals(tmpPwd2, tmpPwd);
+        bool is_empty = RemoveLastSpace(tmpPwd).Length == 0;
+        bool name_is_empty = RemoveLastSpace(pseudoCA.text).Length == 0;
+        bool mail_is_empty = RemoveLastSpace(emailCA.text).Length == 0;
+
+        int day = dayCA.endValue(), month = monthCA.endValue(), year = yearCA.endValue();
+        System.DateTime date;
+        bool valid_date = System.DateTime.TryParse("" + day + "/" + month + "/" + year, out date);
+        if (name_is_empty)
+        {
+            switch (OptionsMenu.langue)
+            {
+                case 1:
+                    errorText.SetText("Please write your login.");
+                    break;
+                case 2:
+                    errorText.SetText("Please");
+                    break;
+                default:
+                    errorText.SetText("Merci d'écrire votre nom d'utilisateur");
+                    break;
+            }
+            errorText.gameObject.SetActive(true);
+        }
+
+        else if (mail_is_empty)
+        {
+            switch (OptionsMenu.langue)
+            {
+                case 1:
+                    errorText.SetText("Please write your mail");
+                    break;
+                case 2:
+                    errorText.SetText("Please");
+                    break;
+                default:
+                    errorText.SetText("Merci d'écrire votre e-mail");
+                    break;
+            }
+            errorText.gameObject.SetActive(true);
+        }
+
+        else if (!valid_date)
+        {
+            switch (OptionsMenu.langue)
+            {
+                case 1:
+                    errorText.SetText("Please write a valid date.");
+                    break;
+                case 2:
+                    errorText.SetText("Please");
+                    break;
+                default:
+                    errorText.SetText("Merci d'écrire une date valide");
+                    break;
+            }
+            errorText.gameObject.SetActive(true);
+        }
+
+        else if (is_empty)
+        {
+            switch (OptionsMenu.langue)
+            {
+                case 1:
+                    errorText.SetText("Please write a password.");
+                    break;
+                case 2:
+                    errorText.SetText("Please");
+                    break;
+                default:
+                    errorText.SetText("Merci d'écrire un mot de passe");
+                    break;
+            }
+            errorText.gameObject.SetActive(true);
+        }
+
+        else if (!valid_pass)
+        {
+            switch (OptionsMenu.langue)
+            {
+                case 1:
+                    errorText.SetText("The passwords doesn't match.");
+                    break;
+                case 2:
+                    errorText.SetText("Passwörter stimmen nicht überein");
+                    break;
+                default:
+                    errorText.SetText("Les mots de passes ne correspondent pas");
+                    break;
+            }
+            errorText.gameObject.SetActive(true);
+        }
+        else if (!boolCGU)
+        {
+            switch (OptionsMenu.langue)
+            {
+                case 1:
+                    errorText.SetText("Please accept the CGU.");
+                    break;
+                case 2:
+                    errorText.SetText("Vielen Dank, dass Sie die CGU akzeptiert haben.");
+                    break;
+                default:
+                    errorText.SetText("Merci d'accepter les CGU.");
+                    break;
+            }
+            errorText.gameObject.SetActive(true);
+        }
+        return valid_pass && boolCGU && !is_empty && !mail_is_empty && !name_is_empty && valid_date;
     }
 
     /// <summary>
@@ -160,6 +277,10 @@ public class AccountMenu : Miscellaneous
             packet.IdPlayer = 0;
             packet.Data = new[] { RemoveLastSpace(pseudoCA.text), RemoveLastSpace(passwordCA.text), RemoveLastSpace(emailCA.text), GameObject.Find("InputField Year CA").GetComponent<InputField>().text + "/" + GameObject.Find("InputField Month CA").GetComponent<InputField>().text + "/" + GameObject.Find("InputField Day CA").GetComponent<InputField>().text };
             Communication.Instance.SendAsync(packet);
+        }
+        else
+        {
+            Debug.Log("CHAMPS PAS OK");
         }
     }
 
@@ -212,6 +333,7 @@ public class AccountMenu : Miscellaneous
             s_listAction.WaitOne();
             listAction.Clear();
             s_listAction.Release();
+            Debug.Log(GetState());
             if (GetState())
             {
                 HideAccountConnected();
@@ -219,10 +341,19 @@ public class AccountMenu : Miscellaneous
             }
             else
             {
-                /*
-                    tmpGO.GetComponent<Text>().color = Color.yellow;
-                    tmpText.text = "Ressaisissez vos informations et acceptez les CGU en cochant la case !";
-                    */
+                switch (OptionsMenu.langue)
+                {
+                    case 1:
+                        errorText.SetText("The account couldn't be created.");
+                        break;
+                    case 2:
+                        errorText.SetText("");
+                        break;
+                    default:
+                        errorText.SetText("Le compte n'a pas pu être créé.");
+                        break;
+                }
+                errorText.gameObject.SetActive(true);
             }
         }
     }
@@ -232,7 +363,6 @@ public class AccountMenu : Miscellaneous
     /// </summary>
     public void ClearAll(string arg)
     {
-        Debug.Log("" + id_Object + "" + pseudoCA + " " + emailCA);
         pseudoCA = Clear(pseudoCA);
         emailCA = Clear(emailCA);
         passwordCA = Clear(passwordCA);

@@ -84,4 +84,20 @@ public class StringValidator : MonoBehaviour
         }
         OnValueFinal?.Invoke(value);
     }
+
+    public int endValue()
+    {
+        int res;
+
+        string to_validate = text_field != null ? text_field.text : text_field_bis.text;
+        if (!int.TryParse(to_validate, out res))
+        {
+            return value;
+        }
+        else
+        {
+            value = res;
+        }
+        return res;
+    }
 }

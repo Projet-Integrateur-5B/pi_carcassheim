@@ -61,6 +61,7 @@ public class ConnectionMenu : Miscellaneous
             case "ConnectionMenu":
                 /* Commuication Async */
                 Communication.Instance.StartListening(OnPacketReceived);
+                ClearAll(null);
                 break;
 
             default:
