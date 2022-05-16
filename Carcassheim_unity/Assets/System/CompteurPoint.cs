@@ -67,6 +67,39 @@ namespace Assets.system
             return result;
         }
 
+        public static Dictionary<ulong, int> CompterPointFinPartie()
+        {
+            var temp = CompterPointDesChampsEnFinDePartie();
+            var result = new Dictionary<ulong, int>();
+
+            foreach (var item in temp)
+            {
+                result.Add(item.Key, item.Value);
+            }
+
+            foreach (var item in instance._plateau.AbbayeIncomplete)
+            {
+                int x, y;
+                (x, y) = item;
+                Tuile tuile = instance._plateau.GetTuile(x, y);
+                int pts = PointAbbaye(tuile, true);
+
+                ulong joueur = tuile.Slots[0].IdJoueur;
+
+                if (joueur == ulong.MaxValue)
+                    continue;
+
+                if (result.ContainsKey(joueur))
+                {
+                    result[joueur] += pts;
+                }
+                else
+                    result.Add(joueur, pts);
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// evalue les points qui vaut une zone
         /// </summary>
@@ -218,19 +251,32 @@ namespace Assets.system
         /// </summary>
         /// <param name="tuile">tuile de l'abbaye</param>
         /// <returns>le nombre de tuile adjascente au celle-ci</returns>
-        private static int PointAbbaye(Tuile tuile)
+        public static int PointAbbaye(Tuile tuile, bool endGame = false)
         {
-            int result = 0;
-
-            for (int i = 0; i < 4; i++)
+            int[,] positionAdjacentes = new int[,]
             {
-                int x = Plateau.PositionAdjacentes[i, 0] + tuile.X;
-                int y = Plateau.PositionAdjacentes[i, 1] + tuile.Y;
+                { -1, -1 },
+                { 0, -1 },
+                { 1, -1 },
+                { -1, 0 },
+                { 1, 0 },
+                { -1, 1 },
+                { 1, 1 },
+                { 0, 1 }
+            };
+            int nombreTuileAdjascentes = 0;
+
+            for (int i = 0; i < 8; i++)
+            {
+                int x = positionAdjacentes[i, 0] + tuile.X;
+                int y = positionAdjacentes[i, 1] + tuile.Y;
                 if (instance._plateau.GetTuile(x, y) != null)
-                    result++;
+                    nombreTuileAdjascentes++;
             }
 
-            return result;
+            if (endGame)
+                return nombreTuileAdjascentes;
+            return nombreTuileAdjascentes == 8 ? 9 : 0;
         }
 
         /// <summary>

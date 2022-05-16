@@ -29,6 +29,7 @@ namespace Assets.System
                 return _instance;
             }
         }
+
         /* Les Informations de la Room */
 
         private int _idPartie;
@@ -80,7 +81,6 @@ namespace Assets.System
 
         void Awake()
         {
-            //_instance = this;
             if (_instance != null)
             {
                 Destroy(gameObject);
@@ -140,7 +140,6 @@ namespace Assets.System
                 int flags_extension = int.Parse(values[10]);
                 _riverOn = (flags_extension & (int)Tools.Extensions.Riviere) > 0;
                 _abbayeOn = (flags_extension & (int)Tools.Extensions.Abbaye) > 0;
-                //Debug.Log("river " + _riverOn + " abba " + _abbayeOn);
 
                 s_RoomInfo.Release();
 
@@ -160,7 +159,6 @@ namespace Assets.System
             if (Communication.Instance.IdClient != idModerateur)
                 return;
 
-            Debug.Log("I SENT ROOM CHANGE");
             Packet packet = new Packet();
             packet.IdPlayer = Communication.Instance.IdClient;
             packet.IdMessage = Tools.IdMessage.RoomSettingsSet;
