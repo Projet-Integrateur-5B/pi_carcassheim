@@ -80,6 +80,7 @@ namespace Assets.system
             CompteurPoints.Init(this);
             _dicoTuile = dicoTuiles;
             ChampsOuDesPionsOntEtePoses = new List<(int, int, ulong)>();
+            AbbayeIncomplete = new List<(int, int)>();
         }
 
         /// <summary>
@@ -90,6 +91,9 @@ namespace Assets.system
             _tuiles = new List<Tuile>();
             //CompteurPoints.Init(this);
             _dicoTuile = new Dictionary<ulong, Tuile>();
+            ChampsOuDesPionsOntEtePoses = new List<(int, int, ulong)>();
+            AbbayeIncomplete = new List<(int, int)>();
+
         }
 
         /// <summary>
