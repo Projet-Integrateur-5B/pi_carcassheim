@@ -26,6 +26,11 @@ namespace system
         /// Nombre de tentatives de triche du joueur
         /// </summary>
         public uint _triche { get; set; }
+
+        /// <summary>
+        /// Nombre d'expiration de suite du timer joueur
+        /// </summary>
+        public uint _timer { get; set; } = 0;
         /// <summary>
         /// Si le joueur est prêt dans le lobby
         /// </summary>

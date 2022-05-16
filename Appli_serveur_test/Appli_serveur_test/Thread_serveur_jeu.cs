@@ -1014,6 +1014,13 @@ namespace system
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
             _timer_player.Stop();
 
+            _dico_joueur[idPlayer]._timer++;
+            if (_dico_joueur[idPlayer]._timer > 3)
+            {
+                _dico_joueur[idPlayer]._timer = 0;
+                // TODO : kickplayer
+            }
+
             string[] dataPlayToSend = ParseStoredPlayToData();
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the turn
@@ -1264,11 +1271,14 @@ namespace system
         ///     Methode : End the turn
         /// </summary>
         /// <returns> The socket of the next player to play </returns>
-        public Socket? EndTurn(ulong idPlayer)
+        public Socket? EndTurn(ulong idPlayer, bool timer)
         {
             _timer_player.Stop();
 
             bool aJoue = false;
+
+            if (timer)
+                _dico_joueur[idPlayer]._timer = 0;
             
             // Prise en compte du placement de la tuile et du pion (mise à jour structure de données)
             _s_plateau.WaitOne();

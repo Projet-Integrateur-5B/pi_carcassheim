@@ -556,7 +556,7 @@ namespace system
                             return errorsEquivalence;
 
                         // Fin du tour actuel
-                        Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
+                        Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer, true);
                         // Mise à jour du status de la game
                         Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
                         Console.WriteLine(thread_serv_ite.Get_Status());
@@ -630,7 +630,7 @@ namespace system
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Fin du tour actuel
-                    Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
+                    Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer, false);
                     // Mise à jour du status de la game
                     Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
 
