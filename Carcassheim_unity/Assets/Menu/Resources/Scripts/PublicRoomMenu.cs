@@ -19,6 +19,7 @@ public class PublicRoomMenu : Miscellaneous
 	public Semaphore s_listAction;
 	private Transform container;
 	private Text id_room; //id de la room (pour l'instant : 'X')
+
 	/// <summary>
 	/// Start is called before the first frame update <see cref = "PublicRoomMenu"/> class.
 	/// </summary>
@@ -69,7 +70,6 @@ public class PublicRoomMenu : Miscellaneous
 	/// </summary>
     public void HideRoom()
     {
-        Debug.Log("HIDDING ROOM");
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.PlayerLeave;
         packet.IdPlayer = Communication.Instance.IdClient;
@@ -80,8 +80,6 @@ public class PublicRoomMenu : Miscellaneous
         Communication.Instance.SendAsync(packet);
         Communication.Instance.IsInRoom = 0;
 
-        // HidePopUpOptions();
-        Debug.Log("HALLO ?????");
         ChangeMenu("PublicRoomMenu", "RoomSelectionMenu");
     }
 
