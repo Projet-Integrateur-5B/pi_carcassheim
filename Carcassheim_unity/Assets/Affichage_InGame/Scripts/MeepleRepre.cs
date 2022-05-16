@@ -16,6 +16,8 @@ public class MeepleRepre : MonoBehaviour
     public List<int> slot_possible = new List<int>();
 
     TuileRepre _parentTile = null;
+
+    public PlayerRepre parent_player;
     public TuileRepre ParentTile
     {
         set

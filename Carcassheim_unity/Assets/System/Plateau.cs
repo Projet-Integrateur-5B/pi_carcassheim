@@ -960,5 +960,55 @@ namespace Assets.system
             }
             return result;
         }
+
+
+
+        private void RemoveAllPawnInTuileAux(Tuile tuile, ulong idSlot,
+            List<(Tuile, ulong)> parcourues, List<Tuple<int, int, ulong>> results)
+        {
+            bool vide;
+            int[] positionsInternesProchainesTuiles;
+            parcourues.Add((tuile, idSlot));
+            Tuile[] adj = TuilesAdjacentesAuSlot(tuile, idSlot, out vide, out positionsInternesProchainesTuiles);
+
+            ulong idCurrentJoueur = tuile.Slots[idSlot].IdJoueur;
+
+            if (idCurrentJoueur != ulong.MaxValue)
+            {
+                results.Add(new Tuple<int, int, ulong>(tuile.X, tuile.Y, idSlot));
+            }
+
+            tuile.Slots[idSlot].IdJoueur = ulong.MaxValue;
+            for (int i = 0; i < adj.Length; i++)
+            {
+                Tuile currentTuile = adj[i];
+                if (currentTuile == null)
+                    continue;
+                ulong nextSlot = currentTuile.IdSlotFromPositionInterne(positionsInternesProchainesTuiles[i]);
+                if (parcourues.Contains((currentTuile, nextSlot)))
+                    continue;
+                RemoveAllPawnInTuileAux(currentTuile,
+                    nextSlot, parcourues, results);
+            }
+        }
+
+        public Dictionary<ulong, int> RemoveAllPawnInTile(int x, int y, List<Tuple<int, int, ulong>> positions)
+        {
+            Dictionary<ulong, int> result = new Dictionary<ulong, int>();
+            List<(Tuile, ulong)> parcourues = new List<(Tuile, ulong)>();
+            var tuile = GetTuile(x, y);
+            for (int slot = 0; slot < tuile.NombreSlot; slot++)
+            {
+                if (tuile.Slots[slot].Terrain == TypeTerrain.Pre || !ZoneFermeeForSlot(x, y, (ulong)slot))
+                {
+                    continue;
+                }
+                parcourues.Clear();
+                RemoveAllPawnInTuileAux(tuile, (ulong)slot, parcourues, positions);
+                parcourues.Clear();
+                RemoveAllPawnInZoneAux(tuile, (ulong)slot, parcourues, ref result);
+            }
+            return result;
+        }
     }
 }

@@ -60,6 +60,8 @@ namespace Assets.system
         List<PlayerScoreParam> gains = new List<PlayerScoreParam>();
         List<Zone> zones = new List<Zone>();
 
+        List<Tuple<int, int, ulong>> meeple_positions = new List<Tuple<int, int, ulong>>();
+
         // DISPLAY SYSTEM
         [SerializeField] DisplaySystem system_display = null;
         //====================================================================================================
@@ -149,15 +151,11 @@ namespace Assets.system
             // PARTAGER LA LISTE DES ID DES MEEPLES POSABLES ET LE NOMBRE DISP�NIBLE => Display
             // Id meeple, nb de meeple d'id Id disponible
             int taille = playerList.Length;
-            for (int i = 0; i < meeple_type; i++)
+            for (int j = 0; j < taille; j++)
             {
-                for (int j = 0; j < taille; j++)
-                {
-                    if (playerList[j].id == nextPlayer)
-                        meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
-                }
+                if (playerList[j].id == nextPlayer && playerList[j].nbMeeples != 0)
+                    meeples.Add(new MeepleInitParam((int)Tools.MeepleType.Default, (int)playerList[j].nbMeeples));
             }
-
         }
 
         override public void getTilePossibilities(int tile_id, List<PositionRepre> positions)
@@ -177,6 +175,12 @@ namespace Assets.system
                     ));
             }
             s_allposition.Release();
+        }
+
+        public override void askMeepleRetired(List<Tuple<int, int, ulong>> positions)
+        {
+            positions.AddRange(meeple_positions);
+            meeple_positions.Clear();
         }
 
         //=======================================================
@@ -603,6 +607,11 @@ namespace Assets.system
                 if (id_meeple != -1)
                     lePlateau.PoserPion(nextPlayer, x_tile, y_tile, (ulong)pos_meeple);
                 lePlateau.ValiderTour();
+
+                if (lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones))
+                {
+                    lePlateau.RemoveAllPawnInTile(x_tile, y_tile, meeple_positions);
+                }
 
                 gains.Clear();
                 zones.Clear();

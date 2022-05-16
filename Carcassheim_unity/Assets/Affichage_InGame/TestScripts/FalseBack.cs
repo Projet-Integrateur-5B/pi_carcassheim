@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Xml;
 using Assets.system;
+using System;
 
 public class FalseBack : CarcasheimBack
 {
@@ -636,5 +637,8 @@ public class FalseBack : CarcasheimBack
     override public void askMeeplePosition(MeeplePosParam mp, List<int> slot_pos)
     {
 
+    }
+    public override void askMeepleRetired(List<Tuple<int, int, ulong>> positions)
+    {
     }
 }
