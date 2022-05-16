@@ -1330,7 +1330,7 @@ namespace system
                 Console.WriteLine("DBG - Avant d'entrer dans removeAllPawnInTile");
 
                 Dictionary<ulong, int> dico = _plateau.RemoveAllPawnInTile(_posTuileTourActu.X, _posTuileTourActu.Y, positions);
-                //Debug.Log("dico de longueur : " + dico.Count);
+                Console.WriteLine("DBG - dico de longueur : " + dico.Count);
                 foreach (ulong id_player in dico.Keys)
                 {
                     Console.WriteLine("DBG - Parcours des joueurs de dico.Keys");
