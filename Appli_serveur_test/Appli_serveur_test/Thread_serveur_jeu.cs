@@ -1018,17 +1018,24 @@ namespace system
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
             _timer_player.Stop();
 
+            GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+
+            _s_dico_joueur.WaitOne();
             _dico_joueur[idPlayer]._timer++;
-            if (_dico_joueur[idPlayer]._timer > 3)
-            {
-                _dico_joueur[idPlayer]._timer = 0;
-                // TODO : kickplayer
-            }
+            _s_dico_joueur.Release();
 
             string[] dataPlayToSend = ParseStoredPlayToData();
-            GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
             // Force the end of the turn
             gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
+
+            // Kick après la fin du tour (pour éviter les erreurs)
+            if (_dico_joueur[idPlayer]._timer > 3)
+            {
+
+                RemoveJoueur(idPlayer);
+                gestionnaire.CallPlayerKick(_id_partie, idPlayer, dataPlayToSend);
+
+            }
         }
 
         /// <summary>

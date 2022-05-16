@@ -426,6 +426,43 @@ namespace system
             return currentPlayer;
         }
 
+        public void CallPlayerKick(int idRoom, ulong idPlayer, string[] data)
+        {
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
+                    // Informe tous le monde du kick
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerKick, idPlayer);
+                    // Mise à jour du status de la game
+                    Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+
+                    // Génération du nouveau tableau data+scores
+                    string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                    string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                    data.CopyTo(dataWithScores, 0);
+                    allScores.CopyTo(dataWithScores, data.Length);
+
+                    if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
+                    {
+                        Console.WriteLine("Com_EndTurn : game stopped !");
+
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.EndTurn, dataWithScores);
+                        ulong idPlayerWinner = thread_serv_ite.GetWinner();
+                        string[] dataToSend = new string[] { idPlayerWinner.ToString() };
+                        thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
+                        thread_com_iterateur.DeleteGame(idRoom);
+                    }
+
+                    break;
+
+                }
+                
+            }
+        }
+
         public Tools.PlayerStatus LogoutPlayer(ulong idPlayer)
         {
             Tools.PlayerStatus playerStatus = Tools.PlayerStatus.Default;
