@@ -611,7 +611,7 @@ namespace Assets.system
             {
                 if (ZoneFermeeForSlot(x, y, i))
                 {
-                    // Debug.Log("Une Zone a ete fermee");
+                    Debug.LogWarning("Une Zone a ete fermee");
                     ulong[] gagnants;
                     int point = CompteurPoints.CompterZoneFerme(x, y, (int)i, out gagnants);
                     foreach (ulong id_joueur in gagnants)
@@ -672,7 +672,10 @@ namespace Assets.system
             Tuile[] tuilesAdjSlot = TuilesAdjacentesAuSlot(tuile, idSlot, out emplacementVide, out positionsInternes);
 
             if (emplacementVide)
+            {
+                Debug.Log("emplacement vide sur tuile d'id : " + tuile.Id);
                 return false;
+            }
 
             int c = 0;
             foreach (var item in tuilesAdjSlot)
@@ -681,9 +684,10 @@ namespace Assets.system
                 {
                     tuilesFormantZone.Add(item);
 
-                    ulong idSlotProchaineTuile = item.IdSlotFromPositionInterne(positionsInternes[c++]);
+                    ulong idSlotProchaineTuile = item.IdSlotFromPositionInterne(positionsInternes[c]);
                     ferme = ferme && ZoneFermeeAux(item, idSlotProchaineTuile, tuilesFormantZone);
                 }
+                c++;
             }
 
             return ferme;
@@ -729,7 +733,16 @@ namespace Assets.system
                                       y + PositionAdjacentes[direction, 1]);
 
                 if (elem == null)
+                {
+                    if (tuile.Id == 12)
+                    {
+                        //Debug.LogWarning("elem null en direction : " + direction);
+                        //Debug.Log("T12 de coordonnees : " + tuile.X + "; " + tuile.Y);
+                        //Debug.Log("La tuile a pour rotation : " + tuile.Rotation + ". la position pointant vers une tuile nulle est " + position);
+                        //Debug.Log("le slot est le numero " + idSlot + ". Il a pour terrain : " + tuile.Slots[idSlot].Terrain);
+                    }
                     emplacementVide = true;
+                }
 
                 else if (!resultat.Contains(elem))
                 {
