@@ -347,6 +347,8 @@ public class DisplaySystem : MonoBehaviour
 
     public void execDirtyAction(DisplaySystemAction action)
     {
+        if (act_player == null || act_player.is_my_player)
+            return;
         queue_actions.Enqueue(action);
     }
 
@@ -446,6 +448,7 @@ public class DisplaySystem : MonoBehaviour
 
     public void setNextState(DisplaySystemState next_state)
     {
+        Debug.Log("ADDING TRANSITION " + next_state + " TO N TRANSIT " + (state_transition.Count + 1));
         state_transition.Enqueue(next_state);
         DisplaySystemState old_state = act_system_state;
         if (state_transition.Count == 1)
@@ -481,6 +484,7 @@ public class DisplaySystem : MonoBehaviour
                     {
                         system_back.sendTile(new TurnPlayParam(-1, null, -1, -1));
                     }
+                    queue_actions.Clear();
                 }
                 break;
             case DisplaySystemState.turnStart:
@@ -489,7 +493,7 @@ public class DisplaySystem : MonoBehaviour
                 break;
         }
 
-        if ((new_state != DisplaySystemState.tilePosing && new_state != DisplaySystemState.meeplePosing) || (!act_player.is_my_player))
+        if ((new_state != DisplaySystemState.tilePosing && new_state != DisplaySystemState.meeplePosing) || (act_player == null || !act_player.is_my_player))
         {
             button_actions.SetActive(false);
         }
@@ -507,9 +511,9 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.timeOutIdleState:
             case DisplaySystemState.idleState:
                 TurnPlayParam play_param;
-                if (act_system_state == DisplaySystemState.idleState)
+                if (new_state == DisplaySystemState.idleState || act_system_state == DisplaySystemState.StateTransition)
                 {
-                    Debug.LogError("Don(t do this ");
+                    Debug.LogError("Don't do this " + act_system_state + " " + new_state);
                     break;
                 }
 
@@ -579,11 +583,9 @@ public class DisplaySystem : MonoBehaviour
                         table.meeplePositionChanged(act_meeple);
                     }
                 }
-                Debug.Log("HALLOcvedsf");
                 List<System.Tuple<int, int, ulong>> positions = new List<System.Tuple<int, int, ulong>>();
                 system_back.askMeepleRetired(positions);
                 meepleGoback(positions);
-                Debug.Log("IGYAZFVJU");
                 act_player = null;
                 break;
             case DisplaySystemState.tilePosing:
@@ -595,7 +597,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        // Debug.Log("State enterring from " + old_state + " to " + new_state);
+        Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
@@ -608,6 +610,12 @@ public class DisplaySystem : MonoBehaviour
                 turnBegin();
                 break;
             case DisplaySystemState.tilePosing:
+                if (act_player == null && old_state == DisplaySystemState.idleState)
+                {
+                    Debug.LogWarning("Mec stop tuile");
+                    new_state = DisplaySystemState.idleState;
+                    break;
+                }
                 if (old_state == DisplaySystemState.turnStart)
                 {
                     if (tiles_hand.Count > 0)
@@ -618,6 +626,12 @@ public class DisplaySystem : MonoBehaviour
                 board.displayTilePossibilities();
                 break;
             case DisplaySystemState.meeplePosing:
+                if (act_player == null && old_state == DisplaySystemState.idleState)
+                {
+                    Debug.LogWarning("Mec stop");
+                    new_state = DisplaySystemState.idleState;
+                    break;
+                }
                 foreach (MeepleRepre mp in meeples_hand)
                 {
                     mp.slot_possible.Clear();
@@ -667,6 +681,7 @@ public class DisplaySystem : MonoBehaviour
                 break;
         }
         act_system_state = new_state;
+        Debug.Log("State enterring final from " + old_state + " to " + new_state + " REMAINING: " + state_transition.Count);
     }
 
     void tableCheck(Ray ray, ref bool consumed)

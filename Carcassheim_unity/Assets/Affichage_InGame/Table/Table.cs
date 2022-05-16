@@ -301,9 +301,16 @@ public class Table : MonoBehaviour
         {
             if (display_system.State == DisplaySystemState.tilePosing || display_system.State == DisplaySystemState.meeplePosing)
             {
-                ColliderStat tst = tile_mapping[tile];
-                tile.transform.parent = tile_zone.transform;
-                tile.transform.localPosition = tst.transform.localPosition - tile.pivotPoint.localPosition;
+                ColliderStat tst = null;
+                if (tile_mapping.TryGetValue(tile, out tst))
+                {
+                    tile.transform.parent = tile_zone.transform;
+                    tile.transform.localPosition = tst.transform.localPosition - tile.pivotPoint.localPosition;
+                }
+                else
+                {
+                    Debug.LogError("Trying to access key " + tile.Id + " when already deleted");
+                }
             }
             tile.model.layer = DisplaySystem.TableLayer;
             if (tile != display_system.act_tile)

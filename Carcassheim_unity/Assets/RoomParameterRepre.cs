@@ -48,16 +48,19 @@ public class RoomParameterRepre : MonoBehaviour
     int point_winmode = 100, def_point_winmode = 100;
 
     bool room_policy_public = true, def_room_policy_public = true;
+    public bool? default_room_policy = null;
     bool riverOn = false, abbayeOn = false;
 
+    public int? default_player_number = null;
     int timer_tour = 60, def_timer_tour = 60;
 
     RoomParametersStruct change_planned;
     bool changed = false;
 
-    public bool IsInititialized { set; get; }
-
+    private bool _initialize = false;
     public bool to_initialize = false;
+    public bool IsInititialized { set { _initialize = value; if (!_initialize) { default_player_number = null; default_room_policy = null; } to_initialize = false; } get => _initialize; }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -69,6 +72,11 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void initRoom(bool isinit = true)
     {
+        if (IsInititialized)
+        {
+            Debug.LogWarning("Shouldn't have reinitialize");
+            return;
+        }
         RoomInfo room = RoomInfo.Instance;
         id_room.text = Communication.Instance.IdRoom.ToString();
         bool interactif = Communication.Instance.IdClient == room.idModerateur;
@@ -76,7 +84,18 @@ public class RoomParameterRepre : MonoBehaviour
         {
             selectable.interactable = interactif;
         }
-        IsInititialized = isinit;
+        if (interactif)
+            Debug.Log("DEZFAUL " + default_room_policy + " " + default_player_number);
+        if (interactif && default_room_policy != null && default_player_number != null)
+        {
+            Debug.Log("SENDING DEZFAULT");
+            room.setDefault((bool)default_room_policy, (int)default_player_number);
+
+            default_room_policy = null;
+            default_player_number = null;
+        }
+        if (!isinit && IsInititialized)
+            IsInititialized = isinit;
     }
 
     public void OnRoomWinChange(int index)
@@ -174,7 +193,10 @@ public class RoomParameterRepre : MonoBehaviour
     void Update()
     {
         if (to_initialize)
+        {
             initRoom();
+            to_initialize = false;
+        }
         if (changed)
             setParameters(change_planned);
     }
