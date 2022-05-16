@@ -300,7 +300,7 @@ public class AccountMenu : Miscellaneous
     public void OnPacketReceived(object sender, Packet packet)
     {
         bool res = false;
-        if (packet.IdMessage == Tools.IdMessage.AccountLogin)
+        if (packet.IdMessage == Tools.IdMessage.AccountSignup)
         {
             if (packet.Error == Tools.Errors.None)
             {
