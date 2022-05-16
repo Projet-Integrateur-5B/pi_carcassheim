@@ -990,7 +990,6 @@ namespace system
                 results.Add(new Tuple<int, int, ulong>(tuile.X, tuile.Y, idSlot));
             }
 
-            tuile.Slots[idSlot].IdJoueur = ulong.MaxValue;
             for (int i = 0; i < adj.Length; i++)
             {
                 Tuile currentTuile = adj[i];
