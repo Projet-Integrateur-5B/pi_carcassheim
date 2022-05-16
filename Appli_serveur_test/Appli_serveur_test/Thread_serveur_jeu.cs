@@ -87,8 +87,8 @@ namespace system
         /// <summary>
         ///     The round timer, for each round the player has to finish before timer expiration.
         /// </summary>
-        private DateTime _DateTime_player;
-        private System.Timers.Timer _timer_player;
+        public DateTime _DateTime_player { get; set; }
+        public System.Timers.Timer _timer_player;
         private Tools.Timer _timer_player_value; // En secondes
 
         /// <summary>
@@ -1229,6 +1229,7 @@ namespace system
             if(_nombre_joueur <= 0)
             {
                 statutGame = Tools.GameStatus.Stopped;
+
             }
             _s_nombre_joueur.Release();
 

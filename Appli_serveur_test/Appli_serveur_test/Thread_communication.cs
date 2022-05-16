@@ -787,8 +787,8 @@ namespace system
                     {
                         // On abandonne les informations du tour actuel
                         Socket? nextPlayerSock = threadJeu.CancelTurn();
-                        // On lui envoit les 3 tuiles
-                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                        // On termine le tour de manière forcée
+                        ForceEndTurn(idPlayer, idRoom, Array.Empty<string>());
                     }
 
                     // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)
@@ -808,11 +808,14 @@ namespace system
         {
             foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
             {
-                if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;             
+                if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;               
                 // Informe tous le monde du kick
                 SendBroadcast(idRoom, Tools.IdMessage.PlayerKick, idPlayer);
                 // Retrait du joueur de la game
                 thread_serv_ite.RemoveJoueur(idPlayer);
+                // Cancel tour actuel
+                Socket? nextPlayerSock = thread_serv_ite.CancelTurn();
+
                 // Mise à jour du status de la game
                 Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
 
@@ -833,6 +836,23 @@ namespace system
                     SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
                     DeleteGame(idRoom);
                 }
+                else // Si la partie n'est pas terminée
+                {
+                    Console.WriteLine("Force_EndTurn : game still running !");
+
+                    // Mélange des tuiles pour le prochain tirage
+                    thread_serv_ite.ShuffleTilesGame();
+                    thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
+
+                    Console.WriteLine("Force_EndTurn : before broadcast !");
+
+                    // Envoi de l'information du endturn
+                    SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
+                }
+
+                // reset player timer               
+                thread_serv_ite._DateTime_player = DateTime.Now;
+                thread_serv_ite._timer_player.Start();
 
                 break;
 
