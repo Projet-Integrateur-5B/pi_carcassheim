@@ -327,6 +327,8 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 Tools.PlayerStatus playerStatus = thread_com_iterateur.PlayerLeave(idPlayer, idRoom);
+                if(playerStatus == Tools.PlayerStatus.Success)
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerLeave, idPlayer);
                 return playerStatus;
             }
 
