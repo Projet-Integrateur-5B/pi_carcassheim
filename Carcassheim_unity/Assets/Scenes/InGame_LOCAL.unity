@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.00079992623, g: 0.00079992623, b: 0.42138046, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0.42770147, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3136,11 +3136,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   board: {fileID: 316843530}
   limitRay: 0.1
-  moveSpeed: 5.5
-  moveTreshold: 0.001
+  moveSpeed: 0.00001
+  moveTreshold: 5
   scrollSpeed: 0.7
   Z_max: 0.46
   Z_min: -1.6
+  nearPlane: 1.5
 --- !u!1 &919545019
 GameObject:
   m_ObjectHideFlags: 0
