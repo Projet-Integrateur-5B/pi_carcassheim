@@ -450,6 +450,12 @@ namespace system
             return this._idTuileInit;
         }
 
+        public List<ulong> Get_rivieresGame()
+        {
+            List<ulong> listReturn = _rivieresGame;
+            return listReturn;
+        }
+
         // <summary>
         ///     Getter : Get number of players.
         /// </summary>

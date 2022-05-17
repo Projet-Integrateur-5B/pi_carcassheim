@@ -452,7 +452,16 @@ namespace system
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
                     currentPlayer[0] = thread_serv_ite.Get_ActualPlayerId();
                     if(currentPlayer[0] != 0)
-                        currentPlayer[1] = thread_serv_ite.Get_PlayerMeeples(currentPlayer[0]);
+                    {
+                        if (thread_serv_ite.IsRiverExtensionOn() && thread_serv_ite.Get_rivieresGame().Count >= 0)
+                        {
+                            currentPlayer[1] = 0;
+                        }
+                        else
+                        {
+                            currentPlayer[1] = thread_serv_ite.Get_PlayerMeeples(currentPlayer[0]);
+                        }
+                    }                                              
                     return currentPlayer;
                 }
             }
