@@ -184,30 +184,40 @@ public class DisplaySystem : MonoBehaviour
         bool verif_meeple = false;
         if (right)
         {
-            act_meeple.SlotPos -= 1;
-            if (act_meeple.SlotPos < 0)
-                verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
-            else if (act_meeple.SlotPos >= act_tile.MaxSlot)
-                verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
-            else
-                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
+            int or_slot = act_tile.MaxSlot;
+            do
+            {
+                act_meeple.SlotPos -= 1;
+                or_slot -= 1;
+                if (act_meeple.SlotPos < 0)
+                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
+                else if (act_meeple.SlotPos >= act_tile.MaxSlot)
+                    verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
+                else
+                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
+            } while (!verif_meeple && or_slot > 0);
         }
         else
         {
-            act_meeple.SlotPos += 1;
-            if (act_meeple.SlotPos < 0)
-                verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
-            else if (act_meeple.SlotPos >= act_tile.MaxSlot)
-                verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
-            else
-                verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
+            int or_slot = act_tile.MaxSlot;
+            do
+            {
+                or_slot -= 1;
+                act_meeple.SlotPos += 1;
+                if (act_meeple.SlotPos < 0)
+                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
+                else if (act_meeple.SlotPos >= act_tile.MaxSlot)
+                    verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
+                else
+                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
+            } while (!verif_meeple && or_slot > 0);
         }
 
         if (verif_meeple)
         {
             table.meeplePositionChanged(act_meeple);
+            system_back.sendAction(new DisplaySystemActionMeepleSetCoord(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
         }
-        system_back.sendAction(new DisplaySystemActionMeepleSetCoord(act_tile.Id, act_tile.Pos, act_meeple.Id, act_meeple.SlotPos));
     }
 
     public void tile_poss(bool right)
@@ -246,11 +256,8 @@ public class DisplaySystem : MonoBehaviour
         if (board.setTileAt(new_pos, act_tile))
         {
             table.tilePositionChanged(act_tile);
+            system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
         }
-        else
-        {
-        }
-        system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
     }
 
     public void cancel()
