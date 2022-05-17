@@ -489,7 +489,9 @@ namespace Assets.system
             TileInitParam tileParam;
             Position[] positions;
 
-            for (i = 0; i < 3; i++)
+            int taille = packet.Data.Length;
+
+            for (i = 0; i < taille; i++)
             {
                 id_tuile = Convert.ToInt32(packet.Data[i]);
                 positions = lePlateau.PositionsPlacementPossible((ulong)id_tuile);
