@@ -1640,9 +1640,8 @@ namespace system
             var db = new Database();
             db.RemplirRivieres(rivieresRaw);
 
-            rivieres.Add(rivieresRaw.First());
-            rivieresRaw.RemoveAt(0);
-            var tail = rivieresRaw.Last();
+            rivieresRaw.RemoveAt(0); // Retrait de la première tuile (init, posée auto)
+            var tail = rivieresRaw.Last(); // Mise à part de la dernière (aval)
             rivieresRaw.RemoveAt(rivieresRaw.Count-1);
 
             while(rivieresRaw.Count > 0)
@@ -1651,8 +1650,8 @@ namespace system
                 rivieres.Add(rivieresRaw[index]);
                 rivieresRaw.RemoveAt(index);
             }
-            
-            rivieres.Add(tail);
+
+            rivieres.Insert(0, tail);
 
             //Retourner la liste 
             return rivieres;
