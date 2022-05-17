@@ -645,7 +645,7 @@ namespace system
             // Initialisation des valeurs par défaut
             _mode = Tools.Mode.Default;
             _nb_tuiles = 60;
-            _score_max = -1;
+            _score_max = 50;
             _privee = false; // Une partie est par défaut privée
             _timer_game_value = Tools.Timer.Heure; // Une heure par défaut
             _timer_player_value = Tools.Timer.Minute;
