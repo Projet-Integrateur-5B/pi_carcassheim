@@ -20,9 +20,11 @@ public class PublicRoomMenu : Miscellaneous
     public Semaphore s_listAction;
     private Transform container;
     private Text id_room; //id de la room (pour l'instant : 'X')
-    private List<Player> listPlayers = new List<Player>();
+    private List<Player> listPlayers;
     private ulong nbPlayer = 0;
-    List<PlayerLine> List_of_Player = new List<PlayerLine>();
+    private List<PlayerLine> List_of_Player;
+    private Semaphore s_List_of_Player;
+
     [SerializeField] PlayerLine PlayerLigneModel;
 
     [SerializeField] RoomParameterRepre repre_parameter;
@@ -39,6 +41,10 @@ public class PublicRoomMenu : Miscellaneous
         RoomInfo.Instance.idPartie = Communication.Instance.IdRoom;
         container = GameObject.Find("SubMenus").transform.Find("PublicRoomMenu").transform.Find("Text").transform;
         id_room = container.Find("NumberOfRoom").GetComponent<Text>();
+
+        s_List_of_Player = new Semaphore(1, 1);
+        List_of_Player = new List<PlayerLine>();
+        listPlayers = new List<Player>();
     }
 
     void OnEnable()
@@ -58,6 +64,20 @@ public class PublicRoomMenu : Miscellaneous
     private void TableauPlayer(List<Player> listPlayers)
     {
         PlayerLine model = PlayerLigneModel;
+        SuppressionTableauPlayer();
+
+        s_List_of_Player.WaitOne();
+        List_of_Player.Clear();
+        int taille = listPlayers.Count;
+        for (int i = 0; i < taille; i ++)
+        {
+            List_of_Player.Add(CreatePlayerLine(model, listPlayers[i].name, listPlayers[i].status));
+        }
+        s_List_of_Player.Release();
+    }
+
+    private void SuppressionTableauPlayer()
+    {
         if (List_of_Player != null)
         {
             foreach (PlayerLine player in List_of_Player)
@@ -65,14 +85,6 @@ public class PublicRoomMenu : Miscellaneous
                 player.killPlayerLine();
             }
         }
-
-        List_of_Player.Clear();
-        int taille = listPlayers.Count;
-        for (int i = 0; i < taille; i ++)
-        {
-            List_of_Player.Add(CreatePlayerLine(model, listPlayers[i].name, listPlayers[i].status));
-        }
-
     }
 
     /// <summary>
@@ -99,6 +111,9 @@ public class PublicRoomMenu : Miscellaneous
                 packet.IdRoom = Communication.Instance.IdRoom;
                 packet.Data = Array.Empty<string>();
                 Communication.Instance.SendAsync(packet);
+
+                List_of_Player = new List<PlayerLine>();
+                listPlayers = new List<Player>();
                 break;
             default:
                 /* Ce n'est pas la bonne page */
@@ -106,6 +121,9 @@ public class PublicRoomMenu : Miscellaneous
                 Communication.Instance.StopListening(OnPacketReceived);
                 Debug.Log("adzzijubg");
                 repre_parameter.IsInititialized = false;
+
+                listPlayers.Clear();
+                SuppressionTableauPlayer();
                 break;
         }
     }
@@ -156,6 +174,21 @@ public class PublicRoomMenu : Miscellaneous
 
         Communication.Instance.IsInRoom = 1;
         Communication.Instance.SendAsync(packet);
+
+        s_listAction.WaitOne();
+        listAction.Add("playerInfo");
+        s_listAction.Release();
+
+        int i;
+        s_List_of_Player.WaitOne();
+        for (i = 0; i < (int)nbPlayer; i++)
+        {
+            if (listPlayers[i].id == packet.IdPlayer)
+            {
+                listPlayers[i].status = !listPlayers[i].status;
+            }
+        }
+        s_List_of_Player.Release();
     }
     public void onReady()
     {
@@ -183,7 +216,6 @@ public class PublicRoomMenu : Miscellaneous
             preparer.text = "NOT READY";
         else if (OptionsMenu.langue == 2)
             preparer.text = "NICHT BEREIT";
-
     }
 
     /// <summary>
@@ -205,7 +237,9 @@ public class PublicRoomMenu : Miscellaneous
         }
         else if (packet.IdMessage == Tools.IdMessage.PlayerJoin)
         {
+            ulong id = Communication.Instance.IdClient;
             string name = Communication.Instance.Name;
+            bool status = false;
             if (packet.IdPlayer == Communication.Instance.IdClient)
             {
                 Packet packet1 = new Packet();
@@ -218,14 +252,28 @@ public class PublicRoomMenu : Miscellaneous
             }
             else
             {
-                name = packet.Data[0];
+                id = ulong.Parse(packet.Data[0]);
+                name = packet.Data[1];
+
+                switch (packet.Data[2])
+                {
+                    case "true":
+                        status = true; 
+                        break;
+                    default:
+                        status = false;
+                        break;
+                }
             }
 
             s_listAction.WaitOne();
             listAction.Add("playerInfo");
             s_listAction.Release();
 
-            listPlayers.Add(new Player(packet.IdPlayer, name, false));
+            s_List_of_Player.WaitOne();
+            listPlayers.Add(new Player(id, name, status));
+            s_List_of_Player.Release();
+
             nbPlayer++;
         }
         else if (packet.IdMessage == Tools.IdMessage.PlayerLeave)
@@ -235,6 +283,7 @@ public class PublicRoomMenu : Miscellaneous
             s_listAction.Release();
 
             int i;
+            s_List_of_Player.WaitOne();
             for (i = 0; i < (int)nbPlayer; i++)
             {
                 if (listPlayers[i].id == packet.IdPlayer)
@@ -242,6 +291,7 @@ public class PublicRoomMenu : Miscellaneous
                     listPlayers.RemoveAt(i);
                 }
             }
+            s_List_of_Player.Release();
             nbPlayer--;
         }
         else if (packet.IdMessage == Tools.IdMessage.RoomSettingsGet)
@@ -256,17 +306,22 @@ public class PublicRoomMenu : Miscellaneous
 
         else if (packet.IdMessage == Tools.IdMessage.PlayerReady)
         {
-            s_listAction.WaitOne();
-            listAction.Add("playerInfo");
-            s_listAction.Release();
-
-            int i;
-            for(i = 0; i < (int)nbPlayer; i++)
+            if(packet.IdPlayer != Communication.Instance.IdClient)
             {
-                if (listPlayers[i].id == packet.IdPlayer)
+                s_listAction.WaitOne();
+                listAction.Add("playerInfo");
+                s_listAction.Release();
+
+                int i;
+                s_List_of_Player.WaitOne();
+                for (i = 0; i < (int)nbPlayer; i++)
                 {
-                    listPlayers[i].status = !listPlayers[i].status;
+                    if (listPlayers[i].id == packet.IdPlayer)
+                    {
+                        listPlayers[i].status = !listPlayers[i].status;
+                    }
                 }
+                s_List_of_Player.Release();
             }
         }
     }
@@ -303,6 +358,7 @@ public class PublicRoomMenu : Miscellaneous
         {
             s_listAction.WaitOne();
             string choixAction = listAction[0];
+            listAction.Clear();
             s_listAction.Release();
 
             switch (choixAction)
@@ -314,12 +370,9 @@ public class PublicRoomMenu : Miscellaneous
                 case "playerInfo":
                     /* Update l'affichage */
                     TableauPlayer(listPlayers);
+
                     break;
             }
-
-            s_listAction.WaitOne();
-            listAction.Clear();
-            s_listAction.Release();
         }
     }
 }

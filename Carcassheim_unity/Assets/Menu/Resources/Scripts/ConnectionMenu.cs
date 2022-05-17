@@ -60,6 +60,7 @@ public class ConnectionMenu : Miscellaneous
         {
             case "ConnectionMenu":
                 /* Commuication Async */
+                Communication.Instance.IsInRoom = 0;
                 Communication.Instance.StartListening(OnPacketReceived);
                 ClearAll(null);
                 break;

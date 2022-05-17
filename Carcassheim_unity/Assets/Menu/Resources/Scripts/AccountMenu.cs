@@ -82,6 +82,7 @@ public class AccountMenu : Miscellaneous
         {
             case "AccountMenu":
                 /* Commuication Async */
+                Communication.Instance.IsInRoom = 0;
                 Communication.Instance.StartListening(OnPacketReceived);
                 ClearAll(null);
                 break;
