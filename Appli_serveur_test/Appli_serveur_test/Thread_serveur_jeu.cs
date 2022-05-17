@@ -1646,7 +1646,14 @@ namespace system
             Console.WriteLine("/!\\ DBG - Random_sort_rivi : tail is " + tail.ToString());
             rivieresRaw.RemoveAt(rivieresRaw.Count-1);
 
-            while(rivieresRaw.Count > 0)
+            // DEBUG
+            Console.WriteLine("/!\\ DBG - rivieresRaw = [");
+            foreach(ulong idTuile in rivieresRaw){
+                Console.Write("" + idTuile.ToString() + ", ");
+            }
+            Console.Write("]");
+
+            while (rivieresRaw.Count > 0)
             {
                 var index = random.Next(0, rivieresRaw.Count);
                 rivieres.Add(rivieresRaw[index]);
@@ -1654,6 +1661,14 @@ namespace system
             }
 
             rivieres.Insert(0, tail);
+
+            // DEBUG
+            Console.WriteLine("/!\\ DBG - rivieres = [");
+            foreach (ulong idTuile in rivieres)
+            {
+                Console.Write("" + idTuile.ToString() + ", ");
+            }
+            Console.Write("]");
 
             //Retourner la liste 
             return rivieres;
