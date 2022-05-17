@@ -964,7 +964,7 @@ namespace system
                 _timer_game = new System.Timers.Timer();
                 _timer_game.Interval = 1000;
                 _timer_game.Elapsed += OnTimedEventGame;
-                _DateTime_player = DateTime.Now;
+                _DateTime_game = DateTime.Now;
                 _timer_game.AutoReset = true;
                 _timer_game.Enabled = true;
             }
@@ -1060,18 +1060,30 @@ namespace system
 
         /// <summary>
         ///     Method : Shuffles the list of game's tiles
+        ///     Draw new set of tile if not in default mode
         /// </summary>
         public void ShuffleTilesGame()
         {
             _s_tuilesGame.WaitOne();
 
             List<ulong> tuilesGame_resultat = new List<ulong>();
-            var rnd = new System.Random();
-            var randomedList = _tuilesGame.OrderBy(item => rnd.Next());
-            foreach (var value in randomedList)
-            {
-                tuilesGame_resultat.Add(value);
+
+            if (_tuilesGame.Count() != 0)
+            {             
+                var rnd = new System.Random();
+                var randomedList = _tuilesGame.OrderBy(item => rnd.Next());
+                foreach (var value in randomedList)
+                {
+                    tuilesGame_resultat.Add(value);
+                }
             }
+            else{
+                if(_mode != Tools.Mode.Default)
+                {
+                    tuilesGame_resultat = Random_sort_tuiles(_nb_tuiles);
+                }
+            }
+            
             
             _tuilesGame = tuilesGame_resultat;
             _s_tuilesGame.Release();
