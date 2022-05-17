@@ -178,7 +178,8 @@ public class PublicRoomMenu : Miscellaneous
 
         int i;
         s_List_of_Player.WaitOne();
-        for (i = 0; i < (int)nbPlayer; i++)
+        int taille = listPlayers.Count;
+        for (i = 0; i < taille; i++)
         {
             if (listPlayers[i].id == packet.IdPlayer)
             {
@@ -270,8 +271,6 @@ public class PublicRoomMenu : Miscellaneous
             s_List_of_Player.WaitOne();
             listPlayers.Add(new Player(id, name, status));
             s_List_of_Player.Release();
-
-            nbPlayer++;
         }
         else if (packet.IdMessage == Tools.IdMessage.PlayerLeave)
         {
@@ -281,15 +280,16 @@ public class PublicRoomMenu : Miscellaneous
 
             int i;
             s_List_of_Player.WaitOne();
-            for (i = 0; i < (int)nbPlayer; i++)
+            int taille = listPlayers.Count;
+            for (i = 0; i < taille; i++)
             {
                 if (listPlayers[i].id == packet.IdPlayer)
                 {
                     listPlayers.RemoveAt(i);
+                    break;
                 }
             }
             s_List_of_Player.Release();
-            nbPlayer--;
         }
         else if (packet.IdMessage == Tools.IdMessage.RoomSettingsGet)
         {
@@ -311,7 +311,8 @@ public class PublicRoomMenu : Miscellaneous
 
                 int i;
                 s_List_of_Player.WaitOne();
-                for (i = 0; i < (int)nbPlayer; i++)
+                int taille = listPlayers.Count;
+                for (i = 0; i < taille; i++)
                 {
                     if (listPlayers[i].id == packet.IdPlayer)
                     {
