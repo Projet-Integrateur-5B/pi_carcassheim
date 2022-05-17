@@ -25,6 +25,8 @@ public class RoomSelectionMenu : Miscellaneous
     public List<string> listAction;
     public List<bool> RoomChangeAction = new List<bool>();
     public Semaphore s_listAction;
+    private bool isVisible = false;
+    private DateTime lastTime;
 
     [SerializeField] RoomLine roomline_model;
 
@@ -94,12 +96,15 @@ public class RoomSelectionMenu : Miscellaneous
                 /* Commuication Async */
                 Communication.Instance.StartListening(OnPacketReceived);
                 LoadRoomInfo();
+                isVisible = true;
+                lastTime = DateTime.Now;
                 break;
             default:
                 RoomChangeAction.Clear();
                 /* Ce n'est pas la bonne page */
                 /* Stop la reception dans cette class */
                 Communication.Instance.StopListening(OnPacketReceived);
+                isVisible = false;
                 break;
         }
     }
@@ -160,6 +165,7 @@ public class RoomSelectionMenu : Miscellaneous
         packet.IdPlayer = Communication.Instance.IdClient;
         packet.Data = Array.Empty<string>();
         Communication.Instance.IsInRoom = 0;
+
         Communication.Instance.SendAsync(packet);
     }
 
@@ -199,6 +205,16 @@ public class RoomSelectionMenu : Miscellaneous
     /// </summary>
     void Update()
     {
+        if (isVisible)
+        {
+            TimeSpan diffTemps = DateTime.Now - lastTime;
+            if(diffTemps > TimeSpan.FromSeconds(10))
+            {
+                lastTime = DateTime.Now;
+                LoadRoomInfo();
+            }
+        }
+
         s_listAction.WaitOne();
         int taille = listAction.Count;
         s_listAction.Release();
