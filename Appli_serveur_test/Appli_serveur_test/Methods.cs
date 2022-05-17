@@ -463,7 +463,7 @@ public partial class Server
         // Attempt to add a player to the room.
         Tools.Errors errors = gestionnaire.JoinPlayer(packetReceived.IdRoom, packetReceived.IdPlayer, socket);
 
-        if(errors != Tools.Errors.None)
+        if(errors == Tools.Errors.None)
             packet.Data = gestionnaire.CallPlayersStatus(packetReceived.IdRoom);
 
         packet.Error = errors;
