@@ -613,18 +613,22 @@ namespace Assets.system
                 play_of_this_turn = new TurnPlayParam(id_tile, new PositionRepre(x_tile, y_tile, r_tile), id_meeple, pos_meeple);
                 if (id_tile != -1)
                     lePlateau.PoserTuileFantome((ulong)id_tile, new Position(x_tile, y_tile, r_tile));
-                if (id_meeple != -1)
+                if (id_meeple != -1 && id_meeple != -1)
                     lePlateau.PoserPion(nextPlayer, x_tile, y_tile, (ulong)pos_meeple);
-                lePlateau.ValiderTour();
 
-                if (lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones))
+                if (id_tile != -1)
                 {
-                    Debug.Log("slowday");
-                    lePlateau.RemoveAllPawnInTile(x_tile, y_tile, meeple_positions);
-                }
+                    lePlateau.ValiderTour();
 
-                gains.Clear();
-                zones.Clear();
+                    if (lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones))
+                    {
+                        Debug.Log("slowday");
+                        lePlateau.RemoveAllPawnInTile(x_tile, y_tile, meeple_positions);
+                    }
+
+                    gains.Clear();
+                    zones.Clear();
+                }
 
                 int taille = playerList.Length;
                 for (int j = 0; j < taille; j++)
