@@ -218,6 +218,7 @@ namespace system
                     lock (_lock_id_parties_gerees)
                     {
                         var idToRemove = _id_parties_gerees.Single(id => id.Equals(roomId));
+                        thread_serv_ite.stopRoomTimer();
                         _id_parties_gerees.Remove(idToRemove);
                     }
                     break;

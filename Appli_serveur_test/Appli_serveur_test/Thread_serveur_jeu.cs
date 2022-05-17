@@ -931,6 +931,8 @@ namespace system
         /// <returns> Returns the id of the initial tile  </returns>
         public ulong StartGame()
         {
+            stopRoomTimer();
+            
             _statut_partie = Tools.GameStatus.Running;
 
             // Génération du dicoTuile de la classe tuile
@@ -1083,13 +1085,19 @@ namespace system
             Console.WriteLine(DateTime.Now.Subtract(_DateTime_room).Seconds);
         }
         
+        public void stopRoomTimer()
+        {
+            Console.WriteLine("========== STOP TIMER ==========");
+            _timer_room.Stop();
+        }
+        
         /// <summary>
         ///     Methode : Event when room timer expires (CloseRoom()) .
         /// </summary>
         private void OnTimedEventRoom(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_room).Minutes;
-            Console.WriteLine(diff + " " + 60 / 60);
+            Console.WriteLine(diff + " " + 30 / 60);
             if (diff < 60 / 60) return; // 1800 -> 30 minutes
             
             Console.WriteLine("Room was raised at {0}. CloseRoom() is called", e.SignalTime);
