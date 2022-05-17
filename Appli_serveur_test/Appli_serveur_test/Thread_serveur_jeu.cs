@@ -721,12 +721,12 @@ namespace system
                 _s_nombre_joueur.Release();
                 if (id_joueur == _id_moderateur)
                 {
-                    if (_dico_joueur.Count != 0)
+                    if (_dico_joueur.Count > 1)
                     {
                         _id_moderateur = _dico_joueur.First().Key;
                     }
                     else
-                    {/* Il n'y a plus personne dans la room */
+                    {/* Il n'y a plus qu'un seul joueur ou moins dans la room */
                         _statut_partie = Tools.GameStatus.Stopped;
                     }
                 }
