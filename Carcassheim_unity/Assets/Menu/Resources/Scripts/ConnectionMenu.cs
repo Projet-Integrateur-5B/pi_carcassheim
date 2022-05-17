@@ -94,8 +94,6 @@ public class ConnectionMenu : Miscellaneous
     /// </summary>
     public void HideConnection()
     {
-
-
         HidePopUpOptions();
         ResetWarningTextCM();
         ChangeMenu("ConnectionMenu", "HomeMenu");
@@ -160,7 +158,6 @@ public class ConnectionMenu : Miscellaneous
     /// </summary>
     public void Connect()
     {
-
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.AccountLogin;
         packet.IdPlayer = 0;
@@ -179,7 +176,6 @@ public class ConnectionMenu : Miscellaneous
     /// <param name = "packet">Packet.</param>
     public void OnPacketReceived(object sender, Packet packet)
     {
-
         bool res = false;
         if (packet.IdMessage == Tools.IdMessage.AccountLogin)
         {

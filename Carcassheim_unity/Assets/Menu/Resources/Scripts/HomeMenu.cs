@@ -25,6 +25,9 @@ public class HomeMenu : Miscellaneous
 		ColorUtility.TryParseHtmlString("#808080", out btnInactivColor);
 		HCB.Find("ShowRoomSelection").GetComponent<Button>().GetComponentInChildren<Text>().color = btnInactivColor;
 		HCB.Find("ShowStat").GetComponent<Button>().GetComponentInChildren<Text>().color = btnInactivColor;
+
+		if (Communication.Instance.IdClient >= 1)
+			Connected();
 	}
 
 	/// <summary>
@@ -49,8 +52,11 @@ public class HomeMenu : Miscellaneous
 	/// </summary>
 	public void ShowRoomSelection()
 	{
-		ChangeMenu("HomeMenu", "RoomSelectionMenu");
-	/* SceneManager.LoadScene("InGame"); */
+		if (Communication.Instance.IdClient >= 1)
+			ChangeMenu("HomeMenu", "RoomSelectionMenu");
+		else
+			ChangeMenu("HomeMenu", "ConnectionMenu");
+		/* SceneManager.LoadScene("InGame"); */
 	}
 
 	/// <summary>
@@ -58,7 +64,10 @@ public class HomeMenu : Miscellaneous
 	/// </summary>
 	public void ShowOptions()
 	{
-		ChangeMenu("HomeMenu", "OptionsMenu");
+		if (Communication.Instance.IdClient >= 1)
+			ChangeMenu("HomeMenu", "OptionsMenu");
+		else
+			ChangeMenu("HomeMenu", "ConnectionMenu");
 	}
 
 	/// <summary>
@@ -66,7 +75,10 @@ public class HomeMenu : Miscellaneous
 	/// </summary>
 	public void ShowStat()
 	{
-		ChangeMenu("HomeMenu", "StatMenu");
+		if (Communication.Instance.IdClient >= 1)
+			ChangeMenu("HomeMenu", "StatMenu");
+		else
+			ChangeMenu("HomeMenu", "ConnectionMenu");
 	}
 
 	/// <summary>
