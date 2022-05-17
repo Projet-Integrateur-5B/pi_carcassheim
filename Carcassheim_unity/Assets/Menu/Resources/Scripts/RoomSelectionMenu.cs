@@ -25,6 +25,9 @@ public class RoomSelectionMenu : Miscellaneous
     public List<string> listAction;
     public List<bool> RoomChangeAction = new List<bool>();
     public Semaphore s_listAction;
+
+    [SerializeField] RoomLine roomline_model;
+
     /// <summary>
     ///     Start is called before the first frame update <see cref = "RoomSelectionMenu"/> class.
     /// </summary>
@@ -53,7 +56,7 @@ public class RoomSelectionMenu : Miscellaneous
     /// </summary>
     private void TableauRoom()
     {
-        RoomLine model = FindObject(gameObject, "ROOMLINE").GetComponent<RoomLine>();
+        RoomLine model = roomline_model;
         if (List_of_Rooms != null)
         {
             foreach (RoomLine room in List_of_Rooms)

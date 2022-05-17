@@ -53,8 +53,9 @@ public class AccountMenu : Miscellaneous
 		tmpGO = GameObject.Find("Create Account");
 		tmpText = tmpGO.GetComponent<Text>();
 		*/
-        errorText.outlineWidth = 0.3f;
-        errorText.outlineColor = new Color32(255, 128, 0, 255);
+
+        // errorText.outlineWidth = 0.3f;
+        // errorText.outlineColor = new Color32(255, 128, 0, 255);
     }
 
     void OnEnable()
@@ -162,7 +163,7 @@ public class AccountMenu : Miscellaneous
         int day = dayCA.endValue(), month = monthCA.endValue(), year = yearCA.endValue();
         System.DateTime date;
         bool valid_date = System.DateTime.TryParse("" + day + "/" + month + "/" + year, out date);
-        
+
         if (name_is_empty)
         {
             switch (OptionsMenu.langue)
@@ -247,7 +248,7 @@ public class AccountMenu : Miscellaneous
             }
             errorText.gameObject.SetActive(true);
         }
-        
+
         else if (!boolCGU)
         {
             switch (OptionsMenu.langue)
@@ -264,7 +265,7 @@ public class AccountMenu : Miscellaneous
             }
             errorText.gameObject.SetActive(true);
         }
-        
+
         return valid_pass && boolCGU && !is_empty && !mail_is_empty && !name_is_empty && valid_date;
     }
 

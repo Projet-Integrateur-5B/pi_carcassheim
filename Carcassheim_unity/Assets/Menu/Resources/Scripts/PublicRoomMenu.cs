@@ -45,7 +45,8 @@ public class PublicRoomMenu : Miscellaneous
     void OnDisable()
     {
         Debug.Log("OSKOUR");
-        RoomInfo.Instance.repre_parameter.IsInititialized = false;
+        if (RoomInfo.Instance.repre_parameter != null)
+            RoomInfo.Instance.repre_parameter.IsInititialized = false;
         OnMenuChange -= OnStart;
     }
 

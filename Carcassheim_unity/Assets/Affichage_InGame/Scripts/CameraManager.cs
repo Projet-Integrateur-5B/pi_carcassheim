@@ -110,11 +110,13 @@ public class CameraManager : MonoBehaviour
                 {
                     original_dist = (v0.position - v1.position).magnitude;
                     last_scroll++;
+                    Debug.Log("DIOSTANCE " + original_dist);
                     return true;
                 }
                 else
                 {
                     float dist = (v0.position - v1.position).magnitude;
+                    Debug.Log("DIOSTANCE " + dist + " / " + original_dist);
                     delta = original_dist / dist - 1;
                 }
             }
