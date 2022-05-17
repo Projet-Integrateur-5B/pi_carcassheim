@@ -505,7 +505,7 @@ namespace system
             {
                 foreach (Thread_serveur_jeu threadJeu in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != threadJeu.Get_ID() || threadJeu.Get_Dico_Joueurs().ContainsKey(idPlayer)) continue;
+                    if (idRoom != threadJeu.Get_ID() || threadJeu.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
                     return threadJeu.GetThreeLastTiles();
                 }                  
             }
