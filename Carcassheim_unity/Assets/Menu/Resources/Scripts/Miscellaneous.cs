@@ -110,6 +110,12 @@ public abstract class Miscellaneous : MonoBehaviour
         Pop_up_Options.SetActive(GetPanelOpen());
     }
 
+    public void SwitchPopUpOption()
+    {
+        SetPanelOpen(!GetPanelOpen());
+        Pop_up_Options.SetActive(GetPanelOpen());
+    }
+
     /// <summary>
     ///     Set the opening or closing of the panel <see cref = "Miscellaneous"/> class.
     /// </summary>

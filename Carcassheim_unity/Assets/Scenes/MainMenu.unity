@@ -4002,7 +4002,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 226543627}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1316006436}
+        m_TargetAssemblyTypeName: Miscellaneous, Assembly-CSharp
+        m_MethodName: SwitchPopUpOption
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &226543627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5032,7 +5044,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1316006440}
         m_TargetAssemblyTypeName: Miscellaneous, Assembly-CSharp
-        m_MethodName: HidePopUpOptions
+        m_MethodName: SwitchPopUpOption
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9342,7 +9354,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 586456489}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1316006441}
+        m_TargetAssemblyTypeName: Miscellaneous, Assembly-CSharp
+        m_MethodName: SwitchPopUpOption
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &586456489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10074,13 +10098,13 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 1316006433}
+        m_TargetAssemblyTypeName: Miscellaneous, Assembly-CSharp
+        m_MethodName: SwitchPopUpOption
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -10600,7 +10624,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1416065376}
   m_HandleRect: {fileID: 1416065375}
   m_Direction: 3
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -11506,7 +11530,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 694409292}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1316006434}
+        m_TargetAssemblyTypeName: Miscellaneous, Assembly-CSharp
+        m_MethodName: SwitchPopUpOption
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &694409292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12702,7 +12738,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 753251492}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1316006439}
+        m_TargetAssemblyTypeName: Miscellaneous, Assembly-CSharp
+        m_MethodName: SwitchPopUpOption
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &753251492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16076,7 +16124,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1017312485}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1316006435}
+        m_TargetAssemblyTypeName: OptionsMenu, Assembly-CSharp
+        m_MethodName: SwitchSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1017312485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21089,7 +21149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   loading_screen: {fileID: 1657837786}
 --- !u!114 &1316006433
 MonoBehaviour:
@@ -21104,7 +21164,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   listAction: []
   RoomChangeAction: 
   roomline_model: {fileID: 1967885026}
@@ -21121,7 +21181,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   listAction: []
   PlayerLigneModel: {fileID: 759389817}
   repre_parameter: {fileID: 1942108292}
@@ -21138,7 +21198,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   toggle_french: {fileID: 0}
   toggle_english: {fileID: 0}
   toggle_german: {fileID: 0}
@@ -21155,7 +21215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   listAction: 
 --- !u!114 &1316006437
 MonoBehaviour:
@@ -21170,7 +21230,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
 --- !u!114 &1316006438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21184,7 +21244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
 --- !u!114 &1316006439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21198,7 +21258,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   listAction: 
   repre_parameter: {fileID: 1942108292}
   nb_player: {fileID: 1810420964}
@@ -21216,7 +21276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   listAction: 
 --- !u!114 &1316006441
 MonoBehaviour:
@@ -21231,7 +21291,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   absolute_parent: {fileID: 652466074}
-  Pop_up_Options: {fileID: 0}
+  Pop_up_Options: {fileID: 1433086384}
   dayCA: {fileID: 2058970542}
   monthCA: {fileID: 2120808348}
   yearCA: {fileID: 1191399189}
@@ -22705,7 +22765,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1409770276}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1316006435}
+        m_TargetAssemblyTypeName: OptionsMenu, Assembly-CSharp
+        m_MethodName: SwitchMusic
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1409770276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22777,7 +22849,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -29666,8 +29738,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 43.172}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1256, y: -124}
-  m_SizeDelta: {x: 170, y: 109.5453}
+  m_AnchoredPosition: {x: 1268, y: -129}
+  m_SizeDelta: {x: 256.39, y: 150.777}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1939247252
 Animator:
@@ -29715,15 +29787,13 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 80
-    m_Alignment: 0
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Alpha
-
-'
+  m_Text: Final
 --- !u!222 &1939247254
 CanvasRenderer:
   m_ObjectHideFlags: 0
