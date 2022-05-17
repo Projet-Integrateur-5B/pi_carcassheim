@@ -1025,15 +1025,18 @@ namespace system
             _s_dico_joueur.Release();
 
             string[] dataPlayToSend = ParseStoredPlayToData();
-            // Force the end of the turn
-            gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
+            
 
             // Kick après la fin du tour (pour éviter les erreurs)
-            if (_dico_joueur[idPlayer]._timer > 3)
-            {
-                
+            if (_dico_joueur[idPlayer]._timer > 2)
+            {         
                 gestionnaire.CallPlayerKick(_id_partie, idPlayer, dataPlayToSend);
 
+            }
+            else // Sinon fin de tour forcée classique
+            {
+                // Force the end of the turn
+                gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
             }
         }
 
