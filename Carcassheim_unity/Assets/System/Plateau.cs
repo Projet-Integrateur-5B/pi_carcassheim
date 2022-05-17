@@ -29,6 +29,7 @@ namespace Assets.system
     };
     public class Plateau
     {
+        private static Tuile decoyTuile;
         /// <summary>
         /// le dernier virage de la riviere
         /// </summary>
@@ -81,6 +82,7 @@ namespace Assets.system
             _dicoTuile = dicoTuiles;
             ChampsOuDesPionsOntEtePoses = new List<(int, int, ulong)>();
             AbbayeIncomplete = new List<(int, int)>();
+            decoyTuile = Tuile.Copy(_dicoTuile[0]);
         }
 
         /// <summary>
@@ -93,7 +95,7 @@ namespace Assets.system
             _dicoTuile = new Dictionary<ulong, Tuile>();
             ChampsOuDesPionsOntEtePoses = new List<(int, int, ulong)>();
             AbbayeIncomplete = new List<(int, int)>();
-
+            decoyTuile = Tuile.Copy(_dicoTuile[0]);
         }
 
         /// <summary>
@@ -118,12 +120,21 @@ namespace Assets.system
         /// <returns>la tuile aux coordonnees (x, y)</returns>
         public Tuile GetTuile(int x, int y)
         {
-            foreach (var item in _tuiles)
-            {
-                if (item.X == x && item.Y == y)
-                    return item;
-            }
-            return null;
+            //foreach (var item in _tuiles)
+            //{
+            //    if (item.X == x && item.Y == y)
+            //        return item;
+            //}
+            //return null;
+
+            decoyTuile.X = x;
+            decoyTuile.Y = y;
+            //Tuile.Compare<Tuile> tuileComparer = Tuile.CompareTuile;
+            //IComparer<Tuile> tuileComparer = Tuile.CompareTuile;
+            int i = _tuiles.BinarySearch(decoyTuile, decoyTuile);
+            if (i < 0)
+                return null;
+            return _tuiles[i];
         }
 
         /// <summary>
@@ -186,6 +197,7 @@ namespace Assets.system
             tuile.Y = y;
             tuile.Rotation = rot;
             _tuiles.Add(tuile);
+            _tuiles.Sort(tuile);
 
             if (tuile.Riviere)
             {
