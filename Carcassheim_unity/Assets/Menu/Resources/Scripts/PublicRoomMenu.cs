@@ -262,9 +262,9 @@ public class PublicRoomMenu : Miscellaneous
                 for (i = 0; i < taille; i += 3)
                 {
                     id = ulong.Parse(packet.Data[i]);
-                    name = packet.Data[i+1];
+                    name = packet.Data[i + 1];
 
-                    switch (packet.Data[i+2])
+                    switch (packet.Data[i + 2])
                     {
                         case "true":
                             status = true;
@@ -321,7 +321,7 @@ public class PublicRoomMenu : Miscellaneous
 
         else if (packet.IdMessage == Tools.IdMessage.PlayerReady)
         {
-            if(packet.IdPlayer != Communication.Instance.IdClient)
+            if (packet.IdPlayer != Communication.Instance.IdClient)
             {
                 s_listAction.WaitOne();
                 listAction.Add("playerInfo");
@@ -339,6 +339,12 @@ public class PublicRoomMenu : Miscellaneous
                 }
                 s_List_of_Player.Release();
             }
+        }
+        else if (packet.IdMessage == Tools.IdMessage.PlayerKick)
+        {
+            s_listAction.WaitOne();
+            listAction.Add("kickplayer");
+            s_listAction.Release();
         }
     }
 
@@ -386,7 +392,9 @@ public class PublicRoomMenu : Miscellaneous
                 case "playerInfo":
                     /* Update l'affichage */
                     TableauPlayer(listPlayers);
-
+                    break;
+                case "kickplayer":
+                    HideRoom();
                     break;
             }
         }

@@ -206,7 +206,6 @@ namespace Assets.system
                 CheckDirectionRiviere(tuile, x, y, rot, out temp);
                 if (temp != 0)
                     _lastRiverTurn = temp;
-                Debug.Log("Derniere tournant de la riviere : " + _lastRiverTurn);
             }
 
             bool abbaye = false;
@@ -376,8 +375,6 @@ namespace Assets.system
                 tuile.TuileFantome = false;
                 _tuileFantome = null;
             }
-            else
-                Debug.LogWarning("pas de tuile fantome trouvee");
         }
 
         /// <summary>
@@ -443,8 +440,6 @@ namespace Assets.system
         /// <returns>un tableau de toutes les positions ou une tuile est posable</returns>
         public Position[] PositionsPlacementPossible(Tuile tuile)
         {
-            if (tuile.Riviere)
-                Debug.Log("Ou cette tuile riviere est placable ? \n" + tuile.ToString());
             var listTuiles = new List<Tuile>();
 
             foreach (var item in _tuiles)
@@ -652,7 +647,6 @@ namespace Assets.system
             {
                 if (ZoneFermeeForSlot(x, y, i))
                 {
-                    Debug.LogWarning("Une Zone a ete fermee");
                     ulong[] gagnants;
                     int point = CompteurPoints.CompterZoneFerme(x, y, (int)i, out gagnants);
                     foreach (ulong id_joueur in gagnants)
@@ -714,7 +708,6 @@ namespace Assets.system
 
             if (emplacementVide)
             {
-                Debug.Log("emplacement vide sur tuile d'id : " + tuile.Id);
                 return false;
             }
 
@@ -755,7 +748,6 @@ namespace Assets.system
             }
             catch (Exception e)
             {
-                Debug.Log("idSlot = " + idSlot);
                 throw new Exception(e.Message + " (probablement la faute de Justin)");
             }
             List<int> positionsInternesProchainesTuilesTemp = new List<int>();

@@ -539,15 +539,12 @@ public class FalseBack : CarcasheimBack
 
     override public void sendTile(TurnPlayParam play)
     {
-        Debug.Log("Am i looking likethis");
         if (num_turn + 1 >= nb_turn)
         {
-            Debug.Log("Merde");
             system_display.setNextState(DisplaySystemState.endOfGame);
         }
         else
         {
-            Debug.Log("Score + turn");
             system_display.setNextState(DisplaySystemState.scoreChange);
         }
     }

@@ -85,7 +85,6 @@ public class PlayerLine : MonoBehaviour
     {
         if (!destroyed)
         {
-            Debug.Log("KILL ME");
             destroyed = true;
             gameObject.SetActive(false);
         }

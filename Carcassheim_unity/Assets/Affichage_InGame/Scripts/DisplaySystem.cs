@@ -185,35 +185,29 @@ public class DisplaySystem : MonoBehaviour
         if (right)
         {
             int or_slot = act_tile.MaxSlot;
+            int slot = act_meeple.SlotPos;
             Debug.Log(" " + or_slot);
             do
             {
-                act_meeple.SlotPos -= 1;
                 or_slot -= 1;
-                Debug.Log(" " + or_slot + " " + act_meeple.SlotPos);
-                if (act_meeple.SlotPos < 0)
-                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
-                else if (act_meeple.SlotPos >= act_tile.MaxSlot)
-                    verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
-                else
-                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
+                slot = (slot - 1 + act_tile.MaxSlot) % act_tile.MaxSlot;
+                act_meeple.SlotPos = -1;
+                verif_meeple = act_tile.setMeeplePos(act_meeple, slot);
+                verif_meeple = slot == act_meeple.SlotPos;
             } while (!verif_meeple && or_slot > 0);
         }
         else
         {
             int or_slot = act_tile.MaxSlot;
+            int slot = act_meeple.SlotPos;
             Debug.Log(" " + or_slot);
             do
             {
                 or_slot -= 1;
-                act_meeple.SlotPos += 1;
-                Debug.Log(" " + or_slot + " " + act_meeple.SlotPos);
-                if (act_meeple.SlotPos < 0)
-                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_tile.MaxSlot - 1); // On va à droite donc on prend la dernière position possible
-                else if (act_meeple.SlotPos >= act_tile.MaxSlot)
-                    verif_meeple = act_tile.setMeeplePos(act_meeple, 0);
-                else
-                    verif_meeple = act_tile.setMeeplePos(act_meeple, act_meeple.SlotPos);
+                slot = (slot + 1) % act_tile.MaxSlot;
+                act_meeple.SlotPos = -1;
+                verif_meeple = act_tile.setMeeplePos(act_meeple, slot);
+                verif_meeple = slot == act_meeple.SlotPos;
             } while (!verif_meeple && or_slot > 0);
         }
 

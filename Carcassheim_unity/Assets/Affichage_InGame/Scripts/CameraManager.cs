@@ -116,7 +116,6 @@ public class CameraManager : MonoBehaviour
 
     bool checkZoom()
     {
-        Debug.Log("MEN IT'S WORKING " + Input.touchCount);
         if (error_text != null)
             error_text.text = "MEN IT'S WORKING " + Input.touchCount;
         bool no_count = false;
@@ -130,7 +129,6 @@ public class CameraManager : MonoBehaviour
             {
                 original_dist = (v0.position - v1.position).magnitude;
                 last_scroll++;
-                Debug.Log("DIOSTANCE " + original_dist);
                 if (error_text != null)
                     error_text.text = "DIOSTANCE " + original_dist;
                 return true;
@@ -138,7 +136,6 @@ public class CameraManager : MonoBehaviour
             else
             {
                 float dist = (v0.position - v1.position).magnitude;
-                Debug.Log("DIOSTANCE " + dist + " / " + original_dist);
                 if (error_text != null)
                     error_text.text = "DIOSTANCE " + dist + " / " + original_dist;
                 delta = original_dist / dist - 1;
