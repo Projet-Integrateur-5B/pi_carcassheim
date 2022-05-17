@@ -43,13 +43,11 @@ public class RoomSelectionMenu : Miscellaneous
 
     void OnEnable()
     {
-        Debug.Log("HALLO");
         OnMenuChange += OnStart;
     }
 
     void OnDisable()
     {
-        Debug.Log("OSKOUR");
         OnMenuChange -= OnStart;
     }
 
@@ -208,7 +206,7 @@ public class RoomSelectionMenu : Miscellaneous
         if (isVisible)
         {
             TimeSpan diffTemps = DateTime.Now - lastTime;
-            if(diffTemps > TimeSpan.FromSeconds(10))
+            if (diffTemps > TimeSpan.FromSeconds(10))
             {
                 lastTime = DateTime.Now;
                 LoadRoomInfo();

@@ -19,9 +19,6 @@ public class AccountMenu : Miscellaneous
     private GameObject tmpGO;
     private Text tmpText;
 
-    static int created = 0;
-    int id_Object = 0;
-
     [SerializeField] TMPro.TMP_Text errorText;
 
     /// <summary>
@@ -29,23 +26,16 @@ public class AccountMenu : Miscellaneous
     /// </summary>
     void Start()
     {
-        id_Object = created++;
-        Debug.Log("xd " + id_Object);
         // INITIALISATION
         accMenu = GameObject.Find("SubMenus").transform.Find("AccountMenu").transform;
         AMCI = accMenu.transform.Find("InputField").Find("InputFieldEndEdit").transform;
-        Debug.Log(AMCI);
         AMCI.Find("InputField Day CA").GetComponent<InputField>().characterLimit = 2;
         AMCI.Find("InputField Month CA").GetComponent<InputField>().characterLimit = 2;
         AMCI.Find("InputField Year CA").GetComponent<InputField>().characterLimit = 4;
         pseudoCA = AMCI.Find("InputField Pseudo CA").GetComponent<InputField>();
-        Debug.Log("pseudo " + pseudoCA);
         emailCA = AMCI.Find("InputField Email CA").GetComponent<InputField>();
-        Debug.Log("email " + emailCA);
         passwordCA = AMCI.Find("InputField Password CA").GetComponent<InputField>();
-        Debug.Log("password " + passwordCA);
         confirmPwdCA = AMCI.Find("InputField ConfirmPwd CA").GetComponent<InputField>();
-        Debug.Log("confirms " + confirmPwdCA);
         passwordCA.inputType = confirmPwdCA.inputType = InputField.InputType.Password; // Hide password by default
         listAction = new List<bool>();
         s_listAction = new Semaphore(1, 1);
@@ -60,13 +50,11 @@ public class AccountMenu : Miscellaneous
 
     void OnEnable()
     {
-        Debug.Log("HALLO");
         OnMenuChange += OnStart;
     }
 
     void OnDisable()
     {
-        Debug.Log("OSKOUR");
         OnMenuChange -= OnStart;
     }
 
@@ -284,7 +272,6 @@ public class AccountMenu : Miscellaneous
         }
         else
         {
-            Debug.Log("CHAMPS PAS OK");
         }
     }
 
@@ -337,7 +324,6 @@ public class AccountMenu : Miscellaneous
             s_listAction.WaitOne();
             listAction.Clear();
             s_listAction.Release();
-            Debug.Log(GetState());
             if (GetState())
             {
                 HideAccountConnected();

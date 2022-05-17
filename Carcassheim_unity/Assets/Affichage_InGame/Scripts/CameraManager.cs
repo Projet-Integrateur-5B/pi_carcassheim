@@ -77,7 +77,7 @@ public class CameraManager : MonoBehaviour
         {
             click_on = true;
             click_init_pos = transform.position;
-            lastMovePos = Input.mousePosition + new Vector3(0, 0, nearPlane - transform.position.z);
+            lastMovePos = -Input.mousePosition + new Vector3(mainCamera.pixelWidth, mainCamera.pixelHeight, nearPlane - transform.position.z);
             origin_click_pos = transform.position;
             origin_click_offset = mainCamera.ScreenToWorldPoint(lastMovePos) - origin_click_pos;
             Debug.Log("START MOVING " + transform.position + " " + origin_click_pos + " " + mainCamera.ScreenToWorldPoint(lastMovePos));
@@ -137,7 +137,7 @@ public class CameraManager : MonoBehaviour
 
     void checkMove()
     {
-        Vector3 pos = Input.mousePosition + new Vector3(0, 0, nearPlane - transform.position.z);
+        Vector3 pos = -Input.mousePosition + new Vector3(mainCamera.pixelWidth, mainCamera.pixelHeight, nearPlane - transform.position.z);
         Vector3 vect = pos - lastMovePos;
 
         Vector3 w_pos = mainCamera.ScreenToWorldPoint(pos);
@@ -155,6 +155,8 @@ public class CameraManager : MonoBehaviour
         vect.z = 0;
 
         npos = w_pos + (origin_click_pos - transform.position) - origin_click_offset;
+
+
         float factor_z = 1f; // amplitude(transform.position.z) + 0.01f;
         npos.z = 0;
         if (npos.sqrMagnitude > limitRay * factor_z)

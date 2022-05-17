@@ -40,7 +40,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     /// </summary>
     void Start()
     {
-        Debug.Log("CALLED");
         absolute_parent_ref = absolute_parent;
 #if !(UNITY_IOS || UNITY_ANDROID)
         boolPC = true;
@@ -324,7 +323,6 @@ public class IOManager : Miscellaneous, IPointerEnterHandler
     /// <param name = "inp">InputField</param>
     public void MethodCall(string methode, Toggle tog, InputField inp)
     {
-        Debug.Log(methode);
         GameObject.Find("SoundController").GetComponent<AudioSource>().Play();
         if (inp == null)
             gameObject.SendMessage(methode, tog);

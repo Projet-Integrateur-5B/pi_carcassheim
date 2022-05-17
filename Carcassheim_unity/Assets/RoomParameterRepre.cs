@@ -90,11 +90,8 @@ public class RoomParameterRepre : MonoBehaviour
         {
             selectable.interactable = interactif;
         }
-        if (interactif)
-            Debug.Log("DEZFAUL " + default_room_policy + " " + default_player_number);
         if (interactif && default_room_policy != null && default_player_number != null)
         {
-            Debug.Log("SENDING DEZFAULT");
             room.setDefault((bool)default_room_policy, (int)default_player_number);
 
             default_room_policy = null;
@@ -106,7 +103,6 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomWinChange(int index)
     {
-        Debug.Log(room_winmode_drop.captionText);
         switch (index)
         {
             case 1:
@@ -128,7 +124,6 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomPolicyChange(int i)
     {
-        Debug.Log("ROOM PRIVATE ON OFF " + (i != 0));
         RoomInfo.Instance.isPrivate = i != 0;
     }
 

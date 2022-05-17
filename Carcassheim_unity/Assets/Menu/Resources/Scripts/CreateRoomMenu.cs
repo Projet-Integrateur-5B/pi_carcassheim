@@ -27,13 +27,11 @@ public class CreateRoomMenu : Miscellaneous
     }
     void OnEnable()
     {
-        Debug.Log("HALLO");
         OnMenuChange += OnStart;
     }
 
     void OnDisable()
     {
-        Debug.Log("OSKOUR");
         OnMenuChange -= OnStart;
     }
 
@@ -78,7 +76,6 @@ public class CreateRoomMenu : Miscellaneous
         packet.Data = Array.Empty<string>();
         repre_parameter.default_room_policy = !room_private.isOn;
         repre_parameter.default_player_number = nb_player.value + 2;
-        Debug.Log("" + repre_parameter.default_player_number + " " + repre_parameter.default_room_policy);
         Communication.Instance.SendAsync(packet);
     }
 
@@ -88,8 +85,6 @@ public class CreateRoomMenu : Miscellaneous
     /// <param name = "curT">Current toggle.</param>
     public void ToggleValueChangedCRM(Toggle curT)
     {
-        if (curT.isOn)
-            Debug.Log(curT.name);
     }
 
     /// <summary>

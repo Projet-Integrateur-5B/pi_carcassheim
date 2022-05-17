@@ -43,13 +43,11 @@ public class PublicRoomMenu : Miscellaneous
 
     void OnEnable()
     {
-        Debug.Log("HALLO");
         OnMenuChange += OnStart;
     }
 
     void OnDisable()
     {
-        Debug.Log("OSKOUR");
         if (RoomInfo.Instance.repre_parameter != null)
             RoomInfo.Instance.repre_parameter.IsInititialized = false;
         OnMenuChange -= OnStart;
@@ -68,7 +66,7 @@ public class PublicRoomMenu : Miscellaneous
 
         List_of_Player.Clear();
         int taille = listPlayers.Count;
-        for (int i = 0; i < taille; i ++)
+        for (int i = 0; i < taille; i++)
         {
             List_of_Player.Add(CreatePlayerLine(model, listPlayers[i].name, listPlayers[i].status));
         }
@@ -104,7 +102,6 @@ public class PublicRoomMenu : Miscellaneous
                 /* Ce n'est pas la bonne page */
                 /* Stop la reception dans cette class */
                 Communication.Instance.StopListening(OnPacketReceived);
-                Debug.Log("adzzijubg");
                 repre_parameter.IsInititialized = false;
                 break;
         }
@@ -261,7 +258,7 @@ public class PublicRoomMenu : Miscellaneous
             s_listAction.Release();
 
             int i;
-            for(i = 0; i < (int)nbPlayer; i++)
+            for (i = 0; i < (int)nbPlayer; i++)
             {
                 if (listPlayers[i].id == packet.IdPlayer)
                 {

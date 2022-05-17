@@ -160,13 +160,11 @@ public class DisplaySystem : MonoBehaviour
 
     public void meeple_accept()
     {
-        Debug.Log("MEEPLE ACCEPT");
         setNextState(DisplaySystemState.idleState);
     }
 
     public void tile_accept()
     {
-        Debug.Log("TILE ACCEPT");
         if (act_tile != null && act_tile.Pos != null)
         {
             if (meeples_hand.Count > 0)
@@ -247,12 +245,10 @@ public class DisplaySystem : MonoBehaviour
 
         if (board.setTileAt(new_pos, act_tile))
         {
-            Debug.Log("placé");
             table.tilePositionChanged(act_tile);
         }
         else
         {
-            Debug.Log("Pas placé");
         }
         system_back.sendAction(new DisplaySystemActionTileSetCoord(act_tile.Id, act_tile.Pos));
     }
@@ -261,7 +257,6 @@ public class DisplaySystem : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Return))
             return;
-        Debug.Log("WAIT MEN");
         if (act_player.is_my_player || DEBUG)
         {
             switch (act_system_state)
@@ -280,7 +275,6 @@ public class DisplaySystem : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Return))
             return;
-        Debug.Log("LETS GO");
         if (act_player.is_my_player || DEBUG)
         {
             switch (act_system_state)
@@ -358,7 +352,7 @@ public class DisplaySystem : MonoBehaviour
         {
             if (DIRTY_ACTIONS && (queue_actions.Count > 0 || (action.required_state != DisplaySystemState.noState && action.required_state != act_system_state)))
             {
-                Debug.Log("ADDING ACTION WHEN SHOULD NOT IN EXEC ACTION");
+                Debug.LogWarning("ADDING ACTION WHEN SHOULD NOT IN EXEC ACTION");
                 if (action.required_state != act_system_state && queue_actions.Count == 0)
                     setNextState(action.required_state);
                 queue_actions.Enqueue(action);
@@ -422,7 +416,7 @@ public class DisplaySystem : MonoBehaviour
         }
         else
         {
-            Debug.Log("NO ACTION ARE EXECUTED FOR AN ELECTED PLAYER");
+            Debug.LogWarning("NO ACTION ARE EXECUTED FOR AN ELECTED PLAYER");
         }
 
     }
@@ -431,11 +425,9 @@ public class DisplaySystem : MonoBehaviour
     {
         foreach (System.Tuple<int, int, ulong> pos_meeple in meeple_leaving)
         {
-            Debug.Log(pos_meeple);
             for (int i = meeple_posed.Count - 1; i >= 0; i--)
             {
                 MeepleRepre mp = meeple_posed[i];
-                Debug.Log("" + mp.ParentTile.Pos + " " + mp.SlotPos);
                 if (PositionRepre.EqualWithoutRotation(mp.ParentTile.Pos, new PositionRepre(pos_meeple.Item1, pos_meeple.Item2)) && mp.SlotPos == (int)pos_meeple.Item3)
                 {
                     mp.parent_player.NbMeeple += 1;
@@ -448,7 +440,7 @@ public class DisplaySystem : MonoBehaviour
 
     public void setNextState(DisplaySystemState next_state)
     {
-        Debug.Log("ADDING TRANSITION " + next_state + " TO N TRANSIT " + (state_transition.Count + 1));
+        // Debug.Log("ADDING TRANSITION " + next_state + " TO N TRANSIT " + (state_transition.Count + 1));
         state_transition.Enqueue(next_state);
         DisplaySystemState old_state = act_system_state;
         if (state_transition.Count == 1)
@@ -513,7 +505,7 @@ public class DisplaySystem : MonoBehaviour
                 TurnPlayParam play_param;
                 if (new_state == DisplaySystemState.idleState || act_system_state == DisplaySystemState.StateTransition)
                 {
-                    Debug.LogError("Don't do this " + act_system_state + " " + new_state);
+                    // Debug.LogError("Don't do this " + act_system_state + " " + new_state);
                     break;
                 }
 
@@ -597,7 +589,7 @@ public class DisplaySystem : MonoBehaviour
 
     void stateEnter(DisplaySystemState new_state, DisplaySystemState old_state)
     {
-        Debug.Log("State enterring from " + old_state + " to " + new_state);
+        // Debug.Log("State enterring from " + old_state + " to " + new_state);
         switch (new_state)
         {
             case DisplaySystemState.turnStart:
@@ -628,7 +620,7 @@ public class DisplaySystem : MonoBehaviour
             case DisplaySystemState.meeplePosing:
                 if (act_player == null && old_state == DisplaySystemState.idleState)
                 {
-                    Debug.LogWarning("Mec stop");
+                    Debug.LogWarning("Mec stop meeple");
                     new_state = DisplaySystemState.idleState;
                     break;
                 }
@@ -681,7 +673,7 @@ public class DisplaySystem : MonoBehaviour
                 break;
         }
         act_system_state = new_state;
-        Debug.Log("State enterring final from " + old_state + " to " + new_state + " REMAINING: " + state_transition.Count);
+        // Debug.Log("State enterring final from " + old_state + " to " + new_state + " REMAINING: " + state_transition.Count);
     }
 
     void tableCheck(Ray ray, ref bool consumed)

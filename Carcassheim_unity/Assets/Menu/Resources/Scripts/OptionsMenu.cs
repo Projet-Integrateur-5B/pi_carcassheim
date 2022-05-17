@@ -108,8 +108,6 @@ public class OptionsMenu : Miscellaneous
     /// <param name = "curT">The current toggle.</param>
     public void ToggleValueChangedOM(Toggle curT)
     {
-        if (curT.isOn)
-            Debug.Log(curT.name);
         if (curT.name == "Toggle French")
         {
             //francais
