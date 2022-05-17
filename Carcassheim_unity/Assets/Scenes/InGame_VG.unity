@@ -1360,7 +1360,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75e453abc62b70befb2b2391798d8951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 0}
+  board: {fileID: 316843530}
   limitRay: 0.1
   moveSpeed: 0.00001
   moveTreshold: 5
