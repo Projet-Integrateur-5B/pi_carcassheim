@@ -19,6 +19,7 @@ public class PublicRoomMenu : Miscellaneous
     public Semaphore s_listAction;
     private Transform container;
     private Text id_room; //id de la room (pour l'instant : 'X')
+    List<PlayerLine> List_of_Player = new List<PlayerLine>();
 
     [SerializeField] RoomParameterRepre repre_parameter;
 
@@ -47,6 +48,31 @@ public class PublicRoomMenu : Miscellaneous
         Debug.Log("OSKOUR");
         RoomInfo.Instance.repre_parameter.IsInititialized = false;
         OnMenuChange -= OnStart;
+    }
+
+    private void TableauPlayer()
+    {
+        PlayerLine model = FindObject(gameObject, "PLAYERLINE").GetComponent<PlayerLine>();
+        if (List_of_Player != null)
+        {
+            foreach (PlayerLine player in List_of_Player)
+            {
+                player.killPlayerLine();
+            }
+        }
+
+        List_of_Player.Clear();
+        s_listAction.WaitOne();
+        int taille = listAction.Count;
+        s_listAction.Release();
+        s_listAction.WaitOne();
+        for (int i = 0; i < taille; i += 2)
+        {
+            List_of_Player.Add(CreatePlayerLine(model, listAction[i], false));
+        }
+
+        listAction.Clear();
+        s_listAction.Release();
     }
 
     /// <summary>
@@ -180,13 +206,24 @@ public class PublicRoomMenu : Miscellaneous
         }
         else if (packet.IdMessage == Tools.IdMessage.PlayerJoin)
         {
-            Packet packet1 = new Packet();
-            packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
-            packet1.IdPlayer = Communication.Instance.IdClient;
-            packet1.IdRoom = Communication.Instance.IdRoom;
-            packet1.Data = Array.Empty<string>();
+            if(packet.IdPlayer == Communication.Instance.IdClient)
+            {
+                Packet packet1 = new Packet();
+                packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
+                packet1.IdPlayer = Communication.Instance.IdClient;
+                packet1.IdRoom = Communication.Instance.IdRoom;
+                packet1.Data = Array.Empty<string>();
 
-            Communication.Instance.SendAsync(packet1);
+                Communication.Instance.SendAsync(packet1);
+            }
+            else
+            {
+                s_listAction.WaitOne();
+                listAction.Add("playerJoin");
+                listAction.Add(packet.Data[0]);
+                s_listAction.Release();
+            }
+            //todo
         }
         else if (packet.IdMessage == Tools.IdMessage.RoomSettingsGet)
         {
@@ -196,6 +233,11 @@ public class PublicRoomMenu : Miscellaneous
                 Array.Copy(packet.Data, res, packet.Data.Length);
                 RoomInfo.Instance.SetValues(packet.Data);
             }
+        }
+
+        else if (packet.IdMessage == Tools.IdMessage.PlayerReady)
+        {
+            //todo
         }
     }
 
@@ -239,9 +281,15 @@ public class PublicRoomMenu : Miscellaneous
                     StartCoroutine(LoadYourAsyncScene());
                     gameObject.SetActive(false);
                     break;
+                case "playerJoin":
+                    /* Update l'affichage */
+                    TableauPlayer();
+                    break;
                 case "playerReady":
                     /* Update l'affichage */
+                    
                     break;
+
             }
 
             s_listAction.WaitOne();

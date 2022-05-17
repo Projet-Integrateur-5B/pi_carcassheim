@@ -66,6 +66,22 @@ public abstract class Miscellaneous : MonoBehaviour
     }
 
     /// <summary>
+    ///     Create a room line <see cref = "Miscellaneous"/> class.
+    /// </summary>
+    /// <param name = "playerline_model">The roomline model.</param>
+    /// <param name = "playerName">The name.</param>
+    /// <param name = "status">The status.</param>
+    /// <returns>The player line.</returns>
+    static protected PlayerLine CreatePlayerLine(PlayerLine playerline_model, string playerName, bool status)
+    {
+        PlayerLine pl = Instantiate<PlayerLine>(playerline_model, playerline_model.parent_area);
+        pl.Player_name = playerName;
+        pl.Player_status = status;
+        pl.EnableOnList();
+        return pl;
+    }
+
+    /// <summary>
     ///     Find a GameObject <see cref = "Miscellaneous"/> class.
     /// </summary>
     /// <param name = "parent">The parent of the object to find.</param>

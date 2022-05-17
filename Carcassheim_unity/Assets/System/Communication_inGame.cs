@@ -366,7 +366,11 @@ namespace Assets.system
             s_InGame.Release();
 
             _nb_joueur_max = RoomInfo.Instance.nbJoueurMax;
-            _timer = (int)RoomInfo.Instance.timerPartie; // En secondes
+
+            if (_mode == 1)
+                _timer = (int)RoomInfo.Instance.timerPartie; // En secondes
+            else
+                _timer = (int)RoomInfo.Instance.timerJoueur;
 
             s_InGame.WaitOne();
             timer_tour_received = true;
