@@ -1068,7 +1068,6 @@ namespace system
 
         public void startRoomTimer()
         {
-            Console.WriteLine("========== START TIMER ==========");
             _timer_room = new System.Timers.Timer();
             _timer_room.Interval = 1000;
             _timer_room.Elapsed += OnTimedEventRoom;
@@ -1079,15 +1078,11 @@ namespace system
 
         public void resetRoomTimer()
         {
-            Console.WriteLine(DateTime.Now.Subtract(_DateTime_room).Seconds);
-            Console.WriteLine("========== RESET TIMER ==========");
             _DateTime_room = DateTime.Now;
-            Console.WriteLine(DateTime.Now.Subtract(_DateTime_room).Seconds);
         }
         
         public void stopRoomTimer()
         {
-            Console.WriteLine("========== STOP TIMER ==========");
             _timer_room.Stop();
         }
         
@@ -1097,8 +1092,7 @@ namespace system
         private void OnTimedEventRoom(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_room).Minutes;
-            Console.WriteLine(diff + " " + 30 / 60);
-            if (diff < 60 / 60) return; // 1800 -> 30 minutes
+            if (diff < 300 / 60) return; // 300 -> 5 minutes
             
             Console.WriteLine("Room was raised at {0}. CloseRoom() is called", e.SignalTime);
             _timer_room.Stop();
