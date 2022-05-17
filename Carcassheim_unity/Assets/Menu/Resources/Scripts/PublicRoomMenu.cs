@@ -238,6 +238,7 @@ public class PublicRoomMenu : Miscellaneous
             ulong id = Communication.Instance.IdClient;
             string name = Communication.Instance.Name;
             bool status = false;
+
             if (packet.IdPlayer == Communication.Instance.IdClient)
             {
                 Packet packet1 = new Packet();
@@ -250,27 +251,44 @@ public class PublicRoomMenu : Miscellaneous
             }
             else
             {
-                id = ulong.Parse(packet.Data[0]);
-                name = packet.Data[1];
+                id = packet.IdPlayer;
+                name = packet.Data[0];
+                status = false;
+            }
 
-                switch (packet.Data[2])
+            if (packet.Data.Length > 1)
+            {
+                int i, taille = packet.Data.Length;
+                for (i = 0; i < taille; i += 3)
                 {
-                    case "true":
-                        status = true; 
-                        break;
-                    default:
-                        status = false;
-                        break;
+                    id = ulong.Parse(packet.Data[i]);
+                    name = packet.Data[i+1];
+
+                    switch (packet.Data[i+2])
+                    {
+                        case "true":
+                            status = true;
+                            break;
+                        default:
+                            status = false;
+                            break;
+                    }
+
+                    s_List_of_Player.WaitOne();
+                    listPlayers.Add(new Player(id, name, status));
+                    s_List_of_Player.Release();
                 }
+            }
+            else
+            {
+                s_List_of_Player.WaitOne();
+                listPlayers.Add(new Player(id, name, status));
+                s_List_of_Player.Release();
             }
 
             s_listAction.WaitOne();
             listAction.Add("playerInfo");
             s_listAction.Release();
-
-            s_List_of_Player.WaitOne();
-            listPlayers.Add(new Player(id, name, status));
-            s_List_of_Player.Release();
         }
         else if (packet.IdMessage == Tools.IdMessage.PlayerLeave)
         {
