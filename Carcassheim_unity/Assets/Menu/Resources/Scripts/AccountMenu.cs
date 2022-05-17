@@ -347,10 +347,10 @@ public class AccountMenu : Miscellaneous
                 switch (OptionsMenu.langue)
                 {
                     case 1:
-                        errorText.SetText("The account couldn't be created.");
+                        errorText.SetText("The account could not be created.");
                         break;
                     case 2:
-                        errorText.SetText("");
+                        errorText.SetText("Das Spielaccount konnte nicht erstellt werden.");
                         break;
                     default:
                         errorText.SetText("Le compte n'a pas pu être créé.");
