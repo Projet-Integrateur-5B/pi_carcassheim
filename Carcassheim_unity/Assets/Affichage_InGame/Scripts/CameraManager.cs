@@ -20,12 +20,17 @@ public class CameraManager : MonoBehaviour
     private Vector3 click_init_pos;
     private Vector3 lastMovePos;
     Vector3 dragOrigin;
+
+    float original_dist;
     bool click_on = false, moving = false;
 
+    [SerializeField] float nearPlane;
+    Vector3 npos, origin_click_pos, origin_click_offset;
 
     void Awake()
     {
         mainCamera = Camera.main;
+        npos = transform.position;
         scrollSpeed *= 30;
         moveSpeed *= 30;
         limitRay *= 1.15f;
@@ -55,6 +60,11 @@ public class CameraManager : MonoBehaviour
         return (x > 0 ? x * 1.4f : x);
     }
 
+    private float clamp(float x)
+    {
+        return x < 1 ? (x > 0 ? x : 0) : 1;
+    }
+
     private float amplitude(float z)
     {
         float val = (z - Z_min) / (Z_max - Z_min);
@@ -67,7 +77,10 @@ public class CameraManager : MonoBehaviour
         {
             click_on = true;
             click_init_pos = transform.position;
-            lastMovePos = mainCamera.ScreenToViewportPoint(Input.mousePosition);
+            lastMovePos = Input.mousePosition + new Vector3(0, 0, nearPlane - transform.position.z);
+            origin_click_pos = transform.position;
+            origin_click_offset = mainCamera.ScreenToWorldPoint(lastMovePos) - origin_click_pos;
+            Debug.Log("START MOVING " + transform.position + " " + origin_click_pos + " " + mainCamera.ScreenToWorldPoint(lastMovePos));
             return true;
         }
         else if (Input.GetMouseButtonUp(0) && click_on)
@@ -83,59 +96,85 @@ public class CameraManager : MonoBehaviour
             checkMove();
             return true;
         }
-        else if (Input.mouseScrollDelta.y != 0)
+        else if (!moving && (Input.mouseScrollDelta.y != 0 || Input.touchCount == 2))
         {
-            Vector3 nz = transform.position + new Vector3(0, 0, discriminateSign(Input.mouseScrollDelta.y) * Time.deltaTime * scrollSpeed * linearCurve(last_scroll, 100));
+            Debug.Log("MEN IT'S WORKING " + Input.touchCount);
+            bool no_count = false;
+            float delta = Input.mouseScrollDelta.y;
+            if (Input.touchCount == 2)
+            {
+                Touch v0 = Input.GetTouch(0);
+                Touch v1 = Input.GetTouch(1);
+                no_count = true;
+                if (last_scroll == 0)
+                {
+                    original_dist = (v0.position - v1.position).magnitude;
+                    last_scroll++;
+                    return true;
+                }
+                else
+                {
+                    float dist = (v0.position - v1.position).magnitude;
+                    delta = original_dist / dist - 1;
+                }
+            }
+
+            Vector3 nz = transform.position + new Vector3(0, 0, discriminateSign(delta) * Time.deltaTime * scrollSpeed * linearCurve(last_scroll, 100));
             last_scroll += 1;
             if (Z_min > nz.z)
                 nz.z = Z_min;
             if (nz.z > Z_max)
                 nz.z = Z_max;
             transform.position = nz;
-            return true;
+            return no_count;
         }
         last_scroll = 0;
         last_move = 0;
-        return false;
+        return true;
     }
 
     void checkMove()
     {
-        Vector3 pos = mainCamera.ScreenToViewportPoint(Input.mousePosition);
+        Vector3 pos = Input.mousePosition + new Vector3(0, 0, nearPlane - transform.position.z);
         Vector3 vect = pos - lastMovePos;
-        if (!moving)
+
+        Vector3 w_pos = mainCamera.ScreenToWorldPoint(pos);
+        Vector3 w_last_pos = mainCamera.ScreenToWorldPoint(lastMovePos);
+        // Debug.Log("SLOW " + vect + " " + vect.sqrMagnitude + " " + moveTreshold);
+        if (vect.sqrMagnitude > moveTreshold)
         {
-            if (vect.sqrMagnitude > moveTreshold)
-            {
-                moving = true;
-            }
-            else
-            {
-                return;
-            }
+            moving = true;
+        }
+        else
+        {
+            return;
         }
         last_move += 1;
         vect.z = 0;
-        lastMovePos = pos;
 
-        vect *= Time.deltaTime * moveSpeed * linearCurve(last_move, 80f);
-        vect.x *= mainCamera.aspect;
-        Vector3 npos = transform.position - vect;
-        float factor_z = amplitude(transform.position.z) + 0.01f;
+        npos = w_pos + (origin_click_pos - transform.position) - origin_click_offset;
+        float factor_z = 1f; // amplitude(transform.position.z) + 0.01f;
         npos.z = 0;
         if (npos.sqrMagnitude > limitRay * factor_z)
         {
             npos.Normalize();
             npos *= Mathf.Sqrt(limitRay * factor_z);
         }
-        npos.z = transform.position.z;
-        transform.position = npos;
+        lastMovePos = pos;
+    }
+
+    void LateUpdate()
+    {
+        float z = transform.position.z;
+        Vector3 pos = Vector3.Lerp(npos, transform.position, clamp(Time.deltaTime * moveSpeed));
+        pos.z = z;
+        transform.position = pos;
     }
 
 
     void limitUpdate()
     {
-        limitRay = board.BoardRadius;
+        limitRay = board.BoardRadius * 0.15f * 0.15f + 0.15f;
     }
 
 }

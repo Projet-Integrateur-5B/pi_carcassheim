@@ -32,12 +32,16 @@ public class RoomParameterRepre : MonoBehaviour
 {
     [SerializeField] Text id_room;
 
-    [SerializeField] Slider time_tour_slider;
+    [SerializeField] Dropdown time_tour_slider;
     [SerializeField] Toggle room_extension_rivier;
     [SerializeField] Toggle room_extension_abbaye;
     [SerializeField] Toggle room_access_private;
     [SerializeField] Toggle room_access_public;
     [SerializeField] Dropdown room_winmode_drop;
+
+    [SerializeField] Dropdown room_win_timer;
+    [SerializeField] Dropdown room_win_tile;
+    [SerializeField] Dropdown room_win_point;
 
 
     [SerializeField] List<Selectable> menu_activate;
@@ -60,6 +64,8 @@ public class RoomParameterRepre : MonoBehaviour
     private bool _initialize = false;
     public bool to_initialize = false;
     public bool IsInititialized { set { _initialize = value; if (!_initialize) { default_player_number = null; default_room_policy = null; } to_initialize = false; } get => _initialize; }
+
+    [SerializeField] List<GameObject> wincond_parameters;
 
     // Start is called before the first frame update
     void Start()
@@ -113,6 +119,10 @@ public class RoomParameterRepre : MonoBehaviour
                 winmode = Tools.Mode.Default;
                 break;
         }
+        for (int i = 0; i < wincond_parameters.Count; i++)
+        {
+            wincond_parameters[i].SetActive(i == index);
+        }
         RoomInfo.Instance.mode = winmode;
     }
 
@@ -135,8 +145,41 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomTimerTurnChange()
     {
-        Debug.Log("timer tour" + time_tour_slider.value);
-        RoomInfo.Instance.timerJoueur = (int)time_tour_slider.value;
+        int timer_tour = 30;
+        if (time_tour_slider.value > 0)
+            timer_tour = (time_tour_slider.value + 1) * 30;
+        Debug.Log("timer tour" + timer_tour);
+        RoomInfo.Instance.timerJoueur = timer_tour;
+    }
+
+    public void OnRoomTimerGameChange(int val)
+    {
+        if (winmode != Tools.Mode.Time)
+            return;
+        int nb = 1800;
+        switch (val)
+        {
+            case 1:
+                nb = 3600;
+                break;
+        }
+        RoomInfo.Instance.timerPartie = nb;
+    }
+
+    public void OnRoomNbTileChange(int val)
+    {
+        if (winmode != Tools.Mode.Default)
+            return;
+        int nb = (val + 1) * 30;
+        RoomInfo.Instance.nbTuile = nb;
+    }
+
+    public void OnRoomNbPointChange(int val)
+    {
+        if (winmode != Tools.Mode.Point)
+            return;
+        int nb = (val + 1) * 50;
+        RoomInfo.Instance.scoreMax = nb;
     }
 
     public void addParameters(bool room_policy, Tools.Mode wm, int timer_tour, int timer_win, int point_win, int tile_win, bool river_on, bool abbaye_on)
@@ -162,25 +205,46 @@ public class RoomParameterRepre : MonoBehaviour
         riverOn = river_on;
         abbayeOn = abbaye_on;
 
+        int index_win = 0;
         switch (winmode)
         {
             case Tools.Mode.Time:
-                room_winmode_drop.SetValueWithoutNotify(1);
+                index_win = 1;
                 break;
             case Tools.Mode.Default:
-                room_winmode_drop.SetValueWithoutNotify(0);
+                index_win = 0;
                 break;
             case Tools.Mode.Point:
-                room_winmode_drop.SetValueWithoutNotify(2);
+                index_win = 2;
                 break;
         }
-        time_tour_slider.SetValueWithoutNotify(timer_tour);
+        room_winmode_drop.SetValueWithoutNotify(index_win);
+        for (int i = 0; i < wincond_parameters.Count; i++)
+        {
+            wincond_parameters[i].SetActive(i == index_win);
+        }
+
+
+        int time_value = 0;
+        if (timer_tour > 20)
+            time_value = timer_tour / 30 - 1;
+        Debug.Log("val " + timer_tour + " " + time_value);
+        time_tour_slider.SetValueWithoutNotify(time_value);
+
+
 
         room_access_public.SetIsOnWithoutNotify(!room_policy);
         room_access_private.SetIsOnWithoutNotify(room_policy);
 
         room_extension_abbaye.SetIsOnWithoutNotify(abbaye_on);
         room_extension_rivier.SetIsOnWithoutNotify(river_on);
+
+        room_win_tile.SetValueWithoutNotify(tile_win / 30 - 1);
+        room_win_point.SetValueWithoutNotify(point_win / 30 - 1);
+        if (timer_win == 3600)
+            room_win_timer.SetValueWithoutNotify(1);
+        else
+            room_win_timer.SetValueWithoutNotify(0);
     }
 
     void OnDisable()

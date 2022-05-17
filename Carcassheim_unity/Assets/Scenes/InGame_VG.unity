@@ -1360,13 +1360,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 75e453abc62b70befb2b2391798d8951, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  board: {fileID: 316843530}
+  board: {fileID: 0}
   limitRay: 0.1
-  moveSpeed: 5.5
-  moveTreshold: 0.001
+  moveSpeed: 0.00001
+  moveTreshold: 5
   scrollSpeed: 0.7
   Z_max: 0.46
   Z_min: -1.6
+  nearPlane: 1.5
 --- !u!1 &931077849
 GameObject:
   m_ObjectHideFlags: 0

@@ -162,18 +162,19 @@ public class AccountMenu : Miscellaneous
         int day = dayCA.endValue(), month = monthCA.endValue(), year = yearCA.endValue();
         System.DateTime date;
         bool valid_date = System.DateTime.TryParse("" + day + "/" + month + "/" + year, out date);
+        
         if (name_is_empty)
         {
             switch (OptionsMenu.langue)
             {
                 case 1:
-                    errorText.SetText("Please write your login.");
+                    errorText.SetText("Please fill in a username.");
                     break;
                 case 2:
-                    errorText.SetText("Please");
+                    errorText.SetText("Bitte füllen Sie Ihren Benutzernamen ein.");
                     break;
                 default:
-                    errorText.SetText("Merci d'écrire votre nom d'utilisateur");
+                    errorText.SetText("Merci de renseigner un nom d'utilisateur.");
                     break;
             }
             errorText.gameObject.SetActive(true);
@@ -184,13 +185,13 @@ public class AccountMenu : Miscellaneous
             switch (OptionsMenu.langue)
             {
                 case 1:
-                    errorText.SetText("Please write your mail");
+                    errorText.SetText("Please fill in an e-mail.");
                     break;
                 case 2:
-                    errorText.SetText("Please");
+                    errorText.SetText("Bitte füllen Sie Ihre E-Mail ein.");
                     break;
                 default:
-                    errorText.SetText("Merci d'écrire votre e-mail");
+                    errorText.SetText("Merci de renseigner un e-mail.");
                     break;
             }
             errorText.gameObject.SetActive(true);
@@ -201,13 +202,13 @@ public class AccountMenu : Miscellaneous
             switch (OptionsMenu.langue)
             {
                 case 1:
-                    errorText.SetText("Please write a valid date.");
+                    errorText.SetText("Please enter a valid date.");
                     break;
                 case 2:
-                    errorText.SetText("Please");
+                    errorText.SetText("Bitte füllen Sie ein gültiges Datum ein.");
                     break;
                 default:
-                    errorText.SetText("Merci d'écrire une date valide");
+                    errorText.SetText("Merci de renseigner une date valide.");
                     break;
             }
             errorText.gameObject.SetActive(true);
@@ -218,13 +219,13 @@ public class AccountMenu : Miscellaneous
             switch (OptionsMenu.langue)
             {
                 case 1:
-                    errorText.SetText("Please write a password.");
+                    errorText.SetText("Please enter a password.");
                     break;
                 case 2:
-                    errorText.SetText("Please");
+                    errorText.SetText("Bitte füllen Sie ein Password ein.");
                     break;
                 default:
-                    errorText.SetText("Merci d'écrire un mot de passe");
+                    errorText.SetText("Merci de renseigner un mot de passe.");
                     break;
             }
             errorText.gameObject.SetActive(true);
@@ -235,17 +236,18 @@ public class AccountMenu : Miscellaneous
             switch (OptionsMenu.langue)
             {
                 case 1:
-                    errorText.SetText("The passwords doesn't match.");
+                    errorText.SetText("The passwords do not match.");
                     break;
                 case 2:
-                    errorText.SetText("Passwörter stimmen nicht überein");
+                    errorText.SetText("Die Passwörter stimmen nicht überein.");
                     break;
                 default:
-                    errorText.SetText("Les mots de passes ne correspondent pas");
+                    errorText.SetText("Les mots de passes ne correspondent pas.");
                     break;
             }
             errorText.gameObject.SetActive(true);
         }
+        
         else if (!boolCGU)
         {
             switch (OptionsMenu.langue)
@@ -254,7 +256,7 @@ public class AccountMenu : Miscellaneous
                     errorText.SetText("Please accept the CGU.");
                     break;
                 case 2:
-                    errorText.SetText("Vielen Dank, dass Sie die CGU akzeptiert haben.");
+                    errorText.SetText("Bitte akzeptieren Sie die CGU.");
                     break;
                 default:
                     errorText.SetText("Merci d'accepter les CGU.");
@@ -262,6 +264,7 @@ public class AccountMenu : Miscellaneous
             }
             errorText.gameObject.SetActive(true);
         }
+        
         return valid_pass && boolCGU && !is_empty && !mail_is_empty && !name_is_empty && valid_date;
     }
 
@@ -344,10 +347,10 @@ public class AccountMenu : Miscellaneous
                 switch (OptionsMenu.langue)
                 {
                     case 1:
-                        errorText.SetText("The account couldn't be created.");
+                        errorText.SetText("The account could not be created.");
                         break;
                     case 2:
-                        errorText.SetText("");
+                        errorText.SetText("Das Spielaccount konnte nicht erstellt werden.");
                         break;
                     default:
                         errorText.SetText("Le compte n'a pas pu être créé.");
