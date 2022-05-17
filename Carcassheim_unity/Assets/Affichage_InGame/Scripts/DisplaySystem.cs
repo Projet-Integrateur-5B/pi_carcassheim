@@ -785,7 +785,7 @@ public class DisplaySystem : MonoBehaviour
         switch (act_system_state)
         {
             case DisplaySystemState.meeplePosing:
-                if (act_player.is_my_player || DEBUG)
+                if ((act_player != null && act_player.is_my_player) || DEBUG)
                 {
                     if (Input.GetKeyDown(KeyCode.Return))
                     {
@@ -800,7 +800,7 @@ public class DisplaySystem : MonoBehaviour
                 }
                 break;
             case DisplaySystemState.tilePosing:
-                if ((act_player.is_my_player || DEBUG) &&
+                if (((act_player != null && act_player.is_my_player) || DEBUG) &&
                     Input.GetKeyDown(KeyCode.Return) &&
                     act_tile != null &&
                     act_tile.Pos != null)
