@@ -38,8 +38,6 @@ namespace Assets.system
             {
                 actualResult[i] = subject.IdSlotFromPositionInterne(i);
 
-                Debug.Log(actualResult[i] == expectedResult[i]);
-
             }
         }
     }

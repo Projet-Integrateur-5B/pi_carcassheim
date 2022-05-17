@@ -133,7 +133,6 @@ public class RoomLine : MonoBehaviour, IPointerClickHandler
     {
         if (!destroyed)
         {
-            Debug.Log("KILL ME");
             destroyed = true;
             gameObject.SetActive(false);
         }

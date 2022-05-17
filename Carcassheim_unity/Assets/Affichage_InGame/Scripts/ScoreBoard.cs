@@ -29,14 +29,12 @@ public class ScoreBoard : MonoBehaviour
             for (int i = index + 1; i < players.Count; i++)
             {
                 int score = players[i].Score;
-                Debug.Log(score);
                 if (score > max_score)
                 {
                     max_index = i;
                     max_score = score;
                 }
             }
-            Debug.Log("max " + max_score);
             tmp = players[index];
             players[index] = players[max_index];
             players[max_index] = tmp;
@@ -45,7 +43,6 @@ public class ScoreBoard : MonoBehaviour
             int rank = index;
             while (rank > 0 && players[rank - 1].Score == max_score)
             {
-                Debug.Log("rank - 1 : " + players[rank - 1].Score);
                 rank -= 1;
             }
             result.Rank = rank + 1;

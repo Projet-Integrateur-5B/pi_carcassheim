@@ -48,7 +48,7 @@ public class StringValidator : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Validator should be connected to an inputstr");
+            // Debug.LogWarning("Validator should be connected to an inputstr");
         }
     }
 

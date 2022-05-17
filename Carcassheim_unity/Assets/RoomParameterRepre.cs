@@ -90,11 +90,8 @@ public class RoomParameterRepre : MonoBehaviour
         {
             selectable.interactable = interactif;
         }
-        if (interactif)
-            Debug.Log("DEZFAUL " + default_room_policy + " " + default_player_number);
         if (interactif && default_room_policy != null && default_player_number != null)
         {
-            Debug.Log("SENDING DEZFAULT");
             room.setDefault((bool)default_room_policy, (int)default_player_number);
 
             default_room_policy = null;
@@ -106,7 +103,6 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomWinChange(int index)
     {
-        Debug.Log(room_winmode_drop.captionText);
         switch (index)
         {
             case 1:
@@ -128,18 +124,15 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomPolicyChange(int i)
     {
-        Debug.Log("ROOM PRIVATE ON OFF " + (i != 0));
         RoomInfo.Instance.isPrivate = i != 0;
     }
 
     public void OnRoomExtensionChangeRiviere(bool state)
     {
-        Debug.Log("Riviere = " + state);
         RoomInfo.Instance.riverOn = state;
     }
     public void OnRoomExtensionChangeAbbaye(bool state)
     {
-        Debug.Log("Abbaye = " + state);
         RoomInfo.Instance.abbayeOn = state;
     }
 
@@ -148,7 +141,6 @@ public class RoomParameterRepre : MonoBehaviour
         int timer_tour = 30;
         if (time_tour_slider.value > 0)
             timer_tour = (time_tour_slider.value + 1) * 30;
-        Debug.Log("timer tour" + timer_tour);
         RoomInfo.Instance.timerJoueur = timer_tour;
     }
 
@@ -228,7 +220,6 @@ public class RoomParameterRepre : MonoBehaviour
         int time_value = 0;
         if (timer_tour > 20)
             time_value = timer_tour / 30 - 1;
-        Debug.Log("val " + timer_tour + " " + time_value);
         time_tour_slider.SetValueWithoutNotify(time_value);
 
 
@@ -240,7 +231,7 @@ public class RoomParameterRepre : MonoBehaviour
         room_extension_rivier.SetIsOnWithoutNotify(river_on);
 
         room_win_tile.SetValueWithoutNotify(tile_win / 30 - 1);
-        room_win_point.SetValueWithoutNotify(point_win / 30 - 1);
+        room_win_point.SetValueWithoutNotify(point_win / 50 - 1);
         if (timer_win == 3600)
             room_win_timer.SetValueWithoutNotify(1);
         else

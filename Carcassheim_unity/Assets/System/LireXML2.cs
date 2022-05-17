@@ -70,10 +70,12 @@ namespace Assets.system
             IdVersTerrain = new Dictionary<int, TypeTerrain>();
             string path;
 #if UNITY_ANDROID
-            path = Path.Combine("jar:file://" + Application.dataPath + "!/assets", "config_back.xml");
+            path = Path.Combine(Application.streamingAssetsPath, "config_back.xml");
 #else
             path = Path.Combine(Application.streamingAssetsPath, "config_back.xml");
 #endif
+
+
 
             StringReader xmlData = null;
 
@@ -82,6 +84,8 @@ namespace Assets.system
                 UnityWebRequest www = UnityWebRequest.Get(path);
                 www.SendWebRequest();
                 path = www.url;
+                xmlData = new StringReader(www.downloadHandler.text);
+                Debug.Log(xmlData.ReadToEnd());
                 xmlData = new StringReader(www.downloadHandler.text);
             }
             Debug.Log(path);

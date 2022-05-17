@@ -179,9 +179,9 @@ public class ClientAsync
         try
         {
             Debug.Log("Client disconnected from {0} " + clientSocket.RemoteEndPoint);
-            
+
             // Complete the disconnect request.
-            clientSocket.Shutdown(SocketShutdown.Both);  
+            clientSocket.Shutdown(SocketShutdown.Both);
             clientSocket.Close();
         }
         catch (Exception e)
@@ -373,7 +373,7 @@ public class ClientAsync
     /// </remarks>
     public static void StopListening()
     {
-        if(Communication.Instance.IsInRoom == 0)
+        if  (Communication.Instance.IsInRoom == 0)
             mustLoop = false;
     }
 }

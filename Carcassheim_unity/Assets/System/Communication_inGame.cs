@@ -141,8 +141,6 @@ namespace Assets.system
             // FLAG => true : garder la tuile; false: jeter la tuile
             // RETURN nombre de tuile dans la main au final
 
-            Debug.Log("TUILE " + tiles_drawed.Count + " / " + nb_tile_for_turn);
-
             for (int i = 0; i < nb_tile_for_turn; i++)
                 tiles.Add(tiles_drawed[i]);
             tiles_drawed.Clear();
@@ -622,7 +620,6 @@ namespace Assets.system
 
                     if (lePlateau.VerifZoneFermeeTuile(x_tile, y_tile, gains, zones))
                     {
-                        Debug.Log("slowday");
                         lePlateau.RemoveAllPawnInTile(x_tile, y_tile, meeple_positions);
                     }
 

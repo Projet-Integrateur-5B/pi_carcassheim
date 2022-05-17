@@ -32,13 +32,11 @@ public class JoinByIdMenu : Miscellaneous
 
     void OnEnable()
     {
-        Debug.Log("HALLO");
         OnMenuChange += OnStart;
     }
 
     void OnDisable()
     {
-        Debug.Log("OSKOUR");
         OnMenuChange -= OnStart;
     }
 

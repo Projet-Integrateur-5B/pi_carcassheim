@@ -169,7 +169,6 @@ public class backLocal : CarcasheimBack
                         tiles_for_river.Add(tile.Id);
                     }
                 }
-                Debug.Log(tiles_for_river.Count);
             }
 
             generatePlayers();
@@ -192,7 +191,6 @@ public class backLocal : CarcasheimBack
 
     override public void sendTile(TurnPlayParam play)
     {
-        Debug.Log("FIN TOUR");
         bool end = false;
         bool score_changed = false;
         // Debug.Log("Am i looking likethis " + play.id_tile + " " + play.tile_pos + " " + play.id_meeple + " " + play.slot_pos);
@@ -201,71 +199,55 @@ public class backLocal : CarcasheimBack
         bool meeple_valide = false;
         ulong player_act = (ulong)players[index_player].id_player;
         // Debug.Log(_plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation));
-        Debug.Log("pk " + play.id_tile);
         if (play.id_tile != -1 && _plateau.PlacementLegal((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation))
         {
             _plateau.PoserTuileFantome((ulong)play.id_tile, play.tile_pos.X, play.tile_pos.Y, play.tile_pos.Rotation);
             tuile_valide = true;
         }
         //Debug.Log(play.id_meeple != -1 && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple));
-        Debug.Log("pk " + play.id_meeple);
         if (play.id_meeple != -1 && tuile_valide && _plateau.PionPosable(play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos, player_act, (ulong)play.id_meeple))
         {
             _plateau.PoserPion(player_act, play.tile_pos.X, play.tile_pos.Y, (ulong)play.slot_pos);
             players[index_player] = new PlayerInitParam(players[index_player].id_player, players[index_player].nb_meeple - 1, players[index_player].player_name);
             meeple_valide = true;
         }
-        Debug.Log("pk");
         if (tuile_valide)
         {
             _plateau.ValiderTour();
 
             gains.Clear();
             zones.Clear();
-            // Debug.Log("PTITI SCORE");
             score_changed = _plateau.VerifZoneFermeeTuile(play.tile_pos.X, play.tile_pos.Y, gains, zones);
             if (score_changed)
             {
-                //_plateau.RemoveAllPawnInZone()
                 for (int i = 0; i < gains.Count; i++)
                 {
-                    Debug.Log("GAGNE " + gains[i].id_player + " " + gains[i].points_gagnes);
                     saved_players_score[(int)gains[i].id_player] += gains[i].points_gagnes;
                 }
 
                 Dictionary<ulong, int> dico = _plateau.RemoveAllPawnInTile(play.tile_pos.X, play.tile_pos.Y, meeple_positions);
-                Debug.Log("dico de longueur : " + dico.Count);
                 foreach (ulong id_player in dico.Keys)
                 {
                     var joueur = players[(int)id_player];
                     int meeplesRendus = dico[id_player];
-                    Debug.Log("joueur j = " + id_player + " a " + joueur.nb_meeple + " meeples");
                     var temp = new PlayerInitParam(joueur.id_player, joueur.nb_meeple + meeplesRendus, joueur.player_name);
                     players[(int)id_player] = temp;
                     joueur = temp;
-                    Debug.LogWarning(meeplesRendus + " meeples ont ete rendus au joueur " + joueur.id_player);
-                    Debug.Log("joueur j = " + id_player + " a " + joueur.nb_meeple + " meeples");
                 }
             }
-            Debug.Log("Score changed ? " + score_changed);
         }
-        Debug.Log("OK");
         switch (my_wincond)
         {
             case WinCondition.WinByTime:
-                Debug.Log("TEMPS");
                 end = (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - time_start_of_game) > win_time_min * 60 + win_time_sec;
                 break;
             case WinCondition.WinByPoint:
-                Debug.Log("RESTART");
                 for (int i = 0; i < players.Count; i++)
                 {
                     end = end || (saved_players_score[i] >= win_point_nb);
-                    Debug.Log("" + saved_players_score[i] + " > " + win_point_nb + " ? " + end);
                 }
                 break;
             case WinCondition.WinByTile:
-                Debug.Log("HALLO");
                 end = _plateau.GetTuiles.Length >= win_tile_nb;
                 break;
         }
@@ -340,8 +322,6 @@ public class backLocal : CarcasheimBack
 
     int drawRiver()
     {
-        Debug.Log("pioche d'une tuile riviere...\ntiles_for_river.Count = " + tiles_for_river.Count);
-        Debug.Log(tiles_for_river.Count);
         possibilities_tile_act_turn.Clear();
         ulong result = 0;
         if (tiles_for_river.Count > 0)
@@ -356,10 +336,7 @@ public class backLocal : CarcasheimBack
             tile_final_river = ulong.MaxValue;
 
         }
-        Debug.Log(tiles_for_river.Count);
         possibilities_tile_act_turn.AddRange(_plateau.PositionsPlacementPossible(result));
-        Debug.Log("tirer");
-        Debug.Log("tuile d'id : " + result + " piochee");
         return (int)result;
     }
 
