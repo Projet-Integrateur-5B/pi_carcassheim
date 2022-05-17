@@ -411,6 +411,32 @@ namespace system
 
             return listPlayerAndName.ToArray();
         }
+        
+        public string[] CallPlayersStatus(int idRoom)
+        {
+            List<string> listPlayerAndNameAndStatus = new List<string>();
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
+                    foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
+                    {
+                        string playerName = joueur.Value.GetName();
+                        string playerStatus = joueur.Value.GetReady().ToString();
+                        listPlayerAndNameAndStatus.Add(joueur.Key.ToString());
+                        listPlayerAndNameAndStatus.Add(playerName);
+                        listPlayerAndNameAndStatus.Add(playerStatus);
+                    }
+
+                    return listPlayerAndNameAndStatus.ToArray();
+                }
+            }
+
+            return listPlayerAndNameAndStatus.ToArray();
+        }
 
         public List<ulong> CallPlayerCurrent(int idRoom)
         {

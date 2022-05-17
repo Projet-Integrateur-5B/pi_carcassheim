@@ -87,6 +87,11 @@ namespace system
         {
             return _name;
         }
+        
+        public bool GetReady()
+        {
+            return _is_ready;
+        }
 
         /// <summary>
         /// Création d'un nouveau joueur
