@@ -780,8 +780,7 @@ namespace system
                 if (threadJeu.Get_ID() == idRoom)
                 {
                     // Retrait du joueur de la partie
-                    Tools.PlayerStatus playerStatus = threadJeu.RemoveJoueur(idPlayer);
-                    return playerStatus;
+                    Tools.PlayerStatus playerStatus = threadJeu.RemoveJoueur(idPlayer);                
 
                     // Si le joueur quitte durant son tour
                     if(threadJeu.Get_ActualPlayerId() == idPlayer)
@@ -792,11 +791,19 @@ namespace system
                         ForceEndTurn(idPlayer, idRoom, Array.Empty<string>());
                     }
 
+                    // Si le joueur était le modérateur
+                    if(threadJeu.Get_Moderateur() == idPlayer)
+                    {
+                        threadJeu.SwitchModerateur();
+                    }
+
                     // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)
                     if(threadJeu.Get_Status() == Tools.GameStatus.Stopped)
                     {
                         DeleteGame(idRoom);
                     }
+
+                    return playerStatus;
 
                     break;
                 }

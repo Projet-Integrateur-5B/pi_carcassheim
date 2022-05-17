@@ -611,6 +611,18 @@ namespace system
         }
 
         /// <summary>
+        /// Switch moderator to the next player
+        /// </summary>
+        public void SwitchModerateur()
+        {
+            _s_dico_joueur.WaitOne();
+            ulong newModerator = Get_Dico_Joueurs().First().Key;
+            _s_dico_joueur.Release();
+            _id_moderateur = newModerator;
+            
+        }
+
+        /// <summary>
         ///     Constructor : initialisation of parameters.
         /// </summary>
         ///<param name="id_partie">id of the game .</param>
