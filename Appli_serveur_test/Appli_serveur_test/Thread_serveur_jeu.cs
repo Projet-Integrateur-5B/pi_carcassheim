@@ -1566,13 +1566,13 @@ namespace system
             if(tuiles.Count > 2)
             {
                 for (int i = tuiles.Count - 3; i < tuiles.Count; i++)
-                    list.Add(tuiles[i].ToString());
+                    list.Insert(0, tuiles[i].ToString());
             }
             else
             {
                 foreach(ulong tileId in tuiles)
                 {
-                    list.Add(tileId.ToString());
+                    list.Insert(0, tileId.ToString());
                 }
             }
             
