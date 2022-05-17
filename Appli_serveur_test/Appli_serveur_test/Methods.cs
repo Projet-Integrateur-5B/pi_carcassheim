@@ -772,7 +772,7 @@ public partial class Server
             return;
         }
         
-        if (packetReceived.Data.Length < 4)
+        if (packetReceived.Data.Length < 4 && packetReceived.Error != Tools.Errors.Data)
         {
             packet.Error = Tools.Errors.BadData;
             return;
