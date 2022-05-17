@@ -29,6 +29,7 @@ namespace Assets.system
     };
     public class Plateau
     {
+        private Tuile _tuileFantome;
         private static Tuile decoyTuile;
         /// <summary>
         /// le dernier virage de la riviere
@@ -357,9 +358,11 @@ namespace Assets.system
         public void PoserTuileFantome(ulong idTuile, int x, int y, int rot)
         {
             var t = tuileDeModelId(idTuile);
+            _tuileFantome = t;
             t.TuileFantome = true;
             _tuiles.Remove(FindTuileFantome);
             PoserTuile(t, x, y, rot);
+
         }
 
         /// <summary>
@@ -381,12 +384,13 @@ namespace Assets.system
         {
             get
             {
-                foreach (var item in _tuiles)
-                {
-                    if (item.TuileFantome)
-                        return item;
-                }
-                return null;
+                //foreach (var item in _tuiles)
+                //{
+                //    if (item.TuileFantome)
+                //        return item;
+                //}
+                //return null;
+                return _tuileFantome;
             }
         }
 
