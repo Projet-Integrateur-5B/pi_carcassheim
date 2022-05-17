@@ -1234,8 +1234,16 @@ namespace system
 
                     break;
                 case Tools.Mode.Score:
-
-                    //TODO
+                    // Vérifie si un joueur a atteint le score maximal
+                    string[] allScores = GetAllPlayersScore();
+                    foreach(string score in allScores)
+                    {
+                        if(Int32.Parse(score) >= _score_max)
+                        {
+                            statutGame = Tools.GameStatus.Stopped;
+                            break;
+                        }
+                    }
 
                     break;
             }
