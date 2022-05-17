@@ -1087,8 +1087,8 @@ namespace system
         private void OnTimedEventRoom(Object source, System.Timers.ElapsedEventArgs e)
         {
             var diff = DateTime.Now.Subtract(_DateTime_room).Minutes;
-            Console.WriteLine(diff + " " + 1800 / 60);
-            if (diff < 1800 / 60) return; // 1800 -> 30 minutes
+            Console.WriteLine(diff + " " + 60 / 60);
+            if (diff < 60 / 60) return; // 1800 -> 30 minutes
             
             Console.WriteLine("Room was raised at {0}. CloseRoom() is called", e.SignalTime);
             _timer_room.Stop();
