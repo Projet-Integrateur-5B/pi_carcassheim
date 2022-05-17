@@ -1077,8 +1077,10 @@ namespace system
 
         public void resetRoomTimer()
         {
+            Console.WriteLine(DateTime.Now.Subtract(_DateTime_room).Seconds);
             Console.WriteLine("========== RESET TIMER ==========");
-            _timer_room.Start();
+            _DateTime_room = DateTime.Now;
+            Console.WriteLine(DateTime.Now.Subtract(_DateTime_room).Seconds);
         }
         
         /// <summary>
