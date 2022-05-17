@@ -76,7 +76,7 @@ public class CameraManager : MonoBehaviour
 
     public bool cameraUpdate()
     {
-        bool ignore_touch = Input.touchCount != 2;
+        bool ignore_touch = Input.touchCount <= 1;
         if (Input.GetMouseButtonDown(0) && ignore_touch)
         {
             click_on = true;
@@ -96,52 +96,63 @@ public class CameraManager : MonoBehaviour
         }
         else if (click_on)
         {
+            if (!ignore_touch)
+            {
+                click_on = false;
+                moving = false;
+                return checkZoom();
+            }
             checkMove();
             return true;
         }
         else if (!moving && (Input.mouseScrollDelta.y != 0 || Input.touchCount == 2))
         {
-            Debug.Log("MEN IT'S WORKING " + Input.touchCount);
-            if (error_text != null)
-                error_text.text = "MEN IT'S WORKING " + Input.touchCount;
-            bool no_count = false;
-            float delta = Input.mouseScrollDelta.y;
-            if (Input.touchCount == 2)
-            {
-                Touch v0 = Input.GetTouch(0);
-                Touch v1 = Input.GetTouch(1);
-                no_count = true;
-                if (last_scroll == 0)
-                {
-                    original_dist = (v0.position - v1.position).magnitude;
-                    last_scroll++;
-                    Debug.Log("DIOSTANCE " + original_dist);
-                    if (error_text != null)
-                        error_text.text = "DIOSTANCE " + original_dist;
-                    return true;
-                }
-                else
-                {
-                    float dist = (v0.position - v1.position).magnitude;
-                    Debug.Log("DIOSTANCE " + dist + " / " + original_dist);
-                    if (error_text != null)
-                        error_text.text = "DIOSTANCE " + dist + " / " + original_dist;
-                    delta = original_dist / dist - 1;
-                }
-            }
-
-            Vector3 nz = transform.position + new Vector3(0, 0, discriminateSign(delta) * Time.deltaTime * scrollSpeed * linearCurve(last_scroll, 100));
-            last_scroll += 1;
-            if (Z_min > nz.z)
-                nz.z = Z_min;
-            if (nz.z > Z_max)
-                nz.z = Z_max;
-            transform.position = nz;
-            return no_count;
+            return checkZoom();
         }
         last_scroll = 0;
         last_move = 0;
         return true;
+    }
+
+    bool checkZoom()
+    {
+        Debug.Log("MEN IT'S WORKING " + Input.touchCount);
+        if (error_text != null)
+            error_text.text = "MEN IT'S WORKING " + Input.touchCount;
+        bool no_count = false;
+        float delta = Input.mouseScrollDelta.y;
+        if (Input.touchCount == 2)
+        {
+            Touch v0 = Input.GetTouch(0);
+            Touch v1 = Input.GetTouch(1);
+            no_count = true;
+            if (last_scroll == 0)
+            {
+                original_dist = (v0.position - v1.position).magnitude;
+                last_scroll++;
+                Debug.Log("DIOSTANCE " + original_dist);
+                if (error_text != null)
+                    error_text.text = "DIOSTANCE " + original_dist;
+                return true;
+            }
+            else
+            {
+                float dist = (v0.position - v1.position).magnitude;
+                Debug.Log("DIOSTANCE " + dist + " / " + original_dist);
+                if (error_text != null)
+                    error_text.text = "DIOSTANCE " + dist + " / " + original_dist;
+                delta = original_dist / dist - 1;
+            }
+        }
+
+        Vector3 nz = transform.position + new Vector3(0, 0, discriminateSign(delta) * Time.deltaTime * scrollSpeed * linearCurve(last_scroll, 100));
+        last_scroll += 1;
+        if (Z_min > nz.z)
+            nz.z = Z_min;
+        if (nz.z > Z_max)
+            nz.z = Z_max;
+        transform.position = nz;
+        return no_count;
     }
 
     void checkMove()
