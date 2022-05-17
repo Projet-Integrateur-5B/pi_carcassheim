@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraManager : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class CameraManager : MonoBehaviour
 
     [SerializeField] float nearPlane;
     Vector3 npos, origin_click_pos, origin_click_offset;
+
+    [SerializeField] Text error_text;
 
     void Awake()
     {
@@ -73,14 +76,14 @@ public class CameraManager : MonoBehaviour
 
     public bool cameraUpdate()
     {
-        if (Input.GetMouseButtonDown(0))
+        bool ignore_touch = Input.touchCount != 2;
+        if (Input.GetMouseButtonDown(0) && ignore_touch)
         {
             click_on = true;
             click_init_pos = transform.position;
             lastMovePos = -Input.mousePosition + new Vector3(mainCamera.pixelWidth, mainCamera.pixelHeight, nearPlane - transform.position.z);
             origin_click_pos = transform.position;
             origin_click_offset = mainCamera.ScreenToWorldPoint(lastMovePos) - origin_click_pos;
-            Debug.Log("START MOVING " + transform.position + " " + origin_click_pos + " " + mainCamera.ScreenToWorldPoint(lastMovePos));
             return true;
         }
         else if (Input.GetMouseButtonUp(0) && click_on)
@@ -99,6 +102,8 @@ public class CameraManager : MonoBehaviour
         else if (!moving && (Input.mouseScrollDelta.y != 0 || Input.touchCount == 2))
         {
             Debug.Log("MEN IT'S WORKING " + Input.touchCount);
+            if (error_text != null)
+                error_text.text = "MEN IT'S WORKING " + Input.touchCount;
             bool no_count = false;
             float delta = Input.mouseScrollDelta.y;
             if (Input.touchCount == 2)
@@ -111,12 +116,16 @@ public class CameraManager : MonoBehaviour
                     original_dist = (v0.position - v1.position).magnitude;
                     last_scroll++;
                     Debug.Log("DIOSTANCE " + original_dist);
+                    if (error_text != null)
+                        error_text.text = "DIOSTANCE " + original_dist;
                     return true;
                 }
                 else
                 {
                     float dist = (v0.position - v1.position).magnitude;
                     Debug.Log("DIOSTANCE " + dist + " / " + original_dist);
+                    if (error_text != null)
+                        error_text.text = "DIOSTANCE " + dist + " / " + original_dist;
                     delta = original_dist / dist - 1;
                 }
             }
@@ -142,7 +151,6 @@ public class CameraManager : MonoBehaviour
 
         Vector3 w_pos = mainCamera.ScreenToWorldPoint(pos);
         Vector3 w_last_pos = mainCamera.ScreenToWorldPoint(lastMovePos);
-        // Debug.Log("SLOW " + vect + " " + vect.sqrMagnitude + " " + moveTreshold);
         if (vect.sqrMagnitude > moveTreshold)
         {
             moving = true;

@@ -129,12 +129,10 @@ public class RoomParameterRepre : MonoBehaviour
 
     public void OnRoomExtensionChangeRiviere(bool state)
     {
-        Debug.Log("Riviere = " + state);
         RoomInfo.Instance.riverOn = state;
     }
     public void OnRoomExtensionChangeAbbaye(bool state)
     {
-        Debug.Log("Abbaye = " + state);
         RoomInfo.Instance.abbayeOn = state;
     }
 
@@ -143,7 +141,6 @@ public class RoomParameterRepre : MonoBehaviour
         int timer_tour = 30;
         if (time_tour_slider.value > 0)
             timer_tour = (time_tour_slider.value + 1) * 30;
-        Debug.Log("timer tour" + timer_tour);
         RoomInfo.Instance.timerJoueur = timer_tour;
     }
 
@@ -223,7 +220,6 @@ public class RoomParameterRepre : MonoBehaviour
         int time_value = 0;
         if (timer_tour > 20)
             time_value = timer_tour / 30 - 1;
-        Debug.Log("val " + timer_tour + " " + time_value);
         time_tour_slider.SetValueWithoutNotify(time_value);
 
 
@@ -235,7 +231,7 @@ public class RoomParameterRepre : MonoBehaviour
         room_extension_rivier.SetIsOnWithoutNotify(river_on);
 
         room_win_tile.SetValueWithoutNotify(tile_win / 30 - 1);
-        room_win_point.SetValueWithoutNotify(point_win / 30 - 1);
+        room_win_point.SetValueWithoutNotify(point_win / 50 - 1);
         if (timer_win == 3600)
             room_win_timer.SetValueWithoutNotify(1);
         else
