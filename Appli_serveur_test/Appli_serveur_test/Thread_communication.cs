@@ -191,6 +191,7 @@ namespace system
                 Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId, playerSocket);
 
                 _lst_serveur_jeu.Add(thread_serveur_jeu);
+                thread_serveur_jeu.startRoomTimer();
 
                 return id_nouv_partie;
 
@@ -217,6 +218,7 @@ namespace system
                     lock (_lock_id_parties_gerees)
                     {
                         var idToRemove = _id_parties_gerees.Single(id => id.Equals(roomId));
+                        thread_serv_ite.stopRoomTimer();
                         _id_parties_gerees.Remove(idToRemove);
                     }
                     break;
@@ -669,8 +671,26 @@ namespace system
                 }
             }             
         }
-        
 
+        public void ForceCloseRoom(int idRoom)
+        {
+            Console.WriteLine("ForceCloseRoom");
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (thread_serv_ite.Get_ID() != idRoom) continue;
+                
+                Console.WriteLine("ForceCloseRoom : idRoom was found !");
+
+                foreach (var player in thread_serv_ite.Get_Dico_Joueurs())
+                {
+                    Console.WriteLine("ForceCloseRoom : remove idPlayer " + player.Value._id_player);
+                    thread_serv_ite.RemoveJoueur(player.Value._id_player);
+                    SendUnicast(idRoom, Tools.IdMessage.PlayerKick, player.Value._socket_of_player, player.Value._id_player, Array.Empty<string>());
+                }
+                DeleteGame(idRoom);
+            }
+        }
+        
         /// <summary>
         ///     Checks if the data is equivalent to the last play stored. If not, check the validity of it.
         /// </summary>

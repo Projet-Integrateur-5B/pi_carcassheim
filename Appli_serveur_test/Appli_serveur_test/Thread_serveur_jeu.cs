@@ -90,6 +90,12 @@ namespace system
         public DateTime _DateTime_player { get; set; }
         public System.Timers.Timer _timer_player;
         private Tools.Timer _timer_player_value; // En secondes
+        
+        /// <summary>
+        ///     The room timer, which is not activ anymore if it expires. 
+        /// </summary>
+        public DateTime _DateTime_room { get; set; }
+        public System.Timers.Timer _timer_room;
 
         /// <summary>
         ///     Initial tile's id, either the path or the river, depends on the dlc
@@ -582,6 +588,8 @@ namespace system
                         {
                             _idTuileInit = 22;
                         }
+                        
+                        resetRoomTimer();
 
                     }
                     catch (Exception ex)
@@ -717,6 +725,8 @@ namespace system
             _nombre_joueur++;
             _s_nombre_joueur.Release();
             _s_dico_joueur.Release();
+            
+            resetRoomTimer();
 
             return Tools.PlayerStatus.Success;
         }
@@ -809,6 +819,8 @@ namespace system
             player._is_ready = !player._is_ready;
             player._s_player.Release();
             _s_dico_joueur.Release();
+            
+            resetRoomTimer();
 
             return Tools.PlayerStatus.Success;
         }
@@ -925,6 +937,8 @@ namespace system
         /// <returns> Returns the id of the initial tile  </returns>
         public ulong StartGame()
         {
+            stopRoomTimer();
+            
             _statut_partie = Tools.GameStatus.Running;
 
             // Génération du dicoTuile de la classe tuile
@@ -1004,7 +1018,7 @@ namespace system
             return _idTuileInit;
         }
         
-
+        
         /// <summary>
         ///     Methode : Event when game timer expires (EndGame()) .
         /// </summary>
@@ -1058,6 +1072,43 @@ namespace system
             }
         }
 
+        public void startRoomTimer()
+        {
+            _timer_room = new System.Timers.Timer();
+            _timer_room.Interval = 1000;
+            _timer_room.Elapsed += OnTimedEventRoom;
+            _DateTime_room = DateTime.Now;
+            _timer_room.AutoReset = true;
+            _timer_room.Enabled = true;
+        }
+
+        public void resetRoomTimer()
+        {
+            _DateTime_room = DateTime.Now;
+        }
+        
+        public void stopRoomTimer()
+        {
+            _timer_room.Stop();
+        }
+        
+        /// <summary>
+        ///     Methode : Event when room timer expires (CloseRoom()) .
+        /// </summary>
+        private void OnTimedEventRoom(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            var diff = DateTime.Now.Subtract(_DateTime_room).Minutes;
+            if (diff < 300 / 60) return; // 300 -> 5 minutes
+            
+            Console.WriteLine("Room was raised at {0}. CloseRoom() is called", e.SignalTime);
+            _timer_room.Stop();
+            _statut_partie = Tools.GameStatus.Stopped;
+            
+            GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+            // Force the end of the game
+            gestionnaire.CallForceCloseRoom(_id_partie);
+        }
+        
         /// <summary>
         ///     Method : Get three tiles' id from the game's list of tile
         /// </summary>
