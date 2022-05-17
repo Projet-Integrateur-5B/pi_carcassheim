@@ -453,7 +453,7 @@ namespace system
                     currentPlayer[0] = thread_serv_ite.Get_ActualPlayerId();
                     if(currentPlayer[0] != 0)
                     {
-                        if (thread_serv_ite.IsRiverExtensionOn() && thread_serv_ite.Get_rivieresGame().Count >= 0)
+                        if (thread_serv_ite.IsRiverExtensionOn() && thread_serv_ite.Get_rivieresGame().Count > 0)
                         {
                             currentPlayer[1] = 0;
                         }
