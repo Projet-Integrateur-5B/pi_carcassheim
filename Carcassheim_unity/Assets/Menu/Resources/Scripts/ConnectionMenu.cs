@@ -187,6 +187,7 @@ public class ConnectionMenu : Miscellaneous
             if (packet.Error == Tools.Errors.None)
             {
                 Communication.Instance.IdClient = packet.IdPlayer;
+                Communication.Instance.Name = RemoveLastSpace(loginCM.text);
                 res = true;
             }
 

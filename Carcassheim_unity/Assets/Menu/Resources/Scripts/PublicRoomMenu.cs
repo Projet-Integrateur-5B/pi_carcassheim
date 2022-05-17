@@ -1,4 +1,5 @@
-﻿using Assets.System;
+﻿using Assert.system;
+using Assets.System;
 using ClassLibrary;
 using System;
 using System.Collections;
@@ -19,7 +20,10 @@ public class PublicRoomMenu : Miscellaneous
     public Semaphore s_listAction;
     private Transform container;
     private Text id_room; //id de la room (pour l'instant : 'X')
+    private List<Player> listPlayers = new List<Player>();
+    private ulong nbPlayer = 0;
     List<PlayerLine> List_of_Player = new List<PlayerLine>();
+    [SerializeField] PlayerLine PlayerLigneModel;
 
     [SerializeField] RoomParameterRepre repre_parameter;
 
@@ -50,9 +54,9 @@ public class PublicRoomMenu : Miscellaneous
         OnMenuChange -= OnStart;
     }
 
-    private void TableauPlayer()
+    private void TableauPlayer(List<Player> listPlayers)
     {
-        PlayerLine model = FindObject(gameObject, "PLAYERLINE").GetComponent<PlayerLine>();
+        PlayerLine model = PlayerLigneModel;
         if (List_of_Player != null)
         {
             foreach (PlayerLine player in List_of_Player)
@@ -62,17 +66,12 @@ public class PublicRoomMenu : Miscellaneous
         }
 
         List_of_Player.Clear();
-        s_listAction.WaitOne();
-        int taille = listAction.Count;
-        s_listAction.Release();
-        s_listAction.WaitOne();
-        for (int i = 0; i < taille; i += 2)
+        int taille = listPlayers.Count;
+        for (int i = 0; i < taille; i ++)
         {
-            List_of_Player.Add(CreatePlayerLine(model, listAction[i], false));
+            List_of_Player.Add(CreatePlayerLine(model, listPlayers[i].name, listPlayers[i].status));
         }
 
-        listAction.Clear();
-        s_listAction.Release();
     }
 
     /// <summary>
@@ -142,7 +141,6 @@ public class PublicRoomMenu : Miscellaneous
     /// </summary>
     public void Ready()
     {
-
         Packet packet = new Packet();
         packet.IdMessage = Tools.IdMessage.PlayerReady;
         packet.IdPlayer = Communication.Instance.IdClient;
@@ -206,7 +204,8 @@ public class PublicRoomMenu : Miscellaneous
         }
         else if (packet.IdMessage == Tools.IdMessage.PlayerJoin)
         {
-            if(packet.IdPlayer == Communication.Instance.IdClient)
+            string name = Communication.Instance.Name;
+            if (packet.IdPlayer == Communication.Instance.IdClient)
             {
                 Packet packet1 = new Packet();
                 packet1.IdMessage = Tools.IdMessage.RoomSettingsGet;
@@ -218,12 +217,31 @@ public class PublicRoomMenu : Miscellaneous
             }
             else
             {
-                s_listAction.WaitOne();
-                listAction.Add("playerJoin");
-                listAction.Add(packet.Data[0]);
-                s_listAction.Release();
+                name = packet.Data[0];
             }
-            //todo
+
+            s_listAction.WaitOne();
+            listAction.Add("playerInfo");
+            s_listAction.Release();
+
+            listPlayers.Add(new Player(packet.IdPlayer, name, false));
+            nbPlayer++;
+        }
+        else if (packet.IdMessage == Tools.IdMessage.PlayerLeave)
+        {
+            s_listAction.WaitOne();
+            listAction.Add("playerInfo");
+            s_listAction.Release();
+
+            int i;
+            for (i = 0; i < (int)nbPlayer; i++)
+            {
+                if (listPlayers[i].id == packet.IdPlayer)
+                {
+                    listPlayers.RemoveAt(i);
+                }
+            }
+            nbPlayer--;
         }
         else if (packet.IdMessage == Tools.IdMessage.RoomSettingsGet)
         {
@@ -237,7 +255,18 @@ public class PublicRoomMenu : Miscellaneous
 
         else if (packet.IdMessage == Tools.IdMessage.PlayerReady)
         {
-            //todo
+            s_listAction.WaitOne();
+            listAction.Add("playerInfo");
+            s_listAction.Release();
+
+            int i;
+            for(i = 0; i < (int)nbPlayer; i++)
+            {
+                if (listPlayers[i].id == packet.IdPlayer)
+                {
+                    listPlayers[i].status = !listPlayers[i].status;
+                }
+            }
         }
     }
 
@@ -281,15 +310,10 @@ public class PublicRoomMenu : Miscellaneous
                     StartCoroutine(LoadYourAsyncScene());
                     gameObject.SetActive(false);
                     break;
-                case "playerJoin":
+                case "playerInfo":
                     /* Update l'affichage */
-                    TableauPlayer();
+                    TableauPlayer(listPlayers);
                     break;
-                case "playerReady":
-                    /* Update l'affichage */
-                    
-                    break;
-
             }
 
             s_listAction.WaitOne();

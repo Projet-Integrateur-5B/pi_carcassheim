@@ -28,6 +28,17 @@ namespace Assets.System
         }
 
         /// <summary>
+        ///    Représente le nom du joueur.
+        /// </summary>
+        /// <value>Par Défaut = ""</value>
+        /// <returns><see cref="string" /></returns>
+        public string Name
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         ///     Attribut utilisé par <see cref="IdClient" />.
         /// </summary>
         /// <value>Par Défaut = 0</value>

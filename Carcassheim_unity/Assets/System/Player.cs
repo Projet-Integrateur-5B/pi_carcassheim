@@ -29,6 +29,11 @@ namespace Assert.system
         public uint score { get; set; }
 
         /// <summary>
+        ///     status du joueur
+        /// </summary>
+        public bool status { get; set; }
+
+        /// <summary>
         ///     récupération des nouvelles informations du joueur
         /// </summary>
         /// <param name="player_id">Id du joueur</param>
@@ -41,6 +46,22 @@ namespace Assert.system
             name = player_name;
             nbMeeples = player_nbMeeples;
             score = player_score;
+            status = true;
+        }
+
+        /// <summary>
+        ///     récupération des nouvelles informations du joueur
+        /// </summary>
+        /// <param name="player_id">Id du joueur</param>
+        /// <param name="player_name">Nom du joueur</param>
+        /// <param name="player_status">Statut du joueur</param>
+        public Player(ulong player_id, string player_name, bool player_status)
+        {
+            id = player_id;
+            name = player_name;
+            nbMeeples = 0;
+            score = 0;
+            status = player_status;
         }
     }
 }
