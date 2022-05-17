@@ -372,7 +372,10 @@ namespace Assets.system
         {
             Tuile tuile = FindTuileFantome;
             if (tuile != null)
-                FindTuileFantome.TuileFantome = false;
+            {
+                tuile.TuileFantome = false;
+                _tuileFantome = null;
+            }
             else
                 Debug.LogWarning("pas de tuile fantome trouvee");
         }
@@ -384,13 +387,13 @@ namespace Assets.system
         {
             get
             {
-                //foreach (var item in _tuiles)
-                //{
-                //    if (item.TuileFantome)
-                //        return item;
-                //}
-                //return null;
-                return _tuileFantome;
+                foreach (var item in _tuiles)
+                {
+                    if (item.TuileFantome)
+                        return item;
+                }
+                return null;
+                //return _tuileFantome;
             }
         }
 
