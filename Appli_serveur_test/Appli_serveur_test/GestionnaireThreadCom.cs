@@ -293,17 +293,24 @@ namespace system
 
         public Tools.Errors JoinPlayer(int idRoom, ulong idPlayer, Socket? playerSocket)
         {
+            List<string> dataPlayerName= new List<string>();
+            var db = new Database();
+
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
+                    var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);                 
                     if (playerStatus == Tools.PlayerStatus.Full) // La room est pleine
                     {
                         return Tools.Errors.RoomJoin;
                     }
+                    string playerName = db.GetPseudo((int)idPlayer);
+                    thread_serv_ite.Get_Dico_Joueurs()[idPlayer].SetName(playerName);
+                    dataPlayerName.Add(playerName);
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerJoin, idPlayer, dataPlayerName.ToArray());
 
                     return Tools.Errors.None;
 
@@ -382,8 +389,6 @@ namespace system
         {
             List<string> listPlayerAndName = new List<string>();
 
-            var db = new Database();
-
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
@@ -392,7 +397,7 @@ namespace system
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
-                        string playerName = db.GetPseudo((int)joueur.Key);
+                        string playerName = joueur.Value.GetName();
                         listPlayerAndName.Add(joueur.Key.ToString());
                         listPlayerAndName.Add(playerName);
                     }

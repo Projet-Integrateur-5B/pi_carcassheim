@@ -47,6 +47,10 @@ namespace system
         /// Semaphore du joueur pour éviter les accès concurrents
         /// </summary>
         public Semaphore _s_player;
+        /// <summary>
+        /// Pseudo du joueur
+        /// </summary>
+        private string _name;
 
         /// <summary>
         /// Ajout de points au joueur
@@ -71,6 +75,17 @@ namespace system
             _nbMeeples = _nbMeeples + meepleNum;
             _s_player.Release();
             Console.WriteLine("DBG - ADD_MEEPLE - " + _id_player + " a reçu " + _nbMeeples + " meeples. (Possédés à présent:" + _nbMeeples + ")");
+        }
+
+        public void SetName(string name)
+        {
+            _s_player.WaitOne();
+            _name = name;
+            _s_player.Release();
+        }
+        public string GetName()
+        {
+            return _name;
         }
 
         /// <summary>
