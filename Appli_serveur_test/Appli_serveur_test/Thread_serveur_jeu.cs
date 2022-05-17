@@ -1640,8 +1640,10 @@ namespace system
             var db = new Database();
             db.RemplirRivieres(rivieresRaw);
 
+            Console.WriteLine("/!\\ DBG - Random_sort_rivi : head is " + rivieresRaw[0]);
             rivieresRaw.RemoveAt(0); // Retrait de la première tuile (init, posée auto)
             var tail = rivieresRaw.Last(); // Mise à part de la dernière (aval)
+            Console.WriteLine("/!\\ DBG - Random_sort_rivi : tail is " + tail.ToString());
             rivieresRaw.RemoveAt(rivieresRaw.Count-1);
 
             while(rivieresRaw.Count > 0)
