@@ -4,7 +4,7 @@ using System;
 
 namespace Assets.system
 {
-    public partial class Tuile
+    public partial class Tuile : Comparer<Tuile>
     {
         /// <summary>
         /// Les slots constituants la tuile
@@ -303,6 +303,21 @@ namespace Assets.system
                     return true;
             }
             return false;
+        }
+
+        public override int Compare(Tuile t1, Tuile t2)
+        {
+            if (t1.X < t2.X)
+                return -1;
+            if (t1.X > t2.X)
+                return 1;
+
+            if (t1.Y < t2.Y)
+                return -1;
+            if (t1.Y > t2.Y)
+                return 1;
+
+            return 0;
         }
     }
 
