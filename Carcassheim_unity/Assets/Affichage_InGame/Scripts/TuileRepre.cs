@@ -203,7 +203,7 @@ public class TuileRepre : MonoBehaviour
     }
     public bool setMeeplePos(MeepleRepre meeple, SlotIndic slot_indic)
     {
-        if (meeple == null || !slot_indic.model_renderer.enabled)
+        if (meeple == null)
         {
             return false;
         }

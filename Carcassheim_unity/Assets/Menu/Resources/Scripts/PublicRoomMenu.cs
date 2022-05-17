@@ -116,6 +116,7 @@ public class PublicRoomMenu : Miscellaneous
             default:
                 /* Ce n'est pas la bonne page */
                 /* Stop la reception dans cette class */
+                onUnready();
                 Communication.Instance.StopListening(OnPacketReceived);
                 repre_parameter.IsInititialized = false;
 

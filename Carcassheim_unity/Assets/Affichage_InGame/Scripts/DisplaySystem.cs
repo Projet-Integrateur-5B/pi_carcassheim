@@ -192,8 +192,9 @@ public class DisplaySystem : MonoBehaviour
                 or_slot -= 1;
                 slot = (slot - 1 + act_tile.MaxSlot) % act_tile.MaxSlot;
                 act_meeple.SlotPos = -1;
-                verif_meeple = act_tile.setMeeplePos(act_meeple, slot);
-                verif_meeple = slot == act_meeple.SlotPos;
+                verif_meeple = act_tile.getSlotAt(slot).model_renderer.enabled;
+                if (verif_meeple)
+                    act_tile.setMeeplePos(act_meeple, slot);
             } while (!verif_meeple && or_slot > 0);
         }
         else
@@ -206,8 +207,9 @@ public class DisplaySystem : MonoBehaviour
                 or_slot -= 1;
                 slot = (slot + 1) % act_tile.MaxSlot;
                 act_meeple.SlotPos = -1;
-                verif_meeple = act_tile.setMeeplePos(act_meeple, slot);
-                verif_meeple = slot == act_meeple.SlotPos;
+                verif_meeple = act_tile.getSlotAt(slot).model_renderer.enabled;
+                if (verif_meeple)
+                    act_tile.setMeeplePos(act_meeple, slot);
             } while (!verif_meeple && or_slot > 0);
         }
 
