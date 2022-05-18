@@ -654,13 +654,13 @@ public partial class Server
             return;
         }
 
-        Tools.Errors error = Tools.Errors.Unknown;
+        Tools.Errors error = Tools.Errors.Permission;
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        List<ulong> currentPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
+        List<ulong> currentPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom, packetReceived.IdPlayer);
 
         if (currentPlayer[0] != 0 && currentPlayer.Count > 1)
         {
