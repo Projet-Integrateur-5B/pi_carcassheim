@@ -125,7 +125,8 @@ namespace system
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
                         // On envoie le display à tous sauf au joueur dont c'est l'action (si tuileDrawn on envoit à tous)
-                        if (joueur.Key != idPlayer || idMessage is Tools.IdMessage.TuileDraw or Tools.IdMessage.PionPlacement) 
+                        if (joueur.Key != idPlayer || idMessage is Tools.IdMessage.RoomSettingsGet or Tools.IdMessage.TuileDraw 
+                            or Tools.IdMessage.PionPlacement or Tools.IdMessage.PlayerKick) 
                         {
                             Console.WriteLine("SendBroadcast : to " + joueur.Value._id_player + "!");
                             Server.Server.SendToSpecificClient(joueur.Value._socket_of_player, packet);
@@ -190,6 +191,7 @@ namespace system
                 Thread_serveur_jeu thread_serveur_jeu = new Thread_serveur_jeu(id_nouv_partie, playerId, playerSocket);
 
                 _lst_serveur_jeu.Add(thread_serveur_jeu);
+                thread_serveur_jeu.startRoomTimer();
 
                 return id_nouv_partie;
 
@@ -216,6 +218,7 @@ namespace system
                     lock (_lock_id_parties_gerees)
                     {
                         var idToRemove = _id_parties_gerees.Single(id => id.Equals(roomId));
+                        thread_serv_ite.stopRoomTimer();
                         _id_parties_gerees.Remove(idToRemove);
                     }
                     break;
@@ -556,7 +559,7 @@ namespace system
                             return errorsEquivalence;
 
                         // Fin du tour actuel
-                        Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
+                        Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer, true);
                         // Mise à jour du status de la game
                         Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
                         Console.WriteLine(thread_serv_ite.Get_Status());
@@ -630,7 +633,7 @@ namespace system
                 if (idPlayer == thread_serv_ite.Get_ActualPlayerId())
                 {
                     // Fin du tour actuel
-                    Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer);
+                    Socket? nextPlayerSocket = thread_serv_ite.EndTurn(idPlayer, false);
                     // Mise à jour du status de la game
                     Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
 
@@ -668,8 +671,26 @@ namespace system
                 }
             }             
         }
-        
 
+        public void ForceCloseRoom(int idRoom)
+        {
+            Console.WriteLine("ForceCloseRoom");
+            foreach (Thread_serveur_jeu thread_serv_ite in _lst_serveur_jeu)
+            {
+                if (thread_serv_ite.Get_ID() != idRoom) continue;
+                
+                Console.WriteLine("ForceCloseRoom : idRoom was found !");
+
+                foreach (var player in thread_serv_ite.Get_Dico_Joueurs())
+                {
+                    Console.WriteLine("ForceCloseRoom : remove idPlayer " + player.Value._id_player);
+                    thread_serv_ite.RemoveJoueur(player.Value._id_player);
+                    SendUnicast(idRoom, Tools.IdMessage.PlayerKick, player.Value._socket_of_player, player.Value._id_player, Array.Empty<string>());
+                }
+                DeleteGame(idRoom);
+            }
+        }
+        
         /// <summary>
         ///     Checks if the data is equivalent to the last play stored. If not, check the validity of it.
         /// </summary>
@@ -757,16 +778,18 @@ namespace system
                     if (playerStatus == Tools.PlayerStatus.Kicked) // Deuxième triche -> kick
                     {
                         packet.IdMessage = Tools.IdMessage.PlayerKick;
+                        PlayerKick(idRoom, idPlayer, Array.Empty<string>());
                     }
                     else // Première triche -> avertissement
                     {
                         packet.IdMessage = Tools.IdMessage.PlayerCheat;
+                        Server.Server.SendToSpecificClient(playerSocket, packet);
                     }
                     break;
                 }
             }
 
-            Server.Server.SendToSpecificClient(playerSocket, packet);
+            
         }
 
         public Tools.PlayerStatus PlayerLeave(ulong idPlayer, int idRoom)
@@ -778,28 +801,95 @@ namespace system
                 {
                     // Retrait du joueur de la partie
                     Tools.PlayerStatus playerStatus = threadJeu.RemoveJoueur(idPlayer);
-                    return playerStatus;
 
-                    // Si le joueur quitte durant son tour
-                    if(threadJeu.Get_ActualPlayerId() == idPlayer)
+                    // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)
+                    if (threadJeu.Get_Status() == Tools.GameStatus.Stopped)
+                    {
+                        DeleteGame(idRoom);
+                        return playerStatus;
+                    }
+
+                    if (threadJeu.Get_ActualPlayerId() == idPlayer) // Si le joueur quitte durant son tour
                     {
                         // On abandonne les informations du tour actuel
                         Socket? nextPlayerSock = threadJeu.CancelTurn();
-                        // On lui envoit les 3 tuiles
-                        SendBroadcast(idRoom, Tools.IdMessage.TuileDraw, threadJeu.GetThreeLastTiles());
+                        // On termine le tour de manière forcée
+                        ForceEndTurn(idPlayer, idRoom, Array.Empty<string>());
                     }
 
-                    // Vérification du status de la partie (si le dernier joueur quitte -> fin de partie)
-                    if(threadJeu.Get_Status() == Tools.GameStatus.Stopped)
+                    // Si le joueur était le modérateur
+                    if(threadJeu.Get_Moderateur() == idPlayer)
                     {
-                        DeleteGame(idRoom);
+                        threadJeu.SwitchModerateur();
                     }
 
-                    break;
+                    
+
+                    return playerStatus;
+
                 }
             }
 
             return Tools.PlayerStatus.NotFound;
+        }
+
+        public void PlayerKick(int idRoom, ulong idPlayer, string[] data)
+        {
+            foreach (Thread_serveur_jeu thread_serv_ite in Get_list_server_thread())
+            {
+                if (thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;               
+                // Informe tous le monde du kick
+                SendBroadcast(idRoom, Tools.IdMessage.PlayerKick, idPlayer);
+
+                //Debug kick
+                Console.WriteLine("/!\\ DEBUG - Playerkicked : " + idPlayer);
+
+                // Retrait du joueur de la game
+                thread_serv_ite.RemoveJoueur(idPlayer);
+                // Cancel tour actuel
+                Socket? nextPlayerSock = thread_serv_ite.CancelTurn();
+
+                // Mise à jour du status de la game
+                Tools.GameStatus statusGame = thread_serv_ite.UpdateGameStatus();
+
+                // Génération du nouveau tableau data+scores
+                string[] allScores = thread_serv_ite.GetAllPlayersScore();
+                string[] dataWithScores = new string[allScores.Length + data.Length];
+
+                data.CopyTo(dataWithScores, 0);
+                allScores.CopyTo(dataWithScores, data.Length);
+
+                if (statusGame == Tools.GameStatus.Stopped) // Si la partie est terminée
+                {
+                    Console.WriteLine("Playerkicked : game stopped !");
+
+                    SendBroadcast(idRoom, Tools.IdMessage.EndTurn, dataWithScores);
+                    ulong idPlayerWinner = thread_serv_ite.GetWinner();
+                    string[] dataToSend = new string[] { idPlayerWinner.ToString() };
+                    SendBroadcast(idRoom, Tools.IdMessage.EndGame, dataToSend);
+                    DeleteGame(idRoom);
+                }
+                else // Si la partie n'est pas terminée
+                {
+                    Console.WriteLine("Playerkicked : game still running !");
+
+                    // Mélange des tuiles pour le prochain tirage
+                    thread_serv_ite.ShuffleTilesGame();
+                    thread_serv_ite.Set_tuilesEnvoyees(thread_serv_ite.GetThreeLastTiles());
+
+                    Console.WriteLine("Playerkicked : before broadcast !");
+
+                    // Envoi de l'information du endturn
+                    SendBroadcast(idRoom, Tools.IdMessage.TimerPlayer, dataWithScores);
+                }
+
+                // reset player timer               
+                thread_serv_ite._DateTime_player = DateTime.Now;
+                thread_serv_ite._timer_player.Start();
+
+                break;
+
+            }
         }
 
         // ===============================

@@ -87,9 +87,15 @@ namespace system
         /// <summary>
         ///     The round timer, for each round the player has to finish before timer expiration.
         /// </summary>
-        private DateTime _DateTime_player;
-        private System.Timers.Timer _timer_player;
+        public DateTime _DateTime_player { get; set; }
+        public System.Timers.Timer _timer_player;
         private Tools.Timer _timer_player_value; // En secondes
+        
+        /// <summary>
+        ///     The room timer, which is not activ anymore if it expires. 
+        /// </summary>
+        public DateTime _DateTime_room { get; set; }
+        public System.Timers.Timer _timer_room;
 
         /// <summary>
         ///     Initial tile's id, either the path or the river, depends on the dlc
@@ -577,6 +583,8 @@ namespace system
                         {
                             _idTuileInit = 22;
                         }
+                        
+                        resetRoomTimer();
 
                     }
                     catch (Exception ex)
@@ -611,6 +619,18 @@ namespace system
         }
 
         /// <summary>
+        /// Switch moderator to the next player
+        /// </summary>
+        public void SwitchModerateur()
+        {
+            _s_dico_joueur.WaitOne();
+            ulong newModerator = Get_Dico_Joueurs().First().Key;
+            _s_dico_joueur.Release();
+            _id_moderateur = newModerator;
+            
+        }
+
+        /// <summary>
         ///     Constructor : initialisation of parameters.
         /// </summary>
         ///<param name="id_partie">id of the game .</param>
@@ -633,7 +653,7 @@ namespace system
             // Initialisation des valeurs par défaut
             _mode = Tools.Mode.Default;
             _nb_tuiles = 60;
-            _score_max = -1;
+            _score_max = 50;
             _privee = false; // Une partie est par défaut privée
             _timer_game_value = Tools.Timer.Heure; // Une heure par défaut
             _timer_player_value = Tools.Timer.Minute;
@@ -699,6 +719,8 @@ namespace system
             _nombre_joueur++;
             _s_nombre_joueur.Release();
             _s_dico_joueur.Release();
+            
+            resetRoomTimer();
 
             return Tools.PlayerStatus.Success;
         }
@@ -721,12 +743,12 @@ namespace system
                 _s_nombre_joueur.Release();
                 if (id_joueur == _id_moderateur)
                 {
-                    if (_dico_joueur.Count != 0)
+                    if (_dico_joueur.Count > 1)
                     {
                         _id_moderateur = _dico_joueur.First().Key;
                     }
                     else
-                    {/* Il n'y a plus personne dans la room */
+                    {/* Il n'y a plus qu'un seul joueur ou moins dans la room */
                         _statut_partie = Tools.GameStatus.Stopped;
                     }
                 }
@@ -791,6 +813,8 @@ namespace system
             player._is_ready = !player._is_ready;
             player._s_player.Release();
             _s_dico_joueur.Release();
+            
+            resetRoomTimer();
 
             return Tools.PlayerStatus.Success;
         }
@@ -841,7 +865,11 @@ namespace system
         /// </summary>
         public void WaitACBarrier()
         {
-            _AC_barrierAllVerifDone.SignalAndWait(2000);
+            if (_AC_barrierUp)
+            {
+                _AC_barrierAllVerifDone.SignalAndWait(5000);
+            }
+            
         }
 
         /// <summary>
@@ -903,6 +931,8 @@ namespace system
         /// <returns> Returns the id of the initial tile  </returns>
         public ulong StartGame()
         {
+            stopRoomTimer();
+            
             _statut_partie = Tools.GameStatus.Running;
 
             // Génération du dicoTuile de la classe tuile
@@ -960,7 +990,7 @@ namespace system
                 _timer_game = new System.Timers.Timer();
                 _timer_game.Interval = 1000;
                 _timer_game.Elapsed += OnTimedEventGame;
-                _DateTime_player = DateTime.Now;
+                _DateTime_game = DateTime.Now;
                 _timer_game.AutoReset = true;
                 _timer_game.Enabled = true;
             }
@@ -982,7 +1012,7 @@ namespace system
             return _idTuileInit;
         }
         
-
+        
         /// <summary>
         ///     Methode : Event when game timer expires (EndGame()) .
         /// </summary>
@@ -1014,12 +1044,65 @@ namespace system
             Console.WriteLine("Player was raised at {0}. EndTurn({1}) is called", e.SignalTime, idPlayer);
             _timer_player.Stop();
 
-            string[] dataPlayToSend = ParseStoredPlayToData();
             GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
-            // Force the end of the turn
-            gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
+
+            _s_dico_joueur.WaitOne();
+            _dico_joueur[idPlayer]._timer++;
+            _s_dico_joueur.Release();
+
+            string[] dataPlayToSend = ParseStoredPlayToData();
+            
+
+            // Kick après la fin du tour (pour éviter les erreurs)
+            if (_dico_joueur[idPlayer]._timer > 2)
+            {         
+                gestionnaire.CallPlayerKick(_id_partie, idPlayer, dataPlayToSend);
+
+            }
+            else // Sinon fin de tour forcée classique
+            {
+                // Force the end of the turn
+                gestionnaire.CallForceEndTurn(idPlayer, _id_partie, dataPlayToSend);
+            }
         }
 
+        public void startRoomTimer()
+        {
+            _timer_room = new System.Timers.Timer();
+            _timer_room.Interval = 1000;
+            _timer_room.Elapsed += OnTimedEventRoom;
+            _DateTime_room = DateTime.Now;
+            _timer_room.AutoReset = true;
+            _timer_room.Enabled = true;
+        }
+
+        public void resetRoomTimer()
+        {
+            _DateTime_room = DateTime.Now;
+        }
+        
+        public void stopRoomTimer()
+        {
+            _timer_room.Stop();
+        }
+        
+        /// <summary>
+        ///     Methode : Event when room timer expires (CloseRoom()) .
+        /// </summary>
+        private void OnTimedEventRoom(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            var diff = DateTime.Now.Subtract(_DateTime_room).Minutes;
+            if (diff < 300 / 60) return; // 300 -> 5 minutes
+            
+            Console.WriteLine("Room was raised at {0}. CloseRoom() is called", e.SignalTime);
+            _timer_room.Stop();
+            _statut_partie = Tools.GameStatus.Stopped;
+            
+            GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
+            // Force the end of the game
+            gestionnaire.CallForceCloseRoom(_id_partie);
+        }
+        
         /// <summary>
         ///     Method : Get three tiles' id from the game's list of tile
         /// </summary>
@@ -1040,18 +1123,30 @@ namespace system
 
         /// <summary>
         ///     Method : Shuffles the list of game's tiles
+        ///     Draw new set of tile if not in default mode
         /// </summary>
         public void ShuffleTilesGame()
         {
             _s_tuilesGame.WaitOne();
 
             List<ulong> tuilesGame_resultat = new List<ulong>();
-            var rnd = new System.Random();
-            var randomedList = _tuilesGame.OrderBy(item => rnd.Next());
-            foreach (var value in randomedList)
-            {
-                tuilesGame_resultat.Add(value);
+
+            if (_tuilesGame.Count() != 0)
+            {             
+                var rnd = new System.Random();
+                var randomedList = _tuilesGame.OrderBy(item => rnd.Next());
+                foreach (var value in randomedList)
+                {
+                    tuilesGame_resultat.Add(value);
+                }
             }
+            else{
+                if(_mode != Tools.Mode.Default)
+                {
+                    tuilesGame_resultat = Random_sort_tuiles(_nb_tuiles);
+                }
+            }
+            
             
             _tuilesGame = tuilesGame_resultat;
             _s_tuilesGame.Release();
@@ -1202,11 +1297,27 @@ namespace system
 
                     break;
                 case Tools.Mode.Score:
-
-                    //TODO
+                    // Vérifie si un joueur a atteint le score maximal
+                    string[] allScores = GetAllPlayersScore();
+                    foreach(string score in allScores)
+                    {
+                        if(Int32.Parse(score) >= _score_max)
+                        {
+                            statutGame = Tools.GameStatus.Stopped;
+                            break;
+                        }
+                    }
 
                     break;
             }
+
+            _s_nombre_joueur.WaitOne();
+            if(_nombre_joueur <= 0)
+            {
+                statutGame = Tools.GameStatus.Stopped;
+
+            }
+            _s_nombre_joueur.Release();
 
             _statut_partie = statutGame;
 
@@ -1264,11 +1375,14 @@ namespace system
         ///     Methode : End the turn
         /// </summary>
         /// <returns> The socket of the next player to play </returns>
-        public Socket? EndTurn(ulong idPlayer)
+        public Socket? EndTurn(ulong idPlayer, bool timer)
         {
             _timer_player.Stop();
 
             bool aJoue = false;
+
+            if (timer)
+                _dico_joueur[idPlayer]._timer = 0;
             
             // Prise en compte du placement de la tuile et du pion (mise à jour structure de données)
             _s_plateau.WaitOne();
@@ -1324,6 +1438,25 @@ namespace system
                 }
 
                 _s_dico_joueur.Release();
+
+                List<Tuple<int, int, ulong>> positions = new List<Tuple<int, int, ulong>>();
+
+                Console.WriteLine("DBG - Avant d'entrer dans removeAllPawnInTile");
+
+                Dictionary<ulong, int> dico = _plateau.RemoveAllPawnInTile(_posTuileTourActu.X, _posTuileTourActu.Y, positions);
+                Console.WriteLine("DBG - dico de longueur : " + dico.Count);
+                foreach (ulong id_player in dico.Keys)
+                {
+                    Console.WriteLine("DBG - Parcours des joueurs de dico.Keys");
+                    _s_dico_joueur.WaitOne();
+                    Player joueur = _dico_joueur[id_player];
+                    _s_dico_joueur.Release();
+                 
+                    int meeplesRendus = dico[id_player];
+                    Console.WriteLine("DBG - Meeples à rendre : " + meeplesRendus);
+
+                    joueur.AddMeeple((uint)meeplesRendus);
+                }
 
             }
 

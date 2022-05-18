@@ -138,7 +138,8 @@ namespace system
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (thread_serv_ite.Is_Private() == false && thread_serv_ite.Get_Status() != Tools.GameStatus.Stopped)
+                    if (thread_serv_ite.Is_Private() == false && thread_serv_ite.Get_Status() != Tools.GameStatus.Stopped
+                        && thread_serv_ite.Get_Status() != Tools.GameStatus.Running)
                     {
                         room_list.Add(thread_serv_ite.Get_ID().ToString());
                         room_list.Add(thread_serv_ite.Get_Moderateur().ToString());
@@ -293,17 +294,24 @@ namespace system
 
         public Tools.Errors JoinPlayer(int idRoom, ulong idPlayer, Socket? playerSocket)
         {
+            List<string> dataPlayerName= new List<string>();
+            var db = new Database();
+
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
-                    var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);
+                    var playerStatus = thread_serv_ite.AddJoueur(idPlayer, playerSocket);                 
                     if (playerStatus == Tools.PlayerStatus.Full) // La room est pleine
                     {
                         return Tools.Errors.RoomJoin;
                     }
+                    string playerName = db.GetPseudo((int)idPlayer);
+                    thread_serv_ite.Get_Dico_Joueurs()[idPlayer].SetName(playerName);
+                    dataPlayerName.Add(playerName);
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerJoin, idPlayer, dataPlayerName.ToArray());
 
                     return Tools.Errors.None;
 
@@ -319,6 +327,8 @@ namespace system
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
                 Tools.PlayerStatus playerStatus = thread_com_iterateur.PlayerLeave(idPlayer, idRoom);
+                if(playerStatus == Tools.PlayerStatus.Success)
+                    thread_com_iterateur.SendBroadcast(idRoom, Tools.IdMessage.PlayerLeave, idPlayer);
                 return playerStatus;
             }
 
@@ -382,8 +392,6 @@ namespace system
         {
             List<string> listPlayerAndName = new List<string>();
 
-            var db = new Database();
-
             // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
             foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
             {
@@ -392,7 +400,7 @@ namespace system
                     if (idRoom != thread_serv_ite.Get_ID()) continue;
                     foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
                     {
-                        string playerName = db.GetPseudo((int)joueur.Key);
+                        string playerName = joueur.Value.GetName();
                         listPlayerAndName.Add(joueur.Key.ToString());
                         listPlayerAndName.Add(playerName);
                     }
@@ -402,6 +410,32 @@ namespace system
             }
 
             return listPlayerAndName.ToArray();
+        }
+        
+        public string[] CallPlayersStatus(int idRoom)
+        {
+            List<string> listPlayerAndNameAndStatus = new List<string>();
+
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
+                {
+                    if (idRoom != thread_serv_ite.Get_ID()) continue;
+                    foreach (var joueur in thread_serv_ite.Get_Dico_Joueurs())
+                    {
+                        string playerName = joueur.Value.GetName();
+                        string playerStatus = joueur.Value.GetReady().ToString();
+                        listPlayerAndNameAndStatus.Add(joueur.Key.ToString());
+                        listPlayerAndNameAndStatus.Add(playerName);
+                        listPlayerAndNameAndStatus.Add(playerStatus);
+                    }
+
+                    return listPlayerAndNameAndStatus.ToArray();
+                }
+            }
+
+            return listPlayerAndNameAndStatus.ToArray();
         }
 
         public List<ulong> CallPlayerCurrent(int idRoom)
@@ -424,6 +458,19 @@ namespace system
             }
             
             return currentPlayer;
+        }
+
+        public void CallPlayerKick(int idRoom, ulong idPlayer, string[] data)
+        {
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
+                {
+                    thread_com_iterateur.PlayerKick(idRoom, idPlayer, data);
+                }
+                break;
+           
+            }
         }
 
         public Tools.PlayerStatus LogoutPlayer(ulong idPlayer)
@@ -492,7 +539,7 @@ namespace system
             {
                 foreach (Thread_serveur_jeu threadJeu in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != threadJeu.Get_ID()) continue;
+                    if (idRoom != threadJeu.Get_ID() || threadJeu.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
                     return threadJeu.GetThreeLastTiles();
                 }                  
             }
@@ -636,6 +683,21 @@ namespace system
                     break;
                 }
 
+            }
+        }
+        
+        public void CallForceCloseRoom(int idRoom)
+        {
+            // Parcours des threads de communication pour trouver celui qui gère la partie cherchée
+            foreach (Thread_communication thread_com_iterateur in _instance._lst_obj_threads_com)
+            {
+                // Thread de com gérant la partie trouvé
+                if (thread_com_iterateur.Get_id_parties_gerees().Contains(idRoom))
+                {
+                    Console.WriteLine("CallForceCloseRoom : idRoom was found !");
+                    thread_com_iterateur.ForceCloseRoom(idRoom);
+                    break;
+                }
             }
         }
         
