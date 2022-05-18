@@ -64,10 +64,7 @@ public class HomeMenu : Miscellaneous
 	/// </summary>
 	public void ShowOptions()
 	{
-		if (Communication.Instance.IdClient >= 1)
 			ChangeMenu("HomeMenu", "OptionsMenu");
-		else
-			ChangeMenu("HomeMenu", "ConnectionMenu");
 	}
 
 	/// <summary>

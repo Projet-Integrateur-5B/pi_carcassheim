@@ -137,6 +137,8 @@ PlayerSettings:
   bundleVersion: 0.1
   preloadedAssets:
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -151,9 +153,10 @@ PlayerSettings:
   m_ColorGamuts: 00000000
   targetPixelDensity: 30
   resolutionScalingMode: 0
-  androidSupportedAspectRatio: 2
-  androidMaxAspectRatio: 16.9
+  androidSupportedAspectRatio: 0
+  androidMaxAspectRatio: 169
   applicationIdentifier:
+    Android: com.DefaultCompany.Carcassheim_unity
     Standalone: com.DefaultCompany.Carcassheimunity
   buildNumber:
     Standalone: 0
