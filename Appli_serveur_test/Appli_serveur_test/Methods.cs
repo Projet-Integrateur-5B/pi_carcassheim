@@ -783,8 +783,16 @@ public partial class Server
         
         try
         {
-            idTuile = ulong.Parse(packetReceived.Data[0]);
-            pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
+            if(packetReceived.Data.Length < 4)
+            {
+                idTuile = 0;
+                pos = new Position(-1,-1,-1);
+            }
+            else
+            {
+                idTuile = ulong.Parse(packetReceived.Data[0]);
+                pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
+            }       
         }
         catch (Exception ex)
         {
