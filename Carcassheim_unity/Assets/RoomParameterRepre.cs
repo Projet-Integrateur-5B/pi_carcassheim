@@ -130,6 +130,7 @@ public class RoomParameterRepre : MonoBehaviour
     public void OnRoomExtensionChangeRiviere(bool state)
     {
         RoomInfo.Instance.riverOn = state;
+        RoomInfo.Instance.nbTuile += 11;
     }
     public void OnRoomExtensionChangeAbbaye(bool state)
     {
