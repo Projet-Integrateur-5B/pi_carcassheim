@@ -438,7 +438,7 @@ namespace system
             return listPlayerAndNameAndStatus.ToArray();
         }
 
-        public List<ulong> CallPlayerCurrent(int idRoom)
+        public List<ulong> CallPlayerCurrent(int idRoom, ulong idPlayer)
         {
             var currentPlayer = new List<ulong>();
             currentPlayer.Add(0);
@@ -449,10 +449,20 @@ namespace system
             {
                 foreach (Thread_serveur_jeu thread_serv_ite in thread_com_iterateur.Get_list_server_thread())
                 {
-                    if (idRoom != thread_serv_ite.Get_ID()) continue;
+                    if (idRoom != thread_serv_ite.Get_ID() || thread_serv_ite.Get_Status() != Tools.GameStatus.Running ||
+                        thread_serv_ite.Get_Dico_Joueurs().ContainsKey(idPlayer) == false) continue;
                     currentPlayer[0] = thread_serv_ite.Get_ActualPlayerId();
                     if(currentPlayer[0] != 0)
-                        currentPlayer[1] = thread_serv_ite.Get_PlayerMeeples(currentPlayer[0]);
+                    {
+                        if (thread_serv_ite.IsRiverExtensionOn() && thread_serv_ite.Get_rivieresGame().Count > 0)
+                        {
+                            currentPlayer[1] = 0;
+                        }
+                        else
+                        {
+                            currentPlayer[1] = thread_serv_ite.Get_PlayerMeeples(currentPlayer[0]);
+                        }
+                    }                                              
                     return currentPlayer;
                 }
             }

@@ -654,13 +654,13 @@ public partial class Server
             return;
         }
 
-        Tools.Errors error = Tools.Errors.Unknown;
+        Tools.Errors error = Tools.Errors.Permission;
 
         // Récupération du singleton gestionnaire
         GestionnaireThreadCom gestionnaire = GestionnaireThreadCom.GetInstance();
 
         // Get the actual player
-        List<ulong> currentPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom);
+        List<ulong> currentPlayer = gestionnaire.CallPlayerCurrent(packetReceived.IdRoom, packetReceived.IdPlayer);
 
         if (currentPlayer[0] != 0 && currentPlayer.Count > 1)
         {
@@ -772,7 +772,7 @@ public partial class Server
             return;
         }
         
-        if (packetReceived.Data.Length < 4)
+        if (packetReceived.Data.Length < 4 && packetReceived.Error != Tools.Errors.Data)
         {
             packet.Error = Tools.Errors.BadData;
             return;
@@ -783,8 +783,16 @@ public partial class Server
         
         try
         {
-            idTuile = ulong.Parse(packetReceived.Data[0]);
-            pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
+            if(packetReceived.Data.Length < 4)
+            {
+                idTuile = 0;
+                pos = new Position(-1,-1,-1);
+            }
+            else
+            {
+                idTuile = ulong.Parse(packetReceived.Data[0]);
+                pos = new Position(int.Parse(packetReceived.Data[1]), int.Parse(packetReceived.Data[2]), int.Parse(packetReceived.Data[3]));
+            }       
         }
         catch (Exception ex)
         {

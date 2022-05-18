@@ -206,6 +206,11 @@ namespace system
         private Semaphore _s_tuilesGame;
 
         /// <summary>
+        ///     Semaphore des tuiles de rivière de la game
+        /// </summary>
+        private Semaphore _s_rivieresGame;
+
+        /// <summary>
         ///     Anti-chreat : Semaphore on _s_tuilesEnvoyees to protect acess.
         /// </summary>
         private Semaphore _s_tuilesEnvoyees;
@@ -445,6 +450,12 @@ namespace system
             return this._idTuileInit;
         }
 
+        public List<ulong> Get_rivieresGame()
+        {
+            List<ulong> listReturn = _rivieresGame;
+            return listReturn;
+        }
+
         // <summary>
         ///     Getter : Get number of players.
         /// </summary>
@@ -678,6 +689,7 @@ namespace system
             _tuilesGame = new List<ulong>();
             _s_tuilesGame = new Semaphore(1, 1);
             _s_tuilesEnvoyees = new Semaphore(1, 1);
+            _s_rivieresGame = new Semaphore(1, 1);
 
             _s_plateau = new Semaphore(1, 1);
             _s_posPionTourActu = new Semaphore(1, 1);
@@ -1109,8 +1121,19 @@ namespace system
         /// <returns> A array of 3 tiles' id </returns>
         public string[] GetThreeLastTiles()
         {
-            // Génère les 3 tuiles à envoyer
-            List<string> tuilesTirees = tirageTroisTuiles(_tuilesGame);
+            List<string> tuilesTirees;
+
+            if (IsRiverExtensionOn() && _rivieresGame.Count() != 0)
+            {
+                // Génère les 3 tuiles à envoyer
+                tuilesTirees = tirageTroisTuiles(_rivieresGame);
+            }
+            else
+            {
+                // Génère les 3 tuiles à envoyer
+                tuilesTirees = tirageTroisTuiles(_tuilesGame);
+            }
+           
 
             // Met à jour le stockage des 3 tuiles envoyées
             _s_tuilesEnvoyees.WaitOne();
@@ -1330,19 +1353,39 @@ namespace system
         /// </summary>
         public void RetirerTuileGame(ulong idTuile)
         {
-            _s_tuilesGame.WaitOne();
+            
             int indexOfTile = -1;
-            for(int i = 0; i<_tuilesGame.Count; i++)
+            if(IsRiverExtensionOn() && _rivieresGame.Count() > 0) // Cas de l'extension rivière et toutes les tuiles n'ont pas été tirées
             {
-                if(_tuilesGame[i] == idTuile)
+                _s_rivieresGame.WaitOne();
+                for (int i = 0; i < _rivieresGame.Count; i++)
                 {
-                    indexOfTile = i;
+                    if (_rivieresGame[i] == idTuile)
+                    {
+                        indexOfTile = i;
+                    }
                 }
+                Console.WriteLine("* RetirerTuileGame _rivieresGame.Count = " + _rivieresGame.Count);
+                Console.WriteLine("* RetirerTuileGame tuile d'index : " + indexOfTile + " de _rivieresGame");
+                _rivieresGame.RemoveAt(indexOfTile);
+                _s_rivieresGame.Release();
             }
-            Console.WriteLine("* RetirerTuileGame _tuilesGame.Count = " + _tuilesGame.Count);
-            Console.WriteLine("* RetirerTuileGame tuile d'index : " + indexOfTile + " de _tuilesGame");
-            _tuilesGame.RemoveAt(indexOfTile);
-            _s_tuilesGame.Release();
+            else
+            {
+                _s_tuilesGame.WaitOne();
+                for (int i = 0; i < _tuilesGame.Count; i++)
+                {
+                    if (_tuilesGame[i] == idTuile)
+                    {
+                        indexOfTile = i;
+                    }
+                }
+                Console.WriteLine("* RetirerTuileGame _tuilesGame.Count = " + _tuilesGame.Count);
+                Console.WriteLine("* RetirerTuileGame tuile d'index : " + indexOfTile + " de _tuilesGame");
+                _tuilesGame.RemoveAt(indexOfTile);
+                _s_tuilesGame.Release();
+            }
+           
         }
 
 
@@ -1523,13 +1566,13 @@ namespace system
             if(tuiles.Count > 2)
             {
                 for (int i = tuiles.Count - 3; i < tuiles.Count; i++)
-                    list.Add(tuiles[i].ToString());
+                    list.Insert(0, tuiles[i].ToString());
             }
             else
             {
                 foreach(ulong tileId in tuiles)
                 {
-                    list.Add(tileId.ToString());
+                    list.Insert(0, tileId.ToString());
                 }
             }
             
@@ -1597,19 +1640,35 @@ namespace system
             var db = new Database();
             db.RemplirRivieres(rivieresRaw);
 
-            rivieres.Add(rivieresRaw.First());
-            rivieresRaw.RemoveAt(0);
-            var tail = rivieresRaw.Last();
+            Console.WriteLine("/!\\ DBG - Random_sort_rivi : head is " + rivieresRaw[0]);
+            rivieresRaw.RemoveAt(0); // Retrait de la première tuile (init, posée auto)
+            var tail = rivieresRaw.Last(); // Mise à part de la dernière (aval)
+            Console.WriteLine("/!\\ DBG - Random_sort_rivi : tail is " + tail.ToString());
             rivieresRaw.RemoveAt(rivieresRaw.Count-1);
 
-            while(rivieresRaw.Count > 0)
+            // DEBUG
+            Console.WriteLine("/!\\ DBG - rivieresRaw = [");
+            foreach(ulong idTuile in rivieresRaw){
+                Console.Write("" + idTuile.ToString() + ", ");
+            }
+            Console.Write("]");
+
+            while (rivieresRaw.Count > 0)
             {
                 var index = random.Next(0, rivieresRaw.Count);
                 rivieres.Add(rivieresRaw[index]);
                 rivieresRaw.RemoveAt(index);
             }
-            
-            rivieres.Add(tail);
+
+            rivieres.Insert(0, tail);
+
+            // DEBUG
+            Console.WriteLine("/!\\ DBG - rivieres = [");
+            foreach (ulong idTuile in rivieres)
+            {
+                Console.Write("" + idTuile.ToString() + ", ");
+            }
+            Console.Write("]");
 
             //Retourner la liste 
             return rivieres;
